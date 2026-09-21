@@ -12,6 +12,8 @@ One Harness to sync them all,
 and in your codebase bind them.
 ```
 
+[![npm version](https://img.shields.io/npm/v/sauron-ai.svg?color=cb3837&logo=npm)](https://www.npmjs.com/package/sauron-ai)
+[![npm downloads](https://img.shields.io/npm/dm/sauron-ai.svg)](https://www.npmjs.com/package/sauron-ai)
 [![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](./licenses/LICENSE-MIT)
 [![License: Apache 2.0](https://img.shields.io/badge/License-Apache%202.0-blue.svg)](./licenses/LICENSE-APACHE-2.0)
 [![Status: Open Source](https://img.shields.io/badge/Status-100%25%20Free%20%26%20Open%20Source-green.svg)](./licenses/)
@@ -22,31 +24,38 @@ Sauron AI is an open-source universal AI agent harness. It prevents unverified c
 
 ## Quickstart
 
-You can use Sauron in two ways: **Modular Mode** (add individual skills to an existing codebase without token bloat) or **Full Harness Mode** (transpile rules across all 17 AI runtimes).
+You can use Sauron in two ways: **Modular Mode** (zero-install: add individual skills to any codebase without token bloat) or **Full Harness Mode** (transpile and synchronize rules across all 17 AI runtimes).
 
-### 1. Modular Skills
+### 1. Modular Skills (Zero-Install via NPX)
 
-Add specific skills directly into your local project workspace:
+Add specific skills directly into your local project workspace without installing dependencies:
 
 ```bash
 # Add an individual skill (e.g. plan-feature, clean-architecture, security-auditor)
-npx sauron add plan-feature
-npx sauron add clean-architecture
+npx sauron-ai add plan-feature
+npx sauron-ai add clean-architecture
 
 # Add to specific directory (default: .agents/skills)
-npx sauron add tdd-workflow --to .claude/skills
+npx sauron-ai add tdd-workflow --to .claude/skills
+npx sauron-ai add tailwind-principles --to .cursor/rules
 
 # Browse all available skills across 9 domains
-npx sauron list-skills
+npx sauron-ai list-skills
 ```
+
+> **Prefer Global CLI?** Install once with `npm install -g sauron-ai` and run `sauron add <skill>` anywhere.
 
 ### 2. Full Harness Synchronization (All 17 Runtimes & Fellowship)
 
-Synchronize the master specification and generate instruction files (`CLAUDE.md`, `.cursorrules`, `.windsurfrules`, `.clinerules`, etc.) across your entire repo:
+Synchronize the master specification and generate native instruction files (`CLAUDE.md`, `.cursorrules`, `.windsurfrules`, `.clinerules`, etc.) across your entire repo:
 
 ```bash
-# Using NPX (Recommended for Node & Web Developers)
-npx sauron init
+# Using NPX (Zero-install, recommended for web developers)
+npx sauron-ai init
+
+# Or install globally
+npm install -g sauron-ai
+sauron init
 
 # Using Python PIP
 pip install sauron-ai && sauron init
@@ -93,11 +102,11 @@ Sauron executes locally and provides full source transparency:
 - Non-destructive backups. The tool creates a `.bak` copy before modifying any existing configuration file.
 - Inspect before applying. Run dry-run mode to inspect diffs:
   ```bash
-  npx sauron init --dry-run
+  npx sauron-ai init --dry-run
   ```
 - Run in a container sandbox:
   ```bash
-  docker run --rm -it -v $(pwd):/workspace node:20-alpine npx sauron init
+  docker run --rm -it -v $(pwd):/workspace node:20-alpine npx sauron-ai init
   ```
 
 ---

@@ -96,11 +96,11 @@ Migration takes less than 60 seconds:
 1. Navigate to your repository root.
 2. Run:
    ```bash
-   npx sauron init
+   npx sauron-ai init
    ```
 3. Sauron will inspect your existing setup, back up existing rules into `.sauron/backups/`, and create `sauron.config.yaml`.
 4. Add any modular skills you need:
    ```bash
-   npx sauron add nextjs-principles
-   npx sauron add clean-architecture
+   npx sauron-ai add nextjs-principles
+   npx sauron-ai add clean-architecture
    ```
