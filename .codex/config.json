@@ -1,0 +1,9 @@
+{
+  "version": "1.0.0",
+  "project": "sauron",
+  "governance": {
+    "testFirst": true,
+    "strictTypes": true,
+    "noEmojis": true
+  }
+}

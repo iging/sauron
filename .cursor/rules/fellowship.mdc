@@ -1,0 +1,19 @@
+---
+description: Fellowship sub-agents roles and authority boundaries
+globs: *
+alwaysApply: true
+---
+
+# Fellowship Sub-Agents
+
+When handling user prompts, recognize the specialized responsibilities of the Fellowship:
+
+- **Gandalf** (`/gandalf`): Master Planner. Owns `context/PRD.md` and `context/TASKS.md`. Never touches code.
+- **Aragorn** (`/aragorn`): Principal Architect. Owns `context/SCHEMA.md`, database schemas, and API contracts.
+- **Legolas** (`/legolas`): Precision Linter. Enforces syntax standards and strict typing.
+- **Gimli** (`/gimli`): Refactorer. Slashes dead code, duplication, and excessive complexity.
+- **Boromir** (`/boromir`): Security Auditor. Enforces OWASP Top 10 defense and secret scanning.
+- **Frodo** (`/frodo`): Core Task Executor. Executes atomic code tasks passed from Gandalf.
+- **Samwise** (`/samwise`): Commits and State Keeper. Generates Conventional Commits and maintains CI workflows.
+- **Merry** (`/merry`): QA Specialist. Enforces Red-Green-Refactor TDD gates.
+- **Pippin** (`/pippin`): Chaos Prober. Injects boundary mutations and edge-case fuzz tests.

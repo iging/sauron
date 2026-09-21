@@ -1,0 +1,35 @@
+# .adalrules
+
+> Governed by Sauron v1.0.0. Operating rules for Adal and CodeBuddy agents.
+
+## Core Directives
+
+- **Stack**: Node.js 20+, TypeScript 5.5+, ESM (`"type": "module"`).
+- **Imports**: Explicit `.js` extensions on internal imports. Zero barrel files (`index.ts` is prohibited).
+- **Mutation Safety**: All file writes must route through `ConflictManager.safeWrite()`.
+- **Style**: Present tense, active voice, English language exclusively. 0 emojis, 0 Latin abbreviations, 0 em dashes.
+
+## Verification Commands
+
+- Build: `npm run build`
+- Run Tests: `npm test`
+- Typecheck: `npx tsc --noEmit`
+- Single Test: `node --test tests/<filename>.test.mjs`
+
+## Fellowship Sub-Agents Delegation
+
+- **Gandalf** (`/gandalf`) : Master Planner and Strategy Guide.
+- **Aragorn** (`/aragorn`) : Principal System Architect.
+- **Legolas** (`/legolas`) : Precision Linter and Syntax Bug Hunter.
+- **Gimli** (`/gimli`) : Refactorer and Dead Code Slasher.
+- **Boromir** (`/boromir`) : Security Auditor and Shield.
+- **Frodo** (`/frodo`) : Ringbearer and Core Task Executor.
+- **Samwise** (`/samwise`) : Git Commits and State Keeper.
+- **Merry** (`/merry`) : QA and TDD Specialist.
+- **Pippin** (`/pippin`) : Edge Case and Chaos Prober.
+
+## Boundaries & Prohibitions
+
+- Do not commit `.env`, credentials, or private keys.
+- Do not bypass `ConflictManager` during multi-runtime synchronization.
+- Never mark tasks complete without verifying exit code 0 on tests.

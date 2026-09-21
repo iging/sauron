@@ -1,0 +1,45 @@
+# syntax=docker/dockerfile:1.6
+# ===================================================================
+# Sauron CLI Hardened Multi-Stage Container
+# Strictly adheres to skills/devops/docker-principles/SKILL.md
+# ===================================================================
+
+# STAGE 1: Dependency Installation & Compilation
+FROM node:22-alpine AS builder
+
+WORKDIR /app
+COPY package.json tsconfig.json ./
+RUN npm ci || npm install --ignore-scripts
+
+COPY . .
+RUN npx tsc --project tsconfig.json
+
+# STAGE 2: Hardened Minimal Non-Root Runtime
+FROM node:22-alpine AS runner
+
+LABEL maintainer="sauron contributors"
+LABEL description="Sauron 17-Runtime AI Agent Harness & Transpiler"
+
+# Install minimal runtime dependencies with cache purged
+RUN apk add --no-cache bash git python3 && \
+    rm -rf /var/cache/apk/*
+
+# Security: Mandatory non-root user execution (UID/GID 10001) per docker-principles
+RUN addgroup -g 10001 -S sauron && \
+    adduser -u 10001 -S sauron -G sauron -s /bin/sh -D
+
+WORKDIR /workspace
+
+# Copy built application and runtime artifacts with non-root ownership
+COPY --from=builder --chown=sauron:sauron /app /opt/sauron
+
+# Symlink sauron executable to system PATH
+RUN ln -s /opt/sauron/bin/sauron.mjs /usr/local/bin/sauron && \
+    chmod +x /opt/sauron/bin/sauron.mjs && \
+    chown -R sauron:sauron /workspace
+
+# Security: Drop root privileges permanently
+USER sauron:sauron
+
+ENTRYPOINT ["sauron"]
+CMD ["status"]

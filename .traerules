@@ -1,0 +1,43 @@
+# .traerules
+
+> Configured by Sauron v1.0.0. Project rules for ByteDance Trae AI IDE.
+
+## Project Overview
+
+Sauron is a universal AI agent harness managing 17 AI coding runtimes.
+
+- Tech Stack: Node.js 20+, TypeScript 5.5+, ESM.
+- Test Runner: Native Node.js test runner.
+
+## Verification Commands
+
+- Build: `npm run build`
+- Run Tests: `npm test`
+- Typecheck: `npx tsc --noEmit`
+- Single Test: `node --test tests/<filename>.test.mjs`
+
+## Engineering Rules
+
+- TypeScript 5.5+ in strict mode using ECMAScript Modules (`"type": "module"`).
+- Always specify `.js` extensions for relative TypeScript module imports.
+- Zero barrel files (`index.ts` prohibited).
+- Route all file modifications through `ConflictManager` to prevent unbacked overwrites.
+- Writing style: Present tense, active voice, English language exclusively. 0 emojis, 0 Latin abbreviations, 0 em dashes.
+
+## Fellowship Sub-Agents
+
+- **Gandalf** (`/gandalf`) : Master Planner and Strategy Guide.
+- **Aragorn** (`/aragorn`) : Principal System Architect.
+- **Legolas** (`/legolas`) : Precision Linter and Syntax Bug Hunter.
+- **Gimli** (`/gimli`) : Refactorer and Dead Code Slasher.
+- **Boromir** (`/boromir`) : Security Auditor and Shield.
+- **Frodo** (`/frodo`) : Ringbearer and Core Task Executor.
+- **Samwise** (`/samwise`) : Git Commits and State Keeper.
+- **Merry** (`/merry`) : QA and TDD Specialist.
+- **Pippin** (`/pippin`) : Edge Case and Chaos Prober.
+
+## Safety Boundaries
+
+- Never commit secrets, authentication tokens, or `.env` files.
+- Never write to disk without backup or manifest tracking via `ConflictManager`.
+- Ensure all tests pass with exit code 0 before task completion.

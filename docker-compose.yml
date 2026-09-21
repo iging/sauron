@@ -1,0 +1,22 @@
+services:
+  sauron:
+    build:
+      context: .
+      dockerfile: docker/Dockerfile.cli
+    volumes:
+      - .:/workspace
+    working_dir: /workspace
+    environment:
+      - NODE_ENV=production
+
+  sauron-landing:
+    build:
+      context: .
+      dockerfile: docker/Dockerfile.landing
+    ports:
+      - "3000:3000"
+    volumes:
+      - ./projects/sauron-landing:/app
+    environment:
+      - NODE_ENV=production
+      - PORT=3000

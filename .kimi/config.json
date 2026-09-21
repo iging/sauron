@@ -1,0 +1,10 @@
+{
+  "version": "1.0.0",
+  "project": "sauron",
+  "model": "kimi-k1.5",
+  "governance": {
+    "tddRequired": true,
+    "noEmojis": true,
+    "strictTypes": true
+  }
+}

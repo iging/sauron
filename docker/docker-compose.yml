@@ -1,0 +1,29 @@
+services:
+  # Sauron Universal CLI Service
+  # Usage: docker compose run --rm sauron <command>
+  # Example: docker compose run --rm sauron status
+  # Example: docker compose run --rm sauron add api-design
+  sauron:
+    build:
+      context: ..
+      dockerfile: docker/Dockerfile.cli
+    volumes:
+      - ..:/workspace
+    working_dir: /workspace
+    environment:
+      - NODE_ENV=production
+
+  # Sauron Landing Page Web Service
+  # Usage: docker compose up sauron-landing
+  # Access: http://localhost:3000
+  sauron-landing:
+    build:
+      context: ..
+      dockerfile: docker/Dockerfile.landing
+    ports:
+      - "3000:3000"
+    volumes:
+      - ../projects/sauron-landing:/app
+    environment:
+      - NODE_ENV=production
+      - PORT=3000

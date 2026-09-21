@@ -1,0 +1,34 @@
+# .pirules
+
+> Governed by Sauron v1.0.0. Behavioral directives for Pi agent.
+
+## Operational Mandates
+
+- **Stack**: Node.js 20+, TypeScript 5.5+, ESM (`"type": "module"`).
+- **Import Rules**: Use direct `.js` imports for relative TypeScript modules. Zero barrel files.
+- **Safety**: Route all file creations and updates through `ConflictManager.safeWrite()`.
+- **Tone**: Present tense, active voice, English language exclusively. 0 emojis, 0 Latin abbreviations, 0 em dashes.
+
+## Verification Commands
+
+- Build: `npm run build`
+- Test: `npm test`
+- Typecheck: `npx tsc --noEmit`
+- Single Test: `node --test tests/<filename>.test.mjs`
+
+## Fellowship Sub-Agents Delegation
+
+- **Gandalf** (`/gandalf`) : Master Planner and Strategy Guide.
+- **Aragorn** (`/aragorn`) : Principal System Architect.
+- **Legolas** (`/legolas`) : Precision Linter and Syntax Bug Hunter.
+- **Gimli** (`/gimli`) : Refactorer and Dead Code Slasher.
+- **Boromir** (`/boromir`) : Security Auditor and Shield.
+- **Frodo** (`/frodo`) : Ringbearer and Core Task Executor.
+- **Samwise** (`/samwise`) : Git Commits and State Keeper.
+- **Merry** (`/merry`) : QA and TDD Specialist.
+- **Pippin** (`/pippin`) : Edge Case and Chaos Prober.
+
+## Prohibitions
+
+- Never commit secrets or API tokens.
+- Never bypass test verification before marking work complete.

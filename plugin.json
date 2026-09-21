@@ -1,0 +1,13 @@
+{
+  "name": "sauron-ai",
+  "version": "1.0.0",
+  "description": "Universal AI agent orchestrator and harness for 17 AI coding runtimes with safety guard and fellowship sub-agents.",
+  "author": "sauron contributors",
+  "homepage": "https://github.com/iging/sauron",
+  "repository": "https://github.com/iging/sauron",
+  "license": ["MIT", "Apache-2.0", "unlicense"],
+  "skills": ["./skills"],
+  "hooks": {
+    "preCommand": "./.claude/hooks/guard.sh"
+  }
+}

@@ -1,0 +1,37 @@
+[build-system]
+requires = ["setuptools>=61.0", "wheel"]
+build-backend = "setuptools.build_meta"
+
+[project]
+name = "sauron-ai"
+version = "1.0.0"
+description = "Universal AI agent orchestrator and harness for 17 AI coding runtimes."
+readme = "README.md"
+requires-python = ">=3.10"
+license = { text = "MIT" }
+authors = [
+  { name = "sauron contributors" }
+]
+keywords = [
+  "ai",
+  "agents",
+  "claude-code",
+  "cursor",
+  "windsurf",
+  "cline",
+  "copilot",
+  "harness",
+  "skills",
+  "sauron"
+]
+dependencies = [
+  "pyyaml>=6.0"
+]
+
+[project.scripts]
+sauron = "sauron:main"
+
+[project.urls]
+Homepage = "https://github.com/agent-spec/sauron"
+Repository = "https://github.com/agent-spec/sauron.git"
+Issues = "https://github.com/agent-spec/sauron/issues"

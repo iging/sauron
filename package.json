@@ -1,0 +1,57 @@
+{
+  "name": "sauron-ai",
+  "version": "1.0.0",
+  "description": "Universal AI agent orchestrator and harness for 17 AI coding runtimes.",
+  "type": "module",
+  "main": "./dist/adapters/transpiler.js",
+  "bin": {
+    "sauron": "./bin/sauron.mjs"
+  },
+  "files": [
+    "bin",
+    "dist",
+    "config",
+    "core",
+    "rules",
+    "skills",
+    "references",
+    "docs"
+  ],
+  "scripts": {
+    "build": "tsc",
+    "start": "node ./bin/sauron.mjs",
+    "test": "node --test tests/**/*.test.mjs",
+    "check-docs": "node ./scripts/hooks/check-docs.mjs",
+    "security-scan": "node ./scripts/security/security-scan.mjs",
+    "ingest-skills": "node ./scripts/skills/ingest-skills.mjs",
+    "prepare": "husky"
+  },
+  "keywords": [
+    "ai",
+    "agents",
+    "claude-code",
+    "cursor",
+    "windsurf",
+    "cline",
+    "copilot",
+    "harness",
+    "skills",
+    "fellowship",
+    "sauron"
+  ],
+  "author": "sauron contributors",
+  "license": "MIT",
+  "engines": {
+    "node": ">=18.0.0"
+  },
+  "dependencies": {
+    "chalk": "^5.3.0",
+    "commander": "^12.1.0",
+    "yaml": "^2.4.5"
+  },
+  "devDependencies": {
+    "@types/node": "^20.19.43",
+    "husky": "^9.1.7",
+    "typescript": "^7.0.2"
+  }
+}

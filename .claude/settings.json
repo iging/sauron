@@ -1,0 +1,18 @@
+{
+  "hooks": {
+    "preCommand": ".claude/hooks/guard.sh"
+  },
+  "permissions": {
+    "allow": [
+      "Bash(npm test*)",
+      "Bash(npx tsc*)",
+      "Bash(git status*)",
+      "Bash(git diff*)"
+    ],
+    "deny": [
+      "Bash(*--force*)",
+      "Bash(*reset --hard*)",
+      "Bash(*rm -rf /*)"
+    ]
+  }
+}

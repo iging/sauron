@@ -1,0 +1,118 @@
+{
+  "$schema": "http://json-schema.org/draft-07/schema#",
+  "title": "SauronConfig",
+  "description": "Configuration schema for Sauron Universal AI Agent Harness",
+  "type": "object",
+  "required": ["version", "project", "runtimes"],
+  "properties": {
+    "version": {
+      "type": "string",
+      "description": "Sauron configuration schema version"
+    },
+    "project": {
+      "type": "object",
+      "description": "Target project metadata",
+      "required": ["name"],
+      "properties": {
+        "name": {
+          "type": "string",
+          "description": "Name of the target workspace or project"
+        },
+        "description": {
+          "type": "string",
+          "description": "Brief description of the workspace domain"
+        },
+        "language": {
+          "type": "string",
+          "description": "Primary programming language",
+          "enum": ["typescript", "javascript", "python", "rust", "go", "multi"]
+        },
+        "framework": {
+          "type": "string",
+          "description": "Primary application framework (e.g., nextjs, express, fastapi)"
+        }
+      },
+      "additionalProperties": false
+    },
+    "runtimes": {
+      "type": "object",
+      "description": "Toggle active status for the 17 AI coding runtimes",
+      "properties": {
+        "claude": { "type": "boolean" },
+        "cursor": { "type": "boolean" },
+        "windsurf": { "type": "boolean" },
+        "copilot": { "type": "boolean" },
+        "cline": { "type": "boolean" },
+        "trae": { "type": "boolean" },
+        "zed": { "type": "boolean" },
+        "codex": { "type": "boolean" },
+        "gemini": { "type": "boolean" },
+        "hermes": { "type": "boolean" },
+        "kimi": { "type": "boolean" },
+        "kiro": { "type": "boolean" },
+        "openclaude": { "type": "boolean" },
+        "opencode": { "type": "boolean" },
+        "pi": { "type": "boolean" },
+        "qwen": { "type": "boolean" },
+        "adal": { "type": "boolean" },
+        "codebuddy": { "type": "boolean" }
+      },
+      "additionalProperties": false
+    },
+    "fellowship": {
+      "type": "object",
+      "description": "Fellowship of 9 sub-agents configuration",
+      "additionalProperties": {
+        "type": "object",
+        "properties": {
+          "enabled": { "type": "boolean" },
+          "role": { "type": "string" },
+          "alias": {
+            "type": "array",
+            "items": { "type": "string" }
+          }
+        },
+        "required": ["enabled", "role"],
+        "additionalProperties": false
+      }
+    },
+    "departments": {
+      "type": "object",
+      "description": "Toggle active skill domains",
+      "properties": {
+        "architecture": { "type": "boolean" },
+        "backend": { "type": "boolean" },
+        "devops": { "type": "boolean" },
+        "frontend": { "type": "boolean" },
+        "quality": { "type": "boolean" },
+        "security": { "type": "boolean" },
+        "workflow": { "type": "boolean" }
+      },
+      "additionalProperties": false
+    },
+    "settings": {
+      "type": "object",
+      "description": "Safety, sandboxing, and execution constraints",
+      "properties": {
+        "backup_existing": {
+          "type": "boolean",
+          "description": "Create timestamped backups before updating existing files"
+        },
+        "dry_run": {
+          "type": "boolean",
+          "description": "Simulate actions without modifying disk"
+        },
+        "anti_vibe_coding_strict_mode": {
+          "type": "boolean",
+          "description": "Enforce strict typing and test-driven validation"
+        },
+        "circuit_breaker_max_steps": {
+          "type": "integer",
+          "description": "Maximum autonomous tool calls before requiring user review"
+        }
+      },
+      "additionalProperties": false
+    }
+  },
+  "additionalProperties": false
+}

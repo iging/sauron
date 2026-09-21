@@ -1,0 +1,6 @@
+{
+  "name": "sauron",
+  "version": "1.0.0",
+  "description": "One Harness to rule them all: 17 AI runtimes, Fellowship sub-agents, and safety guard.",
+  "entrypoint": "./bin/sauron.mjs"
+}

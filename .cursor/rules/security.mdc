@@ -1,0 +1,12 @@
+---
+description: Sauron mandatory security rules and secret protection
+globs: *
+alwaysApply: true
+---
+
+# Sauron Security Directives
+
+- Zero hardcoded credentials, API keys, passwords, or tokens in source files or configuration.
+- Prohibit dynamic string evaluation (`eval`, `exec`, `Invoke-Expression`).
+- Parameterize all database queries. Raw string concatenation in SQL or ORMs is strictly prohibited.
+- Enforce runtime validation schemas (Zod or Pydantic) on all boundary data ingestion points.

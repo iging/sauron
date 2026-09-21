@@ -1,0 +1,44 @@
+# .clinerules
+
+> Governed by Sauron v1.0.0. Autonomous execution protocol for Cline.
+
+## Autonomous Operating Protocol
+
+1. Analyze task requirements and identify target files before editing.
+2. Formulate an execution plan following the Fellowship agent delegation model.
+3. Validate all changes using the verification commands before completing the task.
+4. If tests fail, diagnose and fix the root cause without using fake fixes or suppressed errors.
+
+## Verification Commands
+
+- **Build**: `npm run build`
+- **Run Tests**: `npm test`
+- **Typecheck**: `npx tsc --noEmit`
+- **Single Test**: `node --test tests/<filename>.test.mjs`
+
+## Code & Architecture Conventions
+
+- **Module Format**: ECMAScript Modules (`"type": "module"`).
+- **Import Paths**: Explicit `.js` extensions for relative TypeScript imports.
+- **Zero Barrel Files**: Do not create or use `index.ts` files.
+- **Write Safety**: Always mutate files through `ConflictManager` to avoid unbacked destructive overwrites.
+- **Tone & Style**: Present tense, active voice, English language exclusively. 0 emojis, 0 Latin abbreviations, 0 em dashes.
+
+## Fellowship Sub-Agents Delegation
+
+- **Gandalf** (`/gandalf`) : Master Planner and Strategy Guide.
+- **Aragorn** (`/aragorn`) : Principal System Architect.
+- **Legolas** (`/legolas`) : Precision Linter and Syntax Bug Hunter.
+- **Gimli** (`/gimli`) : Refactorer and Dead Code Slasher.
+- **Boromir** (`/boromir`) : Security Auditor and Shield.
+- **Frodo** (`/frodo`) : Ringbearer and Core Task Executor.
+- **Samwise** (`/samwise`) : Git Commits and State Keeper.
+- **Merry** (`/merry`) : QA and TDD Specialist.
+- **Pippin** (`/pippin`) : Edge Case and Chaos Prober.
+
+## Verification Gates & Safety Boundaries
+
+- **Gate 1**: `npx tsc --noEmit` must report zero diagnostic errors.
+- **Gate 2**: `npm test` must exit with code 0.
+- **Forbidden**: Never commit `.env` files, API keys, or private tokens.
+- **Forbidden**: Never modify `.sauron/backups/` directly.

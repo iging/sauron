@@ -1,0 +1,36 @@
+# .hermesrules
+
+> Governed by Sauron v1.0.0. Instructions for Hermes agent.
+
+## Execution Directives
+
+- **Stack**: Node.js 20+, TypeScript 5.5+, ESM (`"type": "module"`).
+- **Module Resolution**: Use explicit `.js` extensions for relative TypeScript imports.
+- **Barrel Files**: Zero barrel files (`index.ts` is prohibited).
+- **Write Safety**: Always write files through `ConflictManager.safeWrite()` to prevent unbacked overwrites.
+- **Tone**: Present tense, active voice, English language exclusively. 0 emojis, 0 Latin abbreviations, 0 em dashes.
+
+## Commands
+
+- Build: `npm run build`
+- Test: `npm test`
+- Typecheck: `npx tsc --noEmit`
+- Single Test: `node --test tests/<filename>.test.mjs`
+
+## Fellowship Sub-Agents
+
+- **Gandalf** (`/gandalf`) : Master Planner and Strategy Guide.
+- **Aragorn** (`/aragorn`) : Principal System Architect.
+- **Legolas** (`/legolas`) : Precision Linter and Syntax Bug Hunter.
+- **Gimli** (`/gimli`) : Refactorer and Dead Code Slasher.
+- **Boromir** (`/boromir`) : Security Auditor and Shield.
+- **Frodo** (`/frodo`) : Ringbearer and Core Task Executor.
+- **Samwise** (`/samwise`) : Git Commits and State Keeper.
+- **Merry** (`/merry`) : QA and TDD Specialist.
+- **Pippin** (`/pippin`) : Edge Case and Chaos Prober.
+
+## Boundaries
+
+- Zero unredacted credentials or `.env` files in git.
+- Zero untyped boundary parameters.
+- Always verify tests pass before completing tasks.

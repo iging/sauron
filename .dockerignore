@@ -1,0 +1,32 @@
+# Git version control
+.git
+.gitignore
+
+# Node dependencies and build artifacts
+node_modules
+npm-debug.log*
+yarn-debug.log*
+yarn-error.log*
+
+# Python caches and virtual environments
+__pycache__
+*.pyc
+*.pyo
+.venv
+dist
+build
+*.egg-info
+
+# Local environment secrets and credentials
+.env
+.env.*
+*.pem
+*.key
+*.bak
+.sauron/backups
+
+# OS and IDE caches
+.DS_Store
+Thumbs.db
+.idea
+.vscode/*.local

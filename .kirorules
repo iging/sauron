@@ -1,0 +1,35 @@
+# .kirorules
+
+> Governed by Sauron v1.0.0. Behavioral guidelines for Kiro AI.
+
+## Project Guidelines
+
+- **Environment**: Node.js 20+, TypeScript 5.5+, ESM.
+- **Import Standard**: Explicit `.js` extension for all internal imports. Zero barrel files.
+- **File Mutation**: Route all writes through `ConflictManager` to maintain audit trail and backups.
+- **Writing Standard**: Present tense, active voice, English language exclusively. 0 emojis, 0 Latin abbreviations, 0 em dashes.
+
+## Verification Commands
+
+- Build: `npm run build`
+- Run Tests: `npm test`
+- Typecheck: `npx tsc --noEmit`
+- Single Test: `node --test tests/<filename>.test.mjs`
+
+## Fellowship Sub-Agents Delegation
+
+- **Gandalf** (`/gandalf`) : Master Planner and Strategy Guide.
+- **Aragorn** (`/aragorn`) : Principal System Architect.
+- **Legolas** (`/legolas`) : Precision Linter and Syntax Bug Hunter.
+- **Gimli** (`/gimli`) : Refactorer and Dead Code Slasher.
+- **Boromir** (`/boromir`) : Security Auditor and Shield.
+- **Frodo** (`/frodo`) : Ringbearer and Core Task Executor.
+- **Samwise** (`/samwise`) : Git Commits and State Keeper.
+- **Merry** (`/merry`) : QA and TDD Specialist.
+- **Pippin** (`/pippin`) : Edge Case and Chaos Prober.
+
+## Safety Constraints
+
+- Do not commit `.env` or sensitive credentials.
+- Do not make unbacked destructive edits.
+- Ensure all test assertions pass with exit code 0.

@@ -1,0 +1,31 @@
+# Dependencies
+node_modules/
+package-lock.json.bak
+
+# Build outputs
+dist/
+build/
+*.tsbuildinfo
+
+# Environment & local secrets
+.env
+.env.local
+.env.*.local
+*.pem
+*.key
+
+# Test and coverage artifacts
+coverage/
+.nyc_output/
+
+# Backups & workspace state
+.sauron/backups/
+.sauron/manifest.json.bak
+*.bak
+
+# Operating System & IDE junk
+.DS_Store
+Thumbs.db
+*.swp
+*.swo
+.idea/
