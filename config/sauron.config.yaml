@@ -67,15 +67,28 @@ fellowship:
     role: "Edge Case and Chaos Prober"
     alias: ["fuzzer", "chaos"]
 
-# Active Skill Domains
+# Active Skill Domains (8 Functional Departments)
 departments:
   architecture: true
   backend: true
+  database: true
   devops: true
   frontend: true
   quality: true
   security: true
   workflow: true
+
+# Token Optimization Engine (Caveman Mode)
+caveman:
+  default_mode: "full" # full (~60% token savings) | lite (~40%) | ultra (~75%) | off
+  enforce_on_commits: true
+
+# Security & Command Firewall
+security:
+  agent_guard: true
+  block_destructive_commands: true # hard-blocks rm -rf, DROP DATABASE, git push --force
+  protect_credentials: true # hard-blocks .env, id_rsa, AWS/GCP credential reads
+  enforce_docker_sandbox: false # set true to require Docker container execution
 
 # Safety and Sandboxing Settings
 settings:

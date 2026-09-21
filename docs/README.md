@@ -56,3 +56,14 @@ Browse the documentation by topic:
 
 - [Conflict Manager](06-safety-and-governance/conflict-manager.md) : Zero unbacked destructive overwrites, SHA-256 validation, and timestamped backups.
 - [Anti-Pattern Guard](06-safety-and-governance/anti-pattern-guard.md) : Prevention of 53 credit-killing anti-patterns and deterministic validation gates.
+
+### [07. References & Authoritative Matrices](../references/)
+
+- [The 17-Runtime Matrix](../references/runtime-matrix.md) : Complete comparison table of file paths, formats, frontmatter support, and slash command mappings.
+- [Fellowship Authority Contracts](../references/fellowship-contracts.md) : Formal authority boundaries, file modification rules, and 5-phase handoff lifecycle.
+- [Anti-Patterns Reference](../references/anti-patterns.md) : Comprehensive guide to the 60 credit-killing patterns across AI engineering workflows.
+
+### [08. Frequently Asked Questions & Container Sandboxing](faq.md)
+
+- [Frequently Asked Questions (FAQ)](faq.md) : Common questions on backups, zero-telemetry, migration, and multi-IDE synchronization.
+- [Docker Architecture & Sandboxing](../docker/README.md) : Production-grade, non-root isolated container instructions.

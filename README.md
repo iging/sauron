@@ -178,7 +178,10 @@ We welcome contributions from the community to expand the Sauron harness, runtim
 
 - [CONTRIBUTING.md](./CONTRIBUTING.md): Comprehensive guide on local development, adding skills, and PR guidelines.
 - [CONTRIBUTORS.md](./CONTRIBUTORS.md): The official Sauron Fellowship & Contributors Roll.
-- [anti-patterns.md](./references/anti-patterns.md): The 50 credit-killing patterns reference used to audit all skills.
+- [runtime-matrix.md](./references/runtime-matrix.md): Complete technical comparison table across all 17 supported runtimes.
+- [fellowship-contracts.md](./references/fellowship-contracts.md): Explicit authority boundaries and handoff protocols for the 9 sub-agents.
+- [anti-patterns.md](./references/anti-patterns.md): The 60 credit-killing patterns reference used to audit all skills.
+- [faq.md](./docs/faq.md): Frequently asked questions, safety guarantees, and migration guide.
 - [writing-rules.md](./skills/workflow/writing-rules/SKILL.md): Style rules, truth protocol, and readability standards.
 
 ---

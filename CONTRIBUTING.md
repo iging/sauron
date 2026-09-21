@@ -29,7 +29,7 @@ Before contributing, please review our foundational tenets:
 
 1. **Fork and clone the repository:**
    ```bash
-   git clone https://github.com/<your-username>/sauron.git
+   git clone https://github.com/iging/sauron.git
    cd sauron
    ```
 2. **Install dependencies:**

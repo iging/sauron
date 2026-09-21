@@ -29,3 +29,7 @@ Thumbs.db
 *.swp
 *.swo
 .idea/
+
+# Ephemeral reports & analysis artifacts
+progress-report-result.md
+
