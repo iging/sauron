@@ -82,11 +82,51 @@
       "properties": {
         "architecture": { "type": "boolean" },
         "backend": { "type": "boolean" },
+        "database": { "type": "boolean" },
         "devops": { "type": "boolean" },
         "frontend": { "type": "boolean" },
         "quality": { "type": "boolean" },
         "security": { "type": "boolean" },
         "workflow": { "type": "boolean" }
+      },
+      "additionalProperties": false
+    },
+    "caveman": {
+      "type": "object",
+      "description": "Token optimization and conversational compression settings",
+      "properties": {
+        "default_mode": {
+          "type": "string",
+          "description": "Default Caveman compression level",
+          "enum": ["lite", "full", "ultra", "off"]
+        },
+        "enforce_on_commits": {
+          "type": "boolean",
+          "description": "Enforce strict terse formatting on git commit messages"
+        }
+      },
+      "additionalProperties": false
+    },
+    "security": {
+      "type": "object",
+      "description": "Agent Guard and filesystem safety constraints",
+      "properties": {
+        "agent_guard": {
+          "type": "boolean",
+          "description": "Activate Agent Guard command and execution interceptor"
+        },
+        "block_destructive_commands": {
+          "type": "boolean",
+          "description": "Hard-block commands like rm -rf, DROP DATABASE, and git push --force"
+        },
+        "protect_credentials": {
+          "type": "boolean",
+          "description": "Prevent reading or leaking .env, id_rsa, and cloud credentials"
+        },
+        "enforce_docker_sandbox": {
+          "type": "boolean",
+          "description": "Require running in non-root Docker container for untrusted workflows"
+        }
       },
       "additionalProperties": false
     },
