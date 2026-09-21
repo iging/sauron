@@ -1,6 +1,6 @@
 {
   "name": "sauron-ai",
-  "version": "1.0.0",
+  "version": "1.0.1",
   "description": "Universal AI agent orchestrator and harness for 17 AI coding runtimes.",
   "type": "module",
   "main": "./dist/adapters/transpiler.js",
@@ -24,7 +24,10 @@
     "check-docs": "node ./scripts/hooks/check-docs.mjs",
     "security-scan": "node ./scripts/security/security-scan.mjs",
     "ingest-skills": "node ./scripts/skills/ingest-skills.mjs",
-    "prepare": "husky"
+    "prepare": "husky",
+    "release:patch": "npm test && npm run check-docs && npm run build && npm version patch && npm publish && git push origin main --tags",
+    "release:minor": "npm test && npm run check-docs && npm run build && npm version minor && npm publish && git push origin main --tags",
+    "release:major": "npm test && npm run check-docs && npm run build && npm version major && npm publish && git push origin main --tags"
   },
   "keywords": [
     "ai",
