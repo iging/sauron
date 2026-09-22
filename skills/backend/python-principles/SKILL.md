@@ -2,6 +2,7 @@
 name: python-principles
 description: Framework-agnostic baseline standard for modern Python 3.10+ development, strict type hinting, virtual environment hygiene, async safety, and anti-malware defense.
 origin: sauron
+department: backend
 ---
 
 # Python Engineering Principles

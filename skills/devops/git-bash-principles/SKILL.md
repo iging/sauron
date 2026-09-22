@@ -2,6 +2,7 @@
 name: git-bash-principles
 description: Baseline standard for Git Bash (MSYS2 / MinGW) environment compatibility, Windows-to-POSIX path conversion, line ending discipline, and cross-platform scripting security.
 origin: sauron
+department: devops
 ---
 
 # Git Bash Engineering Principles

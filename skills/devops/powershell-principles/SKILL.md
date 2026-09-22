@@ -2,6 +2,7 @@
 name: powershell-principles
 description: Baseline standard for secure, production-grade PowerShell scripting, strict mode enforcement, parameter validation, and anti-malware execution defense.
 origin: sauron
+department: devops
 ---
 
 # PowerShell Engineering Principles

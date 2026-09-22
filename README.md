@@ -18,7 +18,22 @@ and in your codebase bind them.
 [![License: Apache 2.0](https://img.shields.io/badge/License-Apache%202.0-blue.svg)](./licenses/LICENSE-APACHE-2.0)
 [![Status: Open Source](https://img.shields.io/badge/Status-100%25%20Free%20%26%20Open%20Source-green.svg)](./licenses/)
 
-Sauron AI is an open-source universal AI agent harness. It prevents unverified coding practices across 17 AI coding runtimes using one master specification. It organizes a 9-agent Fellowship across your engineering workflow and synchronizes rules directly.
+---
+
+## Overview
+
+**Sauron AI** is an open-source, universal AI agent harness inspired by the legendary lore of _The Lord of the Rings_. Just as the One Ring was forged to bring unity and dominion over fragmented powers, Sauron AI was built to solve the two biggest crises in modern AI-assisted software development:
+
+1. **The Tool Fragmentation & Manual Setup Nightmare**:
+   Today, engineering teams and individual developers use multiple AI tools simultaneously—Claude Code, Cursor, Copilot, Windsurf, Cline, Gemini, Zed, and others. Configuring each tool requires manually writing, syncing, and constantly updating fragmented prompt files (`CLAUDE.md`, `.cursorrules`, `.windsurfrules`, `.github/copilot-instructions.md`, etc.). When rules or architectural constraints change, synchronizing them by hand across every developer's IDE is tedious, error-prone, and unsustainable.
+
+   **Sauron solves this with One Universal Harness**: You define your architectural rules, safety boundaries, and skill contracts once in a master specification, and Sauron automatically transpiles and synchronizes them deterministically across **17 AI coding runtimes**.
+
+2. **The "Vibe Coding" Crisis**:
+   **Vibe coding is a recipe for disaster.** Prompting AI assistants to generate features without architectural blueprints, data invariants, or test criteria produces immediate gratification followed by rapid failure—hallucinated libraries, silent security holes, state corruptions, and unmaintainable spaghetti code.
+
+   **Sauron transforms vibe coding into a disciplined Agentic Workflow**:
+   Instead of blind prompting, Sauron orchestrates a **Fellowship of 9 Specialized Sub-Agents** (Gandalf for planning, Aragorn for system architecture, Legolas for linting, Boromir for security, Frodo for atomic execution, Merry for TDD QA, and more). Every task routes through structured domain blueprints, token-efficient communication (`/caveman`), and rigorous test verification before a single line of code reaches your git history.
 
 ---
 
@@ -149,15 +164,17 @@ Sauron generates native configuration files for:
 | **Merry**   | QA Specialist         | Test-driven development gatekeeper and assertions                  | `/merry` or `@merry`     |
 | **Pippin**  | Chaos Prober          | Boundary fuzzing, payload tests, and edge case exploration         | `/pippin` or `@pippin`   |
 
+## Flagship Engineering Capabilities
+
+Sauron ships with 45 modular skills across 7 functional departments. Four flagship capability pillars anchor the developer and agent experience:
+
 ---
 
-## Token Optimization Engine (Caveman Mode)
+### 1. Token Optimization Engine (Caveman Mode)
 
-Long-running agent sessions suffer from context window bloat caused by polite conversational filler, repetitive summaries, and unnecessary pleasantries. This burns LLM API credits and degrades attention mechanisms over time.
+Long-running agent sessions suffer from context window bloat caused by conversational filler, repetitive apologies, and pleasantries. This burns LLM API credits and causes attention degradation over time.
 
-Sauron embeds **Caveman Mode** as its flagship token conservation suite to preserve technical precision while saving up to 70% of response tokens.
-
-### Available Commands
+Sauron embeds **Caveman Mode** as its flagship token conservation suite to preserve technical precision while saving up to 75% of response tokens.
 
 | Command                         | Action                                                                    | Token Savings |
 | :------------------------------ | :------------------------------------------------------------------------ | :------------ |
@@ -169,7 +186,102 @@ Sauron embeds **Caveman Mode** as its flagship token conservation suite to prese
 | `/caveman-compress`             | Compresses Markdown documentation without losing technical requirements   | ~50%          |
 | `/caveman off`                  | Restores standard conversational mode                                     | Baseline      |
 
-> **Directive:** Use `/caveman` across long engineering sessions to keep the context window focused on production code, test assertions, and system architecture.
+---
+
+### 2. Codebase Knowledge Graph (`sauron graph`)
+
+AI agents often burn thousands of tokens dumping raw source files just to understand project topology. Sauron includes a local, deterministic **Polyglot Knowledge Graph Engine** that maps codebase architecture into three standard artifacts:
+
+- `.sauron/graph/graph.json` — Structured AST nodes, dependencies, and cycle metrics for programmatic agent queries.
+- `.sauron/graph/graph-report.md` — Quantitative architectural health report detailing god modules and circular dependencies.
+- `.sauron/graph/graph.html` — Interactive in-browser force-directed visualizer built with a Linear-craft design preset.
+
+```bash
+# Using NPX (Zero-install in any project)
+npx sauron-ai graph .
+
+# If installed globally (npm install -g sauron-ai)
+sauron graph .
+
+# Or from local sauron clone
+node bin/sauron.mjs graph .
+
+# Open visualizer in browser
+start .sauron/graph/graph.html   # Windows
+open .sauron/graph/graph.html    # macOS
+```
+
+| Feature              | Specification                                                                         |
+| :------------------- | :------------------------------------------------------------------------------------ |
+| **Polyglot Support** | TypeScript, JavaScript, Python, Go, Rust, Java, Kotlin, PHP, Ruby, C/C++, C#          |
+| **Performance**      | Sub-second extraction for 100+ files via local static AST parsing                     |
+| **Visual Interface** | Physics simulation, live search, department clustering, and deep AST symbol inspector |
+
+---
+
+### 3. Design Engineering & Craftsmanship (`design-engineering`)
+
+Modern web applications require deliberate craft: cohesive color palettes, consistent spatial grids, fluid typography, and accessible keyboard navigation. Without explicit design constraints, automated code generation often defaults to unrefined templates—such as stark pitch-black surfaces, disconnected accent gradients, and missing interaction feedback.
+
+For developers and designers aiming for top-tier execution, Sauron provides an end-to-end **Design Engineering Suite** (`skills/frontend/design-engineering/`) that bridges the gap between design vision and production-grade Web standards. It combines `ui-ux-principles`, `html-css-principles`, `javascript-principles`, and `frontend-development` into a cohesive aesthetic and accessibility pipeline:
+
+#### The 6-Stage Design Engineering Pipeline:
+
+- **1. Foundations & Tokens (`01-foundations-and-systems`)**:
+  - **Overview**: Establishes Nielsen heuristics, accessible color tokens, and layout wireframes.
+  - **Why it matters**: Eliminates arbitrary styling values by enforcing a mathematically harmonious 4px baseline rhythm, fluid typography scales (`clamp()`), and semantic surface hierarchies.
+
+- **2. Aesthetic Engines & Anti-Slop Tuning (`02-aesthetic-engines-and-styles`)**:
+  - **Overview**: Replaces generic templates with signature agency-grade styles: _Ethereal Glass_ ($150k+ studio look), _Swiss Print Brutalism_, _Utilitarian Minimalist_, and _Apple Human Interface Spring Physics_.
+  - **Anti-Slop Tuning**: Regulates visual complexity via 3 dials: **Information Density**, **Visual Polish / Restraint**, and **Motion Budget**.
+
+- **3. Curated Brand Presets (`03-brand-presets-and-visual-identity`)**:
+  - **Overview**: Ships with 65+ production-tested brand identities.
+  - **Pre-configured styles**: Linear, Vercel, Stripe, Raycast, Warp, Apple HIG, Cursor, GitHub Dark Pro, and Tailwind UI. Agents adopt exact typography stacks, border radiuses, and border contrasts matching the chosen brand.
+
+- **4. Micro-Interactions & Spring Motion (`04-motion-and-interaction`)**:
+  - **Overview**: Replaces clumsy CSS linear transitions with GPU-accelerated hardware springs (`transform`, `opacity`).
+  - **Tactile feedback**: Implements tactile micro-scale clicks (`transform: scale(0.97)`), spring-driven drawer transitions, and strict `prefers-reduced-motion` fallbacks.
+
+- **5. Vision & Comp Translation (`05-vision-and-code-generation`)**:
+  - **Overview**: Ingests UI screenshots or Figma mockups and translates them directly into semantic, responsive HTML/Tailwind/React code with zero hallucinated placeholders.
+
+- **6. Code Quality & WCAG 2.2 Gatekeeper (`06-audit-refactor-and-enforcement`)**:
+  - **Overview**: Audits frontend code for accessibility and clean architecture.
+  - **Enforcement rules**: 44px minimum touch targets, proper heading hierarchies (`h1` through `h6`), `:focus-visible` ring offsets, zero clickable `div`s, and full screen reader compatibility.
+
+---
+
+### 4. Zero-Trust Security & Static SAST Shield (`agent-guard`)
+
+Autonomous AI agents must operate inside strict safety boundaries. Sauron embeds proactive static application security testing (SAST) and secret leak detection:
+
+- **Pre-Commit Secret Shield**: Scans for private keys, AWS access keys, bearer tokens, and credentials before code reaches git history.
+- **Unsafe Sink Detection**: Flags dangerous dynamic code evaluation (`eval()`, dynamic execution sinks) across JavaScript, TypeScript, and Python.
+- **Audit Command**: Run `npm run security-scan` or activate `@boromir` to perform pre-merge vulnerability inspections.
+
+---
+
+### 5. Anti-Vibe-Coding Context Engine (`context/`)
+
+**Vibe coding is a recipe for disaster.** Prompting AI agents to build production features without architectural blueprints, state invariants, or test criteria leads to catastrophic technical debt, security breaches, and unmaintainable spaghetti code that breaks the moment it scales.
+
+Sauron eliminates vibe coding by connecting the AI directly to persistent, structured specifications under `context/`. Three core workflow skills enforce this discipline:
+
+- **`define-core-domains` (`/define-core-domains`) — Grounding Ideas into Architecture**:
+  - **Overview**: Prevents AI from prematurely writing implementation code from raw ideas or unstructured notes.
+  - **Mechanism**: Conducts a structured 3-round alignment interview clarifying core entities, user journeys, and module boundaries.
+  - **Output**: Generates a verified PRD (`prd.md`), domain models (`domains.md`), and system architecture blueprints in `context/core-domains/` before writing any application code.
+
+- **`define-enterprise-context` (`/define-enterprise-context`) — Production Hardening & Standards**:
+  - **Overview**: Ensures the system meets enterprise production standards rather than remaining an unhardened MVP.
+  - **Mechanism**: Scaffolds 23 software engineering domains across 45 production specification templates covering disaster recovery, auth/RBAC matrices, rate limiting, audit logging, and observability thresholds.
+  - **Output**: Establishes a comprehensive enterprise reference under `context/software-engineering/` to prevent AI agents from generating insecure or non-compliant patterns.
+
+- **`engineering-loop` (`/engineering-loop`) — Safe Feature Execution & Test Gates**:
+  - **Overview**: Provides strict guardrails for routine feature development and refactoring without breaking existing codebase state.
+  - **Mechanism**: Enforces the 5-stage engineering lifecycle (**Blueprint -> UI Tokens -> Code Inspection -> Context Checkpoint -> Failure Triage**).
+  - **Output**: Blocks unverified code mutations. All changes route through an architectural blueprint and automated failure triage in `context/engineering-loop/`.
 
 ## Project Foundation and Specifications
 
@@ -190,7 +302,7 @@ We welcome contributions from the community to expand the Sauron harness, runtim
 - [runtime-matrix.md](./references/runtime-matrix.md): Complete technical comparison table across all 17 supported runtimes.
 - [fellowship-contracts.md](./references/fellowship-contracts.md): Explicit authority boundaries and handoff protocols for the 9 sub-agents.
 - [anti-patterns.md](./references/anti-patterns.md): The 60 credit-killing patterns reference used to audit all skills.
-- [faq.md](./docs/faq.md): Frequently asked questions, safety guarantees, and migration guide.
+- [faq.md](./docs/01-getting-started/faq.md): Frequently asked questions, safety guarantees, and migration guide.
 - [writing-rules.md](./skills/workflow/writing-rules/SKILL.md): Style rules, truth protocol, and readability standards.
 
 ---

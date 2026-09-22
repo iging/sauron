@@ -2,6 +2,7 @@
 name: shell-scripting-principles
 description: Baseline standard for POSIX-compliant, secure, and robust Bash shell scripting, strict error handling, defensive quoting, and anti-malware execution defense.
 origin: sauron
+department: devops
 ---
 
 # Shell Scripting Principles

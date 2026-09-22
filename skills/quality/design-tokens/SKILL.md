@@ -2,6 +2,7 @@
 name: design-tokens
 description: 3-tier token architecture, semantic token naming, OKLCH color ramps, spacing steps, elevation, typography, motion easing and duration assignments, icon sizing tiers, and the component state matrix.
 origin: sauron
+department: quality
 ---
 
 # Design Tokens

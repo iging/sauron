@@ -4,7 +4,7 @@ import assert from "node:assert/strict";
 import fs from "node:fs";
 import path from "node:path";
 import os from "node:os";
-import { ConflictManager } from "../dist/adapters/conflict-manager.js";
+import { ConflictManager } from "../../dist/adapters/conflict-manager.js";
 
 describe("Conflict Manager Zero-Destructive Overwrites (Milestone 6.3)", () => {
   /** @type {string} */

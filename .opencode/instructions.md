@@ -1,6 +1,6 @@
 # OpenCode Governance Instructions : sauron
 
-Sauron v1.0.0
+Sauron
 
 ## Core Principles
 

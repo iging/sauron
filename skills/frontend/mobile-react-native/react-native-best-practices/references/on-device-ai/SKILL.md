@@ -1,6 +1,7 @@
 ---
 name: on-device-ai
 description: Build on-device AI features in React Native and Expo apps with React Native ExecuTorch. Use when adding AI to a mobile app without cloud dependencies — chatbots, image classification, object detection, OCR, semantic or instance segmentation, style transfer, image generation, pose estimation, speech-to-text, text-to-speech, voice activity detection, semantic search with embeddings, tokenization, privacy / PII redaction, or vision-language image understanding. Also use when mentioning offline / on-device / privacy AI, reducing cloud cost or latency, or managing ML models. Covers initExecutorch and every hook (useLLM, useClassification, useObjectDetection, useOCR, useSemanticSegmentation, useInstanceSegmentation, useStyleTransfer, useTextToImage, useImageEmbeddings, usePoseEstimation, useSpeechToText, useTextToSpeech, useVAD, useTextEmbeddings, useTokenizer, usePrivacyFilter, useExecutorchModule), tool calling, structured output, VLMs, Expo and bare resource-fetcher adapters, and error handling.
+department: frontend
 ---
 
 # React Native ExecuTorch

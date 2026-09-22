@@ -1,6 +1,6 @@
 # OpenClaude System Directives
 
-Sauron v1.0.0 Universal Harness.
+Sauron Universal Harness.
 
 ## Operational Rules
 

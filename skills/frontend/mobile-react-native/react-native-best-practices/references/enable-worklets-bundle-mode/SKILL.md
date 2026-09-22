@@ -11,6 +11,7 @@ compatibility: Requires network access to raw.githubusercontent.com and api.gith
 metadata:
   author: Tomasz Żelawski
   version: 1.0.0
+department: frontend
 ---
 
 # Enable Worklets Bundle Mode

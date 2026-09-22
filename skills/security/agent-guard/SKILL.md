@@ -2,6 +2,7 @@
 name: agent-guard
 description: Pre-execution safety hook, destructive command interceptor, and credential shield for autonomous AI coding agents across Claude Code and Copilot CLI.
 origin: sauron
+department: security
 ---
 
 # Agent Guard: Autonomous Safety Hook and Command Interceptor

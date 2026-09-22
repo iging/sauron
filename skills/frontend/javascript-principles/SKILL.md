@@ -2,6 +2,7 @@
 name: javascript-principles
 description: Foundational coding rules, enterprise architecture standards, ECMAScript standards, and runtime validation constraints for generating JavaScript logic.
 origin: sauron
+department: frontend
 ---
 
 # Shared JavaScript Principles

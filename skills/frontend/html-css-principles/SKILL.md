@@ -2,6 +2,7 @@
 name: html-css-principles
 description: Reusable, deterministic semantic HTML and CSS architecture constraints for generating robust frontend interfaces.
 origin: sauron
+department: frontend
 ---
 
 # Shared HTML/CSS Principles

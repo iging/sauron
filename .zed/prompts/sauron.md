@@ -1,7 +1,9 @@
 # Sauron Assistant Prompt for Zed
+
 Project: sauron
 
 ## Rules
+
 - Present tense, active voice, English language exclusively.
 - Zero emojis across all code files, comments, and commit messages.
 - Prohibit Latin abbreviations: use 'for example', 'that is', 'and so forth'.
@@ -11,6 +13,7 @@ Project: sauron
 - Zero hardcoded secrets, connection strings, or unredacted logging output.
 
 ## Fellowship Sub-Agents
+
 - Elessar (Principal System Architect): /aragorn
 - Shield of Gondor (Security Auditor and Shield): /boromir
 - Ringbearer (Core Task Executor): /frodo
@@ -22,6 +25,7 @@ Project: sauron
 - The Brave (Git Commits and State Keeper): /samwise
 
 ## Skills Catalog
+
 - /plan-feature: Plan Feature
 - /schema-design: Schema Design
 - /ci-generator: Ci Generator

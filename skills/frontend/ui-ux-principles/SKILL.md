@@ -2,6 +2,7 @@
 name: ui-ux-principles
 description: Reusable, deterministic UI/UX and UX writing constraints for any prompt generating or modifying user interfaces.
 origin: sauron
+department: frontend
 ---
 
 # Shared UI/UX Principles

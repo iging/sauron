@@ -1,6 +1,7 @@
 ---
 name: rich-text
 description: "the Expo Team's best practices for rich text in React Native using react-native-enriched and react-native-enriched-markdown. Use when building rich text editors, formatted text inputs, Markdown renderers, or any feature requiring inline styling, mentions, links, structured text editing, or Markdown display. Trigger on: 'rich text editor', 'rich text input', 'text editor', 'react-native-enriched', 'react-native-enriched-markdown', 'EnrichedTextInput', 'EnrichedMarkdownText', 'formatted text input', 'WYSIWYG', 'mentions input', 'text formatting toolbar', 'markdown renderer', 'markdown display', 'render markdown', 'display markdown natively', 'LaTeX math', 'GFM tables', or any request to build rich text editing or Markdown rendering in React Native."
+department: frontend
 ---
 
 # Rich Text in React Native

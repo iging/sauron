@@ -1,6 +1,6 @@
 # Cline Governance Directives
 
-Sauron Autonomous Agent Protocol v1.0.0.
+Sauron Autonomous Agent Protocol.
 
 ## Operational Rules
 

@@ -1,6 +1,6 @@
 # Google Gemini Agent Directives
 
-Sauron v1.0.0 Universal Agent Harness.
+Sauron Universal Agent Harness.
 
 ## Operational Rules
 

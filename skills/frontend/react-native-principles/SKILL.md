@@ -2,6 +2,7 @@
 name: react-native-principles
 description: Normative foundation for React Native and Expo apps covering architecture posture, platform boundaries, rendering discipline, list and image policies, storage security, and accessibility mapping.
 origin: sauron
+department: frontend
 ---
 
 # React Native Principles

@@ -2,6 +2,7 @@
 name: tech-debt-principles
 description: Framework-agnostic baseline standard for identifying, quantifying, prioritizing, refactoring, and managing technical debt, architectural erosion, and legacy code modernization.
 origin: sauron
+department: quality
 ---
 
 # Technical Debt & Refactoring Principles

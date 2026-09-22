@@ -2,6 +2,7 @@
 name: error-handling
 description: Rules for exception design covering separation of concerns, contract-first catches, exception translation at third-party boundaries, Error.cause chaining, type-safe catch inspection, and the ban on exceptions as control flow.
 origin: sauron
+department: quality
 ---
 
 # Error Handling

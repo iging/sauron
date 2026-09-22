@@ -1,6 +1,6 @@
 # Adal / CodeBuddy Runtime Governance
 
-Governed by Sauron v1.0.0.
+Governed by Sauron.
 
 ## Operational Principles
 

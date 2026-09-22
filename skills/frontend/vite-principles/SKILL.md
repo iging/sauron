@@ -2,6 +2,7 @@
 name: vite-principles
 description: Reusable, deterministic Vite 6.x architecture constraints, Environment API guidelines, plugin pipeline ordering, SSR hydration, enterprise monorepo rules, and security controls.
 origin: sauron
+department: frontend
 ---
 
 # Shared Vite Principles

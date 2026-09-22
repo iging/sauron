@@ -2,6 +2,7 @@
 name: design-principles
 description: Structural design axioms for application code covering SOLID, composition over inheritance, DRY, KISS, YAGNI, AHA, Law of Demeter, and object-data duality.
 origin: sauron
+department: quality
 ---
 
 # Design Principles

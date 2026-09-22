@@ -1,5 +1,5 @@
 # CodeBuddy Rules for sauron
-Configured by Sauron v1.0.0
+Configured by Sauron
 
 ## Coding Axioms
 - Present tense, active voice, English language exclusively.

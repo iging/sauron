@@ -2,6 +2,7 @@
 name: observability-telemetry
 description: Framework-agnostic baseline standard for structured logging, distributed tracing, metric instrumentations, alert design, OpenTelemetry collection, and incident visibility.
 origin: sauron
+department: devops
 ---
 
 # Observability & Telemetry Principles

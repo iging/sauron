@@ -212,6 +212,9 @@ function printHelpMenu() {
     "  add <skill>  Add one or more modular skills to local project workspace",
   );
   console.log(
+    "  graph [path] Generate AST codebase knowledge graph (json, md, html)",
+  );
+  console.log(
     "  status       Display registered runtimes, Fellowship agents, and skills",
   );
   console.log("  list-skills  List all registered skills organized by domain");
@@ -490,6 +493,43 @@ function executeInitCommand(options) {
 }
 
 /**
+ * Handles the `graph` command by generating an AST knowledge graph of the codebase.
+ *
+ * @param {string} [targetPath="."] - Target directory to scan.
+ * @returns {Promise<void>}
+ */
+async function executeGraphCommand(targetPath = ".") {
+  const resolvedTarget = path.resolve(process.cwd(), targetPath);
+  console.log(LOTR_BANNER);
+  console.log(`[GRAPH] Analyzing AST knowledge graph for: ${resolvedTarget}`);
+
+  try {
+    const { buildCodebaseGraph } =
+      await import("../scripts/graph/generate-graph.mjs");
+    const result = buildCodebaseGraph(resolvedTarget);
+
+    console.log(`  [AST] Extracted ${result.nodes.length} nodes (files)`);
+    console.log(
+      `  [AST] Extracted ${result.edges.length} edges (dependencies)`,
+    );
+    console.log(
+      `  [AST] Detected ${result.cycles.length} circular dependency cycles`,
+    );
+    console.log(
+      `\n[COMPLETE] Knowledge graph artifacts generated in .sauron/graph/`,
+    );
+    console.log(`  - .sauron/graph/graph.json`);
+    console.log(`  - .sauron/graph/graph-report.md`);
+    console.log(`  - .sauron/graph/graph.html`);
+  } catch (error) {
+    console.error(
+      `[ERROR] Failed to generate codebase graph: ${error instanceof Error ? error.message : String(error)}`,
+    );
+    process.exit(1);
+  }
+}
+
+/**
  * CLI dispatcher resolving arguments and executing corresponding command functions.
  *
  * @param {string[]} commandLineArguments - Command-line arguments passed from process.argv.
@@ -526,6 +566,11 @@ function main(commandLineArguments) {
     case "sync":
       executeInitCommand({ dryRun: isDryRun });
       break;
+    case "graph": {
+      const targetDir = commandLineArguments[1] || ".";
+      executeGraphCommand(targetDir);
+      break;
+    }
     case "add": {
       // Parse skill names and --to argument
       const toIndex = commandLineArguments.indexOf("--to");

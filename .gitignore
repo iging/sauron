@@ -32,4 +32,5 @@ Thumbs.db
 
 # Ephemeral reports & analysis artifacts
 progress-report-result.md
+.sauron/graph/
 

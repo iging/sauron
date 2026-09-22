@@ -1,6 +1,7 @@
 ---
 name: audio
 description: "the Expo Team's best practices for audio in React Native using react-native-audio-api. Covers audio playback (buffer sources, oscillators, streaming), recording (file, callback, graph), audio effects (gain, filters, delay, convolver, panner, waveshaper), real-time analysis and visualization, audio worklets (custom synthesis, UIRuntime/AudioRuntime), system integration (sessions, interruptions, permissions), and testing. Trigger on: react-native-audio-api, AudioContext, AudioRecorder, AudioBuffer, AudioBufferSourceNode, AudioBufferQueueSourceNode, OscillatorNode, StreamerNode, GainNode, BiquadFilterNode, DelayNode, ConvolverNode, StereoPannerNode, WaveShaperNode, AnalyserNode, AudioParam, AudioManager, PlaybackNotificationManager, RecordingNotificationManager, WorkletNode, WorkletSourceNode, WorkletProcessingNode, audio playback, record audio, microphone, waveform, audio visualization, audio streaming, audio worklet, or any React Native feature that captures, processes, or emits sound."
+department: frontend
 ---
 
 # Audio

@@ -2,6 +2,7 @@
 name: infrastructure-principles
 description: Framework-agnostic baseline standard for declarative Infrastructure as Code (IaC), immutable infrastructure, cloud resource isolation, least-privilege identity access, cost optimization, and multi-region resilience.
 origin: sauron
+department: devops
 ---
 
 # Infrastructure as Code & Cloud Principles

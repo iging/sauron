@@ -2,6 +2,7 @@
 name: incident-response
 description: Framework-agnostic baseline standard for production incident triage, severity classification, communication protocols, mitigation strategies, blameless postmortems, and preventative action tracking.
 origin: sauron
+department: security
 ---
 
 # Incident Response & Postmortem Principles

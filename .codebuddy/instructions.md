@@ -1,6 +1,6 @@
 # CodeBuddy Agent Instructions
 
-Sauron v1.0.0 Universal Harness.
+Sauron Universal Harness.
 
 ## Character and Governance
 

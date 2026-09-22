@@ -1,6 +1,6 @@
 # CLAUDE.md
 
-> Managed by Sauron AI v1.0.0. Persistent instruction manual for Claude Code.
+> Managed by Sauron AI. Persistent instruction manual for Claude Code.
 
 ## Common Commands
 

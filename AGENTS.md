@@ -1,6 +1,6 @@
 # AGENTS.md
 
-> Universal AI Agent Harness for 17 runtimes. Governed by Sauron AI v1.0.0.
+> Universal AI Agent Harness for 17 runtimes. Governed by Sauron AI.
 
 ## Setup commands
 

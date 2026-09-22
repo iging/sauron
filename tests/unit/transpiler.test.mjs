@@ -5,11 +5,11 @@ import fs from "node:fs";
 import path from "node:path";
 import os from "node:os";
 import { fileURLToPath } from "node:url";
-import { Transpiler } from "../dist/adapters/transpiler.js";
+import { Transpiler } from "../../dist/adapters/transpiler.js";
 
 const __filename = fileURLToPath(import.meta.url);
 const __dirname = path.dirname(__filename);
-const SAURON_ROOT = path.resolve(__dirname, "..");
+const SAURON_ROOT = path.resolve(__dirname, "../..");
 
 describe("Transpiler 17-Runtime Generation (Milestone 6.2)", () => {
   /** @type {string} */

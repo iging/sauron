@@ -2,6 +2,7 @@
 name: performance-principles
 description: Framework-agnostic baseline standard for application responsiveness, throughput optimization, latency reduction, memory management, caching topologies, and scalable systems design.
 origin: sauron
+department: devops
 ---
 
 # Performance & Scalability Principles
