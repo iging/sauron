@@ -1,6 +1,6 @@
 {
   "name": "sauron-ai",
-  "version": "1.0.1",
+  "version": "1.1.0",
   "description": "Universal AI agent orchestrator and harness for 17 AI coding runtimes.",
   "type": "module",
   "main": "./dist/adapters/transpiler.js",
