@@ -1,6 +1,6 @@
 # VS Code Copilot Custom Instructions : sauron
 
-> Governed by Sauron v1.0.0. Universal AI agent harness.
+> Governed by Sauron. Universal AI agent harness.
 > Applied automatically by GitHub Copilot via VS Code instruction files standard.
 
 ## Coding and Architectural Directives

@@ -1,6 +1,7 @@
 ---
 name: gestures
 description: "the Expo Team's best practices for gestures in React Native apps using React Native Gesture Handler. Use when implementing tap, pan, pinch, rotation, swipe, long press, fling, hover, drag, or any touch interaction. Trigger on: 'gesture handler', 'GestureDetector', 'tap gesture', 'pan gesture', 'pinch gesture', 'rotation gesture', 'long press', 'fling', 'hover gesture', 'swipe', 'pinch to zoom', 'drag', 'touch handling', 'Pressable', 'RectButton', 'Swipeable', 'Touchable', 'DrawerLayout', 'VirtualGestureDetector', or any request to handle user touch input in a React Native app."
+department: frontend
 ---
 
 # React Native Gesture Handler

@@ -2,6 +2,7 @@
 name: angular-principles
 description: Angular (v20+) architecture constraints, signal-based state management, standalone component rules, and quality guidelines for modern Angular codebases.
 origin: sauron
+department: frontend
 ---
 
 # Angular Best Practices

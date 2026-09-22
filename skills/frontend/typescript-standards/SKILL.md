@@ -2,6 +2,7 @@
 name: typescript-standards
 description: Strict TypeScript standards covering tsconfig setup, erasable syntax, interface vs type rules, runtime validation, and advanced type derivation.
 origin: sauron
+department: frontend
 ---
 
 # TypeScript Standards

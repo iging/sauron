@@ -1,5 +1,5 @@
 # Kimi Long-Context System Instructions : sauron
-Sauron v1.0.0
+Sauron
 
 ## Core Guidelines
 - Present tense, active voice, English language exclusively.

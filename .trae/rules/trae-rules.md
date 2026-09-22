@@ -1,6 +1,6 @@
 # Trae IDE Custom Rules
 
-Configured by Sauron v1.0.0.
+Configured by Sauron.
 
 ## Operational Rules
 

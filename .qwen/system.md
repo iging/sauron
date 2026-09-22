@@ -1,5 +1,5 @@
 # Qwen System Prompt : sauron
-Sauron v1.0.0
+Sauron
 
 ## Coding Axioms
 - Present tense, active voice, English language exclusively.

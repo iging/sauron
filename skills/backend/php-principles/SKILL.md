@@ -2,6 +2,7 @@
 name: php-principles
 description: Reusable, deterministic modern PHP (PHP 8.x, PSRs) architecture constraints, strict typing rules, security standards, and performance patterns.
 origin: sauron
+department: backend
 ---
 
 # Shared PHP Principles

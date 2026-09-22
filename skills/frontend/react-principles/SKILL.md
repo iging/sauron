@@ -2,6 +2,7 @@
 name: react-principles
 description: Deterministic React 19 architecture constraints, Server Component boundaries, hook rules, state colocation, performance, accessibility, and TypeScript standards.
 origin: sauron
+department: frontend
 ---
 
 # React Principles

@@ -2,6 +2,7 @@
 name: git-reconciler
 description: Automated git merge conflict reconciliation, three-way diff inspection, structural conflict resolution, and non-destructive branch re-alignment.
 origin: sauron
+department: devops
 ---
 
 # Git Reconciler: Conflict Resolution Engine

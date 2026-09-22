@@ -15,6 +15,7 @@ Browse the documentation by topic:
 - [Quickstart Guide](01-getting-started/quickstart.md) : System prerequisites, installation, initialization, and verification.
 - [Configuration Reference](01-getting-started/configuration.md) : Master configuration schema (`sauron.config.yaml`), project flags, and adapter toggles.
 - [CLI Command Reference](01-getting-started/cli-reference.md) : Syntax, flags, and options for `init`, `status`, `list-skills`, and `sync`.
+- [Frequently Asked Questions (FAQ)](01-getting-started/faq.md) : Common questions on backups, zero-telemetry, migration, and multi-IDE synchronization.
 
 ### [02. The Fellowship of 9 Sub-Agents](02-fellowship-agents/overview.md)
 
@@ -62,8 +63,4 @@ Browse the documentation by topic:
 - [The 17-Runtime Matrix](../references/runtime-matrix.md) : Complete comparison table of file paths, formats, frontmatter support, and slash command mappings.
 - [Fellowship Authority Contracts](../references/fellowship-contracts.md) : Formal authority boundaries, file modification rules, and 5-phase handoff lifecycle.
 - [Anti-Patterns Reference](../references/anti-patterns.md) : Comprehensive guide to the 60 credit-killing patterns across AI engineering workflows.
-
-### [08. Frequently Asked Questions & Container Sandboxing](faq.md)
-
-- [Frequently Asked Questions (FAQ)](faq.md) : Common questions on backups, zero-telemetry, migration, and multi-IDE synchronization.
 - [Docker Architecture & Sandboxing](../docker/README.md) : Production-grade, non-root isolated container instructions.

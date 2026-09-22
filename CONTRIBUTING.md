@@ -93,10 +93,38 @@ CLI commands live in `commands/` and `bin/sauron.mjs`. Commands must adhere to t
 
 ## 4. Git & Pull Request Workflow
 
+### Fast-Track for AI Users (`/progress-report`)
+
+If you are using an AI coding assistant (Claude Code, Cursor, Copilot, Cline, Windsurf, etc.), you can automate branch naming, conventional commits, and PR descriptions in seconds:
+
+1. Stage your changes:
+   ```bash
+   git add .
+   ```
+2. Prompt your AI assistant using either slash command, `@` agent mention, or direct file reference:
+   ```text
+   /progress-report
+   ```
+   _If your IDE does not support slash commands, mention Samwise (the Fellowship State Keeper) or reference the file directly:_
+   ```text
+   @samwise run progress-report on active changes
+   ```
+   _(or: "Run instructions in commands/progress-report.md on active git changes")_
+3. The agent inspects `git status` and `git diff`, then outputs:
+   - **Target Branch Name** (for example: `feature/add-react-flow-skill`)
+   - **Conventional Commit Command** ready to copy-paste (for example: `git commit -m "feat(skills): add react-flow diagramming skill"`)
+   - **PR Description** ready to paste into GitHub
+   - An accomplishment report saved to `progress-report-result.md`
+4. Copy the generated commands, push your branch, and paste the PR description into your GitHub Pull Request.
+
+---
+
+### Manual Conventions Reference
+
 1. **Branch Naming Conventions:**
    - Features: `feature/short-description`
    - Bug fixes: `fix/issue-description`
-   - Documentation & Skills: `docs/skill-name` o `skills/department-name`
+   - Documentation & Skills: `docs/skill-name` or `skills/department-name`
    - Refactoring: `refactor/subsystem`
 
 2. **Commit Message Format (Conventional Commits):**

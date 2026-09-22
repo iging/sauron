@@ -2,6 +2,7 @@
 name: windows-cmd-principles
 description: Baseline standard for legacy and modern Windows Command Prompt (CMD / Batch) scripting, delayed expansion safety, and anti-malware command injection defense.
 origin: sauron
+department: devops
 ---
 
 # Windows Command Prompt (CMD) Principles

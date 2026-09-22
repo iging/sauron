@@ -2,6 +2,7 @@
 name: laravel-principles
 description: Reusable, deterministic Laravel 11.x and 12.x architecture constraints, Eloquent ORM performance rules, Livewire and Inertia stack boundaries, security standards, and Pest PHP testing guidelines.
 origin: sauron
+department: backend
 ---
 
 # Shared Laravel Principles

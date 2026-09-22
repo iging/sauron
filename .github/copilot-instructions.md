@@ -1,6 +1,6 @@
 # GitHub Copilot Custom Instructions for sauron
 
-> Sauron Universal Harness v1.0.0
+> Sauron Universal Harness
 
 ## Coding and Architectural Guidelines
 

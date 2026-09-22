@@ -175,7 +175,13 @@ async function runSecurityAudit() {
   }
 }
 
-runSecurityAudit().catch((err) => {
-  console.error("Security audit failed to execute:", err);
-  process.exit(1);
-});
+export { scanDirectory, SECRET_PATTERNS, UNSAFE_SINK_PATTERNS, runSecurityAudit };
+
+// Run automatically only if executed directly
+if (process.argv[1] && process.argv[1].endsWith("security-scan.mjs")) {
+  runSecurityAudit().catch((err) => {
+    console.error("Security audit failed to execute:", err);
+    process.exit(1);
+  });
+}
+

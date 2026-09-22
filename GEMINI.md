@@ -1,6 +1,6 @@
 # GEMINI.md
 
-> Governed by Sauron AI v1.0.0. Persistent context and instructions for Gemini CLI.
+> Governed by Sauron AI. Persistent context and instructions for Gemini CLI.
 
 ## Project Overview & Tech Stack
 

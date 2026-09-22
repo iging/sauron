@@ -2,6 +2,7 @@
 name: bootstrap-principles
 description: Bootstrap 5.3 engineering rules covering grid system, utility classes, Sass customization, dark mode, accessibility (WCAG 2.2 AA), Core Web Vitals performance, and responsive design patterns for modern web development.
 origin: sauron
+department: frontend
 ---
 
 # Bootstrap Best Practices

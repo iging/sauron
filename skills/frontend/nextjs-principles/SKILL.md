@@ -2,6 +2,7 @@
 name: nextjs-principles
 description: Next.js App Router and React 19 architecture constraints, Server Components default, caching, Server Actions security, and Turbopack optimization.
 origin: sauron
+department: frontend
 ---
 
 # Next.js Principles

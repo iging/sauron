@@ -2,6 +2,7 @@
 name: tailwind-principles
 description: Tailwind CSS v4 engineering rules covering design tokens, utility classes, variants, dark mode, responsive design, and performance guidelines for modern web development.
 origin: sauron
+department: frontend
 ---
 
 # Tailwind CSS Best Practices
