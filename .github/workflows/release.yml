@@ -2,8 +2,8 @@ name: Release Sauron Harness
 
 on:
   push:
-    branches:
-      - main
+    tags:
+      - "v*"
   workflow_dispatch:
 
 concurrency:
@@ -45,15 +45,16 @@ jobs:
       - name: Execute Automated Test Suite
         run: npm test
 
-      - name: Automated Semantic Tagging
-        id: tagger
-        uses: anothrNick/github-tag-action@1.71.0
-        env:
-          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-          WITH_V: true
-          DEFAULT_BUMP: patch
-          RELEASE_BRANCHES: main
-          TAG_PREFIX: "sauron-v"
+      - name: Extract Version from Package or Tag
+        id: version_meta
+        run: |
+          VERSION=$(node -p "require('./package.json').version")
+          echo "PACKAGE_VERSION=v$VERSION" >> $GITHUB_ENV
+          TAG_NAME="${GITHUB_REF#refs/tags/}"
+          if [ -z "$TAG_NAME" ] || [ "$TAG_NAME" = "main" ]; then
+            TAG_NAME="v$VERSION"
+          fi
+          echo "RELEASE_TAG=$TAG_NAME" >> $GITHUB_ENV
 
       - name: Package Sauron Distribution Bundle
         run: |
@@ -62,8 +63,8 @@ jobs:
       - name: Create GitHub Release and Attach Bundle
         uses: softprops/action-gh-release@v2
         with:
-          tag_name: ${{ steps.tagger.outputs.new_tag || github.ref_name }}
-          name: Sauron Release ${{ steps.tagger.outputs.new_tag || github.ref_name }}
+          tag_name: ${{ env.RELEASE_TAG }}
+          name: Sauron Release ${{ env.RELEASE_TAG }}
           generate_release_notes: true
           files: sauron-harness.zip
           draft: false
