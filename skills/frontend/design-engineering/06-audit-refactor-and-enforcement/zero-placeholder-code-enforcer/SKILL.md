@@ -22,26 +22,26 @@ antiPatternsPrevented:
 
 ## 1. Intent (9 Dimensions)
 
-| # | Dimension | Value |
-|---|-----------|-------|
-| 1 | Task | Block model output truncation and replace all placeholders with functional code. |
-| 2 | Target Tool | Any agent runtime: Claude Code, Cursor, Copilot, Windsurf, Kiro, Cline, or raw API. |
-| 3 | Output Format | 100% complete, fully implemented production code files. |
-| 4 | Constraints | Prohibit comments like `// ... rest of code stays the same` or `/* insert styles */`. Zero em-dashes. |
-| 5 | Input | Any code generation prompt, component request, or refactoring task. |
-| 6 | Context | Prevents broken builds caused by agents omitting unchanged or long code blocks. |
-| 7 | Audience | Developers receiving agent code outputs. |
-| 8 | Success Criteria | Code file contains zero placeholder comments and compiles without missing symbols. |
-| 9 | Examples | See Section 10. |
+| #   | Dimension        | Value                                                                                                 |
+| --- | ---------------- | ----------------------------------------------------------------------------------------------------- |
+| 1   | Task             | Block model output truncation and replace all placeholders with functional code.                      |
+| 2   | Target Tool      | Any agent runtime: Claude Code, Cursor, Copilot, Windsurf, Kiro, Cline, or raw API.                   |
+| 3   | Output Format    | 100% complete, fully implemented production code files.                                               |
+| 4   | Constraints      | Prohibit comments like `// ... rest of code stays the same` or `/* insert styles */`. Zero em-dashes. |
+| 5   | Input            | Any code generation prompt, component request, or refactoring task.                                   |
+| 6   | Context          | Prevents broken builds caused by agents omitting unchanged or long code blocks.                       |
+| 7   | Audience         | Developers receiving agent code outputs.                                                              |
+| 8   | Success Criteria | Code file contains zero placeholder comments and compiles without missing symbols.                    |
+| 9   | Examples         | See Section 10.                                                                                       |
 
 ## 2. Trigger Matrix
 
-| Trigger | Fire? | Notes |
-|---------|-------|-------|
-| Production file generation or multi-component refactoring | YES | Core trigger. |
-| Code review or audit task | YES | Core trigger. |
-| One-line configuration value answer | NO | Not needed for single values. |
-| Direct user question without code | NO | Out of scope. |
+| Trigger                                                   | Fire? | Notes                         |
+| --------------------------------------------------------- | ----- | ----------------------------- |
+| Production file generation or multi-component refactoring | YES   | Core trigger.                 |
+| Code review or audit task                                 | YES   | Core trigger.                 |
+| One-line configuration value answer                       | NO    | Not needed for single values. |
+| Direct user question without code                         | NO    | Out of scope.                 |
 
 ## 3. Execution Workflow
 
@@ -78,9 +78,21 @@ export function Navigation() {
     <nav className="w-full h-16 border-b border-neutral-200 px-6 flex items-center justify-between">
       <div className="font-bold text-lg">Brand</div>
       <ul className="flex space-x-6 text-sm text-neutral-600">
-        <li><a href="#features" className="hover:text-black">Features</a></li>
-        <li><a href="#pricing" className="hover:text-black">Pricing</a></li>
-        <li><a href="#about" className="hover:text-black">About</a></li>
+        <li>
+          <a href="#features" className="hover:text-black">
+            Features
+          </a>
+        </li>
+        <li>
+          <a href="#pricing" className="hover:text-black">
+            Pricing
+          </a>
+        </li>
+        <li>
+          <a href="#about" className="hover:text-black">
+            About
+          </a>
+        </li>
       </ul>
     </nav>
   );
@@ -101,11 +113,11 @@ export function Navigation() {
 
 ## 7. Anti-Pattern Compliance
 
-| Step | Prevents AP | Mechanism |
-|------|-------------|-----------|
-| 1 | AP-18 (unstructured output) | Scans for lazy placeholder comments. |
-| 2 | AP-28 (untested code) | Expands full code blocks so they can be parsed and tested. |
-| 3 | AP-9 (no verification) | Runs parser check to ensure syntax completeness. |
+| Step | Prevents AP                 | Mechanism                                                  |
+| ---- | --------------------------- | ---------------------------------------------------------- |
+| 1    | AP-18 (unstructured output) | Scans for lazy placeholder comments.                       |
+| 2    | AP-28 (untested code)       | Expands full code blocks so they can be parsed and tested. |
+| 3    | AP-9 (no verification)      | Runs parser check to ensure syntax completeness.           |
 
 ## 8. Versioning & Changelog
 
@@ -115,15 +127,15 @@ export function Navigation() {
 
 ## 9. Portability Matrix
 
-| Runtime | Status | Notes |
-|---------|--------|-------|
-| Claude Code | verified | Enforces non-truncated outputs. |
-| Cursor | verified | In-line full output mode. |
-| Copilot | verified | Complete output generation. |
-| Windsurf | verified | Cascade full file writing. |
-| Kiro | verified | Code completion runner. |
-| Cline | verified | System prompt completeness rule. |
-| Raw API | verified | Model-agnostic output validator. |
+| Runtime     | Status   | Notes                            |
+| ----------- | -------- | -------------------------------- |
+| Claude Code | verified | Enforces non-truncated outputs.  |
+| Cursor      | verified | In-line full output mode.        |
+| Copilot     | verified | Complete output generation.      |
+| Windsurf    | verified | Cascade full file writing.       |
+| Kiro        | verified | Code completion runner.          |
+| Cline       | verified | System prompt completeness rule. |
+| Raw API     | verified | Model-agnostic output validator. |
 
 ## 10. Examples
 

@@ -2,10 +2,11 @@
  * @fileoverview Claude Code adapter generating CLAUDE.md adhering to Anthropic guidelines.
  */
 
-import type {
-  RuntimeAdapter,
-  TranspileContext,
-  TranspileOutput,
+import {
+  formatCavemanSection,
+  type RuntimeAdapter,
+  type TranspileContext,
+  type TranspileOutput,
 } from "./types.js";
 
 /**
@@ -77,21 +78,7 @@ export class ClaudeAdapter implements RuntimeAdapter {
       );
     }
     lines.push("");
-    lines.push("## Claude-Specific Behaviors");
-    lines.push("");
-    lines.push(
-      "- Use adaptive reasoning natively; avoid redundant scratchpad scaffolding.",
-    );
-    lines.push(
-      "- For complex refactoring, outline blast radius and impacted files before modifying code.",
-    );
-    lines.push(
-      "- Route all multi-runtime synchronization writes through ConflictManager.",
-    );
-    lines.push(
-      "- Always verify changes with `npm test` and `npx tsc --noEmit` before concluding.",
-    );
-    lines.push("");
+    lines.push(...formatCavemanSection("##"));
 
     return [
       {

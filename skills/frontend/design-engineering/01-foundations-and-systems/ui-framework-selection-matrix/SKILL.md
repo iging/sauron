@@ -22,17 +22,17 @@ antiPatternsPrevented:
 
 ## 1. Intent (9 Dimensions)
 
-| #   | Dimension        | Value                                                                                |
-| --- | ---------------- | ------------------------------------------------------------------------------------ |
-| 1   | Task             | Match user requirement to exactly one curated library recommendation.                |
-| 2   | Target Tool      | Any agent runtime: Claude Code, Cursor, Copilot, Windsurf, Kiro, Cline, or raw API.  |
-| 3   | Output Format    | Recommendation header with one-sentence rationale and install command.               |
-| 4   | Constraints      | Recommend exactly one library from curated list. Never recommend unlisted packages.  |
+| #   | Dimension        | Value                                                                                       |
+| --- | ---------------- | ------------------------------------------------------------------------------------------- |
+| 1   | Task             | Match user requirement to exactly one curated library recommendation.                       |
+| 2   | Target Tool      | Any agent runtime: Claude Code, Cursor, Copilot, Windsurf, Kiro, Cline, or raw API.         |
+| 3   | Output Format    | Recommendation header with one-sentence rationale and install command.                      |
+| 4   | Constraints      | Recommend exactly one library from curated list. Never recommend unlisted packages.         |
 | 5   | Input            | User feature requirement or library request (for example, "what to use for drag and drop"). |
-| 6   | Context          | Prevents dependency churn and unvetted third-party library adoption.                 |
-| 7   | Audience         | Frontend engineers and software architects.                                          |
-| 8   | Success Criteria | Single recommendation output matching curated domain map.                            |
-| 9   | Examples         | See Section 10.                                                                      |
+| 6   | Context          | Prevents dependency churn and unvetted third-party library adoption.                        |
+| 7   | Audience         | Frontend engineers and software architects.                                                 |
+| 8   | Success Criteria | Single recommendation output matching curated domain map.                                   |
+| 9   | Examples         | See Section 10.                                                                             |
 
 ## 2. Trigger Matrix
 

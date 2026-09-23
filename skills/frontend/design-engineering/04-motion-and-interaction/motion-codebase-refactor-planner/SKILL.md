@@ -22,25 +22,25 @@ antiPatternsPrevented:
 
 ## 1. Intent (9 Dimensions)
 
-| # | Dimension | Value |
-|---|-----------|-------|
-| 1 | Task | Audit animation code against standards and output self-contained plans into `plans/`. |
-| 2 | Target Tool | Any agent runtime: Claude Code, Cursor, Copilot, Windsurf, Kiro, Cline, or raw API. |
-| 3 | Output Format | Prioritized audit findings table (HIGH/MEDIUM/LOW) and markdown plan documents. |
-| 4 | Constraints | Read `../references/animation-audit.md` and `../references/animation-plan-template.md`. |
-| 5 | Input | Codebase search request, motion audit prompt, or animation review request. |
-| 6 | Context | Prevents vague plan instructions by specifying exact cubic-bezier curves. |
-| 7 | Audience | Execution agents, frontend developers, and design engineers. |
-| 8 | Success Criteria | Cites exact `file:line`, values copied from reference, plans self-contained in `plans/`. |
-| 9 | Examples | See Section 10. |
+| #   | Dimension        | Value                                                                                    |
+| --- | ---------------- | ---------------------------------------------------------------------------------------- |
+| 1   | Task             | Audit animation code against standards and output self-contained plans into `plans/`.    |
+| 2   | Target Tool      | Any agent runtime: Claude Code, Cursor, Copilot, Windsurf, Kiro, Cline, or raw API.      |
+| 3   | Output Format    | Prioritized audit findings table (HIGH/MEDIUM/LOW) and markdown plan documents.          |
+| 4   | Constraints      | Read `../references/animation-audit.md` and `../references/animation-plan-template.md`.  |
+| 5   | Input            | Codebase search request, motion audit prompt, or animation review request.               |
+| 6   | Context          | Prevents vague plan instructions by specifying exact cubic-bezier curves.                |
+| 7   | Audience         | Execution agents, frontend developers, and design engineers.                             |
+| 8   | Success Criteria | Cites exact `file:line`, values copied from reference, plans self-contained in `plans/`. |
+| 9   | Examples         | See Section 10.                                                                          |
 
 ## 2. Trigger Matrix
 
-| Trigger | Fire? | Notes |
-|---------|-------|-------|
-| Request for animation roadmap, motion audit, or plan generation | YES | Core trigger. |
-| Auditing codebase easing curves and spring configurations | YES | Core trigger. |
-| Directly editing component code without audit approval | NO | Out of scope. |
+| Trigger                                                         | Fire? | Notes         |
+| --------------------------------------------------------------- | ----- | ------------- |
+| Request for animation roadmap, motion audit, or plan generation | YES   | Core trigger. |
+| Auditing codebase easing curves and spring configurations       | YES   | Core trigger. |
+| Directly editing component code without audit approval          | NO    | Out of scope. |
 
 ## 3. Execution Workflow
 
@@ -75,13 +75,15 @@ antiPatternsPrevented:
 ## 4. Output Specification
 
 **Audit Phase Output:**
+
 ```markdown
-| # | Severity | Category | Location | Finding | Fix summary |
-| --- | --- | --- | --- | --- | --- |
-| 1 | HIGH | Easing | `Toast.tsx:41` | Toasts enter using `ease-in` | Change to `ease-out` (200ms) |
+| #   | Severity | Category | Location       | Finding                      | Fix summary                  |
+| --- | -------- | -------- | -------------- | ---------------------------- | ---------------------------- |
+| 1   | HIGH     | Easing   | `Toast.tsx:41` | Toasts enter using `ease-in` | Change to `ease-out` (200ms) |
 ```
 
 **Plan Phase Output (`plans/001-toast-easing.md`):**
+
 ```markdown
 # Plan 001 - Fix Toast Entrance Easing
 
@@ -89,6 +91,7 @@ antiPatternsPrevented:
 - **Target**: `src/components/Toast.tsx:41`
 
 ## Instruction
+
 Replace `ease-in` with `cubic-bezier(0.23, 1, 0.32, 1)`.
 ```
 
@@ -107,11 +110,11 @@ Replace `ease-in` with `cubic-bezier(0.23, 1, 0.32, 1)`.
 
 ## 7. Anti-Pattern Compliance
 
-| Step | Prevents AP | Mechanism |
-|------|-------------|-----------|
-| 1 | AP-1 (vague task) | Maps entire motion surface before flagging issues. |
-| 3 | AP-18 (unstructured output) | Enforces structured audit table before plan creation. |
-| 4 | AP-28 (untested code) | Includes mechanical and visual verification gates in plans. |
+| Step | Prevents AP                 | Mechanism                                                   |
+| ---- | --------------------------- | ----------------------------------------------------------- |
+| 1    | AP-1 (vague task)           | Maps entire motion surface before flagging issues.          |
+| 3    | AP-18 (unstructured output) | Enforces structured audit table before plan creation.       |
+| 4    | AP-28 (untested code)       | Includes mechanical and visual verification gates in plans. |
 
 ## 8. Versioning & Changelog
 
@@ -121,15 +124,15 @@ Replace `ease-in` with `cubic-bezier(0.23, 1, 0.32, 1)`.
 
 ## 9. Portability Matrix
 
-| Runtime | Status | Notes |
-|---------|--------|-------|
+| Runtime     | Status   | Notes                            |
+| ----------- | -------- | -------------------------------- |
 | Claude Code | verified | Direct audit and plan generator. |
-| Cursor | verified | Interactive plan writing mode. |
-| Copilot | verified | In-line motion audit assistant. |
-| Windsurf | verified | Cascade execution. |
-| Kiro | verified | Audit runner. |
-| Cline | verified | System prompt task mode. |
-| Raw API | verified | Model-agnostic motion auditor. |
+| Cursor      | verified | Interactive plan writing mode.   |
+| Copilot     | verified | In-line motion audit assistant.  |
+| Windsurf    | verified | Cascade execution.               |
+| Kiro        | verified | Audit runner.                    |
+| Cline       | verified | System prompt task mode.         |
+| Raw API     | verified | Model-agnostic motion auditor.   |
 
 ## 10. Examples
 

@@ -22,7 +22,7 @@ and in your codebase bind them.
 
 ## Overview
 
-**Sauron AI** is an open-source, universal AI agent harness inspired by the legendary lore of _The Lord of the Rings_. Just as the One Ring was forged to bring unity and dominion over fragmented powers, Sauron AI was built to solve the two biggest crises in modern AI-assisted software development:
+**Sauron AI** is an open-source, universal AI agent harness inspired by the legendary lore of _The Lord of the Rings_. Just as the One Ring was forged to bring unity and dominion over fragmented powers, Sauron AI was built to solve the six biggest crises in modern AI-assisted software development:
 
 1. **The Tool Fragmentation & Manual Setup Nightmare**:
    Today, engineering teams and individual developers use multiple AI tools simultaneously—Claude Code, Cursor, Copilot, Windsurf, Cline, Gemini, Zed, and others. Configuring each tool requires manually writing, syncing, and constantly updating fragmented prompt files (`CLAUDE.md`, `.cursorrules`, `.windsurfrules`, `.github/copilot-instructions.md`, etc.). When rules or architectural constraints change, synchronizing them by hand across every developer's IDE is tedious, error-prone, and unsustainable.
@@ -34,6 +34,30 @@ and in your codebase bind them.
 
    **Sauron transforms vibe coding into a disciplined Agentic Workflow**:
    Instead of blind prompting, Sauron orchestrates a **Fellowship of 9 Specialized Sub-Agents** (Gandalf for planning, Aragorn for system architecture, Legolas for linting, Boromir for security, Frodo for atomic execution, Merry for TDD QA, and more). Every task routes through structured domain blueprints, token-efficient communication (`/caveman`), and rigorous test verification before a single line of code reaches your git history.
+
+3. **Context Window Bloat & LLM Token Burn**:
+   Long-running agent sessions burn up to 75% of context window limits on conversational filler, pleasantries, and redundant narration. As token budgets deplete, model attention degrades, leading to forgotten requirements, catastrophic forgetfulness, and expensive API bills.
+
+   **Sauron solves this with Built-in Token Conservation & Caveman Transpilation**:
+   Sauron embeds **Caveman Mode**—a native compression engine with multiple intensity tiers (`lite`, `full`, `ultra`) that slashes conversational waste by 40% to 75% while strictly preserving technical precision, code blocks, diffs, and negative boolean logic. Crucially, Sauron transpiles explicit `/caveman` token-conservation directives directly into the instruction manuals and system rules of all **17 target runtimes** (`CLAUDE.md`, `.cursorrules`, `.windsurfrules`, `.clinerules`, etc.). Coupled with zero-install modular skill injection via `npx`, developers load only what the agent needs, eliminating memory bloat.
+
+4. **Blind Multi-File Hallucination & Hidden Architectural Drift**:
+   Large-language models lack holistic codebase perception. When instructed to modify a component, agents frequently introduce silent circular imports, break cross-module boundaries, and create cascading dependency failures because they cannot visualize the full system topology.
+
+   **Sauron solves this with an In-Repo Polyglot Knowledge Graph**:
+   Sauron includes a zero-dependency **AST Knowledge Graph Engine** (`sauron graph`) supporting 11 languages. It statically inspects repository structures, runs DFS circular dependency detection, and generates quantitative architecture health audits alongside interactive ForceAtlas2 canvas visualizations.
+
+5. **Destructive File Overwrites & Secret Leaks**:
+   Automated AI execution tools often indiscriminately overwrite manual developer configurations without diff warnings, or inadvertently bake live API credentials and dangerous shell invocations into generated scripts.
+
+   **Sauron solves this with Cryptographic Conflict Management & SAST**:
+   Every synchronization pipeline runs through an automated **Conflict Manager** utilizing SHA-256 state tracking and automated `.bak` rollbacks. Paired with a static **SAST Security Scanner** and strict local-first execution with zero telemetry, your codebase remains immune to destructive overrides and secret leaks.
+
+6. **Single-Prompt Chaos & Multi-Agent Role Creep**:
+   Forcing a single AI session to concurrently act as product manager, software architect, security auditor, and test engineer results in shallow reasoning, missed edge cases, and scope creep.
+
+   **Sauron solves this with Strict Separation of Concerns**:
+   Sauron enforces precise authority boundaries. Each sub-agent owns a single engineering domain with explicit non-negotiable invariants. Gandalf plans roadmaps, Aragorn guards architectural topologies, Boromir audits vulnerabilities, and Merry blocks merging until test-driven coverage passes. No agent oversteps authority.
 
 ---
 

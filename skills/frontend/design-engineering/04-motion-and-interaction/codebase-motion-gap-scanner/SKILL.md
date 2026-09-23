@@ -22,25 +22,25 @@ antiPatternsPrevented:
 
 ## 1. Intent (9 Dimensions)
 
-| # | Dimension | Value |
-|---|-----------|-------|
-| 1 | Task | Audit UI components for missing leverage motion and list rejected candidates with rationale. |
-| 2 | Target Tool | Any agent runtime: Claude Code, Cursor, Copilot, Windsurf, Kiro, Cline, or raw API. |
-| 3 | Output Format | Structured opportunities markdown table and rejected candidates list. |
-| 4 | Constraints | Read-only mode. Never modify source code. Propose exact CSS curves. Cap at 5-7 items. |
-| 5 | Input | UI component files, JSX templates, or codebase sweep request. |
-| 6 | Context | Prevents jarring visual state pops while blocking sluggish keyboard animations. |
-| 7 | Audience | Frontend design engineers and UI developers. |
-| 8 | Success Criteria | Identifies genuine feedback gaps, specifies exact CSS timing, rejects high-frequency items. |
-| 9 | Examples | See Section 10. |
+| #   | Dimension        | Value                                                                                        |
+| --- | ---------------- | -------------------------------------------------------------------------------------------- |
+| 1   | Task             | Audit UI components for missing leverage motion and list rejected candidates with rationale. |
+| 2   | Target Tool      | Any agent runtime: Claude Code, Cursor, Copilot, Windsurf, Kiro, Cline, or raw API.          |
+| 3   | Output Format    | Structured opportunities markdown table and rejected candidates list.                        |
+| 4   | Constraints      | Read-only mode. Never modify source code. Propose exact CSS curves. Cap at 5-7 items.        |
+| 5   | Input            | UI component files, JSX templates, or codebase sweep request.                                |
+| 6   | Context          | Prevents jarring visual state pops while blocking sluggish keyboard animations.              |
+| 7   | Audience         | Frontend design engineers and UI developers.                                                 |
+| 8   | Success Criteria | Identifies genuine feedback gaps, specifies exact CSS timing, rejects high-frequency items.  |
+| 9   | Examples         | See Section 10.                                                                              |
 
 ## 2. Trigger Matrix
 
-| Trigger | Fire? | Notes |
-|---------|-------|-------|
-| Sweep codebase for missing animation opportunities | YES | Core trigger. |
-| User asks "what could be animated here?" | YES | Core trigger. |
-| Automatic code refactoring or source file editing | NO | Read-only skill. |
+| Trigger                                            | Fire? | Notes            |
+| -------------------------------------------------- | ----- | ---------------- |
+| Sweep codebase for missing animation opportunities | YES   | Core trigger.    |
+| User asks "what could be animated here?"           | YES   | Core trigger.    |
+| Automatic code refactoring or source file editing  | NO    | Read-only skill. |
 
 ## 3. Execution Workflow
 
@@ -77,9 +77,9 @@ antiPatternsPrevented:
 ```markdown
 ### Opportunities
 
-| # | Location | Today | Purpose | Frequency | Suggested motion |
-| --- | --- | --- | --- | --- | --- |
-| 1 | `Button.tsx:18` | No press feedback | Feedback | Tens/day | `:active { transform: scale(0.97) }`, `transition: transform 160ms ease-out` |
+| #   | Location        | Today             | Purpose  | Frequency | Suggested motion                                                             |
+| --- | --------------- | ----------------- | -------- | --------- | ---------------------------------------------------------------------------- |
+| 1   | `Button.tsx:18` | No press feedback | Feedback | Tens/day  | `:active { transform: scale(0.97) }`, `transition: transform 160ms ease-out` |
 
 ### Rejected Candidates
 
@@ -101,11 +101,11 @@ antiPatternsPrevented:
 
 ## 7. Anti-Pattern Compliance
 
-| Step | Prevents AP | Mechanism |
-|------|-------------|-----------|
-| 1 | AP-1 (vague task) | Demands systematic sweep before emitting suggestions. |
-| 3 | AP-4 (over-permissive agent) | Rejects animations on keyboard-triggered actions. |
-| 4 | AP-18 (unstructured output) | Enforces markdown table + rejected candidates list. |
+| Step | Prevents AP                  | Mechanism                                             |
+| ---- | ---------------------------- | ----------------------------------------------------- |
+| 1    | AP-1 (vague task)            | Demands systematic sweep before emitting suggestions. |
+| 3    | AP-4 (over-permissive agent) | Rejects animations on keyboard-triggered actions.     |
+| 4    | AP-18 (unstructured output)  | Enforces markdown table + rejected candidates list.   |
 
 ## 8. Versioning & Changelog
 
@@ -115,15 +115,15 @@ antiPatternsPrevented:
 
 ## 9. Portability Matrix
 
-| Runtime | Status | Notes |
-|---------|--------|-------|
-| Claude Code | verified | Direct read-only motion audit. |
-| Cursor | verified | Interactive sweep mode. |
-| Copilot | verified | In-line inspection tool. |
-| Windsurf | verified | Cascade audit. |
-| Kiro | verified | Motion sweeper runner. |
-| Cline | verified | Read-only task mode. |
-| Raw API | verified | Model-agnostic motion analyzer. |
+| Runtime     | Status   | Notes                           |
+| ----------- | -------- | ------------------------------- |
+| Claude Code | verified | Direct read-only motion audit.  |
+| Cursor      | verified | Interactive sweep mode.         |
+| Copilot     | verified | In-line inspection tool.        |
+| Windsurf    | verified | Cascade audit.                  |
+| Kiro        | verified | Motion sweeper runner.          |
+| Cline       | verified | Read-only task mode.            |
+| Raw API     | verified | Model-agnostic motion analyzer. |
 
 ## 10. Examples
 

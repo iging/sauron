@@ -2,10 +2,11 @@
  * @fileoverview Windsurf adapter generating .windsurfrules file.
  */
 
-import type {
-  RuntimeAdapter,
-  TranspileContext,
-  TranspileOutput,
+import {
+  formatCavemanSection,
+  type RuntimeAdapter,
+  type TranspileContext,
+  type TranspileOutput,
 } from "./types.js";
 
 export class WindsurfAdapter implements RuntimeAdapter {
@@ -29,6 +30,7 @@ export class WindsurfAdapter implements RuntimeAdapter {
       lines.push(`- ${rule}`);
     }
     lines.push("");
+    lines.push(...formatCavemanSection("##"));
     lines.push("## Fellowship Sub-Agents Execution Hierarchy");
     for (const agent of context.fellowship) {
       lines.push(

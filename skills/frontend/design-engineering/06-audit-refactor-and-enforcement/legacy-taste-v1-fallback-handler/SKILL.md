@@ -22,26 +22,26 @@ antiPatternsPrevented:
 
 ## 1. Intent (9 Dimensions)
 
-| # | Dimension | Value |
-|---|-----------|-------|
-| 1 | Task | Output v1-compatible anti-slop frontend code for legacy workflow configurations. |
-| 2 | Target Tool | Any agent runtime: Claude Code, Cursor, Copilot, Windsurf, Kiro, Cline, or raw API. |
-| 3 | Output Format | Clean HTML5/Tailwind frontend code blocks matching original v1 guidelines. |
-| 4 | Constraints | Prohibit Inter/Roboto fonts, pure black `#000000` backgrounds, and harsh drop shadows. Zero em-dashes. |
-| 5 | Input | Legacy landing page request or v1 taste-skill user prompt. |
-| 6 | Context | Preserves exact v1 behavior for adopters with legacy configuration hooks. |
-| 7 | Audience | Teams maintaining existing v1 taste-skill implementations. |
-| 8 | Success Criteria | Clean frontend code output passing original v1 visual standards. |
-| 9 | Examples | See Section 10. |
+| #   | Dimension        | Value                                                                                                  |
+| --- | ---------------- | ------------------------------------------------------------------------------------------------------ |
+| 1   | Task             | Output v1-compatible anti-slop frontend code for legacy workflow configurations.                       |
+| 2   | Target Tool      | Any agent runtime: Claude Code, Cursor, Copilot, Windsurf, Kiro, Cline, or raw API.                    |
+| 3   | Output Format    | Clean HTML5/Tailwind frontend code blocks matching original v1 guidelines.                             |
+| 4   | Constraints      | Prohibit Inter/Roboto fonts, pure black `#000000` backgrounds, and harsh drop shadows. Zero em-dashes. |
+| 5   | Input            | Legacy landing page request or v1 taste-skill user prompt.                                             |
+| 6   | Context          | Preserves exact v1 behavior for adopters with legacy configuration hooks.                              |
+| 7   | Audience         | Teams maintaining existing v1 taste-skill implementations.                                             |
+| 8   | Success Criteria | Clean frontend code output passing original v1 visual standards.                                       |
+| 9   | Examples         | See Section 10.                                                                                        |
 
 ## 2. Trigger Matrix
 
-| Trigger | Fire? | Notes |
-|---------|-------|-------|
-| Explicit request for v1 taste-skill behavior | YES | Core trigger. |
-| Legacy project configured with taste-skill v1 rules | YES | Core trigger. |
-| New anti-slop landing page requiring 3-dial tuning | NO | Use `anti-slop-frontend`. |
-| Backend database optimization | NO | Out of scope. |
+| Trigger                                             | Fire? | Notes                     |
+| --------------------------------------------------- | ----- | ------------------------- |
+| Explicit request for v1 taste-skill behavior        | YES   | Core trigger.             |
+| Legacy project configured with taste-skill v1 rules | YES   | Core trigger.             |
+| New anti-slop landing page requiring 3-dial tuning  | NO    | Use `anti-slop-frontend`. |
+| Backend database optimization                       | NO    | Out of scope.             |
 
 ## 3. Execution Workflow
 
@@ -90,10 +90,10 @@ export function LegacyV1Hero() {
 
 ## 7. Anti-Pattern Compliance
 
-| Step | Prevents AP | Mechanism |
-|------|-------------|-----------|
-| 1 | AP-1 (vague task) | Validates v1 compatibility requirement explicitly. |
-| 2 | AP-18 (unstructured output) | Enforces v1 design token constraints. |
+| Step | Prevents AP                 | Mechanism                                          |
+| ---- | --------------------------- | -------------------------------------------------- |
+| 1    | AP-1 (vague task)           | Validates v1 compatibility requirement explicitly. |
+| 2    | AP-18 (unstructured output) | Enforces v1 design token constraints.              |
 
 ## 8. Versioning & Changelog
 
@@ -103,15 +103,15 @@ export function LegacyV1Hero() {
 
 ## 9. Portability Matrix
 
-| Runtime | Status | Notes |
-|---------|--------|-------|
-| Claude Code | verified | Direct v1 frontend generation. |
-| Cursor | verified | In-line code mode. |
-| Copilot | verified | Component generation. |
-| Windsurf | verified | Cascade execution. |
-| Kiro | verified | Visual runner. |
-| Cline | verified | System prompt task mode. |
-| Raw API | verified | Model-agnostic design generator. |
+| Runtime     | Status   | Notes                            |
+| ----------- | -------- | -------------------------------- |
+| Claude Code | verified | Direct v1 frontend generation.   |
+| Cursor      | verified | In-line code mode.               |
+| Copilot     | verified | Component generation.            |
+| Windsurf    | verified | Cascade execution.               |
+| Kiro        | verified | Visual runner.                   |
+| Cline       | verified | System prompt task mode.         |
+| Raw API     | verified | Model-agnostic design generator. |
 
 ## 10. Examples
 

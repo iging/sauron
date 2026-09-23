@@ -2,10 +2,11 @@
  * @fileoverview Kimi adapter generating .kimi/prompt.md file.
  */
 
-import type {
-  RuntimeAdapter,
-  TranspileContext,
-  TranspileOutput,
+import {
+  formatCavemanSection,
+  type RuntimeAdapter,
+  type TranspileContext,
+  type TranspileOutput,
 } from "./types.js";
 
 export class KimiAdapter implements RuntimeAdapter {
@@ -26,6 +27,7 @@ export class KimiAdapter implements RuntimeAdapter {
       lines.push(`- ${rule}`);
     }
     lines.push("");
+    lines.push(...formatCavemanSection("##"));
     lines.push("## Fellowship Structure");
     for (const agent of context.fellowship) {
       lines.push(`- ${agent.name} [${agent.role}] -> ${agent.slashCommand}`);

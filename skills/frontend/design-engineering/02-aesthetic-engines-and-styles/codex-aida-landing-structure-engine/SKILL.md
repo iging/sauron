@@ -22,26 +22,26 @@ antiPatternsPrevented:
 
 ## 1. Intent (9 Dimensions)
 
-| # | Dimension | Value |
-|---|-----------|-------|
-| 1 | Task | Break LLM statistical loops using seed-based design selection and AIDA structure. |
-| 2 | Target Tool | GPT-4, Codex, Claude Code, Cursor, Copilot, Windsurf, Kiro, Cline, or raw API. |
-| 3 | Output Format | Full-length React/HTML pages with inline GSAP ScrollTrigger animations. |
-| 4 | Constraints | Must simulate seed selection before code. H1 max 2-3 lines. Zero Inter font. |
-| 5 | Input | User landing page or marketing site prompt. |
-| 6 | Context | Prevents LLM statistical collapse into narrow 6-line heroes and repetitive layouts. |
-| 7 | Audience | Frontend developers and agency design teams. |
-| 8 | Success Criteria | Seed selected, AIDA layout applied, GSAP triggers pinned cleanly, tests pass. |
-| 9 | Examples | See Section 10. |
+| #   | Dimension        | Value                                                                               |
+| --- | ---------------- | ----------------------------------------------------------------------------------- |
+| 1   | Task             | Break LLM statistical loops using seed-based design selection and AIDA structure.   |
+| 2   | Target Tool      | GPT-4, Codex, Claude Code, Cursor, Copilot, Windsurf, Kiro, Cline, or raw API.      |
+| 3   | Output Format    | Full-length React/HTML pages with inline GSAP ScrollTrigger animations.             |
+| 4   | Constraints      | Must simulate seed selection before code. H1 max 2-3 lines. Zero Inter font.        |
+| 5   | Input            | User landing page or marketing site prompt.                                         |
+| 6   | Context          | Prevents LLM statistical collapse into narrow 6-line heroes and repetitive layouts. |
+| 7   | Audience         | Frontend developers and agency design teams.                                        |
+| 8   | Success Criteria | Seed selected, AIDA layout applied, GSAP triggers pinned cleanly, tests pass.       |
+| 9   | Examples         | See Section 10.                                                                     |
 
 ## 2. Trigger Matrix
 
-| Trigger | Fire? | Notes |
-|---------|-------|-------|
-| Request for Awwwards-tier motion landing page | YES | Core trigger. |
-| Need for seed-based randomization to avoid AI defaults | YES | Core trigger. |
-| Simple static contact form | NO | Use basic UI design. |
-| Backend API architecture | NO | Out of scope. |
+| Trigger                                                | Fire? | Notes                |
+| ------------------------------------------------------ | ----- | -------------------- |
+| Request for Awwwards-tier motion landing page          | YES   | Core trigger.        |
+| Need for seed-based randomization to avoid AI defaults | YES   | Core trigger.        |
+| Simple static contact form                             | NO    | Use basic UI design. |
+| Backend API architecture                               | NO    | Out of scope.        |
 
 ## 3. Execution Workflow
 
@@ -120,11 +120,11 @@ export function PinnedSection() {
 
 ## 7. Anti-Pattern Compliance
 
-| Step | Prevents AP | Mechanism |
-|------|-------------|-----------|
-| 1 | AP-1 (vague task) | Forces explicit seed selection prior to execution. |
-| 2 | AP-26 (no scope boundary) | Enforces strict AIDA structural boundaries. |
-| 3 | AP-9 (no verification) | Validates GSAP context cleanup to prevent memory leaks. |
+| Step | Prevents AP               | Mechanism                                               |
+| ---- | ------------------------- | ------------------------------------------------------- |
+| 1    | AP-1 (vague task)         | Forces explicit seed selection prior to execution.      |
+| 2    | AP-26 (no scope boundary) | Enforces strict AIDA structural boundaries.             |
+| 3    | AP-9 (no verification)    | Validates GSAP context cleanup to prevent memory leaks. |
 
 ## 8. Versioning & Changelog
 
@@ -134,15 +134,15 @@ export function PinnedSection() {
 
 ## 9. Portability Matrix
 
-| Runtime | Status | Notes |
-|---------|--------|-------|
+| Runtime     | Status   | Notes                                 |
+| ----------- | -------- | ------------------------------------- |
 | Claude Code | verified | Full script and component generation. |
-| Cursor | verified | Interactive motion generation. |
-| Copilot | verified | Component generation. |
-| Windsurf | verified | Cascade execution. |
-| Kiro | verified | Motion runner. |
-| Cline | verified | Task execution mode. |
-| Raw API | verified | Model-agnostic design code generator. |
+| Cursor      | verified | Interactive motion generation.        |
+| Copilot     | verified | Component generation.                 |
+| Windsurf    | verified | Cascade execution.                    |
+| Kiro        | verified | Motion runner.                        |
+| Cline       | verified | Task execution mode.                  |
+| Raw API     | verified | Model-agnostic design code generator. |
 
 ## 10. Examples
 

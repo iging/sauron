@@ -2,10 +2,11 @@
  * @fileoverview Cursor adapter generating .cursorrules and .cursor/rules/*.mdc files.
  */
 
-import type {
-  RuntimeAdapter,
-  TranspileContext,
-  TranspileOutput,
+import {
+  formatCavemanSection,
+  type RuntimeAdapter,
+  type TranspileContext,
+  type TranspileOutput,
 } from "./types.js";
 
 export class CursorAdapter implements RuntimeAdapter {
@@ -35,6 +36,7 @@ export class CursorAdapter implements RuntimeAdapter {
       cursorRulesLines.push(`- ${ap}`);
     }
     cursorRulesLines.push("");
+    cursorRulesLines.push(...formatCavemanSection("##"));
 
     const mdcLines: string[] = [];
     mdcLines.push("---");
@@ -53,6 +55,7 @@ export class CursorAdapter implements RuntimeAdapter {
       mdcLines.push(`- ${rule}`);
     }
     mdcLines.push("");
+    mdcLines.push(...formatCavemanSection("##"));
     mdcLines.push("## Commands and Skills");
     mdcLines.push("");
     for (const skill of context.skills) {

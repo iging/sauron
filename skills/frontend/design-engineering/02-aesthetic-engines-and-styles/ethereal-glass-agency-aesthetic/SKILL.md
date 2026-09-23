@@ -22,26 +22,26 @@ antiPatternsPrevented:
 
 ## 1. Intent (9 Dimensions)
 
-| # | Dimension | Value |
-|---|-----------|-------|
-| 1 | Task | Engineer agency-tier digital experiences with haptic visual depth and fluid motion. |
-| 2 | Target Tool | Any agent runtime: Claude Code, Cursor, Copilot, Windsurf, Kiro, Cline, or raw API. |
-| 3 | Output Format | Production React/Tailwind code with ultra-soft lighting, hair-line borders, and spring physics. |
-| 4 | Constraints | Prohibit Inter/Roboto/Arial fonts, standard Lucide icons, 1px solid gray borders, and harsh shadows. |
-| 5 | Input | SaaS marketing prompt, luxury product page, or high-end portfolio brief. |
-| 6 | Context | Prevents cheap generic AI layouts by enforcing Apple-level visual craftsmanship. |
-| 7 | Audience | Design Directors, product leaders, and enterprise buyers. |
-| 8 | Success Criteria | Diffuse backdrop blurs, organic spring physics, micro-interactions, responsive grid collapse. |
-| 9 | Examples | See Section 10. |
+| #   | Dimension        | Value                                                                                                |
+| --- | ---------------- | ---------------------------------------------------------------------------------------------------- |
+| 1   | Task             | Engineer agency-tier digital experiences with haptic visual depth and fluid motion.                  |
+| 2   | Target Tool      | Any agent runtime: Claude Code, Cursor, Copilot, Windsurf, Kiro, Cline, or raw API.                  |
+| 3   | Output Format    | Production React/Tailwind code with ultra-soft lighting, hair-line borders, and spring physics.      |
+| 4   | Constraints      | Prohibit Inter/Roboto/Arial fonts, standard Lucide icons, 1px solid gray borders, and harsh shadows. |
+| 5   | Input            | SaaS marketing prompt, luxury product page, or high-end portfolio brief.                             |
+| 6   | Context          | Prevents cheap generic AI layouts by enforcing Apple-level visual craftsmanship.                     |
+| 7   | Audience         | Design Directors, product leaders, and enterprise buyers.                                            |
+| 8   | Success Criteria | Diffuse backdrop blurs, organic spring physics, micro-interactions, responsive grid collapse.        |
+| 9   | Examples         | See Section 10.                                                                                      |
 
 ## 2. Trigger Matrix
 
-| Trigger | Fire? | Notes |
-|---------|-------|-------|
-| Request for $150k agency design, Apple-tier UI, or luxury SaaS | YES | Core trigger. |
-| Ethereal Glass, Editorial Luxury, or Soft Structuralism request | YES | Core trigger. |
-| Brutalist tactical telemetry interface | NO | Use `industrial-brutalist-ui`. |
-| Notion-style plain document viewer | NO | Use `minimalist-ui`. |
+| Trigger                                                         | Fire? | Notes                          |
+| --------------------------------------------------------------- | ----- | ------------------------------ |
+| Request for $150k agency design, Apple-tier UI, or luxury SaaS  | YES   | Core trigger.                  |
+| Ethereal Glass, Editorial Luxury, or Soft Structuralism request | YES   | Core trigger.                  |
+| Brutalist tactical telemetry interface                          | NO    | Use `industrial-brutalist-ui`. |
+| Notion-style plain document viewer                              | NO    | Use `minimalist-ui`.           |
 
 ## 3. Execution Workflow
 
@@ -76,7 +76,8 @@ export function HighEndAgencyCard() {
         Ethereal Precision
       </h3>
       <p className="mt-4 text-sm text-neutral-400 leading-relaxed font-light">
-        High-craft interface architecture engineered for luxury digital platforms.
+        High-craft interface architecture engineered for luxury digital
+        platforms.
       </p>
     </div>
   );
@@ -98,11 +99,11 @@ export function HighEndAgencyCard() {
 
 ## 7. Anti-Pattern Compliance
 
-| Step | Prevents AP | Mechanism |
-|------|-------------|-----------|
-| 1 | AP-1 (vague task) | Demands explicit selection of agency texture profile. |
-| 2 | AP-18 (unstructured output) | Enforces responsive layout archetypes. |
-| 3 | AP-4 (over-permissive agent) | Replaces linear transitions with spring cubic-bezier timing. |
+| Step | Prevents AP                  | Mechanism                                                    |
+| ---- | ---------------------------- | ------------------------------------------------------------ |
+| 1    | AP-1 (vague task)            | Demands explicit selection of agency texture profile.        |
+| 2    | AP-18 (unstructured output)  | Enforces responsive layout archetypes.                       |
+| 3    | AP-4 (over-permissive agent) | Replaces linear transitions with spring cubic-bezier timing. |
 
 ## 8. Versioning & Changelog
 
@@ -112,15 +113,15 @@ export function HighEndAgencyCard() {
 
 ## 9. Portability Matrix
 
-| Runtime | Status | Notes |
-|---------|--------|-------|
+| Runtime     | Status   | Notes                                 |
+| ----------- | -------- | ------------------------------------- |
 | Claude Code | verified | Direct high-end interface generation. |
-| Cursor | verified | Interactive component generation. |
-| Copilot | verified | High-precision component generation. |
-| Windsurf | verified | Cascade execution. |
-| Kiro | verified | Visual runner. |
-| Cline | verified | System prompt design mode. |
-| Raw API | verified | Model-agnostic design generator. |
+| Cursor      | verified | Interactive component generation.     |
+| Copilot     | verified | High-precision component generation.  |
+| Windsurf    | verified | Cascade execution.                    |
+| Kiro        | verified | Visual runner.                        |
+| Cline       | verified | System prompt design mode.            |
+| Raw API     | verified | Model-agnostic design generator.      |
 
 ## 10. Examples
 

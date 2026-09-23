@@ -2,10 +2,11 @@
  * @fileoverview Zed editor adapter generating .zed/settings.json and .zed/prompts/sauron.md.
  */
 
-import type {
-  RuntimeAdapter,
-  TranspileContext,
-  TranspileOutput,
+import {
+  formatCavemanSection,
+  type RuntimeAdapter,
+  type TranspileContext,
+  type TranspileOutput,
 } from "./types.js";
 
 export class ZedAdapter implements RuntimeAdapter {
@@ -26,6 +27,7 @@ export class ZedAdapter implements RuntimeAdapter {
       promptLines.push(`- ${rule}`);
     }
     promptLines.push("");
+    promptLines.push(...formatCavemanSection("##"));
     promptLines.push("## Fellowship Sub-Agents");
     for (const agent of context.fellowship) {
       promptLines.push(

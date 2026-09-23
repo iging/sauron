@@ -2,10 +2,11 @@
  * @fileoverview Hermes adapter generating .hermesrules file.
  */
 
-import type {
-  RuntimeAdapter,
-  TranspileContext,
-  TranspileOutput,
+import {
+  formatCavemanSection,
+  type RuntimeAdapter,
+  type TranspileContext,
+  type TranspileOutput,
 } from "./types.js";
 
 export class HermesAdapter implements RuntimeAdapter {
@@ -24,6 +25,7 @@ export class HermesAdapter implements RuntimeAdapter {
       lines.push(`- ${rule}`);
     }
     lines.push("");
+    lines.push(...formatCavemanSection("##"));
     lines.push("## Fellowship Matrix");
     for (const agent of context.fellowship) {
       lines.push(`- ${agent.name} (${agent.role}): ${agent.slashCommand}`);

@@ -97,9 +97,13 @@ export class Transpiler {
    */
   public constructor(options: TranspileOptions) {
     this.workspaceRoot = path.resolve(options.workspaceRoot);
-    this.sauronRoot = path.resolve(
-      options.sauronRoot || path.resolve(this.workspaceRoot, "sauron"),
-    );
+    if (options.sauronRoot) {
+      this.sauronRoot = path.resolve(options.sauronRoot);
+    } else if (fs.existsSync(path.join(this.workspaceRoot, "core"))) {
+      this.sauronRoot = this.workspaceRoot;
+    } else {
+      this.sauronRoot = path.resolve(this.workspaceRoot, "sauron");
+    }
     this.conflictManager = new ConflictManager(this.workspaceRoot);
     this.adapters = new Map();
 
@@ -237,6 +241,7 @@ export class Transpiler {
         "Strict Red-Green-Refactor TDD required before touching production code.",
         "Zero untyped boundary parameters: enforce runtime validation (Zod, Pydantic).",
         "Zero hardcoded secrets, connection strings, or unredacted logging output.",
+        "Token Conservation & Caveman Mode: When invoked with '/caveman' (or 'lite', 'ultra'), eliminate conversational filler and pleasantries while preserving all code, commands, paths, and technical precision verbatim. Restore standard conversational style when requested with '/caveman off'.",
       ],
       antiPatterns: [
         "AP-1 (Vague task verb) : Always decompose requests into concrete atomic tasks.",
