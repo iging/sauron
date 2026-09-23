@@ -2,10 +2,11 @@
  * @fileoverview Cline adapter generating .clinerules file.
  */
 
-import type {
-  RuntimeAdapter,
-  TranspileContext,
-  TranspileOutput,
+import {
+  formatCavemanSection,
+  type RuntimeAdapter,
+  type TranspileContext,
+  type TranspileOutput,
 } from "./types.js";
 
 export class ClineAdapter implements RuntimeAdapter {
@@ -24,6 +25,7 @@ export class ClineAdapter implements RuntimeAdapter {
       lines.push(`1. ${rule}`);
     }
     lines.push("");
+    lines.push(...formatCavemanSection("##"));
     lines.push("## Fellowship Sub-Agents Delegation Model");
     for (const agent of context.fellowship) {
       lines.push(`- ${agent.name} (${agent.role}): ${agent.slashCommand}`);

@@ -22,26 +22,26 @@ antiPatternsPrevented:
 
 ## 1. Intent (9 Dimensions)
 
-| # | Dimension | Value |
-|---|-----------|-------|
-| 1 | Task | Scan existing frontend code, audit design flaws, and refactor styles without breaking logic. |
-| 2 | Target Tool | Any agent runtime: Claude Code, Cursor, Copilot, Windsurf, Kiro, Cline, or raw API. |
-| 3 | Output Format | Targeted CSS/Tailwind refactoring edits, typography upgrades, and audit report. |
-| 4 | Constraints | Preserve all existing component logic, props, event handlers, and data bindings. Zero em-dashes. |
-| 5 | Input | Codebase files, component files, or styling sheets. |
-| 6 | Context | Prevents total scratch rewrites when upgrading existing user interfaces. |
-| 7 | Audience | Frontend developers maintaining existing applications. |
-| 8 | Success Criteria | AI design tropes removed, visual hierarchy enhanced, zero functional regressions. |
-| 9 | Examples | See Section 10. |
+| #   | Dimension        | Value                                                                                            |
+| --- | ---------------- | ------------------------------------------------------------------------------------------------ |
+| 1   | Task             | Scan existing frontend code, audit design flaws, and refactor styles without breaking logic.     |
+| 2   | Target Tool      | Any agent runtime: Claude Code, Cursor, Copilot, Windsurf, Kiro, Cline, or raw API.              |
+| 3   | Output Format    | Targeted CSS/Tailwind refactoring edits, typography upgrades, and audit report.                  |
+| 4   | Constraints      | Preserve all existing component logic, props, event handlers, and data bindings. Zero em-dashes. |
+| 5   | Input            | Codebase files, component files, or styling sheets.                                              |
+| 6   | Context          | Prevents total scratch rewrites when upgrading existing user interfaces.                         |
+| 7   | Audience         | Frontend developers maintaining existing applications.                                           |
+| 8   | Success Criteria | AI design tropes removed, visual hierarchy enhanced, zero functional regressions.                |
+| 9   | Examples         | See Section 10.                                                                                  |
 
 ## 2. Trigger Matrix
 
-| Trigger | Fire? | Notes |
-|---------|-------|-------|
-| Request to upgrade, redesign, or polish existing app UI | YES | Core trigger. |
-| Audit codebase for generic AI visual patterns | YES | Core trigger. |
-| Building brand new UI from scratch | NO | Use `anti-slop-frontend` or `frontend-design`. |
-| Database query optimization | NO | Out of scope. |
+| Trigger                                                 | Fire? | Notes                                          |
+| ------------------------------------------------------- | ----- | ---------------------------------------------- |
+| Request to upgrade, redesign, or polish existing app UI | YES   | Core trigger.                                  |
+| Audit codebase for generic AI visual patterns           | YES   | Core trigger.                                  |
+| Building brand new UI from scratch                      | NO    | Use `anti-slop-frontend` or `frontend-design`. |
+| Database query optimization                             | NO    | Out of scope.                                  |
 
 ## 3. Execution Workflow
 
@@ -72,11 +72,13 @@ antiPatternsPrevented:
 # UI Diagnostic Audit Report
 
 ## Detected Anti-Patterns
+
 1. Typography: Default Inter font used across all headings without character.
 2. Color: Pure `#000000` background causes harsh contrast against white text.
 3. Spacing: Hero headline text wrapped to 5 lines inside narrow `max-w-md` container.
 
 ## Applied Refactor
+
 - Upgraded headline font to `Cabinet Grotesk` with tight tracking `-0.03em`.
 - Replaced background `#000000` with dark charcoal `#0a0a0a`.
 - Expanded hero container to `max-w-5xl` to ensure 2-line headline layout.
@@ -97,11 +99,11 @@ antiPatternsPrevented:
 
 ## 7. Anti-Pattern Compliance
 
-| Step | Prevents AP | Mechanism |
-|------|-------------|-----------|
-| 1 | AP-1 (vague task) | Scans actual codebase before proposing changes. |
-| 3 | AP-4 (over-permissive agent) | Locks state/props to prevent breaking functional logic. |
-| 3 | AP-9 (no verification) | Runs build/test check after styling refactor. |
+| Step | Prevents AP                  | Mechanism                                               |
+| ---- | ---------------------------- | ------------------------------------------------------- |
+| 1    | AP-1 (vague task)            | Scans actual codebase before proposing changes.         |
+| 3    | AP-4 (over-permissive agent) | Locks state/props to prevent breaking functional logic. |
+| 3    | AP-9 (no verification)       | Runs build/test check after styling refactor.           |
 
 ## 8. Versioning & Changelog
 
@@ -111,15 +113,15 @@ antiPatternsPrevented:
 
 ## 9. Portability Matrix
 
-| Runtime | Status | Notes |
-|---------|--------|-------|
+| Runtime     | Status   | Notes                         |
+| ----------- | -------- | ----------------------------- |
 | Claude Code | verified | Direct refactoring execution. |
-| Cursor | verified | In-line code edit mode. |
-| Copilot | verified | Refactoring suggestions. |
-| Windsurf | verified | Cascade code edit. |
-| Kiro | verified | Code modifier. |
-| Cline | verified | File modification mode. |
-| Raw API | verified | Model-agnostic refactor tool. |
+| Cursor      | verified | In-line code edit mode.       |
+| Copilot     | verified | Refactoring suggestions.      |
+| Windsurf    | verified | Cascade code edit.            |
+| Kiro        | verified | Code modifier.                |
+| Cline       | verified | File modification mode.       |
+| Raw API     | verified | Model-agnostic refactor tool. |
 
 ## 10. Examples
 

@@ -2,10 +2,11 @@
  * @fileoverview GitHub Copilot adapter generating .github/copilot-instructions.md.
  */
 
-import type {
-  RuntimeAdapter,
-  TranspileContext,
-  TranspileOutput,
+import {
+  formatCavemanSection,
+  type RuntimeAdapter,
+  type TranspileContext,
+  type TranspileOutput,
 } from "./types.js";
 
 /**
@@ -44,6 +45,7 @@ export class CopilotAdapter implements RuntimeAdapter {
       lines.push(`- ${rule}`);
     }
     lines.push("");
+    lines.push(...formatCavemanSection("##"));
     lines.push("## Fellowship Sub-Agents and Roles");
     lines.push("");
     for (const agent of context.fellowship) {

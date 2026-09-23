@@ -2,10 +2,11 @@
  * @fileoverview Trae AI IDE adapter generating .traerules file.
  */
 
-import type {
-  RuntimeAdapter,
-  TranspileContext,
-  TranspileOutput,
+import {
+  formatCavemanSection,
+  type RuntimeAdapter,
+  type TranspileContext,
+  type TranspileOutput,
 } from "./types.js";
 
 export class TraeAdapter implements RuntimeAdapter {
@@ -24,6 +25,7 @@ export class TraeAdapter implements RuntimeAdapter {
       lines.push(`- ${rule}`);
     }
     lines.push("");
+    lines.push(...formatCavemanSection("##"));
     lines.push("## Fellowship Sub-Agents Context");
     for (const agent of context.fellowship) {
       lines.push(`- ${agent.name} (${agent.role}): ${agent.slashCommand}`);

@@ -168,3 +168,24 @@ export interface RuntimeAdapter {
    */
   transpile(context: TranspileContext): TranspileOutput[];
 }
+
+/**
+ * Standard Token Optimization (Caveman Mode) instruction block.
+ * Shared across all runtime adapters for 100% behavioral parity.
+ *
+ * @param headingLevel - Markdown heading level ('##' or '###').
+ * @returns Array of markdown lines specifying Caveman mode directives.
+ */
+export function formatCavemanSection(
+  headingLevel: "##" | "###" = "##",
+): string[] {
+  return [
+    `${headingLevel} Token Optimization & Caveman Mode`,
+    "",
+    "- When contributor triggers `/caveman` (or `lite`, `ultra`), enforce terse, spartan communication.",
+    "- Drop conversational pleasantries, filler phrases, and tool narration overhead.",
+    "- Never alter or compress code blocks, diffs, file paths, or commands.",
+    "- Restore normal conversational style immediately when requested with `/caveman off`.",
+    "",
+  ];
+}

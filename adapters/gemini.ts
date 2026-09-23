@@ -2,10 +2,11 @@
  * @fileoverview Gemini adapter generating GEMINI.md for Google Gemini CLI and Code Assist.
  */
 
-import type {
-  RuntimeAdapter,
-  TranspileContext,
-  TranspileOutput,
+import {
+  formatCavemanSection,
+  type RuntimeAdapter,
+  type TranspileContext,
+  type TranspileOutput,
 } from "./types.js";
 
 /**
@@ -57,6 +58,7 @@ export class GeminiAdapter implements RuntimeAdapter {
       lines.push(`- ${rule}`);
     }
     lines.push("");
+    lines.push(...formatCavemanSection("##"));
     lines.push("## Fellowship Sub-Agents Delegation");
     lines.push("");
     for (const agent of context.fellowship) {

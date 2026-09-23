@@ -22,26 +22,26 @@ antiPatternsPrevented:
 
 ## 1. Intent (9 Dimensions)
 
-| # | Dimension | Value |
-|---|-----------|-------|
-| 1 | Task | Architect ultra-minimalist, document-style web interfaces with warm monochrome tones. |
-| 2 | Target Tool | Any agent runtime: Claude Code, Cursor, Copilot, Windsurf, Kiro, Cline, or raw API. |
-| 3 | Output Format | Clean HTML/Tailwind templates with restrained typography and subtle pastel accents. |
-| 4 | Constraints | Prohibit Inter/Roboto fonts, heavy drop shadows, neon gradients, pill buttons, and emojis. |
-| 5 | Input | Product design brief, Notion/Linear style UI request, or document interface spec. |
-| 6 | Context | Prevents generic SaaS clutter and over-saturated AI card layouts. |
-| 7 | Audience | Product managers, designers, and developers building editorial web tools. |
-| 8 | Success Criteria | Ultra-flat layout, warm off-white canvas `#F7F6F3`, serif/sans font contrast. |
-| 9 | Examples | See Section 10. |
+| #   | Dimension        | Value                                                                                      |
+| --- | ---------------- | ------------------------------------------------------------------------------------------ |
+| 1   | Task             | Architect ultra-minimalist, document-style web interfaces with warm monochrome tones.      |
+| 2   | Target Tool      | Any agent runtime: Claude Code, Cursor, Copilot, Windsurf, Kiro, Cline, or raw API.        |
+| 3   | Output Format    | Clean HTML/Tailwind templates with restrained typography and subtle pastel accents.        |
+| 4   | Constraints      | Prohibit Inter/Roboto fonts, heavy drop shadows, neon gradients, pill buttons, and emojis. |
+| 5   | Input            | Product design brief, Notion/Linear style UI request, or document interface spec.          |
+| 6   | Context          | Prevents generic SaaS clutter and over-saturated AI card layouts.                          |
+| 7   | Audience         | Product managers, designers, and developers building editorial web tools.                  |
+| 8   | Success Criteria | Ultra-flat layout, warm off-white canvas `#F7F6F3`, serif/sans font contrast.              |
+| 9   | Examples         | See Section 10.                                                                            |
 
 ## 2. Trigger Matrix
 
-| Trigger | Fire? | Notes |
-|---------|-------|-------|
-| Request for minimalist, Notion-style, or Linear-style UI | YES | Core trigger. |
-| Document-style web interface or editorial knowledge base | YES | Core trigger. |
-| Cyberpunk dark mode telemetry HUD | NO | Use `industrial-brutalist-ui`. |
-| $150k agency glassmorphism marketing site | NO | Use `high-end-visual-design`. |
+| Trigger                                                  | Fire? | Notes                          |
+| -------------------------------------------------------- | ----- | ------------------------------ |
+| Request for minimalist, Notion-style, or Linear-style UI | YES   | Core trigger.                  |
+| Document-style web interface or editorial knowledge base | YES   | Core trigger.                  |
+| Cyberpunk dark mode telemetry HUD                        | NO    | Use `industrial-brutalist-ui`. |
+| $150k agency glassmorphism marketing site                | NO    | Use `high-end-visual-design`.  |
 
 ## 3. Execution Workflow
 
@@ -103,11 +103,11 @@ export function MinimalistBentoCard() {
 
 ## 7. Anti-Pattern Compliance
 
-| Step | Prevents AP | Mechanism |
-|------|-------------|-----------|
-| 1 | AP-1 (vague task) | Locks palette to warm monochrome token map. |
-| 2 | AP-18 (unstructured output) | Enforces typography contrast standards. |
-| 3 | AP-4 (over-permissive agent) | Blocks banned fonts, shadows, and emojis. |
+| Step | Prevents AP                  | Mechanism                                   |
+| ---- | ---------------------------- | ------------------------------------------- |
+| 1    | AP-1 (vague task)            | Locks palette to warm monochrome token map. |
+| 2    | AP-18 (unstructured output)  | Enforces typography contrast standards.     |
+| 3    | AP-4 (over-permissive agent) | Blocks banned fonts, shadows, and emojis.   |
 
 ## 8. Versioning & Changelog
 
@@ -117,15 +117,15 @@ export function MinimalistBentoCard() {
 
 ## 9. Portability Matrix
 
-| Runtime | Status | Notes |
-|---------|--------|-------|
-| Claude Code | verified | Direct minimalist UI generation. |
-| Cursor | verified | Interactive component generation. |
-| Copilot | verified | Clean component generation. |
-| Windsurf | verified | Cascade execution. |
-| Kiro | verified | Minimalist UI runner. |
-| Cline | verified | System prompt design mode. |
-| Raw API | verified | Model-agnostic design generator. |
+| Runtime     | Status   | Notes                             |
+| ----------- | -------- | --------------------------------- |
+| Claude Code | verified | Direct minimalist UI generation.  |
+| Cursor      | verified | Interactive component generation. |
+| Copilot     | verified | Clean component generation.       |
+| Windsurf    | verified | Cascade execution.                |
+| Kiro        | verified | Minimalist UI runner.             |
+| Cline       | verified | System prompt design mode.        |
+| Raw API     | verified | Model-agnostic design generator.  |
 
 ## 10. Examples
 

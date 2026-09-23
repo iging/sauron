@@ -22,25 +22,25 @@ antiPatternsPrevented:
 
 ## 1. Intent (9 Dimensions)
 
-| # | Dimension | Value |
-|---|-----------|-------|
-| 1 | Task | Audit and rewrite UI component code to enforce high-craft motion rules. |
-| 2 | Target Tool | Any agent runtime: Claude Code, Cursor, Copilot, Windsurf, Kiro, Cline, or raw API. |
-| 3 | Output Format | Before/After/Why markdown audit comparison tables and refactored code. |
-| 4 | Constraints | Read `../references/high-craft-principles.md`. Never use `ease-in` on UI entrances. |
-| 5 | Input | UI component code, CSS/Tailwind motion snippet, or animation review request. |
-| 6 | Context | Prevents sluggish transitions, scale(0) jumps, and unconstrained hover state churn. |
-| 7 | Audience | Frontend engineers, design system directors, and UI developers. |
-| 8 | Success Criteria | GPU-only transforms applied, frequency rule respected, zero animation on keyboard triggers. |
-| 9 | Examples | See Section 10. |
+| #   | Dimension        | Value                                                                                       |
+| --- | ---------------- | ------------------------------------------------------------------------------------------- |
+| 1   | Task             | Audit and rewrite UI component code to enforce high-craft motion rules.                     |
+| 2   | Target Tool      | Any agent runtime: Claude Code, Cursor, Copilot, Windsurf, Kiro, Cline, or raw API.         |
+| 3   | Output Format    | Before/After/Why markdown audit comparison tables and refactored code.                      |
+| 4   | Constraints      | Read `../references/high-craft-principles.md`. Never use `ease-in` on UI entrances.         |
+| 5   | Input            | UI component code, CSS/Tailwind motion snippet, or animation review request.                |
+| 6   | Context          | Prevents sluggish transitions, scale(0) jumps, and unconstrained hover state churn.         |
+| 7   | Audience         | Frontend engineers, design system directors, and UI developers.                             |
+| 8   | Success Criteria | GPU-only transforms applied, frequency rule respected, zero animation on keyboard triggers. |
+| 9   | Examples         | See Section 10.                                                                             |
 
 ## 2. Trigger Matrix
 
-| Trigger | Fire? | Notes |
-|---------|-------|-------|
-| Review or audit component animations for high-craft standards | YES | Core trigger. |
-| Enforce GPU properties and spatial transform origin rules | YES | Core trigger. |
-| Backend server architecture setup | NO | Out of scope. |
+| Trigger                                                       | Fire? | Notes         |
+| ------------------------------------------------------------- | ----- | ------------- |
+| Review or audit component animations for high-craft standards | YES   | Core trigger. |
+| Enforce GPU properties and spatial transform origin rules     | YES   | Core trigger. |
+| Backend server architecture setup                             | NO    | Out of scope. |
 
 ## 3. Execution Workflow
 
@@ -75,11 +75,11 @@ antiPatternsPrevented:
 ## 4. Output Specification
 
 ```markdown
-| Before | After | Why |
-| --- | --- | --- |
-| `transition: all 300ms` | `transition: transform 200ms ease-out, opacity 200ms ease-out` | Specify exact properties; avoid `all` off-GPU |
-| `transform: scale(0)` | `transform: scale(0.95); opacity: 0` | Real-world objects do not pop out of thin air |
-| `transform-origin: center` | `transform-origin: var(--transform-origin)` | Popovers must scale from trigger position |
+| Before                     | After                                                          | Why                                           |
+| -------------------------- | -------------------------------------------------------------- | --------------------------------------------- |
+| `transition: all 300ms`    | `transition: transform 200ms ease-out, opacity 200ms ease-out` | Specify exact properties; avoid `all` off-GPU |
+| `transform: scale(0)`      | `transform: scale(0.95); opacity: 0`                           | Real-world objects do not pop out of thin air |
+| `transform-origin: center` | `transform-origin: var(--transform-origin)`                    | Popovers must scale from trigger position     |
 ```
 
 ## 5. Validation Gate
@@ -97,11 +97,11 @@ antiPatternsPrevented:
 
 ## 7. Anti-Pattern Compliance
 
-| Step | Prevents AP | Mechanism |
-|------|-------------|-----------|
-| 1 | AP-1 (vague task) | Demands explicit component type identification. |
-| 3 | AP-4 (over-permissive agent) | Hard-blocks layout property animations and `scale(0)`. |
-| 4 | AP-18 (unstructured output) | Forces output into 3-column markdown table. |
+| Step | Prevents AP                  | Mechanism                                              |
+| ---- | ---------------------------- | ------------------------------------------------------ |
+| 1    | AP-1 (vague task)            | Demands explicit component type identification.        |
+| 3    | AP-4 (over-permissive agent) | Hard-blocks layout property animations and `scale(0)`. |
+| 4    | AP-18 (unstructured output)  | Forces output into 3-column markdown table.            |
 
 ## 8. Versioning & Changelog
 
@@ -111,15 +111,15 @@ antiPatternsPrevented:
 
 ## 9. Portability Matrix
 
-| Runtime | Status | Notes |
-|---------|--------|-------|
+| Runtime     | Status   | Notes                                   |
+| ----------- | -------- | --------------------------------------- |
 | Claude Code | verified | Direct craft audit and code generation. |
-| Cursor | verified | Interactive component craft review. |
-| Copilot | verified | In-line motion assistant. |
-| Windsurf | verified | Cascade execution. |
-| Kiro | verified | Motion craft runner. |
-| Cline | verified | System prompt task mode. |
-| Raw API | verified | Model-agnostic craft engine. |
+| Cursor      | verified | Interactive component craft review.     |
+| Copilot     | verified | In-line motion assistant.               |
+| Windsurf    | verified | Cascade execution.                      |
+| Kiro        | verified | Motion craft runner.                    |
+| Cline       | verified | System prompt task mode.                |
+| Raw API     | verified | Model-agnostic craft engine.            |
 
 ## 10. Examples
 

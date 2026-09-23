@@ -22,25 +22,25 @@ antiPatternsPrevented:
 
 ## 1. Intent (9 Dimensions)
 
-| # | Dimension | Value |
-|---|-----------|-------|
-| 1 | Task | Enforce Apple fluid motion, instant response, and interruptible spring physics on UI code. |
-| 2 | Target Tool | Any agent runtime: Claude Code, Cursor, Copilot, Windsurf, Kiro, Cline, or raw API. |
-| 3 | Output Format | Physical constraint specs, spring parameter configurations, and gesture component code. |
-| 4 | Constraints | Read `../references/apple-guidelines.md`. Respond on pointer-down. Zero `@keyframes` on drag. |
-| 5 | Input | Gesture UI component, spring animation request, or Apple-style interface brief. |
-| 6 | Context | Prevents laggy input handling, non-interruptible animations, and artificial delays. |
-| 7 | Audience | Frontend engineers, mobile designers, and design system engineers. |
-| 8 | Success Criteria | Respond on pointer-down, 1:1 tracking, velocity hand-off on release, critically damped default. |
-| 9 | Examples | See Section 10. |
+| #   | Dimension        | Value                                                                                           |
+| --- | ---------------- | ----------------------------------------------------------------------------------------------- |
+| 1   | Task             | Enforce Apple fluid motion, instant response, and interruptible spring physics on UI code.      |
+| 2   | Target Tool      | Any agent runtime: Claude Code, Cursor, Copilot, Windsurf, Kiro, Cline, or raw API.             |
+| 3   | Output Format    | Physical constraint specs, spring parameter configurations, and gesture component code.         |
+| 4   | Constraints      | Read `../references/apple-guidelines.md`. Respond on pointer-down. Zero `@keyframes` on drag.   |
+| 5   | Input            | Gesture UI component, spring animation request, or Apple-style interface brief.                 |
+| 6   | Context          | Prevents laggy input handling, non-interruptible animations, and artificial delays.             |
+| 7   | Audience         | Frontend engineers, mobile designers, and design system engineers.                              |
+| 8   | Success Criteria | Respond on pointer-down, 1:1 tracking, velocity hand-off on release, critically damped default. |
+| 9   | Examples         | See Section 10.                                                                                 |
 
 ## 2. Trigger Matrix
 
-| Trigger | Fire? | Notes |
-|---------|-------|-------|
-| Request for gesture-driven UI, spring animation, or Apple fluid motion | YES | Core trigger. |
-| Building bottom sheets, drag-to-dismiss drawers, or interactive popovers | YES | Core trigger. |
-| Backend database optimization | NO | Out of scope. |
+| Trigger                                                                  | Fire? | Notes         |
+| ------------------------------------------------------------------------ | ----- | ------------- |
+| Request for gesture-driven UI, spring animation, or Apple fluid motion   | YES   | Core trigger. |
+| Building bottom sheets, drag-to-dismiss drawers, or interactive popovers | YES   | Core trigger. |
+| Backend database optimization                                            | NO    | Out of scope. |
 
 ## 3. Execution Workflow
 
@@ -74,7 +74,7 @@ antiPatternsPrevented:
 
 ## 4. Output Specification
 
-```markdown
+````markdown
 # Apple Physical Motion Implementation
 
 - **Constraint:** Feedback must be continuous and 1:1 with pointer drag. Hand off release velocity.
@@ -90,6 +90,8 @@ export function AppleStyleDrawer() {
   );
 }
 ```
+````
+
 ```
 
 ## 5. Validation Gate
@@ -135,3 +137,4 @@ export function AppleStyleDrawer() {
 
 **Input:** "Build a bottom sheet drag gesture."
 **Output:** Physical constraints cited from `../references/apple-guidelines.md`, 1:1 grab offset code produced, spring release velocity handoff output.
+```

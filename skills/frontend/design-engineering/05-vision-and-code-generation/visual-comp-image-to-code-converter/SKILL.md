@@ -22,26 +22,26 @@ antiPatternsPrevented:
 
 ## 1. Intent (9 Dimensions)
 
-| # | Dimension | Value |
-|---|-----------|-------|
-| 1 | Task | Generate high-res section comps, analyze layout grid/typography, and output matching frontend. |
-| 2 | Target Tool | Any agent runtime: Claude Code, Cursor, Copilot, Windsurf, Kiro, Cline, or raw API. |
-| 3 | Output Format | Visual analysis breakdown and production-ready React/HTML code matching comp visuals. |
-| 4 | Constraints | Must generate section-specific comps. No cards-inside-cards-inside-cards UI. Zero em-dashes. |
-| 5 | Input | User website brief, brand directives, or existing visual mockups. |
-| 6 | Context | Prevents generic LLM interpretation by grounding code execution in visual comp analysis. |
-| 7 | Audience | Product designers and frontend design engineers. |
-| 8 | Success Criteria | Coded implementation matches generated visual comps in structure, spacing, and tone. |
-| 9 | Examples | See Section 10. |
+| #   | Dimension        | Value                                                                                          |
+| --- | ---------------- | ---------------------------------------------------------------------------------------------- |
+| 1   | Task             | Generate high-res section comps, analyze layout grid/typography, and output matching frontend. |
+| 2   | Target Tool      | Any agent runtime: Claude Code, Cursor, Copilot, Windsurf, Kiro, Cline, or raw API.            |
+| 3   | Output Format    | Visual analysis breakdown and production-ready React/HTML code matching comp visuals.          |
+| 4   | Constraints      | Must generate section-specific comps. No cards-inside-cards-inside-cards UI. Zero em-dashes.   |
+| 5   | Input            | User website brief, brand directives, or existing visual mockups.                              |
+| 6   | Context          | Prevents generic LLM interpretation by grounding code execution in visual comp analysis.       |
+| 7   | Audience         | Product designers and frontend design engineers.                                               |
+| 8   | Success Criteria | Coded implementation matches generated visual comps in structure, spacing, and tone.           |
+| 9   | Examples         | See Section 10.                                                                                |
 
 ## 2. Trigger Matrix
 
-| Trigger | Fire? | Notes |
-|---------|-------|-------|
-| Task requires translating visual design comps into code | YES | Core trigger. |
-| User requests image-first workflow for landing page | YES | Core trigger. |
-| Text-only CLI utility generation | NO | Out of scope. |
-| SQL query tuning | NO | Out of scope. |
+| Trigger                                                 | Fire? | Notes         |
+| ------------------------------------------------------- | ----- | ------------- |
+| Task requires translating visual design comps into code | YES   | Core trigger. |
+| User requests image-first workflow for landing page     | YES   | Core trigger. |
+| Text-only CLI utility generation                        | NO    | Out of scope. |
+| SQL query tuning                                        | NO    | Out of scope. |
 
 ## 3. Execution Workflow
 
@@ -68,7 +68,7 @@ antiPatternsPrevented:
 
 ## 4. Output Specification
 
-```markdown
+````markdown
 # Visual Analysis Breakdown
 
 - Primary Typography: Display Serif (Hero) + Monospace (Telemetry Labels)
@@ -91,7 +91,7 @@ export function VisualCompHero() {
   );
 }
 ```
-```
+````
 
 ## 5. Validation Gate
 
@@ -107,11 +107,11 @@ export function VisualCompHero() {
 
 ## 7. Anti-Pattern Compliance
 
-| Step | Prevents AP | Mechanism |
-|------|-------------|-----------|
-| 1 | AP-1 (vague task) | Generates explicit section comps before writing code. |
-| 2 | AP-18 (unstructured output) | Extracts visual tokens into structured analysis document. |
-| 3 | AP-4 (over-permissive agent) | Restricts layout to extracted grid bounds. |
+| Step | Prevents AP                  | Mechanism                                                 |
+| ---- | ---------------------------- | --------------------------------------------------------- |
+| 1    | AP-1 (vague task)            | Generates explicit section comps before writing code.     |
+| 2    | AP-18 (unstructured output)  | Extracts visual tokens into structured analysis document. |
+| 3    | AP-4 (over-permissive agent) | Restricts layout to extracted grid bounds.                |
 
 ## 8. Versioning & Changelog
 
@@ -121,15 +121,15 @@ export function VisualCompHero() {
 
 ## 9. Portability Matrix
 
-| Runtime | Status | Notes |
-|---------|--------|-------|
+| Runtime     | Status   | Notes                                       |
+| ----------- | -------- | ------------------------------------------- |
 | Claude Code | verified | Multimodal visual analysis and code output. |
-| Cursor | verified | Multimodal image inspect mode. |
-| Copilot | verified | Multimodal support. |
-| Windsurf | verified | Multimodal cascade execution. |
-| Kiro | verified | Visual runner. |
-| Cline | verified | Multimodal prompt mode. |
-| Raw API | verified | Multimodal vision model support. |
+| Cursor      | verified | Multimodal image inspect mode.              |
+| Copilot     | verified | Multimodal support.                         |
+| Windsurf    | verified | Multimodal cascade execution.               |
+| Kiro        | verified | Visual runner.                              |
+| Cline       | verified | Multimodal prompt mode.                     |
+| Raw API     | verified | Multimodal vision model support.            |
 
 ## 10. Examples
 

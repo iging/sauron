@@ -4,10 +4,11 @@
  * Eliminates deprecated github.copilot.chat.codeGeneration.instructions in settings.json.
  */
 
-import type {
-  RuntimeAdapter,
-  TranspileContext,
-  TranspileOutput,
+import {
+  formatCavemanSection,
+  type RuntimeAdapter,
+  type TranspileContext,
+  type TranspileOutput,
 } from "./types.js";
 
 /**
@@ -61,6 +62,7 @@ export class VSCodeAdapter implements RuntimeAdapter {
       instructionLines.push(`- ${rule}`);
     }
     instructionLines.push("");
+    instructionLines.push(...formatCavemanSection("##"));
     instructionLines.push("## Fellowship Sub-Agents Context");
     instructionLines.push("");
     for (const agent of context.fellowship) {

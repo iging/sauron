@@ -22,9 +22,11 @@ import { Transpiler } from "../dist/adapters/transpiler.js";
 const __filename = fileURLToPath(import.meta.url);
 const __dirname = path.dirname(__filename);
 const SAURON_ROOT = Object.freeze(path.resolve(__dirname, ".."));
+const packageJsonPath = path.join(SAURON_ROOT, "package.json");
+const packageJson = JSON.parse(fs.readFileSync(packageJsonPath, "utf8"));
 
 /** @type {string} Semantic version of the Sauron harness CLI. */
-const VERSION = "1.0.0";
+const VERSION = packageJson.version;
 
 /** @type {string} ASCII banner celebrating the Lord of the Rings fellowship metaphor. */
 const LOTR_BANNER = Object.freeze(`

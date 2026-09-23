@@ -22,25 +22,25 @@ antiPatternsPrevented:
 
 ## 1. Intent (9 Dimensions)
 
-| # | Dimension | Value |
-|---|-----------|-------|
-| 1 | Task | Evaluate code diffs against strict motion standards and declare BLOCK or APPROVE verdict. |
-| 2 | Target Tool | Any agent runtime: Claude Code, Cursor, Copilot, Windsurf, Kiro, Cline, or raw API. |
-| 3 | Output Format | Before/After/Why comparison table and grouped verdict report (BLOCK/APPROVE). |
-| 4 | Constraints | Read `../references/animation-standards.md`. Default to flagging (approval earned). |
-| 5 | Input | PR diff, UI component animation code, or pull request review request. |
-| 6 | Context | Prevents animation regressions, un-accelerated CSS properties, and sluggish UI entrances. |
-| 7 | Audience | Code reviewers, frontend engineers, and release engineers. |
-| 8 | Success Criteria | Verifies purpose, blocks keyboard animations, enforces GPU properties, outputs strict verdict. |
-| 9 | Examples | See Section 10. |
+| #   | Dimension        | Value                                                                                          |
+| --- | ---------------- | ---------------------------------------------------------------------------------------------- |
+| 1   | Task             | Evaluate code diffs against strict motion standards and declare BLOCK or APPROVE verdict.      |
+| 2   | Target Tool      | Any agent runtime: Claude Code, Cursor, Copilot, Windsurf, Kiro, Cline, or raw API.            |
+| 3   | Output Format    | Before/After/Why comparison table and grouped verdict report (BLOCK/APPROVE).                  |
+| 4   | Constraints      | Read `../references/animation-standards.md`. Default to flagging (approval earned).            |
+| 5   | Input            | PR diff, UI component animation code, or pull request review request.                          |
+| 6   | Context          | Prevents animation regressions, un-accelerated CSS properties, and sluggish UI entrances.      |
+| 7   | Audience         | Code reviewers, frontend engineers, and release engineers.                                     |
+| 8   | Success Criteria | Verifies purpose, blocks keyboard animations, enforces GPU properties, outputs strict verdict. |
+| 9   | Examples         | See Section 10.                                                                                |
 
 ## 2. Trigger Matrix
 
-| Trigger | Fire? | Notes |
-|---------|-------|-------|
-| Review PR or component diff for motion regressions | YES | Core trigger. |
-| Verification of easing curves, durations, or hardware acceleration | YES | Core trigger. |
-| General backend code review | NO | Out of scope. |
+| Trigger                                                            | Fire? | Notes         |
+| ------------------------------------------------------------------ | ----- | ------------- |
+| Review PR or component diff for motion regressions                 | YES   | Core trigger. |
+| Verification of easing curves, durations, or hardware acceleration | YES   | Core trigger. |
+| General backend code review                                        | NO    | Out of scope. |
 
 ## 3. Execution Workflow
 
@@ -77,16 +77,17 @@ antiPatternsPrevented:
 ```markdown
 ### Findings Table
 
-| Before | After | Why |
-| --- | --- | --- |
-| `transform: scale(0)` | `transform: scale(0.95); opacity: 0` | Real-world objects do not scale from 0 |
-| `ease-in` | `ease-out` | `ease-in` delays feedback and feels sluggish |
+| Before                | After                                | Why                                          |
+| --------------------- | ------------------------------------ | -------------------------------------------- |
+| `transform: scale(0)` | `transform: scale(0.95); opacity: 0` | Real-world objects do not scale from 0       |
+| `ease-in`             | `ease-out`                           | `ease-in` delays feedback and feels sluggish |
 
 ### Verdict
 
 **Status:** BLOCK
 
 **1. Feel-breaking regressions**
+
 - `ease-in` on drawer entrance makes UI feel unresponsive.
 ```
 
@@ -105,11 +106,11 @@ antiPatternsPrevented:
 
 ## 7. Anti-Pattern Compliance
 
-| Step | Prevents AP | Mechanism |
-|------|-------------|-----------|
-| 1 | AP-1 (vague task) | Demands explicit reference loading before code review. |
-| 3 | AP-4 (over-permissive agent) | Blocks off-GPU layout property animations. |
-| 4 | AP-18 (unstructured output) | Enforces structured findings table and explicit verdict. |
+| Step | Prevents AP                  | Mechanism                                                |
+| ---- | ---------------------------- | -------------------------------------------------------- |
+| 1    | AP-1 (vague task)            | Demands explicit reference loading before code review.   |
+| 3    | AP-4 (over-permissive agent) | Blocks off-GPU layout property animations.               |
+| 4    | AP-18 (unstructured output)  | Enforces structured findings table and explicit verdict. |
 
 ## 8. Versioning & Changelog
 
@@ -119,15 +120,15 @@ antiPatternsPrevented:
 
 ## 9. Portability Matrix
 
-| Runtime | Status | Notes |
-|---------|--------|-------|
+| Runtime     | Status   | Notes                           |
+| ----------- | -------- | ------------------------------- |
 | Claude Code | verified | Direct motion code review gate. |
-| Cursor | verified | Interactive PR diff review. |
-| Copilot | verified | In-line review assistant. |
-| Windsurf | verified | Cascade execution. |
-| Kiro | verified | Motion reviewer runner. |
-| Cline | verified | System prompt task mode. |
-| Raw API | verified | Model-agnostic review engine. |
+| Cursor      | verified | Interactive PR diff review.     |
+| Copilot     | verified | In-line review assistant.       |
+| Windsurf    | verified | Cascade execution.              |
+| Kiro        | verified | Motion reviewer runner.         |
+| Cline       | verified | System prompt task mode.        |
+| Raw API     | verified | Model-agnostic review engine.   |
 
 ## 10. Examples
 

@@ -22,25 +22,25 @@ antiPatternsPrevented:
 
 ## 1. Intent (9 Dimensions)
 
-| # | Dimension | Value |
-|---|-----------|-------|
-| 1 | Task | Generate 3-5 genuinely distinct UI variants rendered behind a standardized picker harness. |
-| 2 | Target Tool | Any agent runtime: Claude Code, Cursor, Copilot, Windsurf, Kiro, Cline, or raw API. |
-| 3 | Output Format | Variant comparison summary table, harness URL/path, and functional prototype code. |
-| 4 | Constraints | Never touch production code during exploration. Follow `../references/prototype-picker.md`. |
-| 5 | Input | Component exploration prompt or multi-variant UI request. |
-| 6 | Context | Prevents superficial color-only tweaks by exploring true interaction and density axes. |
-| 7 | Audience | Product designers, frontend leads, and design engineers. |
-| 8 | Success Criteria | Isolated route created, 3-5 distinct variants rendered, picker harness functional. |
-| 9 | Examples | See Section 10. |
+| #   | Dimension        | Value                                                                                       |
+| --- | ---------------- | ------------------------------------------------------------------------------------------- |
+| 1   | Task             | Generate 3-5 genuinely distinct UI variants rendered behind a standardized picker harness.  |
+| 2   | Target Tool      | Any agent runtime: Claude Code, Cursor, Copilot, Windsurf, Kiro, Cline, or raw API.         |
+| 3   | Output Format    | Variant comparison summary table, harness URL/path, and functional prototype code.          |
+| 4   | Constraints      | Never touch production code during exploration. Follow `../references/prototype-picker.md`. |
+| 5   | Input            | Component exploration prompt or multi-variant UI request.                                   |
+| 6   | Context          | Prevents superficial color-only tweaks by exploring true interaction and density axes.      |
+| 7   | Audience         | Product designers, frontend leads, and design engineers.                                    |
+| 8   | Success Criteria | Isolated route created, 3-5 distinct variants rendered, picker harness functional.          |
+| 9   | Examples         | See Section 10.                                                                             |
 
 ## 2. Trigger Matrix
 
-| Trigger | Fire? | Notes |
-|---------|-------|-------|
-| Exploring visual or interaction design directions for a single component | YES | Core trigger. |
-| Generating interactive variant prototypes behind a visual picker harness | YES | Core trigger. |
-| Refactoring existing production components directly | NO | Out of scope. |
+| Trigger                                                                  | Fire? | Notes         |
+| ------------------------------------------------------------------------ | ----- | ------------- |
+| Exploring visual or interaction design directions for a single component | YES   | Core trigger. |
+| Generating interactive variant prototypes behind a visual picker harness | YES   | Core trigger. |
+| Refactoring existing production components directly                      | NO    | Out of scope. |
 
 ## 3. Execution Workflow
 
@@ -77,11 +77,11 @@ antiPatternsPrevented:
 ```markdown
 ### Prototype Ready
 
-| # | Variant | Axis | When it's the right choice | Its cost |
-| --- | --- | --- | --- | --- |
-| 1 | Quiet | Linear fill, no bounce | Functional dashboards | Unmemorable |
-| 2 | Physical | Spring release, haptic shake | High-risk destructive actions | Adds visual noise |
-| 3 | Minimal | Long press delay, static state | Density-heavy tables | Weak feedback |
+| #   | Variant  | Axis                           | When it's the right choice    | Its cost          |
+| --- | -------- | ------------------------------ | ----------------------------- | ----------------- |
+| 1   | Quiet    | Linear fill, no bounce         | Functional dashboards         | Unmemorable       |
+| 2   | Physical | Spring release, haptic shake   | High-risk destructive actions | Adds visual noise |
+| 3   | Minimal  | Long press delay, static state | Density-heavy tables          | Weak feedback     |
 
 **Location:** `http://localhost:3000/prototypes/delete-btn`
 ```
@@ -101,11 +101,11 @@ antiPatternsPrevented:
 
 ## 7. Anti-Pattern Compliance
 
-| Step | Prevents AP | Mechanism |
-|------|-------------|-----------|
-| 1 | AP-1 (vague task) | Isolates exploration to a single component scope. |
-| 3 | AP-26 (no scope boundary) | Confines all experimental code to `/prototypes/slug`. |
-| 4 | AP-18 (unstructured output) | Enforces structured variant comparison table. |
+| Step | Prevents AP                 | Mechanism                                             |
+| ---- | --------------------------- | ----------------------------------------------------- |
+| 1    | AP-1 (vague task)           | Isolates exploration to a single component scope.     |
+| 3    | AP-26 (no scope boundary)   | Confines all experimental code to `/prototypes/slug`. |
+| 4    | AP-18 (unstructured output) | Enforces structured variant comparison table.         |
 
 ## 8. Versioning & Changelog
 
@@ -115,15 +115,15 @@ antiPatternsPrevented:
 
 ## 9. Portability Matrix
 
-| Runtime | Status | Notes |
-|---------|--------|-------|
+| Runtime     | Status   | Notes                               |
+| ----------- | -------- | ----------------------------------- |
 | Claude Code | verified | Direct prototype harness generator. |
-| Cursor | verified | Interactive prototype route editor. |
-| Copilot | verified | Variant generation assistant. |
-| Windsurf | verified | Cascade execution. |
-| Kiro | verified | Prototype harness runner. |
-| Cline | verified | System prompt task mode. |
-| Raw API | verified | Model-agnostic prototype builder. |
+| Cursor      | verified | Interactive prototype route editor. |
+| Copilot     | verified | Variant generation assistant.       |
+| Windsurf    | verified | Cascade execution.                  |
+| Kiro        | verified | Prototype harness runner.           |
+| Cline       | verified | System prompt task mode.            |
+| Raw API     | verified | Model-agnostic prototype builder.   |
 
 ## 10. Examples
 

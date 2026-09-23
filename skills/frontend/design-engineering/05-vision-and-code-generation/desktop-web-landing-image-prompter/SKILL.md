@@ -22,26 +22,26 @@ antiPatternsPrevented:
 
 ## 1. Intent (9 Dimensions)
 
-| # | Dimension | Value |
-|---|-----------|-------|
-| 1 | Task | Construct image-generation prompts for high-resolution desktop website landing pages. |
-| 2 | Target Tool | Midjourney, DALL-E 3, Stable Diffusion, Recraft, or multimodal AI models. |
-| 3 | Output Format | Structured text prompts specifying layout, aspect ratio (`16:9`), lighting, and UI style. |
-| 4 | Constraints | Must enforce section-specific desktop viewports. Prohibit mobile phone frames. Zero em-dashes. |
-| 5 | Input | Product type, feature overview, visual vibe preference, and brand colors. |
-| 6 | Context | Prevents squeezed or warped mobile UI generated when desktop web comps are requested. |
-| 7 | Audience | UI/UX designers, creative directors, and web developers. |
-| 8 | Success Criteria | Desktop aspect ratio `--ar 16:9` enforced, clean section layout visual prompts output. |
-| 9 | Examples | See Section 10. |
+| #   | Dimension        | Value                                                                                          |
+| --- | ---------------- | ---------------------------------------------------------------------------------------------- |
+| 1   | Task             | Construct image-generation prompts for high-resolution desktop website landing pages.          |
+| 2   | Target Tool      | Midjourney, DALL-E 3, Stable Diffusion, Recraft, or multimodal AI models.                      |
+| 3   | Output Format    | Structured text prompts specifying layout, aspect ratio (`16:9`), lighting, and UI style.      |
+| 4   | Constraints      | Must enforce section-specific desktop viewports. Prohibit mobile phone frames. Zero em-dashes. |
+| 5   | Input            | Product type, feature overview, visual vibe preference, and brand colors.                      |
+| 6   | Context          | Prevents squeezed or warped mobile UI generated when desktop web comps are requested.          |
+| 7   | Audience         | UI/UX designers, creative directors, and web developers.                                       |
+| 8   | Success Criteria | Desktop aspect ratio `--ar 16:9` enforced, clean section layout visual prompts output.         |
+| 9   | Examples         | See Section 10.                                                                                |
 
 ## 2. Trigger Matrix
 
-| Trigger | Fire? | Notes |
-|---------|-------|-------|
-| Request for desktop web landing page image prompts | YES | Core trigger. |
-| Generating visual references for hero or bento grid sections | YES | Core trigger. |
-| Mobile app screen layout prompts | NO | Use `imagegen-mobile-comps`. |
-| Writing Tailwind React code directly | NO | Use `anti-slop-frontend`. |
+| Trigger                                                      | Fire? | Notes                        |
+| ------------------------------------------------------------ | ----- | ---------------------------- |
+| Request for desktop web landing page image prompts           | YES   | Core trigger.                |
+| Generating visual references for hero or bento grid sections | YES   | Core trigger.                |
+| Mobile app screen layout prompts                             | NO    | Use `imagegen-mobile-comps`. |
+| Writing Tailwind React code directly                         | NO    | Use `anti-slop-frontend`.    |
 
 ## 3. Execution Workflow
 
@@ -90,11 +90,11 @@ antiPatternsPrevented:
 
 ## 7. Anti-Pattern Compliance
 
-| Step | Prevents AP | Mechanism |
-|------|-------------|-----------|
-| 1 | AP-1 (vague task) | Demands explicit layout and palette specifications. |
-| 2 | AP-18 (unstructured output) | Enforces desktop viewport parameters (`--ar 16:9`). |
-| 3 | AP-4 (over-permissive agent) | Locks perspective to straight-on clean UI screenshot. |
+| Step | Prevents AP                  | Mechanism                                             |
+| ---- | ---------------------------- | ----------------------------------------------------- |
+| 1    | AP-1 (vague task)            | Demands explicit layout and palette specifications.   |
+| 2    | AP-18 (unstructured output)  | Enforces desktop viewport parameters (`--ar 16:9`).   |
+| 3    | AP-4 (over-permissive agent) | Locks perspective to straight-on clean UI screenshot. |
 
 ## 8. Versioning & Changelog
 
@@ -104,15 +104,15 @@ antiPatternsPrevented:
 
 ## 9. Portability Matrix
 
-| Runtime | Status | Notes |
-|---------|--------|-------|
-| Claude Code | verified | Web comp prompt generator. |
-| Cursor | verified | Interactive prompt mode. |
-| Copilot | verified | Prompt assistant. |
-| Windsurf | verified | Cascade execution. |
-| Kiro | verified | Visual runner. |
-| Cline | verified | System prompt mode. |
-| Raw API | verified | Model-agnostic prompt generator. |
+| Runtime     | Status   | Notes                            |
+| ----------- | -------- | -------------------------------- |
+| Claude Code | verified | Web comp prompt generator.       |
+| Cursor      | verified | Interactive prompt mode.         |
+| Copilot     | verified | Prompt assistant.                |
+| Windsurf    | verified | Cascade execution.               |
+| Kiro        | verified | Visual runner.                   |
+| Cline       | verified | System prompt mode.              |
+| Raw API     | verified | Model-agnostic prompt generator. |
 
 ## 10. Examples
 

@@ -2,10 +2,11 @@
  * @fileoverview OpenCode adapter generating .opencode/instructions.md file.
  */
 
-import type {
-  RuntimeAdapter,
-  TranspileContext,
-  TranspileOutput,
+import {
+  formatCavemanSection,
+  type RuntimeAdapter,
+  type TranspileContext,
+  type TranspileOutput,
 } from "./types.js";
 
 export class OpenCodeAdapter implements RuntimeAdapter {
@@ -24,6 +25,7 @@ export class OpenCodeAdapter implements RuntimeAdapter {
       lines.push(`- ${rule}`);
     }
     lines.push("");
+    lines.push(...formatCavemanSection("##"));
     lines.push("## Fellowship Sub-Agents");
     for (const agent of context.fellowship) {
       lines.push(`- ${agent.name} (${agent.role}): ${agent.slashCommand}`);

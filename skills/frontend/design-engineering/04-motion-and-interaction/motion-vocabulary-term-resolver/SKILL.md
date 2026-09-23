@@ -22,25 +22,25 @@ antiPatternsPrevented:
 
 ## 1. Intent (9 Dimensions)
 
-| # | Dimension | Value |
-|---|-----------|-------|
-| 1 | Task | Resolve vague user motion descriptions into exact terminology from authoritative glossary. |
-| 2 | Target Tool | Any agent runtime: Claude Code, Cursor, Copilot, Windsurf, Kiro, Cline, or raw API. |
-| 3 | Output Format | Bold primary term, verbatim glossary definition, and close alternates. |
-| 4 | Constraints | Quote definitions verbatim from `../references/animation-glossary.md`. Do not invent terms. |
-| 5 | Input | User natural language description of motion effect or visual transition. |
-| 6 | Context | Bridges communication gaps between designers and developers. |
-| 7 | Audience | Motion designers, frontend developers, and product leads. |
-| 8 | Success Criteria | Verbatim match against `../references/animation-glossary.md`, zero hallucinated animation terms. |
-| 9 | Examples | See Section 10. |
+| #   | Dimension        | Value                                                                                            |
+| --- | ---------------- | ------------------------------------------------------------------------------------------------ |
+| 1   | Task             | Resolve vague user motion descriptions into exact terminology from authoritative glossary.       |
+| 2   | Target Tool      | Any agent runtime: Claude Code, Cursor, Copilot, Windsurf, Kiro, Cline, or raw API.              |
+| 3   | Output Format    | Bold primary term, verbatim glossary definition, and close alternates.                           |
+| 4   | Constraints      | Quote definitions verbatim from `../references/animation-glossary.md`. Do not invent terms.      |
+| 5   | Input            | User natural language description of motion effect or visual transition.                         |
+| 6   | Context          | Bridges communication gaps between designers and developers.                                     |
+| 7   | Audience         | Motion designers, frontend developers, and product leads.                                        |
+| 8   | Success Criteria | Verbatim match against `../references/animation-glossary.md`, zero hallucinated animation terms. |
+| 9   | Examples         | See Section 10.                                                                                  |
 
 ## 2. Trigger Matrix
 
-| Trigger | Fire? | Notes |
-|---------|-------|-------|
-| Request to name or identify a motion effect from description | YES | Core trigger. |
-| Disambiguating vague user animation requests | YES | Core trigger. |
-| Writing complex database queries | NO | Out of scope. |
+| Trigger                                                      | Fire? | Notes         |
+| ------------------------------------------------------------ | ----- | ------------- |
+| Request to name or identify a motion effect from description | YES   | Core trigger. |
+| Disambiguating vague user animation requests                 | YES   | Core trigger. |
+| Writing complex database queries                             | NO    | Out of scope. |
 
 ## 3. Execution Workflow
 
@@ -90,11 +90,11 @@ Close alternates:
 
 ## 7. Anti-Pattern Compliance
 
-| Step | Prevents AP | Mechanism |
-|------|-------------|-----------|
-| 1 | AP-1 (vague task) | Demands explicit sensation extraction. |
-| 2 | AP-4 (over-permissive agent) | Locks terminology to `../references/animation-glossary.md`. |
-| 3 | AP-18 (unstructured output) | Enforces structured primary + alternate format. |
+| Step | Prevents AP                  | Mechanism                                                   |
+| ---- | ---------------------------- | ----------------------------------------------------------- |
+| 1    | AP-1 (vague task)            | Demands explicit sensation extraction.                      |
+| 2    | AP-4 (over-permissive agent) | Locks terminology to `../references/animation-glossary.md`. |
+| 3    | AP-18 (unstructured output)  | Enforces structured primary + alternate format.             |
 
 ## 8. Versioning & Changelog
 
@@ -104,15 +104,15 @@ Close alternates:
 
 ## 9. Portability Matrix
 
-| Runtime | Status | Notes |
-|---------|--------|-------|
-| Claude Code | verified | Direct animation glossary lookup. |
-| Cursor | verified | Interactive motion terminology assistant. |
-| Copilot | verified | In-line term suggestion. |
-| Windsurf | verified | Cascade execution. |
-| Kiro | verified | Motion vocabulary runner. |
-| Cline | verified | System prompt task mode. |
-| Raw API | verified | Model-agnostic glossary resolver. |
+| Runtime     | Status   | Notes                                     |
+| ----------- | -------- | ----------------------------------------- |
+| Claude Code | verified | Direct animation glossary lookup.         |
+| Cursor      | verified | Interactive motion terminology assistant. |
+| Copilot     | verified | In-line term suggestion.                  |
+| Windsurf    | verified | Cascade execution.                        |
+| Kiro        | verified | Motion vocabulary runner.                 |
+| Cline       | verified | System prompt task mode.                  |
+| Raw API     | verified | Model-agnostic glossary resolver.         |
 
 ## 10. Examples
 
