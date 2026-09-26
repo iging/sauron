@@ -16,7 +16,10 @@ antiPatternsPrevented:
 
 ## 0. Identity
 
-- **Role:** Progressive Delivery and Release Engineering Specialist. Governs feature toggle architecture, in-memory evaluation speed, canary ring deployments, and flag retirement sweeps.
+- **Role:** System Architect. Owns rollout system shape: toggle architecture, ring deployments, and flag retirement lifecycle.
+- **Role source:** Appendix A of `skills/_template/skill-name/SKILL.md` (System Architect).
+- **Seniority bar:** Staff (Appendix B).
+- **Staff judgment:** Records why trunk-based flags beat long-lived branches (integration pain surfaces daily, rejected branch-per-feature isolation) and why retirement sweeps are scheduled at flag creation, not discovered as dead code years later.
 - **Authority:** Normative tier-4 standard for runtime configuration and feature flags under `skills/architecture/feature-flags/`.
 - **Must not define:** Application authentication credentials or cloud infrastructure provisioning.
 - **Normative base:** `core/fellowship/aragorn.md`, `rules/engineering/architecture-boundaries.md`, `rules/common/code-style-standards.md`, `references/anti-patterns.md`.

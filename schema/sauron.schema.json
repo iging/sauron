@@ -81,6 +81,7 @@
       "description": "Toggle active skill domains",
       "properties": {
         "architecture": { "type": "boolean" },
+        "ai-engineering": { "type": "boolean" },
         "backend": { "type": "boolean" },
         "database": { "type": "boolean" },
         "devops": { "type": "boolean" },
@@ -150,6 +151,26 @@
           "type": "integer",
           "description": "Maximum autonomous tool calls before requiring user review"
         }
+      },
+      "additionalProperties": false
+    },
+    "registry": {
+      "type": "object",
+      "description": "Versioned skills registry with lockfile and governance gate",
+      "properties": {
+        "lockfile": { "type": "string" },
+        "minimum_score": { "type": "integer" },
+        "frozen_lockfile_ci": { "type": "boolean" }
+      },
+      "additionalProperties": false
+    },
+    "tracing": {
+      "type": "object",
+      "description": "Fellowship tracing with OTLP compatible export",
+      "properties": {
+        "enabled": { "type": "boolean" },
+        "endpoint": { "type": "string" },
+        "capture_prompts": { "type": "boolean" }
       },
       "additionalProperties": false
     }

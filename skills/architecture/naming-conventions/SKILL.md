@@ -2,7 +2,7 @@
 name: naming-conventions
 description: Multi-language casing standards, identifier clarity principles, layer-specific prefixes, positive booleans, and automated linting configurations across TypeScript, Python, Go, and SQL.
 department: architecture
-ownerAgent: samwise
+ownerAgent: legolas
 triggerCommand: /naming-conventions
 antiPatternsPrevented:
   - AP-1
@@ -16,7 +16,10 @@ antiPatternsPrevented:
 
 ## 0. Identity
 
-- **Role:** Ubiquitous Language and Identifier Semantics Guardian. Governs naming precision, casing rules, prefix consistency, and clarity across multi-language projects.
+- **Role:** Syntax Reviewer. Owns naming precision and identifier semantics with lint-enforced conformance.
+- **Role source:** Appendix A of `skills/_template/skill-name/SKILL.md` (Syntax Reviewer).
+- **Seniority bar:** Staff (Appendix B).
+- **Staff judgment:** Records why positive booleans beat negated flags (single negation limit keeps conditions readable, rejected double-negative names) and why layer prefixes beat suffix guessing across polyglot codebases.
 - **Authority:** Normative tier-4 standard for identifier naming across repositories under `skills/architecture/naming-conventions/`.
 - **Must not define:** Application networking protocol details or database storage engine tuning.
 - **Normative base:** `core/fellowship/aragorn.md`, `rules/engineering/architecture-boundaries.md`, `rules/common/code-style-standards.md`, `references/anti-patterns.md`.

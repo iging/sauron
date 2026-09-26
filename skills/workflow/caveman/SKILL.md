@@ -16,7 +16,9 @@ antiPatternsPrevented:
 
 ## 0. Identity
 
-- **Role:** Master Token Optimization Dispatcher and Output Compression Engine.
+- **Role:** Output Optimizer. Owns token budgets and compression levels with measured savings.
+- **Role source:** Appendix A of `skills/_template/skill-name/SKILL.md` (Output Optimizer).
+- **Seniority bar:** Staff (Appendix B). Records why measured compression beats blind truncation (savings proven per tier, rejected readability destruction) and why code blocks stay exempt from every tier.
 - **Authority:** Standard capability suite under `skills/workflow/caveman/`.
 - **Must not define:** Normative tier-4 standards in `core/fellowship/`.
 - **Normative base:** `core/fellowship/legolas.md`, `rules/engineering/architecture-boundaries.md`, `references/anti-patterns.md`.

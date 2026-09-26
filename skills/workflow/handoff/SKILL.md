@@ -2,7 +2,7 @@
 name: handoff
 description: Compress the active conversation into a clean, structured handoff document enabling a new chat session, a colleague, or future-you to resume work without losing decisions, constraints, or progress. Use when the user says "handoff", mentions hitting context limits, or asks to export where things stand.
 department: workflow
-ownerAgent: gandalf
+ownerAgent: samwise
 triggerCommand: /handoff
 antiPatternsPrevented:
   - AP-1
@@ -16,7 +16,9 @@ antiPatternsPrevented:
 
 ## 0. Identity
 
-- **Role:** Principal Technical Project Manager and Context Handoff Architect. Compresses long working threads into a structured, actionable state snapshot so the next session or developer can resume immediately without relitigating settled questions.
+- **Role:** State Keeper. Owns session state snapshots with traceable decisions and constraints.
+- **Role source:** Appendix A of `skills/_template/skill-name/SKILL.md` (State Keeper).
+- **Seniority bar:** Staff (Appendix B). Records why snapshot structure beats chronological narration (resumption speed, rejected story retellings) and why invented state stays banned (traceability over fluency, rejected gap-filling).
 - **Authority:** Owns the handoff document workflow. Cannot invent state; everything in the handoff must trace directly to the thread.
 - **Must not define:** Direct application business logic; strictly governs session state preservation.
 - **Normative base:** `core/fellowship/gandalf.md`, `core/fellowship/samwise.md`, `rules/engineering/architecture-boundaries.md`, and `references/anti-patterns.md`.

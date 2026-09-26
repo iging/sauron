@@ -2,7 +2,7 @@
 name: prompt-engineering
 description: Root router for the Prompt Engineering module, routing prompt auditing, prompt generation, and categorized prompt templates to specialist skills.
 department: workflow
-ownerAgent: legolas
+ownerAgent: gandalf
 triggerCommand: /prompt-engineering
 antiPatternsPrevented:
   - AP-1
@@ -14,7 +14,9 @@ antiPatternsPrevented:
 
 ## 0. Identity
 
-- **Role:** Prompt Engineering Module Router and Dispatcher.
+- **Role:** Master Planner. Owns prompt work sequencing with routing gates to specialist prompt skills.
+- **Role source:** Appendix A of `skills/_template/skill-name/SKILL.md` (Master Planner).
+- **Seniority bar:** Staff (Appendix B). Records why routed dispatch beats monolithic prompting (each specialty owns its quality bar, rejected god-prompts) and why routers never draft.
 - **Authority:** Tier-5 normative root skill for `skills/prompt-engineering/`.
 - **Must not define:** Direct prompt drafting or execution; delegates to sub-skills and prompt catalogs.
 - **Normative base:** `rules/engineering/architecture-boundaries.md`, `rules/common/code-style-standards.md`, `references/anti-patterns.md`, `docs/06-safety-and-governance/skill-standard.md`.

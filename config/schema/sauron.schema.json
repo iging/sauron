@@ -81,6 +81,7 @@
       "description": "Toggle active skill domains",
       "properties": {
         "architecture": { "type": "boolean" },
+        "ai-engineering": { "type": "boolean" },
         "backend": { "type": "boolean" },
         "database": { "type": "boolean" },
         "devops": { "type": "boolean" },

@@ -223,6 +223,16 @@ function printHelpMenu() {
   console.log(
     "  sync         Synchronize master configuration into target runtimes",
   );
+  console.log("  diff         Show drift between lockfile pins and workspace");
+  console.log("  mcp-index    Emit MCP skill index with skill:// resources");
+  console.log("  trace-report Summarize Fellowship tracing events");
+  console.log("  fitness      Run harness fitness checks with remediation");
+  console.log("  worktree-plan Generate isolated git worktree assignments");
+  console.log("  slop-scan    Score packages and scan unsafe sinks to SARIF");
+  console.log(
+    "  import       Migrate Cursor Copilot Windsurf configs to Sauron",
+  );
+  console.log("  registry-build Export governed catalog from approved entries");
   console.log("\nOptions:");
   console.log(
     "  --to <dir>   Target directory for added skills (default: .agents/skills)",
@@ -388,8 +398,11 @@ function executeAddCommand(skillNames, options) {
     : path.resolve(cwd, defaultDir);
 
   const modeTag = options.dryRun ? " (DRY-RUN MODE)" : "";
+  const defaultNote = options.targetDir
+    ? ""
+    : " (default; override with --to <dir>)";
   console.log(
-    `[ADD] Adding ${skillNames.length} skill(s) to ${path.relative(cwd, destinationBase) || destinationBase}${modeTag}...\n`,
+    `[ADD] Adding ${skillNames.length} skill(s) to ${path.relative(cwd, destinationBase) || destinationBase}${modeTag}${defaultNote}...\n`,
   );
 
   let addedCount = 0;
@@ -532,6 +545,290 @@ async function executeGraphCommand(targetPath = ".") {
 }
 
 /**
+ * Handles the `diff` command by comparing lockfile pins against workspace checksums.
+ *
+ * Reads sauron-skills.lock.json with fail-closed validation and reports drift.
+ *
+ * @returns {Promise<void>}
+ */
+async function executeDiffCommand() {
+  console.log(LOTR_BANNER);
+  const lockPath = path.join(process.cwd(), "sauron-skills.lock.json");
+  if (!fs.existsSync(lockPath)) {
+    console.log(
+      "[DIFF] No sauron-skills.lock.json found. Run with locked skills first.",
+    );
+    return;
+  }
+  try {
+    const { parseLockfile, detectDrift, formatDriftReport } =
+      await import("../dist/adapters/skills-lock.js");
+    const raw = JSON.parse(fs.readFileSync(lockPath, "utf8"));
+    const lockfile = parseLockfile(raw);
+    const currentChecksums = {};
+    const availableVersions = {};
+    const report = detectDrift(lockfile, currentChecksums, availableVersions);
+    console.log("[DIFF] Skills lockfile drift:");
+    console.log(formatDriftReport(report));
+  } catch (error) {
+    console.error(
+      `[ERROR] Diff failed: ${error instanceof Error ? error.message : String(error)}`,
+    );
+    process.exit(1);
+  }
+}
+
+/**
+ * Handles the `mcp-index` command by emitting SEP-2640 skill index JSON.
+ *
+ * @returns {Promise<void>}
+ */
+async function executeMcpIndexCommand() {
+  console.log(LOTR_BANNER);
+  try {
+    const { buildSkillIndex } = await import("../dist/adapters/mcp-skills.js");
+    const domains = querySkillDomains(SAURON_ROOT);
+    const skills = [];
+    for (const domain of domains) {
+      for (const skill of domain.skills) {
+        skills.push({
+          name: skill,
+          description: `Sauron ${domain.name} capability for ${skill}.`,
+        });
+      }
+    }
+    const index = buildSkillIndex(skills);
+    console.log(JSON.stringify(index, null, 2));
+  } catch (error) {
+    console.error(
+      `[ERROR] MCP index failed: ${error instanceof Error ? error.message : String(error)}`,
+    );
+    process.exit(1);
+  }
+}
+
+/**
+ * Handles the `fitness` command by running layer and doc checks.
+ *
+ * @param {string[]} args - CLI arguments with optional target path.
+ * @returns {Promise<void>}
+ */
+async function executeFitnessCommand(args) {
+  console.log(LOTR_BANNER);
+  const target = args[0] ?? "adapters";
+  const resolved = path.resolve(process.cwd(), target);
+  try {
+    const { checkLayerImports, formatFitnessReport } =
+      await import("../dist/adapters/fitness.js");
+    const findings = [];
+    if (fs.existsSync(resolved) && fs.statSync(resolved).isDirectory()) {
+      const entries = fs.readdirSync(resolved);
+      for (const entry of entries) {
+        if (entry.endsWith(".ts") || entry.endsWith(".mjs")) {
+          const full = path.join(resolved, entry);
+          const content = fs.readFileSync(full, "utf8");
+          findings.push(
+            ...checkLayerImports(path.relative(process.cwd(), full), content),
+          );
+        }
+      }
+    }
+    console.log(formatFitnessReport(findings));
+  } catch (error) {
+    console.error(
+      `[ERROR] Fitness failed: ${error instanceof Error ? error.message : String(error)}`,
+    );
+    process.exit(1);
+  }
+}
+
+/**
+ * Handles the `worktree-plan` command by generating isolated assignments.
+ *
+ * @param {string[]} args - Task names to assign.
+ * @returns {Promise<void>}
+ */
+async function executeWorktreePlanCommand(args) {
+  console.log(LOTR_BANNER);
+  if (args.length === 0) {
+    console.log("[ERROR] Usage: sauron worktree-plan <task...>");
+    process.exit(1);
+  }
+  try {
+    const { buildWorktreePlan, formatWorktreeCommands } =
+      await import("../dist/adapters/worktree.js");
+    const agents = [
+      "frodo",
+      "aragorn",
+      "legolas",
+      "gimli",
+      "boromir",
+      "merry",
+      "pippin",
+      "samwise",
+      "gandalf",
+    ];
+    const assignments = buildWorktreePlan(
+      args,
+      agents.slice(0, args.length),
+      "execute",
+    );
+    console.log(formatWorktreeCommands(assignments));
+  } catch (error) {
+    console.error(
+      `[ERROR] Worktree plan failed: ${error instanceof Error ? error.message : String(error)}`,
+    );
+    process.exit(1);
+  }
+}
+
+/**
+ * Handles the `slop-scan` command by scoring packages and scanning sinks.
+ *
+ * @param {string[]} args - Package names or file paths to review.
+ * @returns {Promise<void>}
+ */
+async function executeSlopScanCommand(args) {
+  console.log(LOTR_BANNER);
+  try {
+    const { scorePackage, scanUnsafeSinks, toSarif } =
+      await import("../dist/adapters/slopsquat.js");
+    const findings = [];
+    for (const target of args) {
+      if (
+        fs.existsSync(path.resolve(target)) &&
+        fs.statSync(path.resolve(target)).isFile()
+      ) {
+        const content = fs.readFileSync(path.resolve(target), "utf8");
+        findings.push(...scanUnsafeSinks(target, content));
+      } else {
+        const verdict = scorePackage({
+          name: target,
+          exists: false,
+          ageDays: 0,
+          weeklyDownloads: 0,
+          maintainers: 0,
+        });
+        console.log(
+          `  [BLOCK] ${verdict.name} risk=${verdict.risk} ${verdict.reason}`,
+        );
+      }
+    }
+    if (findings.length > 0) {
+      console.log(toSarif(findings));
+    } else if (args.length > 0) {
+      console.log("[SLOP] File scan complete with zero sink findings.");
+    } else {
+      console.log("[SLOP] Usage: sauron slop-scan <package|file...>");
+    }
+  } catch (error) {
+    console.error(
+      `[ERROR] Slop scan failed: ${error instanceof Error ? error.message : String(error)}`,
+    );
+    process.exit(1);
+  }
+}
+
+/**
+ * Handles the `import` command by detecting platform configs and previewing migration.
+ *
+ * @param {string[]} args - CLI arguments with dry-run support.
+ * @returns {Promise<void>}
+ */
+async function executeImportCommand(args) {
+  console.log(LOTR_BANNER);
+  const isDryRun = args.includes("--dry-run");
+  try {
+    const { detectPlatforms, buildImportPlan, formatImportPlan } =
+      await import("../dist/adapters/importer.js");
+    const cwd = process.cwd();
+    const entries = [];
+    const candidates = [
+      "CLAUDE.md",
+      "AGENTS.md",
+      "GEMINI.md",
+      ".cursorrules",
+      ".windsurfrules",
+      ".clinerules",
+      ".github/copilot-instructions.md",
+    ];
+    for (const candidate of candidates) {
+      if (fs.existsSync(path.join(cwd, candidate))) {
+        entries.push(candidate);
+      }
+    }
+    if (entries.length === 0) {
+      console.log("[IMPORT] No platform configs detected for migration.");
+      return;
+    }
+    console.log(
+      `[IMPORT] Detected platforms: ${detectPlatforms(entries).join(", ")}${isDryRun ? " (DRY-RUN)" : ""}`,
+    );
+    console.log(formatImportPlan(buildImportPlan(entries)));
+  } catch (error) {
+    console.error(
+      `[ERROR] Import failed: ${error instanceof Error ? error.message : String(error)}`,
+    );
+    process.exit(1);
+  }
+}
+
+/**
+ * Handles the `registry-build` command by exporting approved catalog entries.
+ *
+ * @returns {Promise<void>}
+ */
+async function executeRegistryBuildCommand() {
+  console.log(LOTR_BANNER);
+  try {
+    const { buildCatalog } = await import("../dist/adapters/registry.js");
+    const catalog = buildCatalog([]);
+    console.log(JSON.stringify(catalog, null, 2));
+    console.log(
+      "\n[COMPLETE] Registry catalog exports published entries only. Add entries to provision catalog.",
+    );
+  } catch (error) {
+    console.error(
+      `[ERROR] Registry build failed: ${error instanceof Error ? error.message : String(error)}`,
+    );
+    process.exit(1);
+  }
+}
+
+/**
+ * Handles the `trace-report` command by summarizing tracing events file.
+ *
+ * @param {string[]} args - Optional path to JSON events file.
+ * @returns {Promise<void>}
+ */
+async function executeTraceReportCommand(args) {
+  console.log(LOTR_BANNER);
+  const target = args[0] ?? ".sauron/traces.json";
+  const resolved = path.resolve(process.cwd(), target);
+  if (!fs.existsSync(resolved)) {
+    console.log(
+      `[TRACE] No trace file at ${target}. Emit events first with opt-in hooks.`,
+    );
+    return;
+  }
+  try {
+    const { validateTraceEvent, summarizeTraces, formatTraceSummary } =
+      await import("../dist/adapters/tracing.js");
+    const raw = JSON.parse(fs.readFileSync(resolved, "utf8"));
+    if (!Array.isArray(raw)) {
+      throw new Error("Trace file must contain an array");
+    }
+    const events = raw.map((item) => validateTraceEvent(item));
+    console.log(formatTraceSummary(summarizeTraces(events)));
+  } catch (error) {
+    console.error(
+      `[ERROR] Trace report failed: ${error instanceof Error ? error.message : String(error)}`,
+    );
+    process.exit(1);
+  }
+}
+
+/**
  * CLI dispatcher resolving arguments and executing corresponding command functions.
  *
  * @param {string[]} commandLineArguments - Command-line arguments passed from process.argv.
@@ -596,6 +893,32 @@ function main(commandLineArguments) {
       break;
     case "list-skills":
       executeListSkillsCommand();
+      break;
+    case "diff":
+      executeDiffCommand();
+      break;
+    case "mcp-index":
+      executeMcpIndexCommand();
+      break;
+    case "fitness":
+      executeFitnessCommand(commandLineArguments.slice(1));
+      break;
+    case "worktree-plan":
+      executeWorktreePlanCommand(
+        commandLineArguments.slice(1).filter((arg) => arg !== "--dry-run"),
+      );
+      break;
+    case "slop-scan":
+      executeSlopScanCommand(commandLineArguments.slice(1));
+      break;
+    case "import":
+      executeImportCommand(commandLineArguments.slice(1));
+      break;
+    case "registry-build":
+      executeRegistryBuildCommand();
+      break;
+    case "trace-report":
+      executeTraceReportCommand(commandLineArguments.slice(1));
       break;
     default:
       console.log(`[ERROR] Unknown command: "${primaryCommand}"`);

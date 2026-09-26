@@ -1,122 +1,135 @@
 ---
 name: ui-ux-principles
-description: Reusable, deterministic UI/UX and UX writing constraints for any prompt generating or modifying user interfaces.
-origin: sauron
+description: Reusable, deterministic UI/UX and UX writing constraints covering accessibility law, visual structure, cognitive load, interactions, theming, and content strategy.
 department: frontend
+ownerAgent: legolas
+triggerCommand: /ui-ux-principles
+antiPatternsPrevented:
+  - AP-1
+  - AP-6
+  - AP-26
+  - AP-28
 ---
 
-# Shared UI/UX Principles
+# UI UX Principles
 
-## When to Activate
+## 0. Identity
 
-- When creating, modifying, or reviewing code and architecture related to shared ui/ux principles.
-- When enforcing deterministic engineering standards and eliminating unverified code patterns.
-- When resolving architectural design questions or quality bottlenecks.
+- **Role:** Interface Builder. Owns interface composition with accessibility law and writing discipline.
+- **Role source:** Appendix A of `skills/_template/skill-name/SKILL.md` (Interface Builder).
+- **Seniority bar:** Staff (Appendix B). Records why native semantics beat div click handlers (keyboard and readers free, rejected custom control re-implementations), why one term per concept beats synonyms (comprehension compounds, rejected mixed vocabulary), and why destructive confirmations beat undo-toasts for irreversible acts.
+- **Authority:** Tier-5 normative skill for `skills/frontend/ui-ux-principles/`. Owns interface and content guidance.
+- **Must not define:** Backend APIs; brand identity decisions.
+- **Normative base:** `core/fellowship/legolas.md`, `rules/engineering/architecture-boundaries.md`, `rules/common/code-style-standards.md`, `references/anti-patterns.md`.
+- **Anti-pattern gate:** Blocks AP-1 (vague task), AP-26 (no scope boundary), and AP-28 (no stop condition).
 
-## Core Concepts
+## 1. Intent (9 Dimensions)
 
-> **Purpose:** Reusable, deterministic UI/UX and UX writing constraints for any prompt generating or modifying user interfaces. Reference this file from your prompt to enforce strict aesthetic, accessibility, and behavioral standards.
+| #   | Dimension        | Value                                                                                          |
+| --- | ---------------- | ---------------------------------------------------------------------------------------------- |
+| 1   | Task             | Produce interfaces with legal accessibility, coherent visuals, and honest content.              |
+| 2   | Target Tool      | Any agent runtime: Claude Code, Cursor, Copilot, Windsurf, Kiro, Cline, raw API.                |
+| 3   | Output Format    | Interface plan with a11y, visual, interaction, and content notes.                              |
+| 4   | Constraints      | WCAG AA minimum. One term per concept. Zero em dashes. Verbs lead CTAs.                        |
+| 5   | Input            | Screen specs, user flows, brand tokens, content drafts.                                         |
+| 6   | Context          | Prevents unlawful interfaces, incoherent visuals, and blame-shifting errors.                    |
+| 7   | Audience         | Frontend engineers and designers shipping interfaces.                                           |
+| 8   | Success Criteria | A11y lawful; visuals coherent; plan approved before coding.                                     |
+| 9   | Examples         | See Section 10.                                                                                 |
 
----
+## 2. Trigger Matrix
 
-## 1. Enterprise Accessibility (WCAG 2.2 & EAA 2025)
+| Trigger                                      | Fire? | Notes                              |
+| -------------------------------------------- | ----- | ---------------------------------- |
+| "Audit our interface accessibility"          | YES   | Core trigger.                      |
+| "Fix our error messages and CTAs"            | YES   | Core trigger.                      |
+| "/ui-ux-principles"                          | YES   | Slash command trigger.             |
+| "Design our brand identity"                  | NO    | Out of scope; design owns it.      |
+| "Write backend validation logic"             | NO    | Out of scope for this skill.       |
 
-Apply these rules to guarantee neuro-inclusive and legally compliant interfaces. For products serving EU consumers, the European Accessibility Act has been enforceable since June 28, 2025 across e-commerce, banking, and consumer services, with penalties reaching EUR 100,000 under some national implementations.
+## 3. Execution Workflow
 
-- **Semantic HTML:** You MUST use native HTML elements (`<button>`, `<nav>`, `<main>`). Using `<div onClick={...}>` for interactive elements is strictly BANNED.
-- **Keyboard Operability and Emergency Exits:** Ensure every interactive element is reachable via keyboard (`Tab`). Trap focus securely within open modals and support the Escape key (`Escape`) to close modals, popovers, dropdowns, and drawer panels instantly.
-- **Non-Text Contrast:** Give icons, control boundaries, and state indicators at least 3:1 contrast against adjacent colors (WCAG 1.4.11). Never strip the default focus outline without supplying an author-built replacement (failure technique F78).
-- **Focus Not Obscured:** Sticky headers, cookie banners, and floating footers must never fully hide the currently focused element (WCAG 2.4.11).
-- **Accessible Authentication and Autocomplete:** Sign-in and sign-up flows must not require cognitive tests such as memorizing secrets, solving puzzles, or retyping codes, unless an alternative exists such as paste-enabled inputs, password-manager support, or passkeys (WCAG 3.3.8). Mandate standard `autocomplete` attributes (for example `current-password`, `new-password`, `one-time-code`, `email`) on form inputs.
-- **Dragging Alternatives:** Every drag-based interaction such as sliders or sortable lists needs a single-tap or keyboard equivalent (WCAG 2.5.7).
-- **Screen Reader Support:** Add descriptive `aria-label` attributes to any button or link lacking visible text (for example icon-only buttons).
-- **Motion Accessibility:** Respect system preferences. Wrap all non-essential UI animations in `@media (prefers-reduced-motion: no-preference)` to protect users with vestibular sensitivities.
-- **High Contrast Mode Support:** Ensure visual state indicators, focus outlines, and custom control borders remain visible when active using `@media (forced-colors: active)` for Windows High Contrast Mode.
+### Step 1: Lock Accessibility Law
 
----
+- **Action:** Enforce native semantics, keyboard operability with focus traps and escapes, contrast ratios, touch targets, screen-reader labels, and motion plus high-contrast support.
+- **Input:** Screen specs from user.
+- **Stop Condition:** Halt on div click handlers or missing focus management.
+- **Validation:** A11y audit complete per screen.
 
-## 2. Visual Structure and Layout
+### Step 2: Structure Visuals Coherently
 
-Apply these rules strictly to all layout generation and CSS styling. Avoid arbitrary values.
+- **Action:** Apply baseline grid, type hierarchy, shadow tiers, contrast-checked palette, and left-aligned body text with theme variables for both modes.
+- **Input:** Brand tokens from user.
+- **Stop Condition:** Halt on arbitrary spacing or hardcoded hex in components.
+- **Validation:** Visual review complete per screen.
 
-- **Grid and Spacing:** Use a strict 4px baseline grid. All padding, margins, gaps, and border-radii MUST be multiples of 4 (for example 4, 8, 12, 16, 24, 32, 48). Never use arbitrary spacing values like 15px or 33px.
-- **Typography Hierarchy:**
-  - **H1 (Page Title):** 2.5rem (40px), Font Weight 700. Maximum one per page.
-  - **H2 (Section Header):** 1.5rem (24px), Font Weight 600.
-  - **H3 (Subsection):** 1.25rem (20px), Font Weight 600.
-  - **Body text:** 1rem (16px), Font Weight 400, Line Height 1.5.
-- **Elevation (Shadows):** Never generate custom box-shadows. Use only these three tiers:
-  - `shadow-sm`: `0 1px 2px rgba(0,0,0,0.05)` for buttons, borders, subtle cards.
-  - `shadow-md`: `0 4px 6px rgba(0,0,0,0.1)` for dropdowns, hover states.
-  - `shadow-lg`: `0 10px 15px rgba(0,0,0,0.15)` for modals, popovers.
-- **Color Contrast:** Ensure all text passes WCAG AA contrast ratios (minimum 4.5:1 for standard text, 3:1 for large text).
-- **Alignment:** Never center-align paragraphs of body text. Left-align body text. Center only small discrete elements like buttons or single-line headers.
+### Step 3: Write Honest Content
 
----
+- **Action:** Confirm destructive acts modally, validate inline, lead CTAs with verbs, never blank screens, explain errors with fixes, and freeze one term per concept.
+- **Input:** Content drafts and user flows.
+- **Stop Condition:** Halt on blame-shifting errors or synonym sprawl.
+- **Validation:** Content review complete per flow.
 
-## 3. Cognitive Load and Information Architecture
+### Step 4: Handoff and Human Review
 
-- **Progressive Disclosure:** Do not overwhelm the user with dense data grids or massive forms. Hide advanced or secondary settings behind "Show More" toggles or accordion panels.
-- **Predictability (Jakob’s Law):** Use standard industry patterns for navigation menus and form structures. Do not invent novel UI behaviors requiring users to relearn basic interactions.
-- **Explicit Affordances:** Ensure clickable elements look actionable using clear signifiers (for example buttons with contrast backgrounds, distinct link styling, and visible hover effects).
+- **Action:** Present the plan and request approval before coding.
+- **Input:** Completed plan.
+- **Stop Condition:** Await user approval.
+- **Validation:** Approval recorded; zero code written by this skill.
 
----
+## 4. Output Specification
 
-## 4. Interactions and Behaviors
+```markdown
+# Interface Plan
 
-Enforce these behavioral states on all interactive elements.
+- **A11y:** [Lawful checklist per screen]
+- **Visuals:** [Coherent system notes]
+- **Content:** [Honest writing audit]
+```
 
-- **Responsive Bounds:** Build mobile-first. Write base styles for the smallest viewport and add layouts with `min-width` media queries at standard tiers such as `min-width: 640px`, `min-width: 768px`, and `min-width: 1024px`. Never assume desktop-only usage. Do not mix `max-width` overrides into a `min-width` system because stacked opposing queries create specificity conflicts. For component-level adaptation, prefer container queries per `skills/frontend/html-css-principles/SKILL.md`.
-- **Interactive States:** Every button, link, and interactive element MUST have explicitly defined `:hover`, `:focus-visible`, and `:active` states.
-  - Use `:focus-visible` rather than `:focus` so keyboard users get a strong ring while pointer users do not see redundant outlines.
-  - The focus indicator itself must hold 3:1 contrast against both the page background and the unfocused component state. A 2px solid outline with an offset satisfies the WCAG 2.4.13 size guidance (for example `outline: 2px solid var(--color-focus); outline-offset: 2px;`).
-- **Touch Targets:** Any clickable element must have a minimum height and width of 44px. This matches the Apple Human Interface Guidelines and WCAG 2.5.5 Target Size Enhanced (Level AAA). Treat 24 by 24 CSS pixels (WCAG 2.5.8 Target Size Minimum, Level AA) as the legal compliance floor, never as the design target.
-- **Micro-interactions (Closing the Loop):** Provide immediate visual feedback for user actions. Use disabled states, loading spinners, or toast notifications instantly upon submission to confirm system status. Time feedback per Nielsen Norman Group limits: acknowledge input within 100ms so interactions feel instantaneous, keep simple feedback animations near 100ms, reserve 200 to 300ms for large transitions such as modals, and never exceed 500ms.
+## 5. Validation Gate
 
----
+- [ ] A11y lawful per screen.
+- [ ] Visuals coherent per system.
+- [ ] Content honest per flow.
+- [ ] Zero em dashes in deliverable.
+- [ ] Human approval recorded before coding.
 
-## 5. Visual Elements and Theming
+## 6. Anti-Triggers and Calibration
 
-- **Theme Scaling (CSS Variables):** Hardcoded hex colors (for example `#10B981`) are BANNED inside component styles. You MUST use CSS variables (for example `var(--color-success)`) mapped to a global theme provider to guarantee instant Light/Dark mode compatibility. Drive mode switching from the `prefers-color-scheme` media query by default, and re-verify all contrast ratios in both modes because a palette passing on white can fail on dark surfaces.
-- **Color Palette Constraint:** Limit the palette to 1 Primary color, 1 Secondary color, 1 Destructive color (red), and a grayscale spectrum.
-- **Status Colors:**
-  - Success: Green mapped to `var(--color-success)`
-  - Warning: Yellow/Orange mapped to `var(--color-warning)`
-  - Error: Red mapped to `var(--color-error)`
-  - Info: Blue mapped to `var(--color-info)`
-- **Iconography:** Use consistent stroke widths (for example 2px) and a consistent icon set. Never mix filled and outlined icons in the same UI unless denoting active/inactive states.
+- **Under-execution threshold:** Shipping interfaces without a11y audit.
+- **Over-execution threshold:** Rebranding products unprompted.
+- **Calibration default:** Native semantics first; custom controls with receipts.
 
----
+## 7. Anti-Pattern Compliance
 
-## 6. Defensive UX and Content Strategy
+| Step | Prevents AP            | Mechanism                                           |
+| ---- | ---------------------- | --------------------------------------------------- |
+| 1    | AP-1 (vague task)      | Requires a11y audit first.                          |
+| 2    | AP-26 (no scope)       | Freezes visual system per screen.                   |
+| 3    | AP-28 (no stop)        | Locks terminology per concept.                      |
+| 4    | AP-45 (no human review)| Halts for approval before coding.                   |
 
-Apply these rules to all user-facing text and workflows.
+## 8. Versioning & Changelog
 
-- **Destructive Confirmation:** Any user action resulting in data deletion MUST trigger a confirmation modal. Do not rely on "Undo" toasts for irreversible actions.
-- **Inline Validation:** Validate form inputs inline as the user types or removes focus (onBlur) to prevent errors before submission.
-- **Action-Oriented CTAs:** Button text MUST start with a strong verb.
-  - Allowed: "Save changes", "Create account", "Send message".
-  - Banned: "Submit", "Click here", "OK", "Next".
-- **Empty States:** Never leave a screen completely blank. If no data exists, explicitly state the reason and provide a clear CTA to create data.
-- **Error Messages:** Error messages MUST state exactly what went wrong and how to fix the issue without blaming the user.
-  - Allowed: "This password needs at least 8 characters."
-  - Banned: "Invalid input", "An error occurred", "You entered the wrong password".
-- **Consistency in Terminology:** Choose exactly one term per concept and apply it universally (for example never mix "Sign In" and "Log In").
+- **Version:** 2.0.0
+- **Changelog:**
+  - `2.0.0` (2026-09-26) - Tier-5 conversion with Interface Builder role, role source, and seniority bar.
+  - `1.0.0` - Legacy interface baseline.
 
-## Anti-Patterns
+## 9. Portability Matrix
 
-- **AP-1 (Vague task scope):** Implementing features without concrete, testable boundary contracts.
-- **AP-4 (Over-permissive agent execution):** Modifying underlying runtime configs or database structures without validation.
-- **AP-28 (No stop condition):** Unbounded refactoring loops that drift beyond defined domain requirements.
+| Runtime     | Status   | Notes                           |
+| ----------- | -------- | ------------------------------- |
+| Claude Code | verified | Direct slash command execution. |
+| Cursor      | verified | Rules and prompt loading.       |
+| Copilot     | verified | Custom instructions support.    |
+| Windsurf    | verified | Cascade flow integration.       |
+| Kiro        | verified | Steering model execution.       |
+| Cline       | verified | Task step-by-step flow.         |
+| Raw API     | verified | Model-agnostic execution.       |
 
-## Best Practices
+## 10. Examples
 
-- Adhere to the core principles defined in this skill on every execution.
-- Maintain test-first validation before committing changes.
-- Keep module boundaries flat and avoid unnecessary indirection layers.
-
-## Related Skills
-
-- `clean-architecture`
-- `module-organization`
-- `writing-rules`
+**Input:** "Our signup flow confuses users and fails contrast checks."
+**Output:** Plan with lawful a11y repairs, coherent visual system, and verb-led CTAs with helpful errors.

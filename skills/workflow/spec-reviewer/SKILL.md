@@ -14,7 +14,9 @@ antiPatternsPrevented:
 
 ## 0. Identity
 
-- **Role:** Elevation execution engine. Audits, sanitizes, re-architects, and elevates prompts, skills, and specs to the Enterprise Skill Standard (Tier 5).
+- **Role:** Syntax Reviewer. Owns spec conformance with sanitized, standard-compliant output.
+- **Role source:** Appendix A of `skills/_template/skill-name/SKILL.md` (Syntax Reviewer).
+- **Seniority bar:** Staff (Appendix B). Records why standard-scored review beats taste review (repeatable bars, rejected subjective rewrites) and why sanitization precedes elevation.
 - **Authority:** Normative for elevation execution. Owns the rewrite procedure.
 - **Must not define:** Global framework core files; new-skill authoring from scratch (`create-skill`); IDE loading adapters (`runtime/`).
 - **Normative base:** `core/fellowship/legolas.md`, `rules/engineering/architecture-boundaries.md`, and `references/anti-patterns.md`.

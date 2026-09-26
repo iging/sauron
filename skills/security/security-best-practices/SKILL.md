@@ -13,29 +13,31 @@ antiPatternsPrevented:
   - AP-44
 ---
 
-# Security Best Practices & Defense-in-Depth
+# Security Best Practices
 
 ## 0. Identity
 
-- **Role:** Chief Information Security Architect. Enforces defense-in-depth across client, server, and cloud tiers, preventing OWASP Top 10 vulnerabilities, credential leaks, and unauthorized AI tool execution.
-- **Authority:** Normative tier-4 standard for application security under `skills/security/security-best-practices/`.
+- **Role:** Security Auditor. Owns defense-in-depth posture with verified control evidence per tier.
+- **Role source:** Appendix A of `skills/_template/skill-name/SKILL.md` (Security Auditor).
+- **Seniority bar:** Staff (Appendix B). Records why parameterized queries beat string building (injection dies at construction, rejected interpolation), why memory-hard hashing beats fast hashes (cracking economics favor defenders, rejected MD5 legacies), and why AI guardrails gate destructive tool calls.
+- **Authority:** Tier-5 normative skill for application security under `skills/security/security-best-practices/`.
 - **Must not define:** Direct application UI rendering templates or visual styles.
 - **Normative base:** `core/fellowship/boromir.md`, `rules/engineering/architecture-boundaries.md`, `rules/common/code-style-standards.md`, `references/anti-patterns.md`, `rules/security/owasp-defensive-shield.md`, `context/core-domains/security-policies.md`.
 - **Anti-pattern gate:** Blocks AP-4 (over-permissive execution), AP-26 (leaking secrets in logs/code), and AP-44 (unlocked security boundaries).
 
 ## 1. Intent (9 Dimensions)
 
-| #   | Dimension        | Value                                                                                                 |
-| --- | ---------------- | ----------------------------------------------------------------------------------------------------- |
-| 1   | Task             | Audit, implement, and enforce application and API security defenses and guardrails.                   |
-| 2   | Target Tool      | OWASP ZAP, Trivy, Snyk, Semgrep, Node.js crypto, Argon2id, helmet, DOMPurify.                         |
-| 3   | Output Format    | Secure code implementations, Content Security Policy headers, and vulnerability audit reports.        |
-| 4   | Constraints      | Zero hardcoded secrets. Mandatory parameterized SQL queries. Strict HttpOnly cookie scoping.          |
-| 5   | Input            | Application source code, authentication workflows, API endpoints, dependency manifests.               |
-| 6   | Context          | Eliminates SQLi, XSS, CSRF, BOLA/IDOR vulnerabilities, and sensitive data leakage.                    |
-| 7   | Audience         | Security engineers, backend developers, platform architects, DevOps leads.                            |
+| #   | Dimension        | Value                                                                                          |
+| --- | ---------------- | ---------------------------------------------------------------------------------------------- |
+| 1   | Task             | Audit, implement, and enforce application and API security defenses and guardrails.             |
+| 2   | Target Tool      | OWASP ZAP, Trivy, Snyk, Semgrep, Node.js crypto, Argon2id, helmet, DOMPurify.                  |
+| 3   | Output Format    | Secure code implementations, Content Security Policy headers, and vulnerability audit reports.  |
+| 4   | Constraints      | Zero hardcoded secrets. Mandatory parameterized SQL queries. Strict HttpOnly cookie scoping.    |
+| 5   | Input            | Application source code, authentication workflows, API endpoints, dependency manifests.         |
+| 6   | Context          | Eliminates SQLi, XSS, CSRF, BOLA/IDOR vulnerabilities, and sensitive data leakage.             |
+| 7   | Audience         | Security engineers, backend developers, platform architects, DevOps leads.                      |
 | 8   | Success Criteria | Zero high/critical vulnerabilities; 100 percent parameterized database queries; clean security scans. |
-| 9   | Examples         | See Section 5.                                                                                        |
+| 9   | Examples         | See Section 10.                                                                                   |
 
 ## 2. Trigger Matrix
 
@@ -46,100 +48,89 @@ antiPatternsPrevented:
 | Conducting line-by-line security code review against OWASP standards   | NO    | Route to `skills/security/security-auditor/`.                       |
 | Running software bill of materials and dependency vulnerability audits | NO    | Route to `skills/security/sbom-software-bill-of-materials/`.        |
 
-## 3. Core Architectural Directives
+## 3. Execution Workflow
 
-1. **Defense-in-Depth Authentication:**
-   - Hash passwords with memory-hard Argon2id (`m=19MB, t=2, p=1`) or bcrypt (`cost >= 12`).
-   - Deliver access tokens exclusively via `HttpOnly; Secure; SameSite=Strict` cookies. Never store session tokens in `localStorage` due to Cross-Site Scripting (XSS) extraction risks.
-2. **Zero Injection (SQLi / Command):** All database access must execute through prepared statements or parameterized queries. Dynamic string interpolation in SQL or shell commands is strictly banned.
-3. **Broken Object-Level Authorization (BOLA / IDOR) Defense:** Never fetch resources using user-supplied primary keys alone. Always scope database queries to the authenticated tenant or user context (`WHERE id = :id AND user_id = :authenticated_user_id`).
-4. **Strict HTTP Security Headers:**
-   - Enforce Content-Security-Policy (CSP) without `unsafe-inline` or `unsafe-eval`.
-   - Set `X-Frame-Options: DENY`, `X-Content-Type-Options: nosniff`, and `Strict-Transport-Security: max-age=31536000; includeSubDomains`.
-5. **AI Agent Tool Execution Guardrails:**
-   - AI tools operating on behalf of users must follow least-privilege principles.
-   - Destructive operations (dropping tables, modifying production DNS, deleting files) mandate an explicit interactive confirmation gate before execution.
+### Step 1: Harden Authentication Surfaces
 
-## 4. Execution Workflow
+- **Action:** Hash passwords with memory-hard functions, scope session cookies HttpOnly with SameSite flags, and verify session handling per flow.
+- **Input:** Authentication workflows from user.
+- **Stop Condition:** Halt on plaintext secrets or cookie leaks.
+- **Validation:** Auth checklist reviewed per flow.
 
-### Step 1: Input Validation Boundary
+### Step 2: Close Injection and Access Gaps
 
-- **Action:** Validate incoming request payloads with strict schema parsers (Zod, Pydantic).
-- **Validation:** Malformed types and unknown fields are rejected with HTTP 422 before reaching business logic.
+- **Action:** Parameterize all database access, validate and encode outputs contextually, scope queries to tenant context against BOLA, and emit strict security headers.
+- **Input:** Endpoints and queries from Step 1.
+- **Stop Condition:** Halt on string-built queries; require parameters.
+- **Validation:** Injection audit clean with header proof.
 
-### Step 2: Query Parameterization
+### Step 3: Gate AI Tool Execution
 
-- **Action:** Audit database queries to confirm all user values are passed as positional or named parameters.
-- **Validation:** Zero string concatenation detected in SQL statements.
+- **Action:** Apply least-privilege to agent tool scopes with interactive confirmation gates on destructive operations.
+- **Input:** Tool inventory from user.
+- **Stop Condition:** Halt on ungated destructive tools.
+- **Validation:** Guardrail matrix reviewed per tool.
 
-### Step 3: Header and Cookie Hardening
+### Step 4: Handoff and Human Review
 
-- **Action:** Configure security middleware (Helmet) and scope authentication cookies.
-- **Validation:** Response headers reflect complete security policies in automated scans.
+- **Action:** Present the security report and request approval before enforcement.
+- **Input:** Completed report.
+- **Stop Condition:** Await user approval.
+- **Validation:** Approval recorded; zero enforcement done by this skill.
 
-## 5. Reference Implementation
+## 4. Output Specification
 
-### TypeScript (Secure Authentication Cookies & Parameterized Tenant Query)
+```markdown
+# Security Report
 
-```typescript
-import { NextResponse } from "next/server";
-import type { NextRequest } from "next/server";
-
-// 1. Secure Authentication Cookie Delivery
-export function setAuthCookie(res: NextResponse, token: string): void {
-  res.cookies.set({
-    name: "__Host-auth-token",
-    value: token,
-    httpOnly: true,
-    secure: true,
-    sameSite: "strict",
-    path: "/",
-    maxAge: 3600, // 1 hour
-  });
-}
-
-// 2. BOLA/IDOR-Safe Parameterized Query
-export async function getOrderSecurely(
-  dbClient: any,
-  orderId: string,
-  authenticatedUserId: string,
-) {
-  // Always scope lookup to the authenticated user identity
-  const query = `
-    SELECT id, total_cents, status, created_at 
-    FROM orders 
-    WHERE id = $1 AND user_id = $2
-  `;
-  const result = await dbClient.query(query, [orderId, authenticatedUserId]);
-
-  if (result.rows.length === 0) {
-    throw new Error("Order not found or access denied");
-  }
-
-  return result.rows[0];
-}
+- **Auth:** [Hardening checklist]
+- **Injection:** [Audit evidence]
+- **Guardrails:** [Tool matrix]
 ```
 
-## 6. Validation Gate
+## 5. Validation Gate
 
-Run before certifying security posture:
+- [ ] Auth hardened per flow.
+- [ ] Injection closed with proof.
+- [ ] AI tools gated per scope.
+- [ ] Zero em dashes in deliverable.
+- [ ] Human approval recorded before enforcement.
 
-- [ ] Passwords hashed using Argon2id or bcrypt (cost >= 12).
-- [ ] Authentication tokens delivered via HttpOnly, Secure, SameSite cookies.
-- [ ] Database queries use parameterized placeholders with zero string concatenation.
-- [ ] Object lookups enforce tenant and user ownership boundaries (BOLA defense).
-- [ ] CSP and HSTS security headers configured.
-- [ ] AI tool operations enforce human confirmation gates for destructive actions.
+## 6. Anti-Triggers and Calibration
 
-## 7. Versioning & Portability Matrix
+- **Under-execution threshold:** Shipping auth without hardening review.
+- **Over-execution threshold:** Redesigning UIs unprompted.
+- **Calibration default:** Deny by default; prove per control.
 
-- **Version:** 2.0.0
+## 7. Anti-Pattern Compliance
+
+| Step | Prevents AP            | Mechanism                                           |
+| ---- | ---------------------- | --------------------------------------------------- |
+| 1    | AP-4 (over-permissive) | Hardens auth per flow.                              |
+| 2    | AP-26 (leaking data)   | Parameterizes every query.                          |
+| 3    | AP-44 (unlocked bounds)| Gates AI tools per scope.                           |
+| 4    | AP-45 (no human review)| Halts for approval before enforcement.              |
+
+## 8. Versioning & Changelog
+
+- **Version:** 3.0.0
 - **Changelog:**
-  - `2.0.0` (2026-09-20): Elevated to Sauron Tier-5 specification with BOLA defenses, cookie hardening, and AI tool guardrails.
+  - `3.0.0` (2026-09-26) - Full Tier-5 template conformance with Security Auditor role, role source, and seniority bar.
+  - `2.0.0` - Prior Tier-5 elevation with OWASP defenses.
 
-| Runtime / Harness | Status   | Notes                                    |
-| ----------------- | -------- | ---------------------------------------- |
-| Claude Code       | verified | Fully supported via command integration. |
-| Cursor            | verified | Compatible with editor rule context.     |
-| Windsurf          | verified | Fully functional.                        |
-| Antigravity       | verified | Certified.                               |
+## 9. Portability Matrix
+
+| Runtime     | Status   | Notes                           |
+| ----------- | -------- | ------------------------------- |
+| Claude Code | verified | Direct slash command execution. |
+| Cursor      | verified | Rules and prompt loading.       |
+| Copilot     | verified | Custom instructions support.    |
+| Windsurf    | verified | Cascade flow integration.       |
+| Kiro        | verified | Steering model execution.       |
+| Cline       | verified | Task step-by-step flow.         |
+| Raw API     | verified | Model-agnostic execution.       |
+
+## 10. Examples
+
+**Input:** "Our login stores tokens in localStorage with string-built queries."
+**Output:** Security report with HttpOnly migration, parameterized rewrites, and gated AI tools.

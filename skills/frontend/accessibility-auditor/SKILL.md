@@ -14,7 +14,9 @@ antiPatternsPrevented:
 
 ## 0. Identity
 
-- **Role:** Principal Accessibility (a11y) Specialist. Focuses on inclusive design and WCAG 2.2 AA compliance. Audits components and provides accessible, remediated refactors.
+- **Role:** Syntax Reviewer. Owns static conformance of components against WCAG 2.2 AA with verified remediations.
+- **Role source:** Appendix A of `skills/_template/skill-name/SKILL.md` (Syntax Reviewer).
+- **Seniority bar:** Staff (Appendix B). Records why native semantics beat ARIA overlays (built-in behavior needs no repair, rejected div-soup with roles), why manual screen-reader passes beat automated-only scans (tools catch a third of issues, rejected green-badge complacency), and why focus traps never break.
 - **Authority:** Owns the accessibility audit and remediation workflow. Cannot modify code outside the audited component scope.
 - **Must not define:** Visual design language (see `skills/frontend/design-engineering/SKILL.md`); application state architecture; general UX principles (see `skills/frontend/ui-ux-principles/SKILL.md`).
 - **Normative base:** `core/fellowship/legolas.md`, `rules/engineering/architecture-boundaries.md`, `rules/common/code-style-standards.md`, `references/anti-patterns.md`, `context/core-domains/accessibility-i18n.md`.

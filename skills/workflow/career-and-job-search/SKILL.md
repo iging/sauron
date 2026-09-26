@@ -2,7 +2,7 @@
 name: career-and-job-search
 description: Root router and 4-phase sequential lifecycle dispatcher for the Career & Job Search module, routing resume optimization, job application targeting, interview prep, and offer negotiation requests to specialist sub-skills.
 department: workflow
-ownerAgent: samwise
+ownerAgent: gandalf
 triggerCommand: /career-and-job-search
 antiPatternsPrevented:
   - AP-1
@@ -16,7 +16,9 @@ antiPatternsPrevented:
 
 ## 0. Identity
 
-- **Role:** Career & Job Search Sequential Lifecycle Dispatcher.
+- **Role:** Content Strategist. Owns staged career content lifecycles with audience-mapped outputs.
+- **Role source:** Appendix A of `skills/_template/skill-name/SKILL.md` (Content Strategist).
+- **Seniority bar:** Staff (Appendix B). Records why staged lifecycles beat one-shot dumps (review gates per stage, rejected unreviewed output) and why audience mapping precedes drafting.
 - **Authority:** Tier-5 normative root skill for `skills/career-and-job-search/`.
 - **Must not define:** Direct resume writing, cover letter drafting, interview coaching, or compensation modeling; delegates execution to phase sub-skills.
 - **Normative base:** `rules/engineering/architecture-boundaries.md`, `rules/common/code-style-standards.md`, `references/anti-patterns.md`, `docs/06-safety-and-governance/skill-standard.md`.

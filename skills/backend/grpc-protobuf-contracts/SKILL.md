@@ -2,7 +2,7 @@
 name: grpc-protobuf-contracts
 description: High-throughput gRPC service definitions, protocol buffer compilation, binary serialization, and client streaming.
 department: backend
-ownerAgent: frodo
+ownerAgent: aragorn
 triggerCommand: /grpc-protobuf-contracts
 antiPatternsPrevented:
   - AP-1
@@ -15,24 +15,26 @@ antiPatternsPrevented:
 
 ## 0. Identity
 
-- **Role:** Systems Interconnect Architect. Governs Protocol Buffer specifications, backward compatibility rules, and binary RPC performance.
+- **Role:** API Designer. Owns binary contract specifications with compatibility rules and performance budgets.
+- **Role source:** Appendix A of `skills/_template/skill-name/SKILL.md` (API Designer).
+- **Seniority bar:** Staff (Appendix B). Records why protobuf contracts beat JSON for internal paths (binary efficiency with schema teeth, rejected untyped REST internally) and why field-number discipline beats casual schema edits.
 - **Authority:** Normative specification under `skills/backend/grpc-protobuf-contracts/`.
 - **Must not define:** Browser-facing client layouts.
 - **Normative base:** `core/fellowship/frodo.md`, `rules/engineering/architecture-boundaries.md`, `rules/common/code-style-standards.md`, `references/anti-patterns.md`.
 
 ## 1. Intent (9 Dimensions)
 
-| # | Dimension | Value |
-|---|-----------|-------|
-| 1 | Task | Define high-performance binary RPC interfaces and backward-compatible protobuf schemas. |
-| 2 | Target Tool | Protocol Buffers compiler (protoc), gRPC Node, gRPC Go, Buf CLI. |
-| 3 | Output Format | Strict `.proto` schema definitions and compiled client/server stubs. |
-| 4 | Constraints | Field numbers are immutable once assigned. Deleted fields must use `reserved`. |
-| 5 | Input | Microservice interface contracts and latency requirements. |
-| 6 | Context | Prevents serialization overhead, schema breaking changes, and cross-service RPC crashes. |
-| 7 | Audience | Backend engineers and distributed infrastructure architects. |
-| 8 | Success Criteria | Sub-millisecond serialization overhead, zero field tag collisions, clean lint via Buf. |
-| 9 | Examples | See Section 5. |
+| #   | Dimension        | Value                                                                                    |
+| --- | ---------------- | ---------------------------------------------------------------------------------------- |
+| 1   | Task             | Define high-performance binary RPC interfaces and backward-compatible protobuf schemas.  |
+| 2   | Target Tool      | Protocol Buffers compiler (protoc), gRPC Node, gRPC Go, Buf CLI.                         |
+| 3   | Output Format    | Strict `.proto` schema definitions and compiled client/server stubs.                     |
+| 4   | Constraints      | Field numbers are immutable once assigned. Deleted fields must use `reserved`.           |
+| 5   | Input            | Microservice interface contracts and latency requirements.                               |
+| 6   | Context          | Prevents serialization overhead, schema breaking changes, and cross-service RPC crashes. |
+| 7   | Audience         | Backend engineers and distributed infrastructure architects.                             |
+| 8   | Success Criteria | Sub-millisecond serialization overhead, zero field tag collisions, clean lint via Buf.   |
+| 9   | Examples         | See Section 5.                                                                           |
 
 ## 2. Core Directives
 
@@ -44,10 +46,12 @@ antiPatternsPrevented:
 ## 3. Execution Workflow
 
 ### Step 1: Schema Authoring
+
 - **Action:** Author proto definition following Buf style conventions (snake_case fields, CamelCase services).
 - **Validation:** `buf lint` passes with zero errors.
 
 ### Step 2: Breaking Change Audit
+
 - **Action:** Run `buf breaking --against .git#branch=main` before merging.
 - **Validation:** No field numbers altered or removed without `reserved` markers.
 
@@ -80,4 +84,3 @@ message ProcessPaymentResponse {
   string authorization_code = 2;
 }
 ```
-

@@ -2,7 +2,7 @@
 name: research-and-productivity
 description: Root router for the Research & Productivity module, routing learning, productivity, and research requests to specialist sub-group routers and Tier-5 skills.
 department: workflow
-ownerAgent: pippin
+ownerAgent: gandalf
 triggerCommand: /research-and-productivity
 antiPatternsPrevented:
   - AP-1
@@ -14,7 +14,9 @@ antiPatternsPrevented:
 
 ## 0. Identity
 
-- **Role:** Research & Productivity Module Router and Dispatcher.
+- **Role:** Research Synthesizer. Owns multi-source intelligence routing with cited deltas per sub-skill.
+- **Role source:** Appendix A of `skills/_template/skill-name/SKILL.md` (Research Synthesizer).
+- **Seniority bar:** Staff (Appendix B). Records why cited synthesis beats link dumps (deltas trace to sources, rejected bookmark collections) and why routers never execute research directly.
 - **Authority:** Tier-5 normative root skill for `skills/workflow/research-and-productivity/`.
 - **Must not define:** Direct skill execution or domain task implementation; delegates to sub-group routers or specialist sub-skills.
 - **Normative base:** `rules/engineering/architecture-boundaries.md`, `rules/common/code-style-standards.md`, `references/anti-patterns.md`, `docs/06-safety-and-governance/skill-standard.md`.

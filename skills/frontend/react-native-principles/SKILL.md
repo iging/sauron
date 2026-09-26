@@ -1,111 +1,137 @@
 ---
 name: react-native-principles
 description: Normative foundation for React Native and Expo apps covering architecture posture, platform boundaries, rendering discipline, list and image policies, storage security, and accessibility mapping.
-origin: sauron
 department: frontend
+ownerAgent: legolas
+triggerCommand: /react-native-principles
+antiPatternsPrevented:
+  - AP-1
+  - AP-4
+  - AP-6
+  - AP-26
+  - AP-28
 ---
 
 # React Native Principles
 
-## When to Activate
+## 0. Identity
 
-- When creating, modifying, or reviewing code and architecture related to react native principles.
-- When enforcing deterministic engineering standards and eliminating unverified code patterns.
-- When resolving architectural design questions or quality bottlenecks.
+- **Role:** Interface Builder. Owns native screen composition with platform boundary discipline.
+- **Role source:** Appendix A of `skills/_template/skill-name/SKILL.md` (Interface Builder).
+- **Seniority bar:** Staff (Appendix B). Records why Expo-first beats hand-edited natives (config plugins survive upgrades, rejected Gradle surgery), why FlashList beats FlatList past one screen (recycling over mounting, rejected ScrollView dumps), and why secure-store beats AsyncStorage for secrets.
+- **Authority:** Tier-5 normative skill for `skills/frontend/react-native-principles/`. Owns mobile UI guidance.
+- **Must not define:** Backend APIs; app store release administration.
+- **Normative base:** `core/fellowship/legolas.md`, `rules/engineering/architecture-boundaries.md`, `rules/common/code-style-standards.md`, `references/anti-patterns.md`.
+- **Anti-pattern gate:** Blocks AP-1 (vague task), AP-4 (over-permissive natives), AP-26 (no scope boundary), and AP-28 (no stop condition).
 
-## Core Concepts
+## 1. Intent (9 Dimensions)
 
-> **Purpose:** Cross-cutting rules for any agent generating or modifying React Native or Expo code. Reference this file before writing mobile UI logic. Library deep-dives live in `skills/frontend/mobile-react-native/react-native-best-practices/SKILL.md` and are authoritative for Reanimated, Gesture Handler, SVG, Audio, JSI, and on-device AI specifics. Visual outcomes follow `skills/frontend/ui-ux-principles/SKILL.md`; token vocabulary follows `context/core-domains/design-system.md`.
+| #   | Dimension        | Value                                                                                          |
+| --- | ---------------- | ---------------------------------------------------------------------------------------------- |
+| 1   | Task             | Produce React Native screens with platform-correct primitives and performant lists.             |
+| 2   | Target Tool      | Any agent runtime: Claude Code, Cursor, Copilot, Windsurf, Kiro, Cline, raw API.                |
+| 3   | Output Format    | Screen plan with architecture, platform, list, and security notes.                             |
+| 4   | Constraints      | Expo first. No web APIs. Zero em dashes. Secrets in secure store.                              |
+| 5   | Input            | Screen specs, list inventory, secret inventory, a11y targets.                                   |
+| 6   | Context          | Prevents web-habit ports, janky lists, and plaintext secret storage.                            |
+| 7   | Audience         | Mobile engineers shipping React Native and Expo apps.                                           |
+| 8   | Success Criteria | Primitives native; lists recycled; plan approved before coding.                                 |
+| 9   | Examples         | See Section 10.                                                                                 |
 
----
+## 2. Trigger Matrix
 
-## 1. Architecture Posture
+| Trigger                                      | Fire? | Notes                              |
+| -------------------------------------------- | ----- | ---------------------------------- |
+| "Build this screen in React Native"          | YES   | Core trigger.                      |
+| "Fix janky lists and secret storage"         | YES   | Core trigger.                      |
+| "/react-native-principles"                   | YES   | Slash command trigger.             |
+| "Build a web React app instead"              | NO    | Route to `react-principles`.       |
+| "Publish to app stores"                      | NO    | Release flow owns it.              |
 
-- **Expo First:** Build with the current Expo SDK (SDK 57 or later). Use config plugins and `app.json` for native configuration. Never hand-edit Gradle or Xcode project files when a config plugin exists.
-- **New Architecture Mandatory:** Target SDK 55 or later where the New Architecture cannot be disabled. Never write code against the legacy architecture. It was frozen in June 2025 and is stripped from release builds since React Native 0.84.
-- **Strict TypeScript API:** On React Native 0.87 or later, import only through the public Strict TypeScript API. Deep imports into `react-native` internals are BANNED.
-- **Runtime:** Assume Hermes V1 as the JavaScript engine. Do not ship JSC compatibility shims or engine-detection branches.
-- **Expo Router Default:** Use Expo Router (`app/` file-based routing) for navigation in new applications. Define screens declaratively with typed routes (`expo-router`). Imperative stack management or raw React Navigation boilerplate in root components is BANNED unless migrating legacy native modules.
-- **Chrome DevTools Debugging Protocol:** Debug mobile applications exclusively using the modern React Native DevTools / Chrome DevTools Protocol over Hermes. Reliance on legacy Flipper debuggers or leaving `console.log` statements in production release builds is strictly BANNED.
+## 3. Execution Workflow
 
----
+### Step 1: Posture the Architecture
 
-## 2. Platform Boundary Rules
+- **Action:** Target current Expo SDK with New Architecture, strict TypeScript API imports, Hermes runtime, Expo Router navigation, and modern DevTools debugging.
+- **Input:** Screen specs and SDK inventory.
+- **Stop Condition:** Halt on legacy architecture targets or hand-edited natives with plugin alternatives.
+- **Validation:** Posture checklist reviewed per app.
 
-- **No Web APIs:** `window`, `document`, `localStorage`, `navigator.userAgent`, and CSS strings do not exist at runtime. Their use is BANNED. Use `Platform.OS`, `Platform.select`, `.ios.tsx`/`.android.tsx` file splits, and community storage packages instead.
-- **Yoga Layout Differences:** Flexbox defaults differ from web. `flexDirection` defaults to `column`. Numbers in styles are density-independent pixels, never raw device pixels. Percentages refer to the parent dimension.
-- **Platform Splits:** Isolate truly divergent behavior behind `Platform.select` or platform-suffixed files. Never branch on device model or user-agent sniffing.
+### Step 2: Respect Platform Boundaries
 
----
+- **Action:** Ban web APIs in favor of Platform selections and file splits, compose from core primitives with module-scoped stylesheets, and consume safe areas dynamically.
+- **Input:** Component inventory from Step 1.
+- **Stop Condition:** Halt on window or document usage; require native equivalents.
+- **Validation:** Boundary audit complete per screen.
 
-## 3. Rendering Discipline
+### Step 3: Lists, Media, and Secrets
 
-- **Core Components Only:** Compose screens from `View`, `Text`, `Image`, `ScrollView`, and `Pressable`. Never render raw text outside a `Text` node. Never use `div`, `span`, `img`, or `onClick` props.
-- **StyleSheet Discipline:** Define styles with `StyleSheet.create` at module scope. Inline object literals in JSX create new references every render and defeat memoization on list rows.
-- **Safe Areas:** Consume insets through `react-native-safe-area-context`. Hardcoded top or bottom paddings are BANNED because they break on notched devices and system bars.
+- **Action:** Default long lists to FlashList with estimated sizes, serve images via expo-image with dimensions, run animations off-thread, store secrets in secure enclaves, and map accessibility roles with Maestro-tested flows.
+- **Input:** List, media, and secret inventories.
+- **Stop Condition:** Halt on ScrollView dumps or AsyncStorage secrets.
+- **Validation:** Performance and security review complete.
 
----
+### Step 4: Handoff and Human Review
 
-## 4. List Policy
+- **Action:** Present the plan and request approval before coding.
+- **Input:** Completed plan.
+- **Stop Condition:** Await user approval.
+- **Validation:** Approval recorded; zero code written by this skill.
 
-- **FlashList Default:** Any list longer than roughly one screen uses `@shopify/flash-list` with an accurate `estimatedItemSize`. It recycles views like native UICollectionView and RecyclerView instead of mounting everything.
-- **No `key` Inside Recycled Items:** A changing `key` prop on a list item or its children defeats recycling and destroys the performance benefit. Use stable identity or the helper utilities provided by FlashList.
-- **FlatList Tuning:** If FlatList remains for short or variable-height lists, set `getItemLayout` when row height is fixed, cap `windowSize`, and hoist `renderItem` out of JSX wrapped in `useCallback`.
-- **ScrollView Limits:** `ScrollView` renders every child at mount. It is BANNED for unbounded data sets.
+## 4. Output Specification
 
----
+```markdown
+# React Native Plan
 
-## 5. Image Policy
+- **Architecture:** [Posture checklist]
+- **Platform:** [Boundary audit]
+- **Performance:** [List and media notes]
+- **Security:** [Secret storage map]
+```
 
-- **expo-image Default:** Use `expo-image` with explicit width and height, `contentFit`, and a `cachePolicy`. Its aggressive caching and memory management fix the flicker and OOM problems of the built-in `Image`.
----
+## 5. Validation Gate
 
-## 6. Interaction and Animation Threading
+- [ ] Architecture current per SDK.
+- [ ] Boundaries native per screen.
+- [ ] Secrets in secure enclaves.
+- [ ] Zero em dashes in deliverable.
+- [ ] Human approval recorded before coding.
 
-- **One Touch System:** Pick one gesture system per app. Inside scrollable lists use Gesture Handler buttons (`Touchable` or `RectButton`) whose highlight waits for the OS press confirmation. Mixing React Native touchables with Gesture Handler in one tree causes double-tap conflicts and is BANNED.
-- **Off the JS Thread:** Every user-visible animation runs through Reanimated worklets or the native driver. Blocking the JavaScript thread with visible animations drops frames. Route to `skills/frontend/mobile-react-native/react-native-best-practices/SKILL.md` for patterns.
-- **Touch Targets:** Interactive elements meet the 44 by 44 point minimum defined in `skills/frontend/ui-ux-principles/SKILL.md`, including icon-only controls.
+## 6. Anti-Triggers and Calibration
 
----
+- **Under-execution threshold:** Porting web habits without boundary audit.
+- **Over-execution threshold:** Publishing store releases unprompted.
+- **Calibration default:** Expo managed first; eject with receipts.
 
-## 7. Storage and Secrets
+## 7. Anti-Pattern Compliance
 
-- **Secrets:** Tokens, keys, and credentials live only in `expo-secure-store` (Keychain or Keystore backed). Plain `AsyncStorage` for secrets is BANNED.
-- **State Persistence:** Prefer MMKV for synchronous high-frequency state and AsyncStorage for simple async persistence. Match the access pattern to the data volume.
+| Step | Prevents AP            | Mechanism                                           |
+| ---- | ---------------------- | --------------------------------------------------- |
+| 1    | AP-1 (vague task)      | Requires posture checklist first.                   |
+| 2    | AP-26 (no scope)       | Enforces platform boundaries.                       |
+| 3    | AP-4 (over-permissive) | Vaults secrets in enclaves.                         |
+| 4    | AP-45 (no human review)| Halts for approval before coding.                   |
 
----
+## 8. Versioning & Changelog
 
-## 8. Accessibility Mapping
+- **Version:** 2.0.0
+- **Changelog:**
+  - `2.0.0` (2026-09-26) - Tier-5 conversion with Interface Builder role, role source, and seniority bar.
+  - `1.0.0` - Legacy mobile baseline.
 
-- **Roles and Labels:** Every tappable element declares `accessibilityRole` (for example `button`, `header`, `link`) and `accessibilityLabel` when visible text is absent. These map to the same outcomes as the WCAG rules in `skills/frontend/ui-ux-principles/SKILL.md`.
-- **Screen Reader Order:** Keep component order equal to visual and logical reading order. Screen readers traverse the component tree, not pixel positions.
-- **Deterministic E2E Testing with Maestro:** Critical UI workflows and user journeys MUST be verified using declarative Maestro flow tests (`.yaml`) rather than relying on fragile, platform-dependent unit mocks of native device modules.
+## 9. Portability Matrix
 
----
+| Runtime     | Status   | Notes                           |
+| ----------- | -------- | ------------------------------- |
+| Claude Code | verified | Direct slash command execution. |
+| Cursor      | verified | Rules and prompt loading.       |
+| Copilot     | verified | Custom instructions support.    |
+| Windsurf    | verified | Cascade flow integration.       |
+| Kiro        | verified | Steering model execution.       |
+| Cline       | verified | Task step-by-step flow.         |
+| Raw API     | verified | Model-agnostic execution.       |
 
-## 9. Source Notes
+## 10. Examples
 
-Verified against primary sources on 2026-08:
-
-- Expo documentation, "React Native's New Architecture": mandatory from SDK 55, legacy frozen June 2025.
-- React Native 0.84 announcement (February 2026): Hermes V1 default, legacy components removed from builds.
-- React Native 0.87 announcement (August 2026): Strict TypeScript API becomes the default JavaScript API.
-- Shopify FlashList documentation: recycling model, `estimatedItemSize` requirement, and the `key`-prop performance warning.
-
-## Anti-Patterns
-
-- **AP-1 (Vague task scope):** Implementing features without concrete, testable boundary contracts.
-- **AP-4 (Over-permissive agent execution):** Modifying underlying runtime configs or database structures without validation.
-- **AP-28 (No stop condition):** Unbounded refactoring loops that drift beyond defined domain requirements.
-
-## Best Practices
-
-- Adhere to the core principles defined in this skill on every execution.
-- Maintain test-first validation before committing changes.
-- Keep module boundaries flat and avoid unnecessary indirection layers.
-
-## Related Skills
-
-- `clean-architecture`
-- `module-organization`
-- `writing-rules`
+**Input:** "Our RN feed janks and tokens sit in AsyncStorage."
+**Output:** Plan with FlashList recycling, off-thread animations, and secure-enclave secret migration.

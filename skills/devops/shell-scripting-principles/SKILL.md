@@ -1,157 +1,137 @@
 ---
 name: shell-scripting-principles
-description: Baseline standard for POSIX-compliant, secure, and robust Bash shell scripting, strict error handling, defensive quoting, and anti-malware execution defense.
-origin: sauron
+description: Enforces POSIX shell scripting with strict preambles, defensive quoting, trap cleanup, and injection defense. Excludes Windows batch scripting.
 department: devops
+ownerAgent: gimli
+triggerCommand: /shell-scripting-principles
+antiPatternsPrevented:
+  - AP-1
+  - AP-6
+  - AP-14
+  - AP-20
+  - AP-26
+  - AP-57
 ---
 
 # Shell Scripting Principles
 
-Enforce disciplined, portable, and secure shell scripting across Linux, macOS, and POSIX-compatible runtime environments. Eliminate word-splitting bugs, enforce strict error escalation, and prevent malicious script injection vectors.
+## 0. Identity
 
-## When to Activate
+- **Role:** Service Builder. Owns automation script implementation with strict failure semantics inside scoped files.
+- **Role source:** Appendix A of `skills/_template/skill-name/SKILL.md` (Service Builder).
+- **Seniority bar:** Staff (Appendix B). Records why strict preambles beat bare scripts (failures surface at origin, rejected silent continuations), why arrays beat string-built commands (injection dies at construction, rejected eval assembly), and why hash verification beats curl pipes.
+- **Authority:** Tier-5 normative skill for `skills/devops/shell-scripting-principles/`. Owns scripting and safety guidance.
+- **Must not define:** Windows batch scripting internals.
+- **Normative base:** `core/fellowship/gimli.md`, `rules/engineering/architecture-boundaries.md`, `rules/common/code-style-standards.md`, `references/anti-patterns.md`.
+- **Anti-pattern gate:** Blocks AP-14 (leaking secrets), AP-20 (untracked work), and AP-57 (untracked side effects).
 
-- Authoring, modifying, or reviewing Bash or POSIX shell scripts (`.sh`).
-- Scaffolding CI/CD automation, server provisioning, container entrypoints, and build hooks.
-- Auditing shell scripts for injection risks, unquoted variables, or silent failure modes.
+## 1. Intent (9 Dimensions)
 
-## Core Concepts
+| #   | Dimension        | Value                                                                                          |
+| --- | ---------------- | ---------------------------------------------------------------------------------------------- |
+| 1   | Task             | Produce portable hardened shell scripts with verified execution paths.                         |
+| 2   | Target Tool      | Bash, POSIX sh, ShellCheck, CI Linux and macOS runners.                                        |
+| 3   | Output Format    | Script plan with preamble, quoting, trap, and safety notes.                                    |
+| 4   | Constraints      | Strict preamble always. Quote every expansion. Zero em dashes. No remote pipes.                |
+| 5   | Input            | Automation goals, temp file needs, download inventory.                                          |
+| 6   | Context          | Prevents word-splitting bugs, silent failures, and injection payloads.                          |
+| 7   | Audience         | Engineers automating Unix fleets and CI.                                                        |
+| 8   | Success Criteria | ShellCheck clean; traps registered; plan approved before rollout.                               |
+| 9   | Examples         | See Section 10.                                                                                 |
 
-### 1. Robust Execution Preamble and Error Escalation
+## 2. Trigger Matrix
 
-- Always begin non-POSIX Bash scripts with `#!/usr/bin/env bash` for maximum environment portability.
-- Immediately enforce the strict execution preamble on line 2 of every script:
+| Trigger                                      | Fire? | Notes                              |
+| -------------------------------------------- | ----- | ---------------------------------- |
+| "Harden our build scripts"                   | YES   | Core trigger.                      |
+| "Audit shell scripts for injection"          | YES   | Core trigger.                      |
+| "/shell-scripting-principles"                | YES   | Slash command trigger.             |
+| "Write Windows batch files"                  | NO    | Route to `windows-cmd-principles`. |
+| "Write PowerShell modules"                   | NO    | Route to `powershell-principles`.  |
 
-  ```bash
-  set -euo pipefail
-  IFS=$'\n\t'
-  ```
+## 3. Execution Workflow
 
-  - `-e`: Exit immediately if a pipeline, list, or simple command returns a non-zero exit status.
-  - `-u`: Treat unset variables and parameters as an error during parameter expansion.
-  - `-o pipefail`: Return the exit status of the last command in the pipeline that failed, rather than the exit status of the very last command.
-  - `IFS=$'\n\t'`: Restrict the Internal Field Separator to newlines and tabs, eliminating whitespace word-splitting hazards.
+### Step 1: Open Strictly Every Time
 
-### 2. Defensive Quoting and Expansion
+- **Action:** Start with env-bash shebang plus strict preamble and narrow field separators. Resolve directories from script location, never working directory.
+- **Input:** Script inventory from user.
+- **Stop Condition:** Halt on missing preambles; require them.
+- **Validation:** Preamble audit complete per script.
 
-- Double-quote every variable and parameter expansion (`"${variable}"`, `"${1}"`). Unquoted expansions cause accidental word-splitting, unexpected globbing, and path injection vulnerabilities.
-- Prefer modern `[[ ... ]]` condition syntax over legacy `[ ... ]` in Bash scripts to gain enhanced string comparison and regex matching capabilities without subshell overhead.
-- Use `$(( ... ))` for integer arithmetic rather than obsolete `expr` commands.
+### Step 2: Quote, Trap, and Contain
 
-### 3. Cleanup and Signal Handling with Traps
+- **Action:** Quote every expansion, prefer modern conditionals, register exit traps with mktemp-only temporaries, and canonicalize paths before destructive operations.
+- **Input:** Script bodies from Step 1.
+- **Stop Condition:** Halt on unquoted expansions or predictable temp paths.
+- **Validation:** Quoting and trap review complete per script.
 
-- Always register an `EXIT` trap to guarantee that temporary files, background jobs, and lock files are cleaned up reliably on exit, regardless of whether termination was graceful or caused by an unhandled error:
-  ```bash
-  trap 'cleanup' EXIT INT TERM
-  ```
-- Generate temporary files and directories exclusively using `mktemp` or `mktemp -d`. Never invent predictable temporary paths in `/tmp` to avoid symlink race condition attacks.
+### Step 3: Ban Dangerous Execution
 
-## Security and Anti-Malware Directives
+- **Action:** Prohibit curl pipes and eval entirely. Verify downloads with pinned hashes in isolated directories before execution. Build commands as arrays, never concatenated strings.
+- **Input:** Download inventory from user.
+- **Stop Condition:** Halt on any banned pattern; mark as blocking.
+- **Validation:** ShellCheck zero-error evidence recorded.
 
-1. **Absolute Ban on `curl | bash`:** Never author or execute pipelines that pipe unverified remote URLs into a shell (`curl -s <url> | bash` or `wget -O - <url> | sh`). Remote execution without signature verification allows malicious man-in-the-middle payloads to execute with the user permissions.
-2. **Mandate Cryptographic Hash Verification:** If a script must download and execute a remote binary or script, download it to an isolated directory, compute its SHA256 checksum, verify it against an immutable pinned hash, and abort immediately on mismatch before setting execution flags (`chmod +x`).
-3. **Absolute Ban on `eval`:** Never pass dynamic strings, user inputs, or environment variables to the `eval` command. `eval` is the primary mechanism for shell code injection vulnerabilities.
-4. **Command Injection Prevention in Parameterized Calls:** Avoid building commands by concatenating strings into a variable and then executing that variable. Store arguments in typed Bash arrays (`args=("-a" "-b")`) and execute via `command "${args[@]}"`.
-5. **Path Traversal Containment:** Canonicalize paths using `realpath` or `readlink -f`. Validate that the target path does not escape the approved parent directory before invoking destructive operations (`rm`, `mv`).
+### Step 4: Handoff and Human Review
 
-## Code Examples
+- **Action:** Present the plan and request approval before rollout.
+- **Input:** Completed plan.
+- **Stop Condition:** Await user approval.
+- **Validation:** Approval recorded; zero rollouts performed by this skill.
 
-### Hardened Production Bash Script Example
+## 4. Output Specification
 
-```bash
-#!/usr/bin/env bash
-# ===================================================================
-# Secure build pipeline script following Sauron Shell Scripting Principles
-# ===================================================================
+```markdown
+# Shell Plan
 
-set -euo pipefail
-IFS=$'\n\t'
-
-# Script directory resolution
-readonly SCRIPT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
-readonly WORKSPACE_ROOT="$(cd "${SCRIPT_DIR}/.." && pwd)"
-
-# Temporary directory management with guaranteed cleanup
-TMP_DIR="$(mktemp -d -t sauron-build-XXXXXX)"
-readonly TMP_DIR
-
-cleanup() {
-  local exit_code=$?
-  if [ -d "${TMP_DIR}" ]; then
-    rm -rf "${TMP_DIR}"
-  fi
-  exit "${exit_code}"
-}
-trap cleanup EXIT INT TERM
-
-log_info() {
-  printf "[INFO] %s\n" "${1}"
-}
-
-log_error() {
-  printf "[ERROR] %s\n" "${1}" >&2
-}
-
-build_artifacts() {
-  local target_version="${1}"
-  local output_tar="${TMP_DIR}/package-${target_version}.tar.gz"
-
-  # Validate input format with regex
-  if [[ ! "${target_version}" =~ ^[0-9]+\.[0-9]+\.[0-9]+$ ]]; then
-    log_error "Invalid semantic version format: ${target_version}"
-    return 1
-  fi
-
-  log_info "Creating build archive for version ${target_version}..."
-
-  # Build command using array to prevent argument injection
-  local tar_args=(
-    "-czf"
-    "${output_tar}"
-    "-C"
-    "${WORKSPACE_ROOT}"
-    "dist"
-    "package.json"
-  )
-
-  tar "${tar_args[@]}"
-
-  # Verify file creation
-  if [ ! -f "${output_tar}" ]; then
-    log_error "Archive generation failed."
-    return 1
-  fi
-
-  log_info "Build completed successfully: ${output_tar}"
-}
-
-main() {
-  if [ "$#" -lt 1 ]; then
-    log_error "Usage: $0 <version>"
-    exit 1
-  fi
-
-  local version="${1}"
-  build_artifacts "${version}"
-}
-
-main "$@"
+- **Preamble:** [Strictness per script]
+- **Safety:** [Quoting with trap notes]
+- **Execution:** [Banned patterns with verification]
 ```
 
-## Anti-Patterns
+## 5. Validation Gate
 
-- **AP-14 (Leaking secrets):** Printing full environment lists (`env`, `printenv`) in scripts or logs.
-- **AP-20 (Untracked work):** Relying on uncommitted build scripts that depend on undocumented machine state.
-- **AP-57 (Untracked side effect in CI):** Mutating global machine paths outside the designated workspace directory.
+- [ ] Strict preamble per script.
+- [ ] Expansions quoted with traps set.
+- [ ] Dangerous patterns banned with hashes.
+- [ ] Zero em dashes in deliverable.
+- [ ] Human approval recorded before rollout.
 
-## Best Practices
+## 6. Anti-Triggers and Calibration
 
-- Validate every script using ShellCheck (`shellcheck script.sh`) before committing.
-- Ensure scripts pass ShellCheck with zero errors and zero warnings.
-- Restrict file permissions on generated scripts (`chmod 755` for executables, `chmod 644` for sourced libraries).
+- **Under-execution threshold:** Shipping scripts without ShellCheck runs.
+- **Over-execution threshold:** Mutating machine paths unprompted.
+- **Calibration default:** Strictest preamble first; relax nothing silently.
 
-## Related Skills
+## 7. Anti-Pattern Compliance
 
-- [powershell-principles](file:///C:/Users/IGING/Documents/GitHub/sauron/skills/devops/powershell-principles/SKILL.md)
-- [git-bash-principles](file:///C:/Users/IGING/Documents/GitHub/sauron/skills/devops/git-bash-principles/SKILL.md)
-- [docker-principles](file:///C:/Users/IGING/Documents/GitHub/sauron/skills/devops/docker-principles/SKILL.md)
+| Step | Prevents AP            | Mechanism                                           |
+| ---- | ---------------------- | --------------------------------------------------- |
+| 1    | AP-1 (vague task)      | Requires preamble audit first.                      |
+| 2    | AP-26 (no scope)       | Quotes and contains every path.                     |
+| 3    | AP-14 (leaking secrets)| Bans pipes and eval with verification.              |
+| 4    | AP-45 (no human review)| Halts for approval before rollout.                  |
+
+## 8. Versioning & Changelog
+
+- **Version:** 2.0.0
+- **Changelog:**
+  - `2.0.0` (2026-09-26) - Tier-5 conversion with Service Builder role, role source, and seniority bar.
+  - `1.0.0` - Legacy scripting baseline.
+
+## 9. Portability Matrix
+
+| Runtime     | Status   | Notes                           |
+| ----------- | -------- | ------------------------------- |
+| Claude Code | verified | Direct slash command execution. |
+| Cursor      | verified | Rules and prompt loading.       |
+| Copilot     | verified | Custom instructions support.    |
+| Windsurf    | verified | Cascade flow integration.       |
+| Kiro        | verified | Steering model execution.       |
+| Cline       | verified | Task step-by-step flow.         |
+| Raw API     | verified | Model-agnostic execution.       |
+
+## 10. Examples
+
+**Input:** "Our CI scripts fail silently and one pipes curl to bash."
+**Output:** Plan with strict preambles, trap cleanup, hash-verified downloads, and ShellCheck-clean evidence.

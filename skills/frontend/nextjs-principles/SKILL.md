@@ -1,118 +1,138 @@
 ---
 name: nextjs-principles
 description: Next.js App Router and React 19 architecture constraints, Server Components default, caching, Server Actions security, and Turbopack optimization.
-origin: sauron
 department: frontend
+ownerAgent: legolas
+triggerCommand: /nextjs-principles
+antiPatternsPrevented:
+  - AP-1
+  - AP-4
+  - AP-6
+  - AP-9
+  - AP-26
+  - AP-28
 ---
 
 # Next.js Principles
 
-Architect high-performance web applications using the Next.js App Router and React 19. Maximize server-side data execution, optimize client bundle weight, enforce Server Action authorization, and eliminate client data-fetching waterfalls.
+## 0. Identity
 
-## When to Activate
+- **Role:** Interface Builder. Owns server-first composition with strict client boundaries.
+- **Role source:** Appendix A of `skills/_template/skill-name/SKILL.md` (Interface Builder).
+- **Seniority bar:** Staff (Appendix B). Records why Server Components default beats client fetching (no waterfalls, rejected useEffect data loads), why explicit cache directives beat implicit caching (predictable freshness, rejected stale surprises), and why server-only guards beat leaked secrets.
+- **Authority:** Tier-5 normative skill for `skills/frontend/nextjs-principles/`. Owns App Router and rendering guidance.
+- **Must not define:** Backend database internals; native mobile builds.
+- **Normative base:** `core/fellowship/legolas.md`, `rules/engineering/architecture-boundaries.md`, `rules/common/code-style-standards.md`, `references/anti-patterns.md`.
+- **Anti-pattern gate:** Blocks AP-4 (over-permissive client), AP-9 (unvalidated actions), and AP-26 (leaking secrets).
 
-- Creating or modifying files inside the `app/` directory (`layout.tsx`, `page.tsx`, `route.ts`, `loading.tsx`, `error.tsx`).
-- Implementing data fetching, dynamic caching, Server Actions, or Route Handlers.
-- Structuring server and client component boundaries or configuring Turbopack builds.
-- Reviewing SEO metadata, font optimization, and secret environment variable isolation.
+## 1. Intent (9 Dimensions)
 
-## Core Concepts
+| #   | Dimension        | Value                                                                                          |
+| --- | ---------------- | ---------------------------------------------------------------------------------------------- |
+| 1   | Task             | Produce App Router apps with server-first data, secured actions, and optimized assets.         |
+| 2   | Target Tool      | Any agent runtime: Claude Code, Cursor, Copilot, Windsurf, Kiro, Cline, raw API.                |
+| 3   | Output Format    | Route plan with boundaries, cache rules, action contracts, and asset notes.                    |
+| 4   | Constraints      | Server Components default. Secrets server-only. Zero em dashes. Awaited async APIs.            |
+| 5   | Input            | Route map, data needs, mutation list, SEO needs.                                                |
+| 6   | Context          | Prevents client bloat, waterfall fetches, and secret leaks into bundles.                        |
+| 7   | Audience         | Frontend engineers shipping Next.js App Router apps.                                            |
+| 8   | Success Criteria | Boundaries strict; actions authorized; plan approved before coding.                             |
+| 9   | Examples         | See Section 10.                                                                                 |
 
-### 1. Component Architecture and Rendering Boundaries
+## 2. Trigger Matrix
 
-- **Server Components Default:** All components must be React Server Components by default.
-- **Client Component Constraints:** The `'use client'` directive is strictly regulated. Use it only if the component fundamentally requires:
-  - React hooks (`useState`, `useEffect`, `useReducer`, `useContext`, `useRef`).
-  - Browser APIs (for example `window`, `document`, `navigator`, `localStorage`).
-  - DOM Event listeners (for example `onClick`, `onChange`).
-- **File Structure:** All Next.js projects must use the App Router (`app/` directory). The legacy Pages router (`pages/`) is strictly banned for new features.
-- **Feature-First Architecture:** Place all code inside a `src/` directory. Group code by feature or domain (for example `src/features/auth/`) rather than scattering files globally. The `app/` directory strictly contains routing logic (`page.tsx`, `layout.tsx`).
-- **Serialization Boundary:** Data passed from a Server Component to a Client Component must be strictly serializable (JSON). Passing functions, Dates, or class instances as props is banned.
-- **Async Request APIs (Next.js 16):** Page and layout props (`params`, `searchParams`) are asynchronous Promises. You must explicitly `await params` and `await searchParams` before accessing their properties.
+| Trigger                                      | Fire? | Notes                              |
+| -------------------------------------------- | ----- | ---------------------------------- |
+| "Build this route in Next.js"                | YES   | Core trigger.                      |
+| "Fix client bloat and waterfalls"            | YES   | Core trigger.                      |
+| "/nextjs-principles"                         | YES   | Slash command trigger.             |
+| "Build a React Native screen"                | NO    | Route to `react-native-principles`.|
+| "Tune our Postgres queries"                  | NO    | Out of scope for this skill.       |
 
-### 2. Data Fetching and Dynamic Caching
+## 3. Execution Workflow
 
-- **Server-Side Fetching:** Fetch data on the server using `async/await` directly within Server Components.
-- **Banned Fetching:** Do not use the `useEffect` hook for data fetching. It causes layout shifts and performance degradation.
-- **Next.js 16 Caching and Dynamic I/O:** Dynamic data operations and fetches are uncached by default. Opt-in explicitly using the `'use cache'` directive alongside `cacheLife()` and `cacheTag()` helpers. Invalidate tagged entries with `revalidateTag(tag, cacheLifeProfile)`, which requires a profile argument (such as `'max'`) in Next.js 16. Use `updateTag()` inside Server Actions for read-your-writes semantics.
-- **Async Request Context (Next.js 16):** Dynamic server utilities (`cookies()`, `headers()`, `draftMode()`) are asynchronous. You must explicitly `await cookies()` and `await headers()` in Server Components and Server Actions.
-- **Server Actions and React 19 Action Hooks:** Use Server Actions for all form submissions and internal database mutations. In Client Components, integrate Server Actions using React 19 native hooks (`useActionState`, `useFormStatus`, `useOptimistic`). Reserve Route Handlers strictly for external public REST APIs or webhooks.
-- **Server Action Authorization and Schema Validation:** Server Actions are exposed public HTTP POST endpoints. Every Server Action must explicitly validate input arguments using a schema validator (such as Zod) and execute an explicit session authorization check before performing database mutations or reads.
-- **Suspense and Cache Components:** Enforce granular `<Suspense>` boundaries around genuinely dynamic components. Next.js 16 deprecated the standalone PPR configuration flag; Cache Components built on `'use cache'` deliver partial prerendering behavior. Avoid wrapping entire pages in a single monolithic Suspense boundary.
+### Step 1: Draw Server Client Boundaries
 
-### 3. Asset and Performance Optimization
+- **Action:** Default every component to server rendering with use-client leaves only for hooks, browser APIs, and listeners. Enforce serializable props and feature-first src layout with App Router only.
+- **Input:** Route map from user.
+- **Stop Condition:** Halt on root-level use-client or Pages router additions.
+- **Validation:** Boundary map reviewed per route.
 
-- **Image Optimization:** The standard HTML `<img>` tag is strictly banned. You must import and use the `next/image` component for all images.
-- **Font Optimization:** Importing fonts from external CDNs is banned. You must use the built-in `next/font` module to self-host and optimize fonts.
-- **Lazy Loading:** For heavy Client Components (such as charts or rich text editors), use `next/dynamic` to lazy-load them and reduce initial JavaScript bundle size.
-- **Turbopack Readiness:** All custom configurations, imports, and modules must be fully compatible with Turbopack (the default bundler in Next.js 16).
+### Step 2: Fetch and Cache Explicitly
 
-### 4. Routing, SEO, and Middleware
+- **Action:** Fetch on servers with async components, never in effects. Declare cache directives with tags and revalidation profiles, await async params and server utilities, and bound Suspense regions granularly.
+- **Input:** Data needs per route.
+- **Stop Condition:** Halt on effect fetching or implicit cache assumptions.
+- **Validation:** Cache rules reviewed per route.
 
-- **Metadata API:** Use the built-in Next.js Metadata API (`export const metadata = { ... }`) in `layout.tsx` or `page.tsx` for SEO and Open Graph tags.
-- **Forms and Navigation:** Use plain `<form action={serverAction}>` for mutations. Use `next/form` only for search and navigation forms whose `action` is a URL path string, which adds prefetching of loading UI and client-side navigation.
-- **Error and Loading States:** Every major route segment must include a `loading.tsx` and an `error.tsx` file to handle Suspense boundaries and prevent broken user experiences.
-- **Proxy Over Middleware:** Next.js 16 deprecates `middleware.ts` in favor of `proxy.ts` at the project root for cross-cutting concerns such as authentication checks, rate limiting, and redirects.
-- **Route Segment Config Standards:** Use explicit route segment config exports (`export const dynamic = 'force-dynamic'`, `export const revalidate = 0`) or `'use cache'` directives when non-default dynamic behavior is needed.
+### Step 3: Secure Actions and Assets
 
-### 5. Security and Environment Variables
+- **Action:** Validate and authorize every Server Action with schemas plus session checks, optimize images and fonts through built-ins, lazy-load heavy clients, and guard server modules against client bundling.
+- **Input:** Mutation list and asset inventory.
+- **Stop Condition:** Halt on unauthorized actions or client-leaked secrets.
+- **Validation:** Security audit complete per surface.
 
-- **Client-Side Secrets:** Never expose API keys or secrets to the browser. Only variables explicitly safe for the client may be prefixed with `NEXT_PUBLIC_`.
-- **Server-Side Secrets:** Database credentials, authentication secrets, and private API keys must remain on the server and be accessed securely through `process.env` in Server Components or API Routes only.
-- **`server-only` Package Guardrail:** Import `'server-only'` at the top of server database modules, secret handlers, and domain service files. This triggers a build-time compiler failure if server logic or private keys are accidentally imported into Client Component bundles.
+### Step 4: Handoff and Human Review
 
-## Code Examples
+- **Action:** Present the plan and request approval before coding.
+- **Input:** Completed plan.
+- **Stop Condition:** Await user approval.
+- **Validation:** Approval recorded; zero code written by this skill.
 
-```tsx
-import { Suspense } from "react";
-import Image from "next/image";
-import { UserProfileData } from "@/features/users/components/user-profile-data";
-import { ProfileSkeleton } from "@/features/users/components/profile-skeleton";
+## 4. Output Specification
 
-interface PageProps {
-  params: Promise<{ id: string }>;
-}
+```markdown
+# Next.js Plan
 
-export default async function UserProfilePage({ params }: PageProps) {
-  // Explicitly await async params (Next.js 16 requirement)
-  const { id } = await params;
-
-  return (
-    <main className="max-w-4xl mx-auto p-6">
-      <header className="flex items-center gap-4 mb-8">
-        <Image
-          src="/brand-logo.svg"
-          alt="Organization Logo"
-          width={48}
-          height={48}
-          priority
-        />
-        <h1 className="text-3xl font-bold">User Account Profile</h1>
-      </header>
-      <Suspense fallback={<ProfileSkeleton />}>
-        <UserProfileData userId={id} />
-      </Suspense>
-    </main>
-  );
-}
+- **Boundaries:** [Server-first map]
+- **Cache:** [Explicit rules per route]
+- **Actions:** [Authorized contracts]
+- **Assets:** [Optimization notes]
 ```
 
-## Anti-Patterns
+## 5. Validation Gate
 
-- **AP-4 (Over-permissive client / Bundle explosion):** Placing `'use client'` at the top of layout or page files, stripping all Server Component benefits.
-- **AP-9 (Goal without verification / Unvalidated Server Actions):** Creating Server Actions that modify database state without verifying user session authorization and validating input payloads with Zod.
-- **Synchronous Params Access:** Accessing `params.id` directly without `await params` in Next.js 16.
-- **Raw HTML Images:** Using standard `<img src="..." />` tags, bypassing automated optimization, WebP conversion, and responsive srcset generation.
-- **Accidental Client Secret Leakage:** Omitting `'server-only'` on database utility files, allowing private tokens to bundle into browser assets.
+- [ ] Server default with leaf clients.
+- [ ] Cache explicit per route.
+- [ ] Actions validated and authorized.
+- [ ] Zero em dashes in deliverable.
+- [ ] Human approval recorded before coding.
 
-## Best Practices
+## 6. Anti-Triggers and Calibration
 
-- Use Server Components for all data fetching and Server Actions for form submissions.
-- Guard server-only files with `import 'server-only'`.
-- Define granular `<Suspense>` boundaries around slow data dependencies with matching skeleton loaders.
+- **Under-execution threshold:** Rendering client-first without boundary maps.
+- **Over-execution threshold:** Building backends unprompted.
+- **Calibration default:** Server unless proven interactive.
 
-## Related Skills
+## 7. Anti-Pattern Compliance
 
-- `react-principles`
-- `typescript-standards`
-- `api-design`
+| Step | Prevents AP            | Mechanism                                           |
+| ---- | ---------------------- | --------------------------------------------------- |
+| 1    | AP-4 (over-permissive) | Restricts client boundaries.                        |
+| 2    | AP-26 (no scope)       | Declares cache per route.                           |
+| 3    | AP-9 (unverified)      | Authorizes every action.                            |
+| 4    | AP-45 (no human review)| Halts for approval before coding.                   |
+
+## 8. Versioning & Changelog
+
+- **Version:** 2.0.0
+- **Changelog:**
+  - `2.0.0` (2026-09-26) - Tier-5 conversion with Interface Builder role, role source, and seniority bar.
+  - `1.0.0` - Legacy Next.js baseline.
+
+## 9. Portability Matrix
+
+| Runtime     | Status   | Notes                           |
+| ----------- | -------- | ------------------------------- |
+| Claude Code | verified | Direct slash command execution. |
+| Cursor      | verified | Rules and prompt loading.       |
+| Copilot     | verified | Custom instructions support.    |
+| Windsurf    | verified | Cascade flow integration.       |
+| Kiro        | verified | Steering model execution.       |
+| Cline       | verified | Task step-by-step flow.         |
+| Raw API     | verified | Model-agnostic execution.       |
+
+## 10. Examples
+
+**Input:** "Our Next.js app fetches in effects and leaks secrets."
+**Output:** Plan with server-first boundaries, explicit cache rules, and authorized actions with server-only guards.

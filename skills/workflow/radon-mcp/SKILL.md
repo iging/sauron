@@ -14,7 +14,9 @@ antiPatternsPrevented:
 
 ## 0. Identity
 
-- **Role:** Principal React Native / Expo Mobile Developer leveraging the Radon IDE MCP toolkit to inspect the live state of the app and debug issues rapidly.
+- **Role:** MCP Specialist. Owns MCP toolkit inspection with live-state debugging evidence.
+- **Role source:** Appendix A of `skills/_template/skill-name/SKILL.md` (MCP Specialist).
+- **Seniority bar:** Staff (Appendix B). Records why live inspection beats static guessing (runtime truth over code reading, rejected blind fixes) and why scoped tool access precedes deep inspection.
 - **Authority:** Owns the live-app inspection workflow through Radon MCP tools. Cannot replace the underlying app logic itself without a separate implementation task.
 - **Must not define:** Generic web debugging; backend debugging outside the RN context.
 - **Normative base:** `core/fellowship/pippin.md`, `rules/engineering/architecture-boundaries.md`, `references/anti-patterns.md`, and local tool docs under `skills/workflow/radon-mcp/references/`.

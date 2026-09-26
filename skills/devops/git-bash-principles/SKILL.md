@@ -1,114 +1,136 @@
 ---
 name: git-bash-principles
-description: Baseline standard for Git Bash (MSYS2 / MinGW) environment compatibility, Windows-to-POSIX path conversion, line ending discipline, and cross-platform scripting security.
-origin: sauron
+description: Enforces Git Bash compatibility with path translation discipline, line-ending hygiene, and cross-boundary execution safety. Excludes POSIX-only server scripting.
 department: devops
+ownerAgent: gimli
+triggerCommand: /git-bash-principles
+antiPatternsPrevented:
+  - AP-1
+  - AP-6
+  - AP-14
+  - AP-26
+  - AP-27
 ---
 
-# Git Bash Engineering Principles
+# Git Bash Principles
 
-Enforce cross-platform compatibility, line-ending hygiene, and safe path translation for scripts executing within Git Bash (MSYS2 / MinGW) on Windows. Prevent execution anomalies caused by automatic path conversion and carriage return corruption.
+## 0. Identity
 
-## When to Activate
+- **Role:** Service Builder. Owns cross-platform script implementation that runs clean on Windows and POSIX.
+- **Role source:** Appendix A of `skills/_template/skill-name/SKILL.md` (Service Builder).
+- **Seniority bar:** Staff (Appendix B). Records why cygpath beats string replacement (drive-letter hacks break on edge cases, rejected sed path surgery), why LF enforcement beats per-machine fixes (one gitattributes rule ends CRLF errors forever, rejected dos2unix whack-a-mole), and why quoted expansions beat bare variables.
+- **Authority:** Tier-5 normative skill for `skills/devops/git-bash-principles/`. Owns compatibility and safety guidance.
+- **Must not define:** POSIX-only server scripting internals.
+- **Normative base:** `core/fellowship/gimli.md`, `rules/engineering/architecture-boundaries.md`, `rules/common/code-style-standards.md`, `references/anti-patterns.md`.
+- **Anti-pattern gate:** Blocks AP-14 (leaking secrets), AP-26 (no scope boundary), and AP-27 (missing setup instructions).
 
-- Writing or executing Bash scripts in Git Bash on Windows hosts.
-- Debugging path translation issues between Windows format (`C:\path`) and POSIX format (`/c/path`).
-- Resolving line-ending parse errors (`\r`: command not found) in cross-platform CI pipelines and repositories.
-- Bridging Windows executables (`node.exe`, `git.exe`, `powershell.exe`) with POSIX shell scripts.
+## 1. Intent (9 Dimensions)
 
-## Core Concepts
+| #   | Dimension        | Value                                                                                          |
+| --- | ---------------- | ---------------------------------------------------------------------------------------------- |
+| 1   | Task             | Produce scripts that execute identically under Git Bash and POSIX shells.                      |
+| 2   | Target Tool      | Git Bash MSYS2, cygpath, dos2unix, Node.js, Python.                                            |
+| 3   | Output Format    | Compatibility plan with path, ending, and execution notes.                                     |
+| 4   | Constraints      | LF endings enforced. Paths quoted. Zero em dashes. No unverified remote execution.             |
+| 5   | Input            | Script inventory, Windows executable bridges, CI matrix.                                        |
+| 6   | Context          | Prevents path-conversion surprises and carriage-return failures on Windows checkouts.          |
+| 7   | Audience         | Engineers shipping cross-platform tooling and CI.                                               |
+| 8   | Success Criteria | Scripts green on Linux and Git Bash; endings enforced; plan approved.                          |
+| 9   | Examples         | See Section 10.                                                                                 |
 
-### 1. Windows vs POSIX Path Translation Discipline
+## 2. Trigger Matrix
 
-- Git Bash runs an MSYS2 translation layer that automatically converts POSIX-style paths (`/c/Users`) to Windows-style paths (`C:\Users`) when passing arguments to native Windows programs.
-- When invoking Windows native executables with slash-style command flags (such as `/s`, `/v`, or `/debug`), MSYS2 may mistakenly convert these flags into filesystem paths (such as `C:\s`). Disable path conversion for such calls using the environment variable:
-  ```bash
-  MSYS_NO_PATHCONV=1 native-command.exe /flag
-  ```
-- Use `cygpath` to convert between Windows and POSIX path representations programmatically when calling cross-boundary tools:
-  ```bash
-  windows_path="$(cygpath -w "${posix_path}")"
-  posix_path="$(cygpath -u "${windows_path}")"
-  ```
+| Trigger                                      | Fire? | Notes                              |
+| -------------------------------------------- | ----- | ---------------------------------- |
+| "Make our scripts work on Git Bash"          | YES   | Core trigger.                      |
+| "Fix CRLF parse errors on Windows"           | YES   | Core trigger.                      |
+| "/git-bash-principles"                       | YES   | Slash command trigger.             |
+| "Write Linux-only server scripts"            | NO    | Route to `shell-scripting-principles`. |
+| "Author Windows batch files"                 | NO    | Route to `windows-cmd-principles`. |
 
-### 2. Line Ending (CRLF vs LF) Hygiene
+## 3. Execution Workflow
 
-- Git Bash executes shell scripts strictly expecting UNIX line endings (`LF`). If a script contains Windows carriage returns (`CRLF`), the Bash interpreter encounters syntax failures such as `\r: command not found`.
-- Configure Git repositories with a strict `.gitattributes` file enforcing `eol=lf` on all `.sh`, `.bash`, `.py`, and `.md` files.
-- Run `dos2unix` on shell scripts if carriage return corruption occurs during Windows checkouts.
+### Step 1: Fix Endings and Translation
 
-### 3. Subshell and Terminal Differences
+- **Action:** Enforce LF via gitattributes on scripts, docs, and sources. Disable path conversion for native flag calls and convert boundaries programmatically with cygpath.
+- **Input:** Repository file inventory.
+- **Stop Condition:** Halt when gitattributes lacks LF rules; require them.
+- **Validation:** Checkouts verified clean on Windows hosts.
 
-- Git Bash on Windows typically runs inside `mintty`. Some interactive commands (such as `node` in interactive REPL mode, `python`, or `winpty`) may require a pseudo-terminal wrapper (`winpty node.exe`).
-- In non-interactive automated scripts, invoke Node and Python directly without `winpty` to preserve standard input and output pipe buffering.
+### Step 2: Quote and Isolate Execution
 
-## Security and Anti-Malware Directives
+- **Action:** Double-quote every expansion, resolve directories from script location instead of working directory, and wrap interactive tools for terminal quirks without breaking pipes.
+- **Input:** Script list from Step 1.
+- **Stop Condition:** Halt on unquoted expansions in reviewed scripts.
+- **Validation:** ShellCheck clean with quoting audit.
 
-1. **Path Quoting Across Environments:** Paths on Windows machines frequently contain spaces (such as `/c/Program Files` or `/c/Users/First Last`). Double-quote every variable expansion (`"${target_dir}"`) to prevent split-word execution vulnerabilities.
-2. **Prevent Dangerous Environment Inheritance:** Git Bash inherits all Windows system and user environment variables. Do not dump or export the full environment blindly (`env > out.txt`) to avoid exposing sensitive Windows registry tokens, machine passwords, or user profile directories.
-3. **Prohibit Unauthenticated Remote Execution:** Never execute remote shell scripts piped into Git Bash without prior signature and hash verification (`curl -s <url> | bash` is strictly prohibited).
-4. **Execution Permissions Management:** Windows filesystems (NTFS) do not natively store POSIX executable bit flags (`chmod +x`). Git stores executable permissions via file mode `100755` in the git index. Use `git update-index --chmod=+x <script.sh>` to mark scripts executable in the git index without relying on local filesystem metadata.
+### Step 3: Harden Against Exfiltration
 
-## Code Examples
+- **Action:** Ban unverified remote piping, pin executable bits via git index, and forbid blind environment dumps that leak Windows tokens.
+- **Input:** Security requirements from user.
+- **Stop Condition:** Halt on curl-pipe patterns; require hash verification.
+- **Validation:** Security review complete per script.
 
-### Cross-Platform Git Bash Wrapper Script Example
+### Step 4: Handoff and Human Review
 
-```bash
-#!/usr/bin/env bash
-# ===================================================================
-# Cross-platform orchestrator runner compatible with Git Bash & POSIX
-# ===================================================================
+- **Action:** Present the compatibility plan and request approval before rollout.
+- **Input:** Completed plan.
+- **Stop Condition:** Await user approval.
+- **Validation:** Approval recorded; zero rollouts performed by this skill.
 
-set -euo pipefail
-IFS=$'\n\t'
+## 4. Output Specification
 
-# Determine if running under Git Bash / MSYS2
-IS_MSYS=false
-if [[ "$(uname -s)" =~ ^(MINGW|MSYS|CYGWIN) ]]; then
-  IS_MSYS=true
-fi
+```markdown
+# Git Bash Plan
 
-# Resolve directory safely
-SCRIPT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
-WORKSPACE_ROOT="$(cd "${SCRIPT_DIR}/.." && pwd)"
-
-# Resolve path for Node execution
-NODE_CMD="node"
-if ! command -v "${NODE_CMD}" >/dev/null 2>&1; then
-  printf "[ERROR] Node.js executable not found in PATH.\n" >&2
-  exit 1
-fi
-
-TARGET_SCRIPT="${WORKSPACE_ROOT}/bin/sauron.mjs"
-
-# On MSYS/Git Bash, translate path safely if needed
-if [ "${IS_MSYS}" = true ]; then
-  # Translate to Windows native path format for Node if required
-  NATIVE_TARGET="$(cygpath -w "${TARGET_SCRIPT}")"
-else
-  NATIVE_TARGET="${TARGET_SCRIPT}"
-fi
-
-printf "[INFO] Invoking Sauron orchestrator via Git Bash wrapper...\n"
-
-# Execute with preserved argument array
-"${NODE_CMD}" "${NATIVE_TARGET}" "$@"
+- **Endings:** [Enforcement with verification]
+- **Paths:** [Translation strategy]
+- **Safety:** [Execution hardening notes]
 ```
 
-## Anti-Patterns
+## 5. Validation Gate
 
-- **AP-14 (Leaking secrets):** Committing Windows system profile variables or credentials into tracked repositories.
-- **AP-27 (Missing setup instructions):** Authoring shell scripts that fail on Windows checkouts due to unhandled `CRLF` line endings.
-- **AP-58 (Unpinned dependency in CI):** Relying on unpinned global tools installed in the Windows host PATH.
+- [ ] LF enforced via gitattributes.
+- [ ] Expansions quoted per script.
+- [ ] Remote execution verified or banned.
+- [ ] Zero em dashes in deliverable.
+- [ ] Human approval recorded before rollout.
 
-## Best Practices
+## 6. Anti-Triggers and Calibration
 
-- Standardize all repository shell scripts to UNIX line endings (`LF`) using `.gitattributes`.
-- Test all shell scripts under both Linux/macOS Bash and Windows Git Bash before merging.
-- Use `cygpath` defensively rather than attempting string replacement on drive letters.
+- **Under-execution threshold:** Shipping scripts untested on Windows checkouts.
+- **Over-execution threshold:** Modifying developer machines unprompted.
+- **Calibration default:** Test both shells before every merge.
 
-## Related Skills
+## 7. Anti-Pattern Compliance
 
-- [shell-scripting-principles](file:///C:/Users/IGING/Documents/GitHub/sauron/skills/devops/shell-scripting-principles/SKILL.md)
-- [windows-cmd-principles](file:///C:/Users/IGING/Documents/GitHub/sauron/skills/devops/windows-cmd-principles/SKILL.md)
-- [powershell-principles](file:///C:/Users/IGING/Documents/GitHub/sauron/skills/devops/powershell-principles/SKILL.md)
+| Step | Prevents AP            | Mechanism                                           |
+| ---- | ---------------------- | --------------------------------------------------- |
+| 1    | AP-27 (missing setup)  | Enforces endings via attributes.                    |
+| 2    | AP-26 (no scope)       | Quotes every expansion.                             |
+| 3    | AP-14 (leaking secrets)| Bans env dumps and unverified pipes.                |
+| 4    | AP-45 (no human review)| Halts for approval before rollout.                  |
+
+## 8. Versioning & Changelog
+
+- **Version:** 2.0.0
+- **Changelog:**
+  - `2.0.0` (2026-09-26) - Tier-5 conversion with Service Builder role, role source, and seniority bar.
+  - `1.0.0` - Legacy compatibility baseline.
+
+## 9. Portability Matrix
+
+| Runtime     | Status   | Notes                           |
+| ----------- | -------- | ------------------------------- |
+| Claude Code | verified | Direct slash command execution. |
+| Cursor      | verified | Rules and prompt loading.       |
+| Copilot     | verified | Custom instructions support.    |
+| Windsurf    | verified | Cascade flow integration.       |
+| Kiro        | verified | Steering model execution.       |
+| Cline       | verified | Task step-by-step flow.         |
+| Raw API     | verified | Model-agnostic execution.       |
+
+## 10. Examples
+
+**Input:** "Our install script fails on Windows with carriage-return errors."
+**Output:** Compatibility plan with LF enforcement, cygpath bridges, and dual-shell verification.

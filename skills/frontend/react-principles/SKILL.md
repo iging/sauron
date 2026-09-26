@@ -1,116 +1,137 @@
 ---
 name: react-principles
 description: Deterministic React 19 architecture constraints, Server Component boundaries, hook rules, state colocation, performance, accessibility, and TypeScript standards.
-origin: sauron
 department: frontend
+ownerAgent: legolas
+triggerCommand: /react-principles
+antiPatternsPrevented:
+  - AP-1
+  - AP-4
+  - AP-6
+  - AP-12
+  - AP-26
+  - AP-28
 ---
 
 # React Principles
 
-Enforce modern React architecture constraints, rendering boundaries, hook rules, and accessibility baselines. Eliminate client bundle bloat, waterfall network fetches, and unhandled component state lifecycles.
+## 0. Identity
 
-## When to Activate
+- **Role:** Interface Builder. Owns component boundaries with hook discipline and colocation rules.
+- **Role source:** Appendix A of `skills/_template/skill-name/SKILL.md` (Interface Builder).
+- **Seniority bar:** Staff (Appendix B). Records why server-first beats effect fetching (no waterfalls, rejected mount fetches), why colocation beats global stores (ownership follows use, rejected provider pyramids), and why compiler memoization beats manual memo sprawl.
+- **Authority:** Tier-5 normative skill for `skills/frontend/react-principles/`. Owns component and hook guidance.
+- **Must not define:** Backend APIs; native mobile builds.
+- **Normative base:** `core/fellowship/legolas.md`, `rules/engineering/architecture-boundaries.md`, `rules/common/code-style-standards.md`, `references/anti-patterns.md`.
+- **Anti-pattern gate:** Blocks AP-4 (over-permissive client), AP-12 (effect misuse), and AP-26 (leaking internals).
 
-- Creating or modifying React components, custom hooks, or context providers.
-- Structuring React Server Component and Client Component boundaries.
-- Refactoring state management, form submissions, or rendering performance bottlenecks.
-- Reviewing accessibility (a11y) semantics and DOM event handlers.
+## 1. Intent (9 Dimensions)
 
-## Core Concepts
+| #   | Dimension        | Value                                                                                          |
+| --- | ---------------- | ---------------------------------------------------------------------------------------------- |
+| 1   | Task             | Produce React components with strict boundaries, correct hooks, and accessible markup.         |
+| 2   | Target Tool      | Any agent runtime: Claude Code, Cursor, Copilot, Windsurf, Kiro, Cline, raw API.                |
+| 3   | Output Format    | Component plan with boundaries, hooks, state, and a11y notes.                                  |
+| 4   | Constraints      | Hooks rules enforced. No any types. Zero em dashes. Stable keys always.                        |
+| 5   | Input            | Component specs, state inventory, data needs, a11y targets.                                     |
+| 6   | Context          | Prevents bundle bloat, waterfall fetches, and inaccessible markup.                              |
+| 7   | Audience         | Frontend engineers shipping React 19 interfaces.                                                |
+| 8   | Success Criteria | Boundaries strict; hooks correct; plan approved before coding.                                  |
+| 9   | Examples         | See Section 10.                                                                                 |
 
-### 1. Component Architecture and Rendering Boundaries
+## 2. Trigger Matrix
 
-- **Server Components Default:** All components must be React Server Components by default when operating within Server Component architectures (for example Next.js App Router).
-- **Client Component Directive:** Place `'use client'` strictly at interactive leaf components. Use it only when the component fundamentally requires:
-  - React state hooks (`useState`, `useReducer`, `useContext`, `useRef`).
-  - React effect hooks (`useEffect`, `useLayoutEffect`).
-  - DOM Event handlers (`onClick`, `onChange`, `onSubmit`).
-  - Browser APIs (`window`, `document`, `localStorage`).
-- **No Derivative State in `useEffect`:** Updating state derived from props or other state variables inside `useEffect` is strictly banned. Calculate derived values directly within the component body during rendering.
-- **Component Granularity:** Keep components small, focused, and single-purpose. Extract complex presentation subtrees into dedicated sub-components, and pull reusable business workflows into custom hooks.
-- **Props Serialization Across Boundaries:** Data passed across Server-to-Client boundaries must be strictly serializable (JSON primitives, plain objects, arrays). Passing functions, class instances, or Symbol objects across the boundary is strictly banned.
+| Trigger                                      | Fire? | Notes                              |
+| -------------------------------------------- | ----- | ---------------------------------- |
+| "Build this component in React"              | YES   | Core trigger.                      |
+| "Fix re-renders and hook bugs"               | YES   | Core trigger.                      |
+| "/react-principles"                          | YES   | Slash command trigger.             |
+| "Build a Vue component instead"              | NO    | Route to `vue-principles`.         |
+| "Design our backend API"                     | NO    | Out of scope for this skill.       |
 
-### 2. State Colocation and Data Fetching
+## 3. Execution Workflow
 
-- **State Colocation:** Keep state as close to where it is consumed as possible. Local UI state (such as modal visibility or dropdown toggles) must not be pushed into global state stores.
-- **No `useEffect` Data Fetching:** Fetching data inside `useEffect` on component mount is strictly banned due to layout shifts and network waterfall cascades. Data must be fetched using Server Components, TanStack Query, or SWR.
-- **React 19 Action Hooks:** Use React 19 native action hooks (`useActionState`, `useFormStatus`, `useOptimistic`) for form submissions, state transitions, and server action mutations in client components.
-- **Context API Boundaries:** Wrap React Context providers closely around the subtree that consumes them rather than mounting all providers globally at the root layout.
+### Step 1: Bound Components and Data Flow
 
-### 3. Hook Mechanics and Rules of Hooks
+- **Action:** Default to Server Components where available, restrict client directives to interactive leaves, forbid derived state in effects, and enforce serializable cross-boundary props.
+- **Input:** Component specs from user.
+- **Stop Condition:** Halt on root client directives or function props across boundaries.
+- **Validation:** Boundary map reviewed per component.
 
-- **Strict Rules of Hooks:** Hooks must only be called at the top level of React function components or custom hooks. Calling hooks inside loops, conditions, or nested functions is strictly banned.
-- **Custom Hook Naming:** Custom hooks must begin with the `use` prefix (for example `useAuth`, `useLocalStorage`).
-- **Effect Dependency Completeness:** Every variable from component scope used inside a `useEffect` must be explicitly declared in its dependency array. Omitting dependencies or suppressing linter rules is strictly banned.
+### Step 2: Colocate State and Fetch Correctly
 
-### 4. Performance and Memory Management
+- **Action:** Keep state near consumers, fetch via server or query libraries (never mount effects), drive forms with action hooks, and scope contexts tightly around consumers.
+- **Input:** State inventory and data needs.
+- **Stop Condition:** Halt on effect fetching or global state for local needs.
+- **Validation:** State map reviewed with fetch strategy.
 
-- **Stable List Keys:** Always provide a stable, unique `key` prop when mapping arrays to JSX elements. Using array indices as `key` props for dynamic, filterable, or reorderable lists is strictly banned.
-- **List Virtualization:** Render dynamic lists containing more than 100 items using virtualization libraries (`@tanstack/react-virtual` or `react-window`).
-- **React Compiler and Memoization:** Trust the React Compiler for automated memoization where available. In non-compiler build setups, apply `React.memo`, `useMemo`, and `useCallback` explicitly around computational bottlenecks or memoized child trees.
+### Step 3: Harden Hooks, Performance, and a11y
 
-### 5. Strict TypeScript Enforcement
+- **Action:** Enforce hook rules with complete deps, type everything without any, stabilize list keys with virtualization past 100 rows, sanitize HTML injection, and prefer native semantics with keyboard support.
+- **Input:** Component inventory from Steps 1 and 2.
+- **Stop Condition:** Halt on rule violations or unsanitized HTML.
+- **Validation:** Hook, perf, and a11y audit complete.
 
-- **No `any` Types:** All component props, state objects, event handlers, and hook return values must have explicit, non-`any` TypeScript types.
-- **Component Props Naming and Extension:** Prop interfaces must be named `[ComponentName]Props`. Extend native HTML element attributes using `React.ComponentPropsWithoutRef<'button'>` to allow standard attributes.
-- **Event Handler Typing:** Explicitly type DOM event handlers using React built-in event types (for example `React.ChangeEvent<HTMLInputElement>`, `React.FormEvent<HTMLFormElement>`).
+### Step 4: Handoff and Human Review
 
-### 6. Security and Accessibility (a11y)
+- **Action:** Present the plan and request approval before coding.
+- **Input:** Completed plan.
+- **Stop Condition:** Await user approval.
+- **Validation:** Approval recorded; zero code written by this skill.
 
-- **Sanitize HTML Injection:** `dangerouslySetInnerHTML` is strictly banned unless the input is explicitly sanitized through DOMPurify or an equivalent security sanitizer.
-- **Semantic HTML and ARIA:** Prefer native semantic HTML elements (`<button>`, `<nav>`, `<header>`, `<main>`) over generic `<div>` wrappers. Custom interactive elements must include explicit keyboard handlers (`onKeyDown`), `tabIndex={0}`, and proper WAI-ARIA roles.
+## 4. Output Specification
 
-## Code Examples
+```markdown
+# React Plan
 
-```tsx
-import type { ComponentPropsWithoutRef } from "react";
-
-// Correct Props Interface extending native element attributes
-export interface PrimaryButtonProps extends ComponentPropsWithoutRef<"button"> {
-  variant?: "solid" | "outline";
-  isLoading?: boolean;
-}
-
-export function PrimaryButton({
-  children,
-  variant = "solid",
-  isLoading = false,
-  disabled,
-  className,
-  ...restProps
-}: PrimaryButtonProps) {
-  return (
-    <button
-      type="button"
-      disabled={disabled || isLoading}
-      aria-busy={isLoading}
-      className={`px-4 py-2 rounded font-medium ${
-        variant === "solid" ? "bg-blue-600 text-white" : "border border-blue-600 text-blue-600"
-      } ${className ?? ""}`}
-      {...restProps}
-    >
-      {isLoading ? "Processing..." : children}
-    </button>
-  );
-}
+- **Components:** [Boundary map]
+- **State:** [Colocation with fetch strategy]
+- **Quality:** [Hooks, perf, a11y notes]
 ```
 
-## Anti-Patterns
+## 5. Validation Gate
 
-- **AP-12 (Forgotten state lifecycle / Effect misuse):** Using `useEffect` to synchronize state with props or calculate values that could be derived directly during rendering.
-- **AP-4 (Over-permissive client boundary):** Placing `'use client'` at root layout or page files, stripping all Server Component benefits.
-- **Array Index as Key:** Writing `<li key={index}>` in dynamic lists, causing input focus bugs and state corruption during sorting or item deletion.
-- **Unsanitized HTML:** Rendering untrusted user content via `dangerouslySetInnerHTML`.
-- **Mount Data Fetching in `useEffect`:** Triggering raw `fetch()` on mount inside `useEffect`, causing waterfalls and layout shifts.
+- [ ] Boundaries strict per component.
+- [ ] Hooks correct with deps complete.
+- [ ] No any types in props or state.
+- [ ] Zero em dashes in deliverable.
+- [ ] Human approval recorded before coding.
 
-## Best Practices
+## 6. Anti-Triggers and Calibration
 
-- Fetch data on the server using Server Components or specialized data-fetching hooks.
-- Colocate UI state within the component that renders it.
-- Use semantic HTML tags with accessible ARIA attributes.
+- **Under-execution threshold:** Building components without boundary maps.
+- **Over-execution threshold:** Building backends unprompted.
+- **Calibration default:** Server first; client leaves only.
 
-## Related Skills
+## 7. Anti-Pattern Compliance
 
-- `nextjs-principles`
-- `typescript-standards`
-- `clean-architecture`
+| Step | Prevents AP            | Mechanism                                           |
+| ---- | ---------------------- | --------------------------------------------------- |
+| 1    | AP-4 (over-permissive) | Restricts client boundaries.                        |
+| 2    | AP-12 (effect misuse)  | Bans effect fetching.                               |
+| 3    | AP-26 (no scope)       | Types everything without any.                       |
+| 4    | AP-45 (no human review)| Halts for approval before coding.                   |
+
+## 8. Versioning & Changelog
+
+- **Version:** 2.0.0
+- **Changelog:**
+  - `2.0.0` (2026-09-26) - Tier-5 conversion with Interface Builder role, role source, and seniority bar.
+  - `1.0.0` - Legacy React baseline.
+
+## 9. Portability Matrix
+
+| Runtime     | Status   | Notes                           |
+| ----------- | -------- | ------------------------------- |
+| Claude Code | verified | Direct slash command execution. |
+| Cursor      | verified | Rules and prompt loading.       |
+| Copilot     | verified | Custom instructions support.    |
+| Windsurf    | verified | Cascade flow integration.       |
+| Kiro        | verified | Steering model execution.       |
+| Cline       | verified | Task step-by-step flow.         |
+| Raw API     | verified | Model-agnostic execution.       |
+
+## 10. Examples
+
+**Input:** "Our React list janks and effects refetch endlessly."
+**Output:** Plan with server-first boundaries, colocated state, virtualized stable keys, and hook corrections.

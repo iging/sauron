@@ -131,3 +131,113 @@ antiPatternsPrevented:
 
 **Input:** "[Sample user prompt]"
 **Output:** [Concrete sample output demonstrating proper agent execution]
+
+## Appendix A: Role Catalog (Normative)
+
+Contributors select exactly one role verbatim from this catalog for Section 0.
+A role states responsibility, boundary, and handoff in one line, following subagent design practice: name what the skill owns and name what it hands to neighbors. Never invent titles outside this list. Pair each role with its mapped ownerAgent.
+
+### Architect family (ownerAgent: aragorn)
+
+| Role title              | Remit                                                               | Must not define           |
+| ----------------------- | ------------------------------------------------------------------- | ------------------------- |
+| System Architect        | Owns system shape: components, boundaries, and recorded trade-offs. | Implementation code.      |
+| API Designer            | Owns service contracts and versioning policy.                       | Backend business logic.   |
+| Data Modeler            | Owns schema shapes and relationship rules.                          | Database administration.  |
+| Retrieval Architect     | Owns index topology and query routing.                              | Embedding model training. |
+| Decision Records Keeper | Owns architecture decision log completeness.                        | Product roadmap choices.  |
+
+### Builder family (ownerAgent: frodo, gimli; Interface Builder also pairs with legolas for frontend construction)
+
+| Role title        | Remit                                              | Must not define               |
+| ----------------- | -------------------------------------------------- | ----------------------------- |
+| Service Builder   | Owns service implementation within scoped files.   | Infrastructure provisioning.  |
+| Interface Builder | Owns screen composition and interaction wiring.    | Backend APIs.                 |
+| Mobile Builder    | Owns cross-platform screens and channel contracts. | Store release administration. |
+| Pipeline Builder  | Owns staged data or delivery pipeline topology.    | Production traffic routing.   |
+| Release Engineer  | Owns packaging, versioning, and rollback paths.    | Cluster administration.       |
+
+### Precision family (ownerAgent: legolas)
+
+| Role title         | Remit                                            | Must not define            |
+| ------------------ | ------------------------------------------------ | -------------------------- |
+| Syntax Reviewer    | Owns static correctness and style conformance.   | Feature design.            |
+| Contract Enforcer  | Owns schema validity and call-policy compliance. | Tool business logic.       |
+| Relevance Tuner    | Owns ranking quality measured on judged sets.    | Answer generation prompts. |
+| Diagnostic Analyst | Owns failure classification with evidence spans. | Live system repairs.       |
+| Output Optimizer   | Owns token budgets and compression levels with measured savings. | Model selection. |
+
+### Quality family (ownerAgent: merry)
+
+| Role title         | Remit                                                | Must not define      |
+| ------------------ | ---------------------------------------------------- | -------------------- |
+| Quality Gatekeeper | Owns pass and fail verdicts with threshold evidence. | Pipeline redesign.   |
+| Eval Runner        | Owns metric collection and regression proof.         | Production rollouts. |
+| Test Strategist    | Owns coverage plans matched to risk areas.           | Application code.    |
+
+### Security family (ownerAgent: boromir)
+
+| Role title        | Remit                                                | Must not define           |
+| ----------------- | ---------------------------------------------------- | ------------------------- |
+| Security Auditor  | Owns vulnerability findings with severity and proof. | Live exploitation.        |
+| Compliance Mapper | Owns control-to-criterion traceability.              | Auditor opinions.         |
+| Telemetry Auditor | Owns trace completeness and privacy-safe capture.    | Provider billing records. |
+
+### Planning family (ownerAgent: gandalf)
+
+| Role title           | Remit                                                | Must not define          |
+| -------------------- | ---------------------------------------------------- | ------------------------ |
+| Master Planner       | Owns decomposition, sequencing, and approval gates.  | Implementation code.     |
+| Graph Designer       | Owns agent topology with checkpoints and interrupts. | Model provider choice.   |
+| Context Steward      | Owns window budgets, maps, and compaction policy.    | Prompt wording style.    |
+| Research Synthesizer | Owns multi-source intelligence with cited deltas.    | Production code changes. |
+| Content Strategist   | Owns staged content lifecycles with audience-mapped outputs. | Product strategy. |
+
+### State family (ownerAgent: samwise)
+
+| Role title     | Remit                                             | Must not define         |
+| -------------- | ------------------------------------------------- | ----------------------- |
+| State Keeper   | Owns session state, commits, and handoff records. | Feature implementation. |
+| Release Scribe | Owns changelog drafts traced to commits.          | Tag pushes.             |
+| Docs Gardener  | Owns doc-to-code freshness with evidence.         | Feature code changes.   |
+| Import Scout   | Owns migration previews with backup notice.       | Blind bulk rewrites.    |
+
+### Chaos family (ownerAgent: pippin)
+
+| Role title        | Remit                                               | Must not define            |
+| ----------------- | --------------------------------------------------- | -------------------------- |
+| Edge Prober       | Owns boundary and fuzz findings with reproductions. | Production traffic.        |
+| Integration Scout | Owns external surface discovery and summaries.      | Credential-bearing writes. |
+| MCP Specialist    | Owns MCP server inspection and resource mapping.    | Server administration.     |
+
+### Catalog rules
+
+- One skill carries exactly one catalog role. Splits mean two skills.
+- Write the Role line as `**Role:** [Title]. [Remit adapted to the skill].`
+- The Must-not-define column seeds the Section 0 boundary line.
+- New titles require a template amendment. Propose the title, remit, and ownerAgent mapping first.
+
+## Appendix B: Seniority Ladder (Informative)
+
+Titles signal scope and autonomy, not just years. Contributors use this ladder to calibrate how deep a skill should reason. Skill files carry no seniority label; seniority shows in scope, trade-off records, and boundary discipline.
+
+### Individual contributor track
+
+| Level                         | Scope                                                                             | Autonomy marker                            |
+| ----------------------------- | --------------------------------------------------------------------------------- | ------------------------------------------ |
+| Junior (IC1-IC2)              | Executes scoped tasks with guidance.                                              | Needs task breakdowns from others.         |
+| Mid-level (IC3)               | Owns features independently end to end.                                           | Ships without supervision inside a domain. |
+| Senior (IC4)                  | Owns systems, mentors juniors, decides architecture inside a domain.              | Others seek their review on domain calls.  |
+| Staff (IC5)                   | Multi-team impact through Tech Lead, Architect, Solver, or Right Hand archetypes. | Sets direction others execute.             |
+| Principal (IC6)               | Organization-wide technical strategy across domains.                              | Decisions bind multiple teams.             |
+| Distinguished / Fellow (IC7+) | Industry-level influence on practice and standards.                               | Work cited outside the company.            |
+
+### Management track (for context, never skill roles)
+
+Engineering Manager, Director, VP Engineering, CTO. Skills never take management titles because skills own technical remit, never people or org decisions.
+
+### Ladder-to-skill mapping
+
+- Principle skills (Tier-3 style) encode Senior judgment: concrete versioned rules a senior applies without deliberation.
+- Orchestration skills (Tier-5 planning, multi-agent, governance) encode Staff judgment: recorded trade-offs, rejected alternatives, and cross-team boundaries.
+- A skill that only lists steps without trade-off reasoning reads Junior. A skill that records why alternatives lost reads Staff. Write toward the higher bar.

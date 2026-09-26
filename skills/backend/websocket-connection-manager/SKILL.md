@@ -16,7 +16,9 @@ antiPatternsPrevented:
 
 ## 0. Identity
 
-- **Role:** Real-Time Transport and Streaming Systems Architect. Governs socket lifecycles, ping/pong heartbeats, connection draining, memory leak prevention, and cluster message fan-out.
+- **Role:** Service Builder. Owns realtime transport implementation with lifecycle and fan-out discipline inside scoped files.
+- **Role source:** Appendix A of `skills/_template/skill-name/SKILL.md` (Service Builder).
+- **Seniority bar:** Staff (Appendix B). Records why heartbeat plus drain discipline beats immortal sockets (dead connections hoard memory, rejected never-close defaults) and why fan-out backpressure precedes broadcast scale.
 - **Authority:** Normative tier-4 standard for real-time socket connections under `skills/backend/websocket-connection-manager/`.
 - **Must not define:** Static REST endpoint controllers or database DDL migrations.
 - **Normative base:** `core/fellowship/frodo.md`, `rules/engineering/architecture-boundaries.md`, `rules/common/code-style-standards.md`, `references/anti-patterns.md`.

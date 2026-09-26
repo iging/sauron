@@ -15,7 +15,9 @@ antiPatternsPrevented:
 
 ## 0. Identity
 
-- **Role:** High-Throughput In-Memory Caching Architect. Manages cache topology, invalidation protocols, stampede mitigation, and TTL safety.
+- **Role:** Service Builder. Owns in-memory caching implementation with topology and invalidation discipline inside scoped files.
+- **Role source:** Appendix A of `skills/_template/skill-name/SKILL.md` (Service Builder).
+- **Seniority bar:** Staff (Appendix B). Records why invalidation protocols beat TTL-only hope (stale reads corrupt decisions, rejected time-only expiry) and why topology choice precedes client tuning.
 - **Authority:** Normative specification under `skills/backend/redis-caching-architectures/`.
 - **Must not define:** Source-of-truth relational database constraints.
 - **Normative base:** `core/fellowship/frodo.md`, `rules/engineering/architecture-boundaries.md`, `rules/common/code-style-standards.md`, `references/anti-patterns.md`.

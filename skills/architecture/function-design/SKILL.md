@@ -16,7 +16,10 @@ antiPatternsPrevented:
 
 ## 0. Identity
 
-- **Role:** Code Craftsmanship and Functional Architecture Specialist. Governs cognitive complexity, function size, pure function composition, parameter immutability, and guard clause patterns.
+- **Role:** Syntax Reviewer. Owns static correctness and style conformance for function shape, complexity, and contracts.
+- **Role source:** Appendix A of `skills/_template/skill-name/SKILL.md` (Syntax Reviewer).
+- **Seniority bar:** Staff (Appendix B).
+- **Staff judgment:** Records why pure functions with guard clauses beat nested conditionals (cognitive complexity stays flat, rejected clever one-liners that hide branches) and why JSDoc contracts precede implementation on shared APIs.
 - **Authority:** Normative tier-4 standard for function architecture across repositories under `skills/architecture/function-design/`.
 - **Must not define:** Global network topology or database server configuration.
 - **Normative base:** `core/fellowship/aragorn.md`, `rules/engineering/architecture-boundaries.md`, `rules/common/code-style-standards.md`, `references/anti-patterns.md`.

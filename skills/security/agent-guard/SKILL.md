@@ -1,107 +1,137 @@
 ---
 name: agent-guard
 description: Pre-execution safety hook, destructive command interceptor, and credential shield for autonomous AI coding agents across Claude Code and Copilot CLI.
-origin: sauron
 department: security
+ownerAgent: boromir
+triggerCommand: /agent-guard
+antiPatternsPrevented:
+  - AP-1
+  - AP-6
+  - AP-14
+  - AP-20
+  - AP-26
+  - AP-57
 ---
 
-# Agent Guard: Autonomous Safety Hook and Command Interceptor
+# Agent Guard
 
-Intercept, evaluate, and gate autonomous agent tool calls and shell commands before execution. Block destructive filesystem wipes, irreversible git history rewrites, and credential exposure.
+## 0. Identity
 
-## When to Activate
+- **Role:** Security Auditor. Owns pre-execution threat posture with fail-closed interception evidence.
+- **Role source:** Appendix A of `skills/_template/skill-name/SKILL.md` (Security Auditor).
+- **Seniority bar:** Staff (Appendix B). Records why fail-closed beats fail-open on guard errors (unknown state must block, rejected permissive fallthrough), why deterministic matching beats clever parsing (predictable blocks, rejected regex cleverness that misses), and why CI headless paths fail instead of hanging.
+- **Authority:** Tier-5 normative skill for `skills/security/agent-guard/`. Owns hook policy and interception guidance.
+- **Must not define:** Application business logic or CI pipeline design.
+- **Normative base:** `core/fellowship/boromir.md`, `rules/engineering/architecture-boundaries.md`, `rules/common/code-style-standards.md`, `references/anti-patterns.md`.
+- **Anti-pattern gate:** Blocks AP-14 (leaking secrets), AP-20 (untracked destructive work), AP-26 (no scope boundary), and AP-57 (untracked CI side effects).
 
-- Configuring pre-execution safety hooks for Claude Code or GitHub Copilot CLI.
-- Auditing autonomous agent permission models and shell access boundaries.
-- Preventing automated accidental execution of `git push --force`, `rm -rf`, or database drops.
-- Enforcing human confirmation gates for high-risk operations.
+## 1. Intent (9 Dimensions)
 
-## Core Concepts
+| #   | Dimension        | Value                                                                                          |
+| --- | ---------------- | ---------------------------------------------------------------------------------------------- |
+| 1   | Task             | Produce hook policies with block, gate, and permit tiers plus fail-closed defaults.            |
+| 2   | Target Tool      | Claude Code hooks, Copilot CLI hooks, POSIX shells.                                            |
+| 3   | Output Format    | Guard plan with policy matrix, hook notes, and verification evidence.                          |
+| 4   | Constraints      | Fail closed always. Deterministic matching. Zero em dashes. No headless hangs.                 |
+| 5   | Input            | Tool inventory, credential map, destructive command list.                                       |
+| 6   | Context          | Prevents agent-driven wipes, history rewrites, and secret leaks into model context.            |
+| 7   | Audience         | Engineers gating autonomous agent execution.                                                    |
+| 8   | Success Criteria | Tiers enforced; failures closed; plan approved before wiring.                                   |
+| 9   | Examples         | See Section 10.                                                                                 |
 
-### 1. Interception Levels and Policy Matrix
+## 2. Trigger Matrix
 
-Every tool call or shell command executed by an autonomous coding agent must pass through this evaluation matrix:
+| Trigger                                      | Fire? | Notes                              |
+| -------------------------------------------- | ----- | ---------------------------------- |
+| "Gate our agents destructive commands"       | YES   | Core trigger.                      |
+| "Shield credentials from agent context"      | YES   | Core trigger.                      |
+| "/agent-guard"                               | YES   | Slash command trigger.             |
+| "Write application business logic"           | NO    | Out of scope for this skill.       |
+| "Design our CI pipelines"                    | NO    | Out of scope for this skill.       |
 
-| Action Category          | Target Commands / Patterns                                                     | Guard Policy          | Rationale                                                                    |
-| :----------------------- | :----------------------------------------------------------------------------- | :-------------------- | :--------------------------------------------------------------------------- |
-| **Credential Access**    | Reading or modifying `.env`, `.env.*`, `*credentials*`, `*id_rsa*`, `*secret*` | **HARD BLOCK**        | Secrets must never leak into LLM context windows or logs.                    |
-| **Destructive Git**      | `git push --force`, `git push -f`, `git reset --hard`, `git rebase -i`         | **HARD BLOCK**        | Overwriting shared upstream git history causes permanent teammate data loss. |
-| **Filesystem Wipe**      | `rm -rf /`, `rm -rf ~`, `rm -rf .`, `rmdir /s /q C:\`                          | **HARD BLOCK**        | Monolithic recursive wipes cause irreversible workspace corruption.          |
-| **Database Destruction** | `DROP DATABASE`, `DROP TABLE`, `TRUNCATE TABLE`, `prisma migrate reset`        | **HARD BLOCK**        | Production data loss must require explicit manual operator invocation.       |
-| **Moderate Mutations**   | Single file deletion (`rm <file>`), `git clean -fd`, `git branch -D`           | **CONFIRMATION GATE** | Prompts operator with interactive confirmation before running.               |
-| **Safe Read / Build**    | `git status`, `git diff`, `npm test`, `cargo check`, reading source files      | **AUTO-PERMIT**       | Harmless deterministic actions execute without friction.                     |
+## 3. Execution Workflow
 
-### 2. Hook Architecture (Claude Code vs Copilot CLI)
+### Step 1: Tier Every Action
 
-```text
-Autonomous Agent Request
-          │
-          ▼
-┌─────────────────────────────────┐
-│   Sauron Agent Guard Hook       │
-│  (.claude/hooks/guard.sh)       │
-│  (.github/hooks/agent-guard.js) │
-└─────────────────────────────────┘
-          │
-    ┌─────┴─────────────────────┐
-    ▼                           ▼
-[Forbidden Command]     [Permitted Command]
-    │                           │
-    ▼                           ▼
-Exit Code 1 (Blocked)   Exit Code 0 (Execute)
+- **Action:** Classify tool calls into hard block (credentials, wipes, force pushes, drops), confirmation gate (single deletes, cleanups, branch force), and auto-permit (status, diffs, tests, reads).
+- **Input:** Tool inventory from user.
+- **Stop Condition:** Halt when destructive commands lack tiers.
+- **Validation:** Policy matrix reviewed per tier.
+
+### Step 2: Wire Hooks Fail-Closed
+
+- **Action:** Install pre-execution hooks with normalized deterministic matching, exit-1 defaults on errors, and graceful headless failures instead of hangs.
+- **Input:** Hook surfaces per runtime.
+- **Stop Condition:** Halt on fail-open error paths; require closed defaults.
+- **Validation:** Hook behavior proven per tier with tests.
+
+### Step 3: Shield Secrets Absolutely
+
+- **Action:** Block credential file reads into model context, forbid env dumps, and audit every secret-adjacent pattern with evidence.
+- **Input:** Credential map from Step 1.
+- **Stop Condition:** Halt when any secret path stays readable; mark as blocking.
+- **Validation:** Secret audit clean with proof.
+
+### Step 4: Handoff and Human Review
+
+- **Action:** Present the guard plan and request approval before wiring.
+- **Input:** Completed plan.
+- **Stop Condition:** Await user approval.
+- **Validation:** Approval recorded; zero hooks wired by this skill.
+
+## 4. Output Specification
+
+```markdown
+# Guard Plan
+
+- **Tiers:** [Block, gate, permit matrix]
+- **Hooks:** [Fail-closed wiring notes]
+- **Secrets:** [Shield audit]
 ```
 
-## Security Directives
+## 5. Validation Gate
 
-1. **Fail-Closed Default:** If the guard script encounters an unexpected syntax error or unhandled exception during pattern matching, it must exit with code 1 (fail-closed) to prevent unauthorized execution.
-2. **Deterministic String Matching:** Strip leading whitespace, quotes, and case differences before matching commands against the blocklist.
-3. **No Interactive Bypass:** In headless CI environments, moderate actions that require operator confirmation must fail gracefully rather than hanging the execution pipeline indefinitely.
+- [ ] Actions tiered per risk.
+- [ ] Hooks fail closed with proof.
+- [ ] Secrets unreadable to agents.
+- [ ] Zero em dashes in deliverable.
+- [ ] Human approval recorded before wiring.
 
-## Code Examples
+## 6. Anti-Triggers and Calibration
 
-### POSIX Shell Guard Hook (`.claude/hooks/guard.sh`)
+- **Under-execution threshold:** Gating agents without tier mapping.
+- **Over-execution threshold:** Rewriting application code unprompted.
+- **Calibration default:** Block by default; permit with receipts.
 
-```bash
-#!/usr/bin/env bash
-set -euo pipefail
+## 7. Anti-Pattern Compliance
 
-# Ingest proposed tool command from environment or argument
-COMMAND="${1:-}"
+| Step | Prevents AP            | Mechanism                                           |
+| ---- | ---------------------- | --------------------------------------------------- |
+| 1    | AP-1 (vague task)      | Requires tier map first.                            |
+| 2    | AP-26 (no scope)       | Fails closed per hook.                              |
+| 3    | AP-14 (leaking secrets)| Shields credentials absolutely.                     |
+| 4    | AP-45 (no human review)| Halts for approval before wiring.                   |
 
-if [ -z "${COMMAND}" ]; then
-  exit 0
-fi
+## 8. Versioning & Changelog
 
-# 1. Hard block credentials access
-if echo "${COMMAND}" | grep -E -i '(\.env|id_rsa|id_ed25519|credentials\.json|\.pem|\.key)' >/dev/null; then
-  printf "[AGENT GUARD] BLOCKED: Command attempts to access credentials or environment secret files.\n" >&2
-  exit 1
-fi
+- **Version:** 2.0.0
+- **Changelog:**
+  - `2.0.0` (2026-09-26) - Tier-5 conversion with Security Auditor role, role source, and seniority bar.
+  - `1.0.0` - Legacy guard baseline.
 
-# 2. Hard block destructive git commands
-if echo "${COMMAND}" | grep -E -i '(git\s+push\s+.*(--force|-f)|git\s+reset\s+--hard)' >/dev/null; then
-  printf "[AGENT GUARD] BLOCKED: Destructive git command detected.\n" >&2
-  exit 1
-fi
+## 9. Portability Matrix
 
-# 3. Hard block recursive filesystem wipes
-if echo "${COMMAND}" | grep -E -i '(rm\s+-[a-zA-Z]*r[a-zA-Z]*f\s+[/~.]|rmdir\s+/s\s+/q)' >/dev/null; then
-  printf "[AGENT GUARD] BLOCKED: Dangerous recursive filesystem deletion detected.\n" >&2
-  exit 1
-fi
+| Runtime     | Status   | Notes                           |
+| ----------- | -------- | ------------------------------- |
+| Claude Code | verified | Direct slash command execution. |
+| Cursor      | verified | Rules and prompt loading.       |
+| Copilot     | verified | Custom instructions support.    |
+| Windsurf    | verified | Cascade flow integration.       |
+| Kiro        | verified | Steering model execution.       |
+| Cline       | verified | Task step-by-step flow.         |
+| Raw API     | verified | Model-agnostic execution.       |
 
-# Command passed all safety checks
-exit 0
-```
+## 10. Examples
 
-## Anti-Patterns
-
-- **AP-14 (Leaking secrets):** Allowing agents to read `.env` and print secrets to LLM context.
-- **AP-20 (Untracked work):** Agents resetting working trees without saving diff checkpoints.
-- **AP-57 (Untracked side effect in CI):** Unsandboxed shell commands deleting dependencies or databases.
-
-## Related Skills
-
-- [security-audit](file:///C:/Users/IGING/Documents/GitHub/sauron/core/skills/security/security-audit.md)
-- [secrets-scan](file:///C:/Users/IGING/Documents/GitHub/sauron/core/skills/security/secrets-scan.md)
-- [docker-principles](file:///C:/Users/IGING/Documents/GitHub/sauron/skills/devops/docker-principles/SKILL.md)
+**Input:** "Our agent force-pushed main and printed env secrets."
+**Output:** Guard plan with hard blocks on force pushes, credential read bans, and fail-closed hook wiring.

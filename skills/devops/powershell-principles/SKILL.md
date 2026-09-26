@@ -1,134 +1,137 @@
 ---
 name: powershell-principles
-description: Baseline standard for secure, production-grade PowerShell scripting, strict mode enforcement, parameter validation, and anti-malware execution defense.
-origin: sauron
+description: Enforces hardened PowerShell scripting with strict mode, validated parameters, pipeline hygiene, and injection defense. Excludes Linux shell scripting.
 department: devops
+ownerAgent: gimli
+triggerCommand: /powershell-principles
+antiPatternsPrevented:
+  - AP-1
+  - AP-6
+  - AP-14
+  - AP-26
+  - AP-28
+  - AP-52
 ---
 
-# PowerShell Engineering Principles
+# PowerShell Principles
 
-Enforce structured, robust, and secure PowerShell scripting across administration tools, CI/CD automation, and deployment engines. Prohibit dangerous dynamic execution sinks, enforce strict parameter validation, and guarantee fail-closed error handling.
+## 0. Identity
 
-## When to Activate
+- **Role:** Service Builder. Owns automation script implementation with fail-closed execution inside scoped files.
+- **Role source:** Appendix A of `skills/_template/skill-name/SKILL.md` (Service Builder).
+- **Seniority bar:** Staff (Appendix B). Records why strict mode plus approved verbs beat ad-hoc scripts (entire error classes die at runtime, rejected loose scripting), why SecureString beats plaintext (credential theft starts in scripts, rejected string passwords), and why array arguments beat concatenated commands.
+- **Authority:** Tier-5 normative skill for `skills/devops/powershell-principles/`. Owns scripting and safety guidance.
+- **Must not define:** Linux shell scripting internals.
+- **Normative base:** `core/fellowship/gimli.md`, `rules/engineering/architecture-boundaries.md`, `rules/common/code-style-standards.md`, `references/anti-patterns.md`.
+- **Anti-pattern gate:** Blocks AP-14 (leaking secrets), AP-26 (no scope boundary), and AP-52 (fake fixes).
 
-- Writing, modifying, or reviewing PowerShell scripts (`.ps1`) and binary modules (`.psm1`, `.psd1`).
-- Scaffolding Windows automation pipelines, deployment tasks, or provisioning hooks.
-- Auditing PowerShell scripts for injection risks, credential leakage, or execution policy violations.
+## 1. Intent (9 Dimensions)
 
-## Core Concepts
+| #   | Dimension        | Value                                                                                          |
+| --- | ---------------- | ---------------------------------------------------------------------------------------------- |
+| 1   | Task             | Produce hardened PowerShell automation with validated inputs and safe execution.                |
+| 2   | Target Tool      | PowerShell 7, PSScriptAnalyzer, SecretManagement, CI Windows runners.                           |
+| 3   | Output Format    | Script plan with hardening notes and analyzer evidence.                                        |
+| 4   | Constraints      | Strict mode on. Parameters validated. Zero em dashes. No remote pipes.                         |
+| 5   | Input            | Automation goals, credential inventory, execution scope.                                        |
+| 6   | Context          | Prevents injection payloads, credential leaks, and silent failures in Windows automation.       |
+| 7   | Audience         | Engineers automating Windows fleets and CI.                                                     |
+| 8   | Success Criteria | Analyzer clean; secrets vaulted; plan approved before rollout.                                  |
+| 9   | Examples         | See Section 10.                                                                                 |
 
-### 1. Robust Scripting Architecture and Fail-Closed Execution
+## 2. Trigger Matrix
 
-- Always declare `[CmdletBinding()]` and explicit `param()` blocks at the beginning of scripts and functions to enable advanced cmdlet behaviors (such as `-Verbose` and `-WhatIf`).
-- Mandate fail-closed error handling by setting `$ErrorActionPreference = 'Stop'` at script initialization. Non-terminating errors must be promoted to terminating exceptions.
-- Enable `Set-StrictMode -Version Latest` to catch uninitialized variables, invalid property lookups, and deprecated indexing patterns at runtime.
-- Follow the approved PowerShell verb naming taxonomy (`Get`, `Set`, `New`, `Remove`, `Invoke`, `Test`, `Export`, `Import`). Never author custom or non-approved verbs.
+| Trigger                                      | Fire? | Notes                              |
+| -------------------------------------------- | ----- | ---------------------------------- |
+| "Harden our deploy scripts"                  | YES   | Core trigger.                      |
+| "Audit PowerShell for injection risks"       | YES   | Core trigger.                      |
+| "/powershell-principles"                     | YES   | Slash command trigger.             |
+| "Write Linux shell scripts"                  | NO    | Route to `shell-scripting-principles`. |
+| "Author batch wrappers"                      | NO    | Route to `windows-cmd-principles`. |
 
-### 2. Parameter Validation and Typing
+## 3. Execution Workflow
 
-- Strongly type every parameter (such as `[string]`, `[int]`, `[switch]`, `[FileInfo]`).
-- Apply defensive parameter validation attributes (`[ValidateNotNullOrEmpty()]`, `[ValidateSet()]`, `[ValidateRange()]`, `[ValidatePattern()]`).
-- Implement `[System.IO.Path]::GetFullPath()` or `Resolve-Path` for filesystem operations rather than relying on current working directory assumptions.
+### Step 1: Structure Scripts Strictly
 
-### 3. Pipeline and Object Stream Hygiene
+- **Action:** Declare CmdletBinding with param blocks, enforce strict mode with stop-on-error preference, follow approved verb taxonomy, and type every parameter with validation attributes.
+- **Input:** Automation goals from user.
+- **Stop Condition:** Halt on untyped params or custom verbs; require fixes.
+- **Validation:** Structure review complete per script.
 
-- Emit structured objects (`[PSCustomObject]`) across the pipeline instead of formatted text or raw strings. Leave string formatting to the consumer via `Format-Table` or `Out-String`.
-- Use the pipeline efficiently by implementing `process {}` blocks in reusable functions.
-- Release external handles and unmanaged resources using `try { ... } finally { ... }` blocks.
+### Step 2: Stream Objects Safely
 
-## Security and Anti-Malware Directives
+- **Action:** Emit structured objects through process blocks, release handles in finally blocks, and resolve paths absolutely instead of trusting working directories.
+- **Input:** Pipeline needs from Step 1.
+- **Stop Condition:** Halt when text munging replaces objects; require structured flow.
+- **Validation:** Pipeline review complete per function.
 
-1. **Absolute Ban on `Invoke-Expression` (`iex`):** Never pipe strings, network downloads, or user parameters into `Invoke-Expression`. `Invoke-Expression` is a critical command injection vulnerability and the primary vector for malicious fileless script payloads.
-2. **Prohibit Unverified Web Execution:** Never execute scripts downloaded directly from the internet (`irm <url> | iex` or `Invoke-WebRequest <url> | powershell`). Always download to a quarantine directory, verify cryptographic hashes against a trusted manifest, and inspect content before execution.
-3. **Execution Policy Integrity:** Never distribute scripts that permanently weaken machine execution policy (`Set-ExecutionPolicy Unrestricted -Scope LocalMachine`). When execution is required in automated environments, constrain scope strictly to the process boundary (`-Scope Process`).
-4. **Secure Credential Management:** Never accept or store credentials in plain text strings. Use `[System.Security.SecureString]` or standard secret stores (`Microsoft.PowerShell.SecretManagement`).
-5. **Sanitize External Process Arguments:** When calling native Windows executables (`cmd.exe`, `git.exe`, `docker.exe`), pass arguments as an explicit array rather than a single concatenated string to avoid argument injection.
+### Step 3: Ban Dangerous Sinks
 
-## Code Examples
+- **Action:** Prohibit Invoke-Expression and remote pipes without hash verification, constrain execution policy to process scope, vault all credentials, and pass native arguments as arrays.
+- **Input:** Credential inventory and execution scope.
+- **Stop Condition:** Halt on any banned sink; mark as blocking.
+- **Validation:** Analyzer clean with safety audit.
 
-### Production-Grade Hardened PowerShell Script Example
+### Step 4: Handoff and Human Review
 
-```powershell
-<#
-.SYNOPSIS
-    Secure deployment artifact builder following Sauron PowerShell principles.
-.DESCRIPTION
-    Validates inputs, enforces strict error control, and builds release artifacts safely.
-#>
-[CmdletBinding(SupportsShouldProcess = $true)]
-param (
-    [Parameter(Mandatory = $true, Position = 0)]
-    [ValidateNotNullOrEmpty()]
-    [ValidatePattern('^[a-zA-Z0-9_\-\.]+$')]
-    [string]$ReleaseTag,
+- **Action:** Present the plan and request approval before rollout.
+- **Input:** Completed plan.
+- **Stop Condition:** Await user approval.
+- **Validation:** Approval recorded; zero rollouts performed by this skill.
 
-    [Parameter(Mandatory = $false)]
-    [ValidateNotNullOrEmpty()]
-    [string]$TargetDirectory = "$PSScriptRoot\dist",
+## 4. Output Specification
 
-    [Parameter(Mandatory = $false)]
-    [switch]$Force
-)
+```markdown
+# PowerShell Plan
 
-Set-StrictMode -Version Latest
-$ErrorActionPreference = 'Stop'
-
-try {
-    # Resolve and validate full destination path
-    $ResolvedTarget = [System.IO.Path]::GetFullPath($TargetDirectory)
-
-    if (-not (Test-Path -LiteralPath $ResolvedTarget)) {
-        if ($PSCmdlet.ShouldProcess($ResolvedTarget, "Create Directory")) {
-            $null = New-Item -ItemType Directory -LiteralPath $ResolvedTarget -Force
-            Write-Verbose "Created destination folder: $ResolvedTarget"
-        }
-    }
-
-    $ManifestPath = Join-Path -Path $ResolvedTarget -ChildPath "manifest-$ReleaseTag.json"
-
-    if ((Test-Path -LiteralPath $ManifestPath) -and (-not $Force)) {
-        throw "Target manifest already exists at $ManifestPath. Use -Force to overwrite."
-    }
-
-    $ManifestData = [PSCustomObject]@{
-        ReleaseTag   = $ReleaseTag
-        GeneratedAt  = (Get-Date).ToUniversalTime().ToString("o")
-        BuiltBy      = $env:USERNAME
-        ChecksumAlgorithm = "SHA256"
-    }
-
-    if ($PSCmdlet.ShouldProcess($ManifestPath, "Write Release Manifest")) {
-        $JsonContent = $ManifestData | ConvertTo-Json -Depth 4
-        Set-Content -LiteralPath $ManifestPath -Value $JsonContent -Encoding utf8NoBOM
-        Write-Verbose "Successfully wrote manifest to $ManifestPath"
-    }
-
-    # Emit structured output to pipeline
-    [PSCustomObject]@{
-        Status   = "Success"
-        Artifact = $ManifestPath
-    }
-}
-catch {
-    Write-Error "Deployment artifact build failed: $_"
-    exit 1
-}
+- **Structure:** [Strictness with verb audit]
+- **Pipeline:** [Object flow notes]
+- **Safety:** [Banned sinks with vault map]
 ```
 
-## Anti-Patterns
+## 5. Validation Gate
 
-- **AP-14 (Leaking secrets):** Writing plaintext passwords, tokens, or private keys inside `.ps1` files.
-- **AP-28 (No stop condition):** Unbounded loops querying external services without timeout counters.
-- **AP-52 (Fake fix):** Suppressing terminating script errors with `$ErrorActionPreference = 'SilentlyContinue'` to mask failures.
+- [ ] Strict mode with validated params.
+- [ ] Objects stream through pipelines.
+- [ ] Dangerous sinks banned with vaulting.
+- [ ] Zero em dashes in deliverable.
+- [ ] Human approval recorded before rollout.
 
-## Best Practices
+## 6. Anti-Triggers and Calibration
 
-- Validate all PowerShell scripts using PSScriptAnalyzer (`Invoke-ScriptAnalyzer -Path .`).
-- Prefer `-LiteralPath` over `-Path` when handling user-provided file paths to prevent wildcard expansion attacks.
-- Format all files with UTF-8 without BOM encoding (`utf8NoBOM`).
+- **Under-execution threshold:** Shipping loose scripts without analyzer runs.
+- **Over-execution threshold:** Changing machine policies unprompted.
+- **Calibration default:** Strictest settings first; relax with receipts.
 
-## Related Skills
+## 7. Anti-Pattern Compliance
 
-- [shell-scripting-principles](file:///C:/Users/IGING/Documents/GitHub/sauron/skills/devops/shell-scripting-principles/SKILL.md)
-- [windows-cmd-principles](file:///C:/Users/IGING/Documents/GitHub/sauron/skills/devops/windows-cmd-principles/SKILL.md)
-- [security-audit](file:///C:/Users/IGING/Documents/GitHub/sauron/core/skills/security/security-audit.md)
+| Step | Prevents AP            | Mechanism                                           |
+| ---- | ---------------------- | --------------------------------------------------- |
+| 1    | AP-1 (vague task)      | Requires structure audit first.                     |
+| 2    | AP-26 (no scope)       | Streams objects with cleanup.                       |
+| 3    | AP-14 (leaking secrets)| Vaults credentials, bans pipes.                     |
+| 4    | AP-45 (no human review)| Halts for approval before rollout.                  |
+
+## 8. Versioning & Changelog
+
+- **Version:** 2.0.0
+- **Changelog:**
+  - `2.0.0` (2026-09-26) - Tier-5 conversion with Service Builder role, role source, and seniority bar.
+  - `1.0.0` - Legacy scripting baseline.
+
+## 9. Portability Matrix
+
+| Runtime     | Status   | Notes                           |
+| ----------- | -------- | ------------------------------- |
+| Claude Code | verified | Direct slash command execution. |
+| Cursor      | verified | Rules and prompt loading.       |
+| Copilot     | verified | Custom instructions support.    |
+| Windsurf    | verified | Cascade flow integration.       |
+| Kiro        | verified | Steering model execution.       |
+| Cline       | verified | Task step-by-step flow.         |
+| Raw API     | verified | Model-agnostic execution.       |
+
+## 10. Examples
+
+**Input:** "Our deploy scripts use plain passwords and silent failures."
+**Output:** Plan with vaulted credentials, strict-mode enforcement, and analyzer-clean scripts.

@@ -1,82 +1,136 @@
 ---
 name: github-actions-matrix-ci
-description: Reusable GitHub Actions workflows, matrix test suites across runtimes, deterministic cache pinning, and pipeline gates.
+description: Builds hermetic GitHub Actions matrices with SHA-pinned actions, deterministic caches, and fail-fast policies. Excludes deployment release logic.
 department: devops
-ownerAgent: samwise
+ownerAgent: gimli
 triggerCommand: /github-actions-matrix-ci
 antiPatternsPrevented:
   - AP-1
   - AP-6
   - AP-18
   - AP-26
+  - AP-28
 ---
 
 # GitHub Actions Matrix CI
 
 ## 0. Identity
 
-- **Role:** Continuous Integration Architect. Designs parallel execution matrices, deterministic dependency caching, and fail-fast pipeline policies.
-- **Authority:** Normative specification under `skills/devops/github-actions-matrix-ci/`.
-- **Must not define:** Application business logic.
-- **Normative base:** `core/fellowship/samwise.md`, `rules/engineering/architecture-boundaries.md`, `rules/common/code-style-standards.md`, `references/anti-patterns.md`.
+- **Role:** Release Engineer. Owns CI matrix packaging with hermetic, pinned, cache-clean execution.
+- **Role source:** Appendix A of `skills/_template/skill-name/SKILL.md` (Release Engineer).
+- **Seniority bar:** Staff (Appendix B). Records why SHA pins beat mutable tags (supply-chain integrity, rejected latest-tag hope), why matrix splits beat monolith jobs (parallel feedback in minutes, rejected serial suites), and why hermetic caches beat warm hopes.
+- **Authority:** Tier-5 normative skill for `skills/devops/github-actions-matrix-ci/`. Owns workflow design guidance.
+- **Must not define:** Application business logic; production release orchestration.
+- **Normative base:** `core/fellowship/gimli.md`, `rules/engineering/architecture-boundaries.md`, `rules/common/code-style-standards.md`, `references/anti-patterns.md`.
+- **Anti-pattern gate:** Blocks AP-1 (vague task), AP-18 (flaky pipelines), AP-26 (no scope boundary), and AP-28 (no stop condition).
 
 ## 1. Intent (9 Dimensions)
 
-| #   | Dimension        | Value                                                                                         |
-| --- | ---------------- | --------------------------------------------------------------------------------------------- |
-| 1   | Task             | Construct hermetic, parallel CI matrices across Node, Go, Python, and OS environments.        |
-| 2   | Target Tool      | GitHub Actions, GitHub Runners, action-cache, docker buildx.                                  |
-| 3   | Output Format    | Clean YAML workflow files (`.github/workflows/*.yml`).                                        |
-| 4   | Constraints      | Pin all external actions by full 40-character commit SHA. Prohibit mutable tags.              |
-| 5   | Input            | Test suites, linting rules, build scripts, deployment environments.                           |
-| 6   | Context          | Prevents supply-chain attacks, slow un-cached builds, and platform compatibility regressions. |
-| 7   | Audience         | DevOps engineers and developer productivity leads.                                            |
-| 8   | Success Criteria | Total pipeline completion under 5 minutes, 100% SHA pinning, zero flaky cache misses.         |
-| 9   | Examples         | See Section 5.                                                                                |
+| #   | Dimension        | Value                                                                                          |
+| --- | ---------------- | ---------------------------------------------------------------------------------------------- |
+| 1   | Task             | Produce parallel CI matrices that finish fast with zero supply-chain gaps.                     |
+| 2   | Target Tool      | GitHub Actions, GitHub Runners, action-cache, docker buildx.                                   |
+| 3   | Output Format    | Clean YAML workflow files with matrix, cache, and gate notes.                                  |
+| 4   | Constraints      | Pin actions by full SHA. Deterministic caches only. Zero em dashes.                            |
+| 5   | Input            | Test suites, lint rules, build scripts, runtime matrix.                                         |
+| 6   | Context          | Prevents slow, flaky, supply-chain-exposed pipelines.                                           |
+| 7   | Audience         | DevOps engineers and developer productivity leads.                                              |
+| 8   | Success Criteria | Pipeline under 5 minutes; 100 percent SHA pins; zero flaky cache misses.                       |
+| 9   | Examples         | See Section 10.                                                                                 |
 
-## 2. CI Pipeline Directives
+## 2. Trigger Matrix
 
-1. **Deterministic Lockfile Pinning:** Use strict hash verification for runner tool installations and dependency lockfiles.
-2. **Hermetic Matrix Partitioning:** Separate unit tests, integration tests, and static linting into independent parallel jobs.
-3. **Security Perimeter:** Pin all third-party GitHub Actions to full commit SHA hashes rather than mutable branch tags.
-4. **Fail-Fast Strategy:** Configure `fail-fast: false` when running multi-version matrix audits to view full failure diagnostic trees.
+| Trigger                                      | Fire? | Notes                              |
+| -------------------------------------------- | ----- | ---------------------------------- |
+| "Parallelize our CI across runtimes"         | YES   | Core trigger.                      |
+| "Pin and harden our Actions supply chain"    | YES   | Core trigger.                      |
+| "/github-actions-matrix-ci"                  | YES   | Slash command trigger.             |
+| "Design our deploy release flow"             | NO    | Route to `cicd-deployment`.        |
+| "Write application business logic"           | NO    | Out of scope for this skill.       |
 
-## 3. Workflow Manifest Example
+## 3. Execution Workflow
 
-```yaml
-name: Continuous Integration
+### Step 1: Partition the Matrix
 
-on:
-  push:
-    branches: [main]
-  pull_request:
-    branches: [main]
+- **Action:** Split unit, integration, and lint suites into independent parallel jobs across OS and runtime axes with fail-fast policies per axis.
+- **Input:** Test suites and runtime matrix.
+- **Stop Condition:** Halt when suites stay monolithic; require splits.
+- **Validation:** Matrix covers all axes with time budget per job.
 
-permissions:
-  contents: read
+### Step 2: Pin and Cache Deterministically
 
-jobs:
-  test-matrix:
-    runs-on: ${{ matrix.os }}
-    strategy:
-      fail-fast: false
-      matrix:
-        os: [ubuntu-latest, macos-latest, windows-latest]
-        node-version: [20.x, 22.x]
+- **Action:** Pin every third-party action to full commit SHAs, verify lockfiles with hashes, and cache dependencies with exact keys.
+- **Input:** Action inventory from Step 1.
+- **Stop Condition:** Halt on any mutable tag; require SHAs.
+- **Validation:** Pin audit clean with cache-hit evidence.
 
-    steps:
-      - name: Checkout Code
-        uses: actions/checkout@b4ffde65f46336ab88eb53be808477a3936bae11 # v4.1.1
+### Step 3: Gate Merges on Green
 
-      - name: Setup Node
-        uses: actions/setup-node@60edb5dd545a775178f525247059d6172fe8d310 # v4.0.2
-        with:
-          node-version: ${{ matrix.node-version }}
-          cache: "npm"
+- **Action:** Require matrix green plus minimal permissions per job before merge eligibility.
+- **Input:** Branch protection needs from user.
+- **Stop Condition:** Halt when required checks stay unconfigured.
+- **Validation:** Gate list reviewed with owners.
 
-      - name: Install Dependencies
-        run: npm ci
+### Step 4: Handoff and Human Review
 
-      - name: Execute Tests
-        run: npm test
+- **Action:** Present the workflow plan and request approval before wiring.
+- **Input:** Completed plan.
+- **Stop Condition:** Await user approval.
+- **Validation:** Approval recorded; zero workflows wired by this skill.
+
+## 4. Output Specification
+
+```markdown
+# Matrix CI Plan
+
+- **Matrix:** [Axes with parallel jobs]
+- **Pins:** [SHA audit with cache keys]
+- **Gates:** [Required checks per branch]
 ```
+
+## 5. Validation Gate
+
+- [ ] Suites split across parallel axes.
+- [ ] Actions pinned 100 percent by SHA.
+- [ ] Caches deterministic with evidence.
+- [ ] Zero em dashes in deliverable.
+- [ ] Human approval recorded before wiring.
+
+## 6. Anti-Triggers and Calibration
+
+- **Under-execution threshold:** Wiring CI without pins or splits.
+- **Over-execution threshold:** Merging workflow changes unprompted.
+- **Calibration default:** Fastest feedback first; coverage second.
+
+## 7. Anti-Pattern Compliance
+
+| Step | Prevents AP            | Mechanism                                           |
+| ---- | ---------------------- | --------------------------------------------------- |
+| 1    | AP-1 (vague task)      | Requires matrix map first.                          |
+| 2    | AP-26 (no scope)       | Pins every external action.                         |
+| 3    | AP-28 (no stop)        | Gates merges on green checks.                       |
+| 4    | AP-45 (no human review)| Halts for approval before wiring.                   |
+
+## 8. Versioning & Changelog
+
+- **Version:** 2.0.0
+- **Changelog:**
+  - `2.0.0` (2026-09-26) - Tier-5 conversion with Release Engineer role, role source, and seniority bar.
+  - `1.0.0` - Legacy CI baseline.
+
+## 9. Portability Matrix
+
+| Runtime     | Status   | Notes                           |
+| ----------- | -------- | ------------------------------- |
+| Claude Code | verified | Direct slash command execution. |
+| Cursor      | verified | Rules and prompt loading.       |
+| Copilot     | verified | Custom instructions support.    |
+| Windsurf    | verified | Cascade flow integration.       |
+| Kiro        | verified | Steering model execution.       |
+| Cline       | verified | Task step-by-step flow.         |
+| Raw API     | verified | Model-agnostic execution.       |
+
+## 10. Examples
+
+**Input:** "Our CI takes 40 minutes and uses floating action tags."
+**Output:** Matrix plan with parallel axes under 5 minutes and 100 percent SHA pins.

@@ -2,7 +2,7 @@
 name: docker-principles
 description: Docker and containerization standards covering multi-stage builds, minimal base images, non-root user execution, layer caching discipline, BuildKit secrets, and vulnerability scanning.
 department: devops
-ownerAgent: samwise
+ownerAgent: gimli
 triggerCommand: /docker-principles
 antiPatternsPrevented:
   - AP-1
@@ -16,10 +16,12 @@ antiPatternsPrevented:
 
 ## 0. Identity
 
-- **Role:** Containerization Systems Architect. Governs Dockerfile design, multi-stage compilation, image layer caching, non-root security isolation, and container vulnerability management.
-- **Authority:** Normative tier-4 standard for containerization across repositories under `skills/devops/docker-principles/`.
+- **Role:** Release Engineer. Owns image packaging with minimal attack surface and verifiable provenance.
+- **Role source:** Appendix A of `skills/_template/skill-name/SKILL.md` (Release Engineer).
+- **Seniority bar:** Staff (Appendix B). Records why multi-stage builds beat single-stage bloat (compilers never ship, rejected fat images), why digest pins beat mutable tags (tested content equals running content, rejected latest tags), and why BuildKit secrets beat ENV credentials.
+- **Authority:** Tier-5 normative skill for containerization across repositories under `skills/devops/docker-principles/`.
 - **Must not define:** Kubernetes Custom Resource Definitions (see `kubernetes-operator-deployment`).
-- **Normative base:** `core/fellowship/samwise.md`, `rules/engineering/architecture-boundaries.md`, `rules/common/code-style-standards.md`, `references/anti-patterns.md`.
+- **Normative base:** `core/fellowship/gimli.md`, `rules/engineering/architecture-boundaries.md`, `rules/common/code-style-standards.md`, `references/anti-patterns.md`.
 - **Anti-pattern gate:** Blocks AP-4 (root-user container execution), AP-26 (leaking secrets in image layers), and AP-44 (unlocked container configurations).
 
 ## 1. Intent (9 Dimensions)
@@ -34,7 +36,7 @@ antiPatternsPrevented:
 | 6   | Context          | Prevents container privilege escalation, massive image bloat, and slow CI build times.           |
 | 7   | Audience         | Backend engineers, DevOps architects, site reliability engineers, security auditors.             |
 | 8   | Success Criteria | Production image size under 100MB; zero critical/high CVEs; 100 percent non-root user execution. |
-| 9   | Examples         | See Section 5.                                                                                   |
+| 9   | Examples         | See Section 10.                                                                                   |
 
 ## 2. Trigger Matrix
 
@@ -45,88 +47,89 @@ antiPatternsPrevented:
 | Container processes running with root (UID 0) privileges         | YES   | Inject dedicated system user and set USER directive.      |
 | Managing Kubernetes cluster orchestration and CRD controllers    | NO    | Route to `skills/devops/kubernetes-operator-deployment/`. |
 
-## 3. Core Architectural Directives
+## 3. Execution Workflow
 
-1. **Multi-Stage Build Discipline:** Separate build-time dependencies (compilers, npm build tooling, package caches) from production runtime stages. Copy only the final compiled artifact into the runtime container.
-2. **Minimal Base Image Selection:** Use minimal base images (Distroless or Alpine Linux) for production execution stages to minimize image size and attack surface.
-3. **Mandatory Non-Root User Execution:** Never run production container processes as root (UID 0). Create a dedicated non-root user and group, and enforce the `USER` instruction prior to the entrypoint.
-4. **Layer Caching Optimization:** Order Dockerfile instructions from least frequently changing (system dependencies, package manifests) to most frequently changing (source code) to maximize layer cache hits.
-5. **Zero Secrets in Image Layers:** Never pass API keys or credentials via `ENV` or `ARG` directives. Use Docker BuildKit secret mounts (`RUN --mount=type=secret,id=...`) for build-time authentication.
+### Step 1: Stage Builds for Minimal Runtimes
 
-## 4. Execution Workflow
+- **Action:** Separate builder stages from runtime stages on distroless or Alpine bases. Order instructions from least to most frequently changing for cache hits. Exclude build context waste with .dockerignore.
+- **Input:** Application source trees and build toolchains.
+- **Stop Condition:** Halt when compilers or secrets risk shipping in runtime stages.
+- **Validation:** Build context excludes .git, local modules, and environment files.
 
-### Step 1: Base Image & Dependency Setup
+### Step 2: Harden Users and Secrets
 
-- **Action:** Select pinned base image using SHA256 digest. Establish .dockerignore file.
-- **Validation:** Build context excludes .git, local node_modules, and environment files.
+- **Action:** Create dedicated non-root users with USER directives, drop capabilities, and pass build credentials exclusively through BuildKit secret mounts. Scan with Trivy for zero critical CVEs.
+- **Input:** Security requirements and secret inventory.
+- **Stop Condition:** Halt on root execution or ENV-baked secrets; require fixes.
+- **Validation:** Process launches with non-zero UID; scan reports clean.
 
-### Step 2: Multi-Stage Compilation
+### Step 3: Pin, Probe, and Ship
 
-- **Action:** Execute compilation in designated builder stage.
-- **Validation:** Development compilers and source files are excluded from the final stage.
+- **Action:** Pin base images to SHA digests, declare readiness and liveness probes, set resource limits, and tag outputs immutably for promotion.
+- **Input:** Deployment targets from user.
+- **Stop Condition:** Halt when tags float on latest or probes stay missing.
+- **Validation:** Digest-pinned manifest with probes reviewed.
 
-### Step 3: Security Hardening & User Step-Down
+### Step 4: Handoff and Human Review
 
-- **Action:** Create non-root system user. Assign file permissions and declare `USER appuser`.
-- **Validation:** Container process launches with non-zero UID.
+- **Action:** Present the image plan with scan evidence and request approval before registry push.
+- **Input:** Completed image design.
+- **Stop Condition:** Await user approval.
+- **Validation:** Approval recorded; zero pushes performed by this skill.
 
-## 5. Reference Implementation
+## 4. Output Specification
 
-### Multi-Stage Node.js Production Dockerfile
+```markdown
+# Image Blueprint
 
-```dockerfile
-# syntax=docker/dockerfile:1.6
-
-# STAGE 1: Dependency Installation
-FROM node:20-alpine AS dependencies
-WORKDIR /app
-COPY package*.json ./
-RUN npm ci --ignore-scripts
-
-# STAGE 2: Source Compilation
-FROM node:20-alpine AS builder
-WORKDIR /app
-COPY --from=dependencies /app/node_modules ./node_modules
-COPY . .
-RUN npm run build && npm prune --production
-
-# STAGE 3: Production Runtime
-FROM node:20-alpine AS runner
-WORKDIR /app
-
-# Enforce Non-Root Execution
-RUN addgroup --system --gid 1001 nodejs && \
-    adduser --system --uid 1001 --ingroup nodejs appuser
-
-COPY --from=builder --chown=appuser:nodejs /app/dist ./dist
-COPY --from=builder --chown=appuser:nodejs /app/node_modules ./node_modules
-COPY --from=builder --chown=appuser:nodejs /app/package.json ./package.json
-
-USER appuser
-EXPOSE 3000
-ENV NODE_ENV=production
-CMD ["node", "dist/index.js"]
+- **Stages:** [Builder versus runtime split]
+- **Security:** [User, secrets, scan evidence]
+- **Pins:** [Digest-pinned bases with probes]
 ```
 
-## 6. Validation Gate
-
-Run before accepting container images:
+## 5. Validation Gate
 
 - [ ] Dockerfile uses multi-stage architecture with distinct builder and runner stages.
 - [ ] Base images are pinned to explicit versions or immutable digests.
 - [ ] Process executes under an explicit non-root user (`USER` directive present).
 - [ ] `.dockerignore` file exists and excludes build artifacts and secrets.
-- [ ] Automated container vulnerability scan (Trivy) reports zero critical CVEs.
+- [ ] Human approval recorded before registry push.
 
-## 7. Versioning & Portability Matrix
+## 6. Anti-Triggers and Calibration
 
-- **Version:** 2.0.0
+- **Under-execution threshold:** Shipping single-stage images with root users.
+- **Over-execution threshold:** Pushing images to shared registries unprompted.
+- **Calibration default:** Minimal base first; add packages with receipts.
+
+## 7. Anti-Pattern Compliance
+
+| Step | Prevents AP            | Mechanism                                           |
+| ---- | ---------------------- | --------------------------------------------------- |
+| 1    | AP-1 (vague task)      | Requires staged build plan first.                   |
+| 2    | AP-44 (unlocked data)  | Bans secrets in layers with scans.                  |
+| 3    | AP-4 (over-permissive) | Enforces pins and probes.                           |
+| 4    | AP-45 (no human review)| Halts for approval before push.                     |
+
+## 8. Versioning & Changelog
+
+- **Version:** 3.0.0
 - **Changelog:**
-  - `2.0.0` (2026-09-20): Elevated to Sauron Tier-5 specification with multi-stage non-root hardening patterns.
+  - `3.0.0` (2026-09-26) - Full Tier-5 template conformance with Release Engineer role, role source, and seniority bar.
+  - `2.0.0` (2026-09-20) - Elevated to Sauron Tier-5 specification with multi-stage non-root hardening patterns.
 
-| Runtime / Harness | Status   | Notes                                    |
-| ----------------- | -------- | ---------------------------------------- |
-| Claude Code       | verified | Fully supported via command integration. |
-| Cursor            | verified | Compatible with editor rule context.     |
-| Windsurf          | verified | Fully functional.                        |
-| Antigravity       | verified | Certified.                               |
+## 9. Portability Matrix
+
+| Runtime     | Status   | Notes                           |
+| ----------- | -------- | ------------------------------- |
+| Claude Code | verified | Direct slash command execution. |
+| Cursor      | verified | Rules and prompt loading.       |
+| Copilot     | verified | Custom instructions support.    |
+| Windsurf    | verified | Cascade flow integration.       |
+| Kiro        | verified | Steering model execution.       |
+| Cline       | verified | Task step-by-step flow.         |
+| Raw API     | verified | Model-agnostic execution.       |
+
+## 10. Examples
+
+**Input:** "Our Node image is 1.2GB, runs as root, and ships dev dependencies."
+**Output:** Multi-stage Dockerfile under 100MB with non-root user, digest-pinned base, BuildKit secrets, and clean Trivy scan.

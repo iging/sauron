@@ -16,7 +16,9 @@ antiPatternsPrevented:
 
 ## 0. Identity
 
-- **Role:** Design Engineering Lifecycle Dispatcher.
+- **Role:** System Architect. Owns design system routing shape with explicit dispatch maps to stage sub-skills.
+- **Role source:** Appendix A of `skills/_template/skill-name/SKILL.md` (System Architect).
+- **Seniority bar:** Staff (Appendix B). Records why staged dispatch beats monolithic design prompts (each stage owns its quality bar, rejected god-prompts) and why routers never implement (separation keeps dispatch auditable, rejected executing routers).
 - **Authority:** Normative root router for `skills/frontend/design-engineering/`.
 - **Must not define:** Direct frontend code implementation, routing hands off to specialized stage sub-skills.
 - **Normative base:** `core/fellowship/aragorn.md`, `rules/engineering/architecture-boundaries.md`, `rules/common/code-style-standards.md`, `references/anti-patterns.md`, `context/core-domains/design-system.md`.

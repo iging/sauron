@@ -1,126 +1,135 @@
 ---
 name: tailwind-principles
 description: Tailwind CSS v4 engineering rules covering design tokens, utility classes, variants, dark mode, responsive design, and performance guidelines for modern web development.
-origin: sauron
 department: frontend
+ownerAgent: legolas
+triggerCommand: /tailwind-principles
+antiPatternsPrevented:
+  - AP-1
+  - AP-6
+  - AP-26
+  - AP-28
 ---
 
-# Tailwind CSS Best Practices
+# Tailwind Principles
 
-## When to Activate
+## 0. Identity
 
-- When creating, modifying, or reviewing code and architecture related to tailwind css best practices.
-- When enforcing deterministic engineering standards and eliminating unverified code patterns.
-- When resolving architectural design questions or quality bottlenecks.
+- **Role:** Interface Builder. Owns utility-first styling with token discipline and tree-shakeable output.
+- **Role source:** Appendix A of `skills/_template/skill-name/SKILL.md` (Interface Builder).
+- **Seniority bar:** Staff (Appendix B). Records why theme tokens beat bracket values (one change propagates, rejected scattered hex), why components beat apply blocks (tree-shaking survives, rejected hidden utilities), and why static class names beat interpolation (scanner detection, rejected dynamic ghosts).
+- **Authority:** Tier-5 normative skill for `skills/frontend/tailwind-principles/`. Owns utility and token guidance.
+- **Must not define:** Global design language decisions beyond token mechanics.
+- **Normative base:** `core/fellowship/legolas.md`, `rules/engineering/architecture-boundaries.md`, `rules/common/code-style-standards.md`, `references/anti-patterns.md`.
+- **Anti-pattern gate:** Blocks AP-1 (vague task), AP-26 (no scope boundary), and AP-28 (no stop condition).
 
-## Core Concepts
+## 1. Intent (9 Dimensions)
 
-> **Purpose:** Tailwind CSS v4 engineering rules for design tokens, utility classes, variants, dark mode, and performance. Reference this file from your prompt to enforce strict Tailwind standards.
+| #   | Dimension        | Value                                                                                          |
+| --- | ---------------- | ---------------------------------------------------------------------------------------------- |
+| 1   | Task             | Produce Tailwind v4 styling with tokenized themes and detectable classes.                      |
+| 2   | Target Tool      | Any agent runtime: Claude Code, Cursor, Copilot, Windsurf, Kiro, Cline, raw API.                |
+| 3   | Output Format    | Styling plan with tokens, variants, detection, and budget notes.                               |
+| 4   | Constraints      | Tokens in theme. Classes static. Zero em dashes. Apply sparingly.                              |
+| 5   | Input            | Design specs, dark mode needs, responsive targets, bundle budget.                               |
+| 6   | Context          | Prevents token sprawl, undetectable classes, and bloated CSS output.                            |
+| 7   | Audience         | Frontend engineers styling with Tailwind v4.                                                    |
+| 8   | Success Criteria | Tokens centralized; classes detectable; plan approved before coding.                            |
+| 9   | Examples         | See Section 10.                                                                                 |
 
----
+## 2. Trigger Matrix
 
-## 1. Design Tokens and Theme Configuration
+| Trigger                                      | Fire? | Notes                              |
+| -------------------------------------------- | ----- | ---------------------------------- |
+| "Tokenize our Tailwind theme"                | YES   | Core trigger.                      |
+| "Fix bloated CSS and dark mode bugs"         | YES   | Core trigger.                      |
+| "/tailwind-principles"                       | YES   | Slash command trigger.             |
+| "Design our brand palette"                   | NO    | Out of scope; design owns it.      |
+| "Write JavaScript business logic"            | NO    | Out of scope for this skill.       |
 
-- **CSS-First Configuration:** All design tokens live in `@theme` blocks in your main CSS file. Never scatter values across arbitrary bracket syntax (`bg-[#1a2b3c]`) as a primary design system :  this creates inconsistency and maintenance debt.
-- **Token Promotion:** When a value appears more than once (colors, radii, shadows, spacing, breakpoints), promote it to `@theme` rather than repeating bracket syntax. Example: define `--primary` in `@theme` and use `bg-primary` / `text-primary` / `border-primary` everywhere.
-- **Semantic Naming:** Use semantic token names (`text-foreground`, `bg-surface`) rather than literal color names (`text-slate-800`). This makes refactoring brand colors trivial :  change the token once, everywhere updates.
-- **Spacing, Radius, Typography Tokens:** Standardize on Tailwind's default scale for spacing (`p-4`, not `p-[18px]`), radius (`rounded-md`, `rounded-xl`), typography (`text-sm leading-6`), and shadows (`shadow-sm`, `shadow-md`). Allow arbitrary values only as rare exceptions with a clear reason.
+## 3. Execution Workflow
 
----
+### Step 1: Centralize Theme Tokens
 
-## 2. Utility Classes and Component Patterns
+- **Action:** Promote repeated values into theme blocks with semantic names, standardize scales, and sort classes deterministically in CI.
+- **Input:** Design specs from user.
+- **Stop Condition:** Halt when arbitrary values repeat; require tokens.
+- **Validation:** Token audit complete per design surface.
 
-- **Think in Utility Classes First:** The core Tailwind habit is combining single-purpose utility classes directly in markup. Only reach for custom CSS when Tailwind genuinely cannot express the styling need.
-- **Keep Class Lists Readable:** Long class lists are normal in Tailwind, but unformatted lists are the problem. Use `prettier-plugin-tailwindcss` to auto-sort classes in a deterministic order (layout > spacing > sizing > typography > visual > interactive). Configure CI with `prettier --check`.
-- **Group Long Class Lists with Comments:** For class lists with 20+ utilities, group them with comments representing styling concerns: layout, spacing, typography, visual, responsive overrides, dark mode, conditional states.
-- **Extract Real Components, Not Giant Parent Classes:** When the same combination of utilities appears in 3+ places, extract it as a React/Vue component with the class string directly on the element :  not via `@apply`. Component extraction preserves Tailwind's tree-shaking mechanism and keeps styles co-located with markup.
-- **Avoid `@apply` as Default:** `@apply` is an anti-pattern for everyday component styling because it hides the utility layer Tailwind provides and prevents tree-shaking (scanner cannot detect `@apply` usage in templates). Use `@apply` only for:
-  - Truly global, non-composable patterns (base button resets)
-  - Bridging Tailwind with CSS you cannot express in markup (CMS articles, vendor widgets)
-  - Component primitives where the class string is versioned separately
-    Otherwise, extract components or keep utilities in templates.
+### Step 2: Variant States Correctly
 
----
+- **Action:** Apply state, responsive, dark, focus-visible, and reduced-motion variants through first-class prefixes with runtime-safe dark theming.
+- **Input:** Dark mode and responsive targets.
+- **Stop Condition:** Halt on custom CSS duplicating variant jobs.
+- **Validation:** Variant review complete per state.
 
-## 3. Variants for States, Themes, and Responsive Behavior
+### Step 3: Protect Detection and Budget
 
-- **State Variants:** Use `hover:`, `focus:`, `disabled:`, `active:` prefixes for interactive states. Never rely on custom CSS for hover/focus styles :  Tailwind's variants are the first-class mechanism.
-- **Responsive Prefixes:** Use responsive prefixes (`sm:`, `md:`, `lg:`, `xl:`, `2xl:`) intentionally. Define what each breakpoint means in your product context and only override what changes at larger breakpoints. Mobile-first: set base mobile styles, then add overrides at specific breakpoints.
-- **Dark Mode (Class Strategy):** For products, class-based dark mode (`dark:` prefix) is usually best. Toggle the `dark` class on `<html>` from a script that reads `localStorage` and `prefers-color-scheme` (use `next-themes` or minimal approach). Style with `dark:` variants.
-- **Dark Mode Pitfall:** Never use `@theme inline` for dark mode colors. `@theme inline` bakes the variable's value into the utility at build time, breaking runtime dark-mode switching. The correct approach: put raw HSL channel values in `:root` / `.dark` and map them with non-inline `@theme`.
-- **Focus Visible:** Always include `focus-visible` styles. Never use `:focus { outline: none }` without providing an accessible alternative. Example: `:focus-visible { outline: 2px solid hsl(var(--ring)); outline-offset: 2px }`.
-- **Reduced Motion:** Honor `prefers-reduced-motion` with minimal CSS: `*, ::before, ::after { animation-duration: 0.01ms !important; transition-duration: 0.01ms !important; }` at `@media (prefers-reduced-motion: reduce)`.
+- **Action:** Keep class names statically detectable with complete-name maps, register exact sources, extract repeating combos into components instead of apply blocks, and monitor production CSS size.
+- **Input:** Bundle budget from user.
+- **Stop Condition:** Halt on interpolated class construction; require maps.
+- **Validation:** Detection audit complete with size evidence.
 
----
+### Step 4: Handoff and Human Review
 
-## 4. Class Name Detectability and Dynamic Classes
+- **Action:** Present the plan and request approval before coding.
+- **Input:** Completed plan.
+- **Stop Condition:** Await user approval.
+- **Validation:** Approval recorded; zero code written by this skill.
 
-- **Statically Detectable Classes:** Tailwind only generates classes it can find in source files. Never construct class names dynamically via string concatenation (for example `` `bg-${color}-600` ``). Tailwind's scanner cannot detect these, leading to missing styles or bloated CSS.
-- **Interpolation Replacement:** Replace interpolated fragments like `bg-${color}-600` with a map of complete class names, or promote the value to a `@theme` token.
-- **Gitignore and Scanning:** Register library paths explicitly when they contain full utility classes you need. Tailwind ignores `node_modules` and paths covered by `.gitignore` during automatic detection. Add `@source` for exact paths Tailwind must scan.
-- **Safelist for Known Variations:** Use `safelist` in your Tailwind config only for known class variations that the scanner cannot detect. Keep safelist minimal :  it should not be a replacement for proper token usage.
+## 4. Output Specification
 
----
+```markdown
+# Tailwind Plan
 
-## 5. Custom CSS and @apply Usage
+- **Tokens:** [Centralized theme map]
+- **Variants:** [State coverage notes]
+- **Budget:** [Detection with size evidence]
+```
 
-- **Custom CSS Only When Needed:** Tailwind is not a religion. Use custom CSS when:
-  - Styling third-party markup you do not control
-  - Defining a truly reusable custom utility
-  - Targeting selectors or pseudo-elements that would be awkward inline (for example `::before` content, complex `:not()` chains)
-- **@Apply Restrictions:** Use `@apply` sparingly. In Tailwind v4, `@apply` doubles down on preventing tree-shaking because the scanner cannot analyze which parts of the utility are needed inside CSS rules. Each `@apply` block carries the full weight of the utility's generated rules.
-  - Good uses: Base button resets, design-system primitives, components you genuinely want to version separately.
-  - Bad uses: Everyday component styling, theme customization, composing utilities that could stay in templates.
-- **@Layer Components:** For creating reusable component abstractions, use `@layer components` directive. This ensures your custom component styles have correct cascade priority and can be overridden by utilities. `@layer components` still allows tree-shaking, unlike bare `@apply`.
+## 5. Validation Gate
 
----
+- [ ] Tokens centralized in theme.
+- [ ] Variants cover states accessibly.
+- [ ] Classes statically detectable.
+- [ ] Zero em dashes in deliverable.
+- [ ] Human approval recorded before coding.
 
-## 6. Preflight and Base Styles
+## 6. Anti-Triggers and Calibration
 
-- **Understand Preflight Before Disabling:** Preflight (built on `modern-normalize`) is usually why buttons, headings, lists, or borders look different after installing Tailwind. Do not turn it off globally as a reflex :  understand what it changed and override specific areas.
-- **Selective Overrides:** If Preflight's base reset affects areas you care about, override only those specific selectors rather than disabling the entire layer.
+- **Under-execution threshold:** Styling without token centralization.
+- **Over-execution threshold:** Redesigning brand palettes unprompted.
+- **Calibration default:** Utilities first; custom CSS with receipts.
 
----
+## 7. Anti-Pattern Compliance
 
-## 7. Upgrade to v4 Deliberately
+| Step | Prevents AP            | Mechanism                                           |
+| ---- | ---------------------- | --------------------------------------------------- |
+| 1    | AP-1 (vague task)      | Requires token audit first.                         |
+| 2    | AP-26 (no scope)       | Covers variants per state.                          |
+| 3    | AP-28 (no stop)        | Protects detection with budgets.                    |
+| 4    | AP-45 (no human review)| Halts for approval before coding.                   |
 
-- **Official Upgrade Guide Required:** Tailwind v4 changes how customization, installation, and browser support work. Read the official upgrade guide before upgrading.
-- **Migration Checklist:**
-  - Move repeated design decisions into `@theme` (colors, spacing, typography, breakpoints, shadows)
-  - Check any old `tailwind.config.js` assumptions (config is gone in v4 :  moved to CSS `@import`/`@theme`)
-  - Validate build tooling and plugins (v4 uses Oxide engine, new Vite plugin `@tailwindcss/vite`)
-  - Test pages that relied on older defaults or reset behavior
-- **10-Minute Tailwind Audit:** On one representative screen:
-  1. Find repeated arbitrary colors, radii, shadows, spacing, breakpoints. Promote to `@theme`.
-  2. Find class strings repeated across templates. Extract components when markup/behavior repeat.
-  3. Find interpolated fragments `bg-${color}-600`. Replace with complete class names.
-  4. Check if shared packages live in ignored folders. Add `@source` for exact sources.
-  5. Build production CSS and open hover, focus, disabled, dark, and responsive states :  not only default desktop view.
-  6. Keep one unusual arbitrary value when truly one-off. A clean system still needs escape hatches.
+## 8. Versioning & Changelog
 
----
+- **Version:** 2.0.0
+- **Changelog:**
+  - `2.0.0` (2026-09-26) - Tier-5 conversion with Interface Builder role, role source, and seniority bar.
+  - `1.0.0` - Legacy styling baseline.
 
-## 8. Performance and Bundle Optimization
+## 9. Portability Matrix
 
-- **Content Paths Configuration:** Configure the `content` array (or `@source` in v4) precisely to include all files where Tailwind classes are used. Misconfigured paths are the most common cause of bloated CSS files :  either huge output or missing styles.
-- **Tree-Shaking Mechanism:** Tailwind's JIT compiler scans source files and generates only utilities you actually use. Preserve this by never constructing class names dynamically and avoiding `@apply` abuse.
-- **Production CSS Monitoring:** Track your CSS output size. A typical Tailwind project has a 3-5 KB CSS file after purging unused utilities. Every `@apply` block used in 10 places can bloat output by 40-60KB per instance.
-- **Build Speed:** Tailwind v4's Oxide engine (Rust) offers up to 5× faster build speed and over 100× incremental builds. Keep configuration minimal to maintain performance.
+| Runtime     | Status   | Notes                           |
+| ----------- | -------- | ------------------------------- |
+| Claude Code | verified | Direct slash command execution. |
+| Cursor      | verified | Rules and prompt loading.       |
+| Copilot     | verified | Custom instructions support.    |
+| Windsurf    | verified | Cascade flow integration.       |
+| Kiro        | verified | Steering model execution.       |
+| Cline       | verified | Task step-by-step flow.         |
+| Raw API     | verified | Model-agnostic execution.       |
 
-## Anti-Patterns
+## 10. Examples
 
-- **AP-1 (Vague task scope):** Implementing features without concrete, testable boundary contracts.
-- **AP-4 (Over-permissive agent execution):** Modifying underlying runtime configs or database structures without validation.
-- **AP-28 (No stop condition):** Unbounded refactoring loops that drift beyond defined domain requirements.
-
-## Best Practices
-
-- Adhere to the core principles defined in this skill on every execution.
-- Maintain test-first validation before committing changes.
-- Keep module boundaries flat and avoid unnecessary indirection layers.
-
-## Related Skills
-
-- `clean-architecture`
-- `module-organization`
-- `writing-rules`
+**Input:** "Our Tailwind CSS is 400KB with broken dark mode."
+**Output:** Plan with centralized theme, runtime-safe dark tokens, and detectable classes under budget.

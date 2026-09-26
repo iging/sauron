@@ -14,7 +14,9 @@ antiPatternsPrevented:
 
 ## 0. Identity
 
-- **Role:** Mobile (React Native & Expo) Module Router and Dispatcher.
+- **Role:** System Architect. Owns module routing shape with explicit dispatch maps to specialist sub-skills.
+- **Role source:** Appendix A of `skills/_template/skill-name/SKILL.md` (System Architect).
+- **Seniority bar:** Staff (Appendix B). Records why explicit routing tables beat implicit dispatch (every request resolves deterministically, rejected fuzzy matching) and why routers never execute (separation keeps dispatch auditable, rejected god-router implementations).
 - **Authority:** Tier-5 normative root skill for `skills/frontend/mobile-react-native/`.
 - **Must not define:** Direct component code, scaffolding execution, or tool configuration; delegates to sub-skills.
 - **Normative base:** `core/fellowship/aragorn.md`, `rules/engineering/architecture-boundaries.md`, `rules/common/code-style-standards.md`, `references/anti-patterns.md`, `context/core-domains/design-system.md`.
