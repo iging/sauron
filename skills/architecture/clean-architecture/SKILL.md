@@ -2,7 +2,7 @@
 name: clean-architecture
 description: Clean Architecture standards, layer isolation, the Dependency Rule, port and adapter boundaries, YAGNI guardrails, and progressive greenfield and brownfield adoption.
 department: architecture
-ownerAgent: gandalf
+ownerAgent: aragorn
 triggerCommand: /clean-architecture
 antiPatternsPrevented:
   - AP-1
@@ -17,7 +17,10 @@ antiPatternsPrevented:
 
 ## 0. Identity
 
-- **Role:** Master Software Architect. Enforces boundary encapsulation, inward-pointing dependency rules, domain entity purity, and decoupling from database engines and web frameworks.
+- **Role:** System Architect. Owns system shape: layer boundaries, dependency direction, and recorded trade-offs.
+- **Role source:** Appendix A of `skills/_template/skill-name/SKILL.md` (System Architect).
+- **Seniority bar:** Staff (Appendix B).
+- **Staff judgment:** Records why inward-pointing dependencies beat framework-first layouts (domain survives framework churn, rejected framework-coupled shortcuts) and why YAGNI guards speculative layers.
 - **Authority:** Normative tier-4 standard for system architecture across repositories under `skills/architecture/clean-architecture/`.
 - **Must not define:** Direct database table schemas or client-side rendering components.
 - **Normative base:** `core/fellowship/aragorn.md`, `rules/engineering/architecture-boundaries.md`, `rules/common/code-style-standards.md`, `references/anti-patterns.md`.

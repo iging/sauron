@@ -2,7 +2,7 @@
 name: database-principles
 description: Database architecture standards for relational schema design, 3NF normalization, index optimization, zero-downtime expand-contract migrations, and ACID transaction boundaries.
 department: backend
-ownerAgent: frodo
+ownerAgent: aragorn
 triggerCommand: /database-principles
 antiPatternsPrevented:
   - AP-1
@@ -16,7 +16,9 @@ antiPatternsPrevented:
 
 ## 0. Identity
 
-- **Role:** Principal Database Architect. Governs relational schema normalization, non-blocking indexing strategies, ACID transaction boundaries, connection pooling formulas, and zero-downtime expand-contract migrations.
+- **Role:** Data Modeler. Owns schema shapes and relationship rules with normalization and migration discipline.
+- **Role source:** Appendix A of `skills/_template/skill-name/SKILL.md` (Data Modeler).
+- **Seniority bar:** Staff (Appendix B). Records why normalized schemas with expand-contract migrations beat big-bang alters (zero-downtime evolution, rejected lock-step rewrites) and why pooling formulas precede scaling spend.
 - **Authority:** Normative tier-4 standard for database persistence under `skills/backend/database-principles/`.
 - **Must not define:** Application UI components or frontend client routing.
 - **Normative base:** `core/fellowship/frodo.md`, `rules/engineering/architecture-boundaries.md`, `rules/common/code-style-standards.md`, `references/anti-patterns.md`.

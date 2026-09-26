@@ -1,108 +1,135 @@
 ---
 name: design-tokens
 description: 3-tier token architecture, semantic token naming, OKLCH color ramps, spacing steps, elevation, typography, motion easing and duration assignments, icon sizing tiers, and the component state matrix.
-origin: sauron
 department: quality
+ownerAgent: legolas
+triggerCommand: /design-tokens
+antiPatternsPrevented:
+  - AP-1
+  - AP-6
+  - AP-26
+  - AP-28
 ---
 
 # Design Tokens
 
-## When to Activate
+## 0. Identity
 
-- When creating, modifying, or reviewing code and architecture related to design tokens.
-- When enforcing deterministic engineering standards and eliminating unverified code patterns.
-- When resolving architectural design questions or quality bottlenecks.
+- **Role:** Interface Builder. Owns token vocabulary with tier discipline and state coverage.
+- **Role source:** Appendix A of `skills/_template/skill-name/SKILL.md` (Interface Builder).
+- **Seniority bar:** Staff (Appendix B). Records why three tiers beat flat variables (internals never leak to components, rejected global soup), why semantic names beat literal colors (one change propagates, rejected hex hunts), and why six documented states beat hopeful defaults.
+- **Authority:** Tier-5 normative skill for token systems under `skills/quality/design-tokens/`.
+- **Must not define:** Behavioral interaction rules beyond state matrix; brand identity decisions.
+- **Normative base:** `core/fellowship/legolas.md`, `rules/engineering/architecture-boundaries.md`, `rules/common/code-style-standards.md`, `references/anti-patterns.md`.
+- **Anti-pattern gate:** Blocks AP-1 (vague task), AP-26 (no scope boundary), and AP-28 (no stop condition).
 
-## Core Concepts
+## 1. Intent (9 Dimensions)
 
-> **Purpose:** The vocabulary of the design system: which tokens exist, how they are named, and how components consume them. Reference this file when generating styles, naming CSS custom properties, picking icons, or animating transitions. Behavioral rules live in `skills/frontend/ui-ux-principles/SKILL.md`. CSS architecture lives in `skills/frontend/html-css-principles/SKILL.md`.
+| #   | Dimension        | Value                                                                                          |
+| --- | ---------------- | ---------------------------------------------------------------------------------------------- |
+| 1   | Task             | Produce token systems with tiered architecture, perceptual ramps, and full state matrices.     |
+| 2   | Target Tool      | Any agent runtime: Claude Code, Cursor, Copilot, Windsurf, Kiro, Cline, raw API.                |
+| 3   | Output Format    | Token plan with tiers, ramps, motion, icons, and state notes.                                  |
+| 4   | Constraints      | Three tiers enforced. Semantic names only. Zero em dashes. Six states per component.           |
+| 5   | Input            | Theme needs, brand palette, motion targets, icon inventory.                                     |
+| 6   | Context          | Prevents token sprawl, contrast failures, and undocumented component states.                    |
+| 7   | Audience         | Design engineers building token systems.                                                        |
+| 8   | Success Criteria | Tiers respected; ramps perceptual; plan approved before coding.                                 |
+| 9   | Examples         | See Section 10.                                                                                 |
 
----
+## 2. Trigger Matrix
 
-## 1. 3-Tier Token Architecture
+| Trigger                                      | Fire? | Notes                              |
+| -------------------------------------------- | ----- | ---------------------------------- |
+| "Tokenize our design system"                 | YES   | Core trigger.                      |
+| "Fix contrast and motion gaps"               | YES   | Core trigger.                      |
+| "/design-tokens"                             | YES   | Slash command trigger.             |
+| "Decide our brand identity"                  | NO    | Out of scope; design owns it.      |
+| "Write interaction logic"                    | NO    | Out of scope for this skill.       |
 
-- **Tier 1 : Global Primitives (`primitive-`):** Raw scales representing absolute values (for example `--primitive-blue-500: oklch(0.55 0.2 250)`, `--primitive-space-4: 16px`). Primitives are system internals; components must not consume Tier 1 tokens directly.
-- **Tier 2 : Semantic Contextual (`bg-`, `text-`, `border-`, `brand-`, `status-`):** Purpose-driven tokens mapping user-facing UI roles to primitive values (for example `--bg-primary`, `--text-muted`). Components consume Tier 2 tokens by default.
-- **Tier 3 : Component Scoped (`cmp-`):** Specific overrides scoped to a single component (for example `--cmp-button-bg-hover`). Use Tier 3 tokens when a component requires unique state layers without polluting the global semantic space.
+## 3. Execution Workflow
 
----
+### Step 1: Tier the Vocabulary
 
-## 2. Semantic Color Tokens and Perceptual Ramps
+- **Action:** Separate primitives from semantic roles from component scopes. Derive ramps perceptually with hyphenated namespaces per role.
+- **Input:** Theme needs from user.
+- **Stop Condition:** Halt when components consume primitives directly.
+- **Validation:** Tier audit complete with namespace review.
 
-- **OKLCH Perceptual Uniformity:** Derive color ramps in OKLCH or perceptually uniform color spaces to ensure consistent contrast step spacing across light and dark modes. Maintain raw ramps numbered 100 to 900 in steps of 100 per hue.
-- **Naming Namespaces:** Use hyphenated prefixes for CSS custom properties. Dots are invalid inside custom property names (for example `bg.primary` is banned):
-  - `bg-` for background surfaces: `--bg-primary`, `--bg-surface`, `--bg-subtle`
-  - `text-` for text foregrounds: `--text-primary`, `--text-secondary`, `--text-muted`
-  - `border-` for borders and dividers: `--border-default`, `--border-subtle`, `--border-focus`
-  - `brand-` for brand accents: `--brand-primary`, `--brand-secondary`
-  - `status-` for system feedback: `--status-success`, `--status-warning`, `--status-error`, `--status-info`
-- **Ramp Discipline:** Derive each ramp from one base hue. Never hand-pick adjacent steps independently.
-- **Theme Switching:** Redefine semantic token values per theme under `@media (prefers-color-scheme: dark)` or class-based theme containers. Re-verify contrast ratios in both modes per `skills/frontend/ui-ux-principles/SKILL.md`.
+### Step 2: Scale Space, Type, and Motion
 
----
+- **Action:** Fix 4px spacing steps with radius and z-index hierarchies, map type steps with line-height bands, and assign easing plus durations with reduced-motion guards.
+- **Input:** Brand palette and motion targets.
+- **Stop Condition:** Halt on arbitrary values without token mapping.
+- **Validation:** Scale review complete per category.
 
-## 3. Spacing, Radius, and Stacking Tokens
+### Step 3: Cover Icons and States
 
-- **Base Spacing Unit:** 4px. Every margin, padding, gap, and dimension is a multiple of 4.
-- **Named Spacing Steps:** `space-1` (4px), `space-2` (8px), `space-3` (12px), `space-4` (16px), `space-6` (24px), `space-8` (32px), `space-12` (48px), `space-16` (64px).
-- **Layout Grid:** Twelve columns. Gutters between 16px and 24px. Page margins between 24px and 48px at desktop widths.
-- **Border Radius Steps:** `radius-none` (0px), `radius-sm` (4px), `radius-md` (8px), `radius-lg` (12px), `radius-xl` (16px), `radius-full` (9999px).
-- **Z-Index Stacking Hierarchy:** `z-deep` (-1), `z-default` (0), `z-dropdown` (1000), `z-sticky` (1100), `z-fixed` (1200), `z-modal` (1300), `z-popover` (1400), `z-toast` (1500).
+- **Action:** Standardize one icon set with size tiers and currentColor rendering, then document all six states per interactive component with contrast evidence.
+- **Input:** Icon inventory from Step 2.
+- **Stop Condition:** Halt on mixed sets or undocumented states.
+- **Validation:** Icon and state audit complete.
 
----
+### Step 4: Handoff and Human Review
 
-## 4. Typography and Layout Tokens
+- **Action:** Present the token plan and request approval before coding.
+- **Input:** Completed plan.
+- **Stop Condition:** Await user approval.
+- **Validation:** Approval recorded; zero code written by this skill.
 
-- **Named Text Steps:** `text-xs` (12px), `text-sm` (14px), `text-base` (16px), `text-lg` (18px), `text-xl` (20px), `text-2xl` (24px), `text-3xl` (32px), `text-4xl` (40px). Body copy uses `text-base`. Heading mappings follow `skills/frontend/ui-ux-principles/SKILL.md`: H3 uses `text-xl`, H2 uses `text-2xl`, H1 uses `text-4xl`.
-- **Line Height Bands:** Headings 1.1 to 1.3. Body text 1.5 minimum. Compact UI labels 1.0 to 1.2.
-- **Weight Roles:** Regular 400 body, Medium 500 labels, Semibold 600 subheadings, Bold 700 headings, ExtraBold 800 display only.
-- **Responsive Viewport Breakpoints:** `breakpoint-sm` (640px), `breakpoint-md` (768px), `breakpoint-lg` (1024px), `breakpoint-xl` (1280px), `breakpoint-2xl` (1536px).
+## 4. Output Specification
 
----
+```markdown
+# Token Plan
 
-## 5. Elevation and Motion Tokens
+- **Tiers:** [Vocabulary map]
+- **Scales:** [Space, type, motion notes]
+- **States:** [Six-state coverage]
+```
 
-- **Elevation Shadows:** `shadow-none` (none), `shadow-sm` (0 1px 2px rgba(0,0,0,0.05)), `shadow-md` (0 4px 6px -1px rgba(0,0,0,0.1)), `shadow-lg` (0 10px 15px -3px rgba(0,0,0,0.1)), `shadow-xl` (0 20px 25px -5px rgba(0,0,0,0.1)).
-- **Easing Assignments:** `ease-out` for elements entering or appearing. `ease-in` for elements exiting or leaving. `ease-in-out` for movement and resizing inside the viewport.
-- **Duration Assignments:** 100ms for micro-feedback (hover tints, toggles, fades). 150ms to 200ms for small elements (button presses, tooltips). 200ms to 300ms for medium surfaces (modals, dropdowns). Up to 400ms for large movements (page transitions). 500ms is the hard ceiling per `skills/frontend/ui-ux-principles/SKILL.md`.
-- **Reduced Motion:** Apply all motion tokens only inside `@media (prefers-reduced-motion: no-preference)` per `skills/frontend/ui-ux-principles/SKILL.md`.
+## 5. Validation Gate
 
----
+- [ ] Tiers respected per token.
+- [ ] Scales standardized per category.
+- [ ] States documented per component.
+- [ ] Zero em dashes in deliverable.
+- [ ] Human approval recorded before coding.
 
-## 6. Icon System Specifications
+## 6. Anti-Triggers and Calibration
 
-- **One Library Per Project:** Choose exactly one set and stick with it. Approved options: Lucide, Phosphor, Heroicons, Radix Icons. Never mix sets.
-- **Size Tiers:** 16px inline with text. 20px default UI glyphs. 24px navigation and primary controls. 32px feature highlights. 48px hero moments.
-- **Rendering Rules:** 2px stroke weight throughout per `skills/frontend/ui-ux-principles/SKILL.md`. Rounded caps and joins. Draw on a 24 by 24 grid with optical alignment. Color icons through `currentColor` so they inherit text tokens automatically.
-- **Hit Areas:** The visual glyph never equals the interactive area. Tappable icons reserve at least 44 by 44px per `skills/frontend/ui-ux-principles/SKILL.md`.
+- **Under-execution threshold:** Theming without tier discipline.
+- **Over-execution threshold:** Rebranding products unprompted.
+- **Calibration default:** Semantic tokens first; overrides with receipts.
 
----
+## 7. Anti-Pattern Compliance
 
-## 7. Component State Matrix & State Layers
+| Step | Prevents AP            | Mechanism                                           |
+| ---- | ---------------------- | --------------------------------------------------- |
+| 1    | AP-1 (vague task)      | Requires tier map first.                            |
+| 2    | AP-26 (no scope)       | Standardizes scales per category.                   |
+| 3    | AP-28 (no stop)        | Documents states per component.                     |
+| 4    | AP-45 (no human review)| Halts for approval before coding.                   |
 
-Every interactive component implements and documents all six states before shipping:
+## 8. Versioning & Changelog
 
-1. **Default:** Resting appearance using semantic surface and text tokens.
-2. **Hover:** Micro-feedback via state overlay tint (`color-mix(in oklch, var(--text-primary) 8%, transparent)`) or explicit hover token.
-3. **Active:** Pressed state response with increased overlay opacity (12% to 16%) or active transform step.
-4. **Focus-Visible:** Distinct outline or focus ring meeting WCAG 2.2 contrast rules per `skills/frontend/ui-ux-principles/SKILL.md`.
-5. **Disabled:** Non-interactive appearance with non-text contrast exemptions noted.
-6. **Loading:** Spinner or skeleton overlay for triggers performing async operations.
+- **Version:** 2.0.0
+- **Changelog:**
+  - `2.0.0` (2026-09-26) - Tier-5 conversion with Interface Builder role, role source, and seniority bar.
+  - `1.0.0` - Legacy tokens baseline.
 
-## Anti-Patterns
+## 9. Portability Matrix
 
-- **AP-1 (Vague task scope):** Implementing features without concrete, testable boundary contracts.
-- **AP-4 (Over-permissive agent execution):** Modifying underlying runtime configs or database structures without validation.
-- **AP-28 (No stop condition):** Unbounded refactoring loops that drift beyond defined domain requirements.
+| Runtime     | Status   | Notes                           |
+| ----------- | -------- | ------------------------------- |
+| Claude Code | verified | Direct slash command execution. |
+| Cursor      | verified | Rules and prompt loading.       |
+| Copilot     | verified | Custom instructions support.    |
+| Windsurf    | verified | Cascade flow integration.       |
+| Kiro        | verified | Steering model execution.       |
+| Cline       | verified | Task step-by-step flow.         |
+| Raw API     | verified | Model-agnostic execution.       |
 
-## Best Practices
+## 10. Examples
 
-- Adhere to the core principles defined in this skill on every execution.
-- Maintain test-first validation before committing changes.
-- Keep module boundaries flat and avoid unnecessary indirection layers.
-
-## Related Skills
-
-- `clean-architecture`
-- `module-organization`
-- `writing-rules`
+**Input:** "Our themes drift and focus states are missing."
+**Output:** Token plan with tiered vocabulary, perceptual ramps, and six-state coverage.

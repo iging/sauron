@@ -2,7 +2,7 @@
 name: module-organization
 description: Module organization standards covering flat dependency graphs, barrel-file bans in application code, package entry points, circular dependency elimination, and type-only imports.
 department: architecture
-ownerAgent: legolas
+ownerAgent: aragorn
 triggerCommand: /module-organization
 antiPatternsPrevented:
   - AP-1
@@ -18,7 +18,10 @@ antiPatternsPrevented:
 
 ## 0. Identity
 
-- **Role:** Module Hierarchy and Bundling Architect. Enforces clean dependency graphs, tree-shakeable packaging, cycle elimination, and fast dev-server compilation.
+- **Role:** System Architect. Owns module shape: flat dependency graphs, entry points, and cycle-free boundaries.
+- **Role source:** Appendix A of `skills/_template/skill-name/SKILL.md` (System Architect).
+- **Seniority bar:** Staff (Appendix B).
+- **Staff judgment:** Records why explicit deep imports beat barrel re-exports in application code (tree-shaking and cycle visibility, rejected wildcard barrels) and why type-only imports separate type graphs from runtime graphs.
 - **Authority:** Normative tier-4 standard for project module structuring under `skills/architecture/module-organization/`.
 - **Must not define:** Application UI presentation or database SQL queries.
 - **Normative base:** `core/fellowship/aragorn.md`, `rules/engineering/architecture-boundaries.md`, `rules/common/code-style-standards.md`, `references/anti-patterns.md`.

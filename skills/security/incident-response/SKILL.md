@@ -1,93 +1,135 @@
 ---
 name: incident-response
-description: Framework-agnostic baseline standard for production incident triage, severity classification, communication protocols, mitigation strategies, blameless postmortems, and preventative action tracking.
-origin: sauron
+description: Production incident triage with severity classification, command roles, mitigation-first stabilization, runbook discipline, and blameless postmortems. Excludes pager vendor APIs.
 department: security
+ownerAgent: legolas
+triggerCommand: /incident-response
+antiPatternsPrevented:
+  - AP-1
+  - AP-6
+  - AP-26
+  - AP-28
 ---
 
-# Incident Response & Postmortem Principles
+# Incident Response
 
-## When to Activate
+## 0. Identity
 
-- When creating, modifying, or reviewing code and architecture related to incident response & postmortem principles.
-- When enforcing deterministic engineering standards and eliminating unverified code patterns.
-- When resolving architectural design questions or quality bottlenecks.
+- **Role:** Diagnostic Analyst. Owns incident classification with timeline evidence and systemic fixes.
+- **Role source:** Appendix A of `skills/_template/skill-name/SKILL.md` (Diagnostic Analyst).
+- **Seniority bar:** Staff (Appendix B). Records why mitigation precedes root cause (users first, curiosity second; rejected debug-during-outage), why blameless postmortems beat blame (systems fail people, rejected witch hunts), and why evidence preservation precedes restarts.
+- **Authority:** Tier-5 normative skill for `skills/security/incident-response/`. Owns triage and postmortem guidance.
+- **Must not define:** Pager vendor APIs or customer SLA contracts.
+- **Normative base:** `core/fellowship/legolas.md`, `rules/engineering/architecture-boundaries.md`, `rules/common/code-style-standards.md`, `references/anti-patterns.md`.
+- **Anti-pattern gate:** Blocks AP-1 (vague task), AP-26 (no scope boundary), and AP-28 (no stop condition).
 
-## Core Concepts
+## 1. Intent (9 Dimensions)
 
-> **Purpose:** Baseline incident response and postmortem rules. Reference this file when declaring incidents, managing production outages, authoring incident runbooks, or writing blameless postmortems.
+| #   | Dimension        | Value                                                                                          |
+| --- | ---------------- | ---------------------------------------------------------------------------------------------- |
+| 1   | Task             | Produce triage discipline with severity tiers, command roles, and postmortem loops.            |
+| 2   | Target Tool      | Any agent runtime: Claude Code, Cursor, Copilot, Windsurf, Kiro, Cline, raw API.                |
+| 3   | Output Format    | Response plan with severity, roles, runbooks, and postmortem notes.                            |
+| 4   | Constraints      | Mitigation before diagnosis. Blameless always. Zero em dashes. Evidence preserved.             |
+| 5   | Input            | Service map, alert inventory, on-call roster, drill history.                                    |
+| 6   | Context          | Prevents chaotic outages, lost evidence, and repeat incidents.                                  |
+| 7   | Audience         | On-call engineers and incident commanders.                                                      |
+| 8   | Success Criteria | Tiers declared; roles staffed; plan approved before incidents.                                  |
+| 9   | Examples         | See Section 10.                                                                                 |
 
----
+## 2. Trigger Matrix
 
-## Role / Authority
+| Trigger                                      | Fire? | Notes                              |
+| -------------------------------------------- | ----- | ---------------------------------- |
+| "Set up our incident response"               | YES   | Core trigger.                      |
+| "Run a blameless postmortem"                 | YES   | Core trigger.                      |
+| "/incident-response"                         | YES   | Slash command trigger.             |
+| "Page our on-call now"                       | NO    | Out of scope; live ops owns it.    |
+| "Write our SLA contracts"                    | NO    | Out of scope for this skill.       |
 
-- **Role:** Framework-agnostic baseline standard for operational incident response workflows, incident severity classification, incident command procedures, blameless postmortem analysis, and reliability remediation.
-- **Authority:** Tier-3 shared engineering specification applicable across production engineering teams, operations centers, and site reliability organization practices.
-- **Must not define:** Third-party on-call scheduling platform vendor APIs or customer service level agreements (SLAs).
+## 3. Execution Workflow
 
----
+### Step 1: Declare Severity Tiers
 
-## 1. Incident Severity Classification and Triage
+- **Action:** Define SEV-1 through SEV-3 by business impact with declaration rights for every engineer and 5-minute triage expectations.
+- **Input:** Service map from user.
+- **Stop Condition:** Halt when tiers stay verbal; require written tiers.
+- **Validation:** Tier table reviewed with examples.
 
-- Define clear incident severity levels based on business impact: SEV-1 (Critical: total system outage or severe data loss), SEV-2 (Major: core functionality broken for large user subset), SEV-3 (Minor: localized non-critical issue with workaround).
-- Establish low-friction incident declaration paths: any engineer or operator must be empowered to declare an incident immediately upon detecting production anomaly.
-- Prioritize rapid triage: assess customer impact, data integrity risk, and system blast radius within 5 minutes of incident declaration.
+### Step 2: Staff Command and Mitigate
 
----
+- **Action:** Assign commander, communications, and operations roles per incident. Stabilize first with rollbacks, flags, capacity, or breakers while preserving logs, metrics, and dumps before restarts.
+- **Input:** On-call roster from Step 1.
+- **Stop Condition:** Halt when roles stay unassigned during active incidents.
+- **Validation:** Role chart reviewed with update cadence.
 
-## 2. Roles, Incident Command, and Communication Protocols
+### Step 3: Postmortem Without Blame
 
-- Designate explicit operational roles during an active incident: Incident Commander (leads response and decision-making), Communications Lead (manages stakeholder updates), and Operations Lead (coordinates technical investigation).
-- Establish a single dedicated communication channel (incident Slack channel or bridge) for all real-time incident coordination.
-- Maintain regular stakeholder status updates: publish internal and status-page updates at fixed intervals (every 15 minutes for SEV-1, every 30 minutes for SEV-2).
+- **Action:** Run 48-hour postmortems on SEV-1 and SEV-2 with 5-Whys depth, full timelines, owned action items with deadlines, and leadership review before new feature work.
+- **Input:** Incident timelines from Step 2.
+- **Stop Condition:** Halt on blame language; rewrite systemically.
+- **Validation:** Postmortem reviewed with tracked actions.
 
----
+### Step 4: Handoff and Human Review
 
-## 3. Mitigation-First Incident Stabilization
+- **Action:** Present the response plan and request approval before adoption.
+- **Input:** Completed plan.
+- **Stop Condition:** Await user approval.
+- **Validation:** Approval recorded; zero pages run by this skill.
 
-- Prioritize rapid service restoration and mitigation over root cause identification during active outages.
-- Execute fast stabilization moves: roll back recent deployments, disable non-critical features via feature flags, scale up compute capacity, or activate circuit breakers.
-- Preserve operational evidence: capture log snapshots, metric graphs, and heap dumps before restarting services or recycling nodes.
+## 4. Output Specification
 
----
+```markdown
+# Response Plan
 
-## 4. Operational Runbooks and Diagnostic Playbooks
+- **Tiers:** [Severity table]
+- **Command:** [Roles with cadence]
+- **Postmortem:** [Blameless process]
+```
 
-- Maintain actionable operational runbooks for all core services, high-priority alerts, and critical failure modes.
-- Structure runbooks deterministically: symptom description, verification commands, diagnostic checks, immediate mitigation steps, and escalation points.
-- Test runbooks routinely through chaos engineering exercises or operational game-day simulations to ensure accuracy.
+## 5. Validation Gate
 
----
+- [ ] Tiers declared with examples.
+- [ ] Roles staffed per incident.
+- [ ] Postmortems blameless with owners.
+- [ ] Zero em dashes in deliverable.
+- [ ] Human approval recorded before adoption.
 
-## 5. Blameless Postmortems and Root Cause Analysis
+## 6. Anti-Triggers and Calibration
 
-- Conduct blameless postmortems for all SEV-1 and SEV-2 incidents within 48 hours of resolution.
-- Focus postmortems on systemic process and technical vulnerabilities rather than human error; ask how systems failed to prevent or catch the mistake.
-- Apply the 5 Whys methodology to identify deep systemic root causes beyond immediate triggering events.
-- Document accurate timeline of events: trigger time, detection time, triage time, mitigation time, and full resolution time.
+- **Under-execution threshold:** Responding without severity tiers.
+- **Over-execution threshold:** Paging humans unprompted.
+- **Calibration default:** Mitigate first; diagnose second.
 
----
+## 7. Anti-Pattern Compliance
 
-## 6. Action Item Tracking and Reliability Prevention
+| Step | Prevents AP            | Mechanism                                           |
+| ---- | ---------------------- | --------------------------------------------------- |
+| 1    | AP-1 (vague task)      | Requires tier table first.                          |
+| 2    | AP-26 (no scope)       | Staffs command per incident.                        |
+| 3    | AP-28 (no stop)        | Tracks actions with deadlines.                      |
+| 4    | AP-45 (no human review)| Halts for approval before adoption.                 |
 
-- Generate explicit, actionable preventive items from postmortem analysis; prioritize items by risk impact and implementation complexity.
-- Assign clear engineering owners and completion deadlines to every postmortem action item.
-- Review open postmortem action items in engineering leadership meetings to ensure items are completed before launching new features.
+## 8. Versioning & Changelog
 
-## Anti-Patterns
+- **Version:** 2.0.0
+- **Changelog:**
+  - `2.0.0` (2026-09-26) - Tier-5 conversion with Diagnostic Analyst role, role source, and seniority bar.
+  - `1.0.0` - Legacy response baseline.
 
-- **AP-1 (Vague task scope):** Implementing features without concrete, testable boundary contracts.
-- **AP-4 (Over-permissive agent execution):** Modifying underlying runtime configs or database structures without validation.
-- **AP-28 (No stop condition):** Unbounded refactoring loops that drift beyond defined domain requirements.
+## 9. Portability Matrix
 
-## Best Practices
+| Runtime     | Status   | Notes                           |
+| ----------- | -------- | ------------------------------- |
+| Claude Code | verified | Direct slash command execution. |
+| Cursor      | verified | Rules and prompt loading.       |
+| Copilot     | verified | Custom instructions support.    |
+| Windsurf    | verified | Cascade flow integration.       |
+| Kiro        | verified | Steering model execution.       |
+| Cline       | verified | Task step-by-step flow.         |
+| Raw API     | verified | Model-agnostic execution.       |
 
-- Adhere to the core principles defined in this skill on every execution.
-- Maintain test-first validation before committing changes.
-- Keep module boundaries flat and avoid unnecessary indirection layers.
+## 10. Examples
 
-## Related Skills
-
-- `clean-architecture`
-- `module-organization`
-- `writing-rules`
+**Input:** "Our last outage had no commander and no postmortem."
+**Output:** Plan with severity tiers, command roles, and blameless 48-hour postmortem loop.

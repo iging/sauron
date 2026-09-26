@@ -70,7 +70,7 @@ You can use Sauron in two ways: **Modular Mode** (zero-install: add individual s
 Add specific skills directly into your local project workspace without installing dependencies:
 
 ```bash
-# Add an individual skill (e.g. plan-feature, clean-architecture, security-auditor)
+# Add an individual skill (installs to .agents/skills by default; use --to to override)
 npx sauron-ai add plan-feature
 npx sauron-ai add clean-architecture
 
@@ -190,7 +190,7 @@ Sauron generates native configuration files for:
 
 ## Flagship Engineering Capabilities
 
-Sauron ships with 45 modular skills across 7 functional departments. Four flagship capability pillars anchor the developer and agent experience:
+Sauron ships with 374 modular skills across 9 functional departments, plus 114 CLI commands. Four flagship capability pillars anchor the developer and agent experience:
 
 ---
 

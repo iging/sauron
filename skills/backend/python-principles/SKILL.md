@@ -1,128 +1,142 @@
 ---
 name: python-principles
-description: Framework-agnostic baseline standard for modern Python 3.10+ development, strict type hinting, virtual environment hygiene, async safety, and anti-malware defense.
-origin: sauron
+description: Modern Python 3.10 engineering rules covering strict typing, async discipline, dependency hygiene, deserialization safety, and static analysis gates. Excludes frontend UI builds.
 department: backend
+ownerAgent: frodo
+triggerCommand: /python-principles
+antiPatternsPrevented:
+  - AP-1
+  - AP-4
+  - AP-6
+  - AP-14
+  - AP-26
+  - AP-28
+  - AP-41
+  - AP-44
 ---
 
-# Python Engineering Principles
-
-Enforce idiomatic, type-safe, and secure Python engineering across applications, scripts, and libraries. Eliminate arbitrary dynamic execution, unpinned dependencies, and untrusted deserialization vulnerabilities.
+# Python Principles
 
 ## 0. Identity
 
-- **Role:** Backend Engineering Specialist.
-- **Authority:** Enforces backend architectural boundaries and runtime safety.
+- **Role:** Service Builder. Owns type-safe Python implementation with security hardening inside scoped files.
+- **Role source:** Appendix A of `skills/_template/skill-name/SKILL.md` (Service Builder).
+- **Seniority bar:** Staff (Appendix B).
+- **Role source:** Appendix A of `skills/_template/skill-name/SKILL.md` (Service Builder).
+- **Seniority bar:** Staff (Appendix B). Records why strict annotations plus static analysis beat dynamic velocity (Mypy-clean codebases reject entire bug classes at CI, rejected untyped speed), why pickle stays banned on untrusted input (remote execution by deserialization, rejected convenience parsing), and why virtualenv isolation precedes every install.
+- **Authority:** Tier-5 normative skill for `skills/backend/python-principles/`. Owns typing, async, and security guidance.
 - **Must not define:** Frontend UI layout or client-side hydration routines.
 - **Normative base:** `core/fellowship/frodo.md`, `rules/engineering/architecture-boundaries.md`, `rules/common/code-style-standards.md`, `references/anti-patterns.md`.
+- **Anti-pattern gate:** Blocks AP-1 (vague task), AP-4 (over-permissive execution), AP-14 (leaking secrets), AP-41 (unparameterized queries), AP-44 (phantom types), and AP-28 (no stop condition).
 
-## When to Activate
+## 1. Intent (9 Dimensions)
 
-- Creating, editing, or reviewing Python source files (`.py`, `.pyi`).
-- Configuring Python build tools, virtual environments, and dependency managers (`uv`, `poetry`, `pip`, `pyproject.toml`).
-- Designing domain models, service layers, async routines, and data pipelines.
-- Auditing Python code for performance bottlenecks, type errors, or security vulnerabilities.
+| #   | Dimension        | Value                                                                                |
+| --- | ---------------- | ------------------------------------------------------------------------------------ |
+| 1   | Task             | Produce idiomatic, type-safe, secure Python across apps, scripts, and libraries.     |
+| 2   | Target Tool      | Any agent runtime: Claude Code, Cursor, Copilot, Windsurf, Kiro, Cline, raw API.     |
+| 3   | Output Format    | Implementation plan with typing, async, security, and gate notes.                    |
+| 4   | Constraints      | Python 3.10 plus only. Ruff formatted. Zero em dashes. No dynamic execution.         |
+| 5   | Input            | Feature spec, domain model, async needs, threat surface.                             |
+| 6   | Context          | Prevents untyped sprawl, blocking event loops, and deserialization vulnerabilities.  |
+| 7   | Audience         | Backend engineers shipping modern Python 3.10 codebases.                             |
+| 8   | Success Criteria | Annotations complete; async clean; security floors met; plan approved before coding. |
+| 9   | Examples         | See Section 10.                                                                      |
 
-## Core Concepts
+## 2. Trigger Matrix
 
-### 1. Modern Language Standards and Architecture
+| Trigger                        | Fire? | Notes                             |
+| ------------------------------ | ----- | --------------------------------- |
+| "Build this feature in Python" | YES   | Core trigger.                     |
+| "Harden this Python service"   | YES   | Core trigger.                     |
+| "/python-principles"           | YES   | Slash command trigger.            |
+| "Build a React frontend"       | NO    | Out of scope for this skill.      |
+| "Administer our servers"       | NO    | Out of scope; ops runbook needed. |
 
-- Target Python 3.10 or newer exclusively. Utilize native union syntax (`X | Y` instead of `Union[X, Y]`) and structural pattern matching (`match / case`).
-- Adopt `pyproject.toml` (PEP 621) as the singular configuration standard for package metadata, linters, and build settings. Discard legacy `setup.py` and `setup.cfg` configurations.
-- Enforce strict static typing with Mypy or Pyright. Annotate every function parameter and return type explicitly.
-- Separate business logic from framework adapters. Ensure core business models remain importable without web frameworks or ORMs present.
+## 3. Execution Workflow
 
-### 2. Dependency and Environment Hygiene
+### Step 1: Lock Modern Standards
 
-- Never install packages into global system Python environments. Mandate isolated virtual environments via `.venv` managed by `uv` or `poetry`.
-- Pin all production dependencies using deterministic lockfiles (`uv.lock`, `poetry.lock`).
-- Audit installed packages against known CVEs before merging code using automated scanners (`pip-audit`, `safety`).
+- **Action:** Target Python 3.10 plus with native union syntax and match statements. Standardize on `pyproject.toml` for metadata and tooling. Annotate every signature and enforce Mypy or Pyright clean.
+- **Input:** Feature spec and domain model.
+- **Stop Condition:** Halt when untyped public functions appear; require annotations.
+- **Validation:** Typing audit complete with Ruff format clean.
 
-### 3. Resource Management and Async Discipline
+### Step 2: Isolate Environments and Dependencies
 
-- Employ context managers (`with` and `async with`) for all resources requiring release (file handles, database transactions, network connections, thread locks).
-- Avoid blocking calls inside `async def` routines. Offload CPU-intensive operations or synchronous filesystem IO to worker pools (`asyncio.to_thread`).
-- Set explicit timeouts on all network requests (`httpx.Client(timeout=10.0)`, `requests.get(..., timeout=10.0)`). Never issue unbounded HTTP requests.
+- **Action:** Mandate virtualenvs via uv or Poetry, pin lockfiles deterministically, and audit installs against CVE feeds before merging.
+- **Input:** Dependency list from user.
+- **Stop Condition:** Halt on global installs or unpinned production deps.
+- **Validation:** Lockfile reviewed with audit evidence.
 
-## Security and Anti-Malware Directives
+### Step 3: Discipline Async and Security
 
-1. **Prohibit Dynamic Code Execution:** Never invoke `eval()`, `exec()`, or `compile()` on dynamic or user-supplied strings. Dynamic evaluation constitutes a remote code execution vulnerability.
-2. **Prohibit Insecure Deserialization:** Never use the `pickle` module to deserialize data from untrusted or network sources. Use typed JSON, Protocol Buffers, or MessagePack schemas validated through Pydantic.
-3. **Safe Subprocess Invocation:** When invoking system processes using `subprocess.run()`, pass argument lists directly and set `shell=False`. Never execute commands with `shell=True` on interpolated strings to prevent shell injection.
-4. **Path Traversal Protection:** Sanitize all incoming file paths using `pathlib.Path.resolve()`. Verify that the resolved target path begins with the intended base directory to prevent directory traversal attacks (`../../`).
-5. **No Plaintext Credential Exposure:** Read credentials exclusively from verified environment variables. Never print, log, or persist raw credential dictionaries or system environment dumps.
+- **Action:** Wrap resources in context managers, keep event loops non-blocking with worker offload, and timeout every network call. Ban eval, exec, pickle on untrusted input, and shell interpolation. Resolve paths against base directories and source secrets from environment only.
+- **Input:** Async needs and threat surface.
+- **Stop Condition:** Halt when any security floor stays unmet; mark as blocking.
+- **Validation:** Security checklist reviewed per surface.
 
-## Code Examples
+### Step 4: Handoff and Human Review
 
-### Idiomatic Type-Safe Service Example
+- **Action:** Present the plan and request approval before coding.
+- **Input:** Completed plan.
+- **Stop Condition:** Await user approval.
+- **Validation:** Approval recorded; zero code written by this skill.
 
-```python
-"""User service implementation following Sauron Python principles."""
+## 4. Output Specification
 
-from __future__ import annotations
+```markdown
+# Python Plan
 
-from dataclasses import dataclass
-from datetime import datetime, timezone
-from pathlib import Path
-import json
-
-
-@dataclass(frozen=True, slots=True)
-class UserRecord:
-    """Immutable user entity representation."""
-    user_id: str
-    email: str
-    is_active: bool
-    created_at: datetime
-
-
-class UserService:
-    """Provides validated user profile management."""
-
-    def __init__(self, storage_directory: Path) -> None:
-        self._storage_directory = storage_directory.resolve()
-        if not self._storage_directory.exists():
-            self._storage_directory.mkdir(parents=True, exist_ok=True)
-
-    def save_user(self, user: UserRecord) -> Path:
-        """Saves user record to filesystem safely without path traversal."""
-        # Sanitize filename to prevent directory traversal
-        safe_filename = f"{user.user_id}.json"
-        target_path = (self._storage_directory / safe_filename).resolve()
-
-        # Enforce boundary containment check
-        if not str(target_path).startswith(str(self._storage_directory)):
-            raise ValueError(f"Illegal path traversal detected: {target_path}")
-
-        payload = {
-            "user_id": user.user_id,
-            "email": user.email,
-            "is_active": user.is_active,
-            "created_at": user.created_at.isoformat(),
-        }
-
-        # Safe atomic write with UTF-8 encoding
-        temp_path = target_path.with_suffix(".tmp")
-        temp_path.write_text(json.dumps(payload, indent=2), encoding="utf-8")
-        temp_path.replace(target_path)
-        return target_path
+- **Standards:** [Version with typing target]
+- **Environment:** [Lockfile with audit notes]
+- **Security:** [Floors per surface]
+- **Async:** [Discipline notes]
 ```
 
-## Anti-Patterns
+## 5. Validation Gate
 
-- **AP-14 (Leaking secrets):** Hardcoding API tokens or committing `.env` files into source repositories.
-- **AP-41 (Unparameterized queries):** Formatting SQL queries with string concatenation instead of parameterized placeholders.
-- **AP-44 (Phantom types):** Relying on raw untyped dictionaries instead of Pydantic models or typed Dataclasses.
-- **AP-52 (Fake fix):** Suppressing Mypy errors with blanket `# type: ignore` or catching broad `Exception` with silent `pass`.
+- [ ] Modern standards locked before logic.
+- [ ] Dependencies pinned with audit.
+- [ ] Security floors met per surface.
+- [ ] Zero em dashes in deliverable.
+- [ ] Human approval recorded before coding.
 
-## Best Practices
+## 6. Anti-Triggers and Calibration
 
-- Format all Python code strictly using Ruff (`ruff format` and `ruff check`).
-- Maintain 100 percent type annotation coverage for public modules.
-- Ensure all test suites run hermetically in isolated pytest runners without mutating host machine state.
+- **Under-execution threshold:** Shipping untyped code with global installs.
+- **Over-execution threshold:** Rewriting working systems unprompted.
+- **Calibration default:** Strictness first; velocity follows.
 
-## Related Skills
+## 7. Anti-Pattern Compliance
 
-- [docker-principles](file:///C:/Users/IGING/Documents/GitHub/sauron/skills/devops/docker-principles/SKILL.md)
-- [security-audit](file:///C:/Users/IGING/Documents/GitHub/sauron/core/skills/security/security-audit.md)
-- [backend-development](file:///C:/Users/IGING/Documents/GitHub/sauron/skills/backend/backend-development/SKILL.md)
+| Step | Prevents AP             | Mechanism                                       |
+| ---- | ----------------------- | ----------------------------------------------- |
+| 1    | AP-44 (phantom types)   | Requires annotations with static analysis.      |
+| 2    | AP-26 (no scope)        | Isolates envs with pinned lockfiles.            |
+| 3    | AP-4 (over-permissive)  | Bans dynamic execution and shell interpolation. |
+| 4    | AP-45 (no human review) | Halts for approval before coding.               |
+
+## 8. Versioning & Changelog
+
+- **Version:** 2.0.0
+- **Changelog:**
+  - `2.0.0` (2026-09-26) - Tier-5 conversion with Service Builder role, role source, and seniority bar.
+  - `1.0.0` - Legacy engineering principles baseline.
+
+## 9. Portability Matrix
+
+| Runtime     | Status   | Notes                           |
+| ----------- | -------- | ------------------------------- |
+| Claude Code | verified | Direct slash command execution. |
+| Cursor      | verified | Rules and prompt loading.       |
+| Copilot     | verified | Custom instructions support.    |
+| Windsurf    | verified | Cascade flow integration.       |
+| Kiro        | verified | Steering model execution.       |
+| Cline       | verified | Task step-by-step flow.         |
+| Raw API     | verified | Model-agnostic execution.       |
+
+## 10. Examples
+
+**Input:** "Build an async ingestion worker in Python with safe subprocess calls."
+**Output:** Plan with typed service boundaries, worker-offloaded blocking I/O, argument-list subprocesses, and isolated test strategy.

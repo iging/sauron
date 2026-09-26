@@ -1,112 +1,135 @@
 ---
 name: angular-principles
-description: Angular (v20+) architecture constraints, signal-based state management, standalone component rules, and quality guidelines for modern Angular codebases.
-origin: sauron
+description: Angular v20+ engineering rules covering standalone components, signals reactivity, zoneless change detection, and strict project setup. Excludes backend API design.
 department: frontend
+ownerAgent: legolas
+triggerCommand: /angular-principles
+antiPatternsPrevented:
+  - AP-1
+  - AP-6
+  - AP-26
+  - AP-28
 ---
 
-# Angular Best Practices
+# Angular Principles
 
-## When to Activate
+## 0. Identity
 
-- When creating, modifying, or reviewing code and architecture related to angular best practices.
-- When enforcing deterministic engineering standards and eliminating unverified code patterns.
-- When resolving architectural design questions or quality bottlenecks.
+- **Role:** Interface Builder. Owns screen composition and interaction wiring within Angular signals discipline.
+- **Role source:** Appendix A of `skills/_template/skill-name/SKILL.md` (Interface Builder).
+- **Seniority bar:** Staff (Appendix B). Records why standalone components beat NgModules (explicit dependencies, rejected module ceremony), why signals beat zone-based reactivity (targeted updates, rejected whole-tree checks), and why RxJS keeps time-based async while signals own state.
+- **Authority:** Tier-5 normative skill for `skills/frontend/angular-principles/`. Owns component and reactivity guidance.
+- **Must not define:** Backend APIs; global design tokens.
+- **Normative base:** `core/fellowship/legolas.md`, `rules/engineering/architecture-boundaries.md`, `rules/common/code-style-standards.md`, `references/anti-patterns.md`.
+- **Anti-pattern gate:** Blocks AP-1 (vague task), AP-26 (no scope boundary), and AP-28 (no stop condition).
 
-## Core Concepts
+## 1. Intent (9 Dimensions)
 
-> **Purpose:** Angular v20+ engineering rules covering standalone components, signal reactivity, change detection, accessibility, and project setup. Reference this file from your prompt to enforce strict Angular standards.
+| #   | Dimension        | Value                                                                                          |
+| --- | ---------------- | ---------------------------------------------------------------------------------------------- |
+| 1   | Task             | Produce Angular features with standalone components, signals state, and strict setup.           |
+| 2   | Target Tool      | Any agent runtime: Claude Code, Cursor, Copilot, Windsurf, Kiro, Cline, raw API.                |
+| 3   | Output Format    | Feature plan with component map, reactivity notes, and setup checklist.                        |
+| 4   | Constraints      | Standalone only. Signals first. Zero em dashes. Strict TypeScript on.                          |
+| 5   | Input            | Screen specs, state inventory, async needs, form complexity.                                    |
+| 6   | Context          | Prevents module sprawl, zone overhead, and untyped templates.                                   |
+| 7   | Audience         | Frontend engineers shipping Angular v20+ apps.                                                  |
+| 8   | Success Criteria | Components standalone; reactivity explicit; plan approved before coding.                         |
+| 9   | Examples         | See Section 10.                                                                                 |
 
----
+## 2. Trigger Matrix
 
-## 1. Core Architecture and Component Design
+| Trigger                                      | Fire? | Notes                              |
+| -------------------------------------------- | ----- | ---------------------------------- |
+| "Build this screen in Angular"               | YES   | Core trigger.                      |
+| "Migrate our app to signals"                 | YES   | Core trigger.                      |
+| "/angular-principles"                        | YES   | Slash command trigger.             |
+| "Design our backend API"                     | NO    | Out of scope for this skill.       |
+| "Write React components instead"             | NO    | Out of scope; different paradigm.  |
 
-- **Standalone Default:** All components MUST be standalone by default. Do NOT use NgModules for new code; NgModules are legacy.
-- **Folder Structure:** Organize by feature, not by type. Each feature owns its components, services, and related logic. Avoid `components/`, `services/`, `directives/` directories.
-- **Feature Boundaries:** Keep components, services, and logic isolated within their feature domain. Cross-feature dependencies should be minimized.
-- **Lazy Loading:** Load features only when needed via route-level lazy loading or `@defer` for template parts.
+## 3. Execution Workflow
 
----
+### Step 1: Structure Features Standalone
 
-## 2. Reactive State Management
+- **Action:** Organize by feature domain with standalone components, route-level lazy loading, and defer blocks for template parts.
+- **Input:** Screen specs from user.
+- **Stop Condition:** Halt on new NgModules; require standalone.
+- **Validation:** Feature map reviewed with lazy boundaries.
 
-- **Signals First:** Use `signal()` for local component state, `computed()` for derived values, `effect()` for side effects (always clean up), `linkedSignal()` for synchronized derived state.
-- **RxJS for Time-Based Async:** Use RxJS for debounce, throttle, retry, `switchMap`, `mergeMap`, websockets, and server-sent events. Bridge to signals via `toSignal()`.
-- **Key Heuristic:** "Use RxJS to fetch and transform; use Signals to store and display."
-- **NgRx SignalStore:** Only for complex global state with side effects (pagination, optimistic updates, undo). Otherwise prefer service-level signals.
-- **Avoid `any`:** Use `unknown` for external data; force safe narrowing with type guards.
+### Step 2: Assign Reactivity Correctly
 
----
+- **Action:** Hold local state in signals with computed derivations, reserve RxJS for time-based async bridged via toSignal, and escalate only complex global state to SignalStore.
+- **Input:** State inventory from Step 1.
+- **Stop Condition:** Halt when effects replace derivations; require computed.
+- **Validation:** Reactivity map reviewed per feature.
 
-## 3. Change Detection and Performance
+### Step 3: Harden Templates and Setup
 
-- **Zoneless Default:** Angular v21+ makes zoneless the default; removes Zone.js (~33KB bundle reduction). Change detection only runs on Signal updates, template events, or AsyncPipe.
-- **OnPush:** Default in Angular v22; works synergistically with zoneless/Signals. Do NOT turn it off.
-- **`httpResource`:** Stable in Angular v22; reactive HTTP with automatic refetch, cancellation, loading/error states as signals. Keep `HttpClient` for mutations only.
-- **`@defer`:** Lazy load templates with placeholder/loading blocks; enables incremental hydration for SSR; control hydration with viewport/interaction/condition triggers.
+- **Action:** Use modern control flow with tracked keys, signal inputs and outputs, strict templates without any, zoneless change detection, and CLI strict scaffolding with esbuild builds.
+- **Input:** Template inventory and setup needs.
+- **Stop Condition:** Halt on template-driven forms or untyped expressions.
+- **Validation:** Template audit complete with setup checklist.
 
----
+### Step 4: Handoff and Human Review
 
-## 4. Template Syntax and Patterns
+- **Action:** Present the plan and request approval before coding.
+- **Input:** Completed plan.
+- **Stop Condition:** Await user approval.
+- **Validation:** Approval recorded; zero code written by this skill.
 
-- **Modern Control Flow:** Use `@if`/`@for`/`@switch` replacing `*ngIf`/`*ngFor`/`*ngSwitch`. `@for` requires `track` with stable unique keys.
-- **Signal Inputs/Outputs:** Use `input()`, `output()`, `model()` replacing `@Input()`/`@Output()` decorators. `model()` for two-way bound properties with `[(prop)]` syntax.
-- **`class`/`style` Bindings:** Prefer native `class` and `style` bindings over `ngClass`/`ngStyle` directives.
-- **Inline Templates:** Prefer inline templates for small components. Use `NgOptimizedImage` for static images (does NOT work for inline base64).
-- **No `any` in Templates:** Template expressions should use explicit types; avoid implicit `any`.
+## 4. Output Specification
 
----
+```markdown
+# Angular Plan
 
-## 5. Forms
+- **Components:** [Standalone map with lazy bounds]
+- **Reactivity:** [Signals with RxJS bridges]
+- **Setup:** [Strict CLI checklist]
+```
 
-- **Signal Forms:** Stable in Angular v22; schema-based validation, type-safe field access, `input()` signals for form controls.
-- **Reactive Forms:** For large, dynamic, or highly conditional forms. Keep `FormBuilder` patterns where applicable.
-- **Avoid:** Template-driven forms entirely.
+## 5. Validation Gate
 
----
+- [ ] Components standalone by default.
+- [ ] Reactivity explicit per feature.
+- [ ] Templates typed without any.
+- [ ] Zero em dashes in deliverable.
+- [ ] Human approval recorded before coding.
 
-## 6. Accessibility and Quality
+## 6. Anti-Triggers and Calibration
 
-- **WCAG AA:** Must pass all AXE checks. Include focus management, color contrast ratios, and proper ARIA attributes.
-- **`readonly` on Angular-Initialized Properties:** Mark `input`, `model`, `output`, and query properties as `readonly` to prevent overwriting Angular-set values.
-- **`protected` for Template-Bound Members:** Use `protected` access for any class members meant to be read from the component template.
-- **Safe Navigation:** Use `?.` operator for optional property access in templates.
+- **Under-execution threshold:** Writing components without feature mapping.
+- **Over-execution threshold:** Building backends unprompted.
+- **Calibration default:** Signals first; RxJS for time; stores for complexity.
 
----
+## 7. Anti-Pattern Compliance
 
-## 7. Project Setup and Stack
+| Step | Prevents AP            | Mechanism                                           |
+| ---- | ---------------------- | --------------------------------------------------- |
+| 1    | AP-1 (vague task)      | Requires feature map first.                         |
+| 2    | AP-26 (no scope)       | Assigns reactivity per feature.                     |
+| 3    | AP-28 (no stop)        | Enforces typed templates.                           |
+| 4    | AP-45 (no human review)| Halts for approval before coding.                   |
 
-- **CLI Defaults:** `ng new` with `--standalone --routing --strict`. Enable strict TypeScript mode.
-- **Build Tool:** esbuild default; 70%+ faster than webpack.
-- **UI Library:** Angular Material 3 for complex interactive components (tables, dialogs, date pickers, forms); Tailwind CSS v4 for layout and custom styling.
-- **Testing:** Jest + Angular Testing Library (replaced Karma, 3x faster); Playwright for E2E testing.
-- **i18n:** Transloco for internationalization.
-- **State (Complex):** NgRx SignalStore for global state; otherwise service-level signals.
+## 8. Versioning & Changelog
 
----
+- **Version:** 2.0.0
+- **Changelog:**
+  - `2.0.0` (2026-09-26) - Tier-5 conversion with Interface Builder role, role source, and seniority bar.
+  - `1.0.0` - Legacy Angular baseline.
 
-## 8. Code Quality
+## 9. Portability Matrix
 
-- **Small PRs:** Reviewable in under 15 minutes; use feature flags for frequent merging.
-- **No Nested Subscriptions:** `.subscribe()` inside `.subscribe()` is an anti-pattern; flatten with RxJS operators or convert to signals.
-- **No Direct Signal Mutation:** Use `set()`/`update()` on signals; never direct assignment that bypasses store logic.
-- **No Over-Using `effect()`:** Prefer `computed()` for derived state; `effect()` only for last-resort side effects (logging, manual DOM manipulation).
-- **No `any`:** Enable `"noImplicitAny": true` and `"strict": true` in tsconfig.
+| Runtime     | Status   | Notes                           |
+| ----------- | -------- | ------------------------------- |
+| Claude Code | verified | Direct slash command execution. |
+| Cursor      | verified | Rules and prompt loading.       |
+| Copilot     | verified | Custom instructions support.    |
+| Windsurf    | verified | Cascade flow integration.       |
+| Kiro        | verified | Steering model execution.       |
+| Cline       | verified | Task step-by-step flow.         |
+| Raw API     | verified | Model-agnostic execution.       |
 
-## Anti-Patterns
+## 10. Examples
 
-- **AP-1 (Vague task scope):** Implementing features without concrete, testable boundary contracts.
-- **AP-4 (Over-permissive agent execution):** Modifying underlying runtime configs or database structures without validation.
-- **AP-28 (No stop condition):** Unbounded refactoring loops that drift beyond defined domain requirements.
-
-## Best Practices
-
-- Adhere to the core principles defined in this skill on every execution.
-- Maintain test-first validation before committing changes.
-- Keep module boundaries flat and avoid unnecessary indirection layers.
-
-## Related Skills
-
-- `clean-architecture`
-- `module-organization`
-- `writing-rules`
+**Input:** "Build a dashboard in Angular with live charts."
+**Output:** Plan with standalone feature modules, signal state with RxJS streams, and zoneless setup.

@@ -14,7 +14,9 @@ antiPatternsPrevented:
 
 ## 0. Identity
 
-- **Role:** Principal Database Administrator. Plans and executes schema changes while ensuring data integrity, zero-downtime deployments, and type safety across the stack.
+- **Role:** Data Modeler. Owns schema change shapes with type-sync discipline across the stack.
+- **Role source:** Appendix A of `skills/_template/skill-name/SKILL.md` (Data Modeler).
+- **Seniority bar:** Staff (Appendix B). Records why multi-phase expand-contract beats big-bang alters (broken changes deploy safely in stages, rejected single-shot rewrites) and why dependent type sync ships with the migration, never after.
 - **Authority:** Owns schema change execution. Cannot modify production data without explicit, highlighted user approval for destructive operations.
 - **Must not define:** The data model itself (see project `context/core-domains/database-schema.md`); application business rules (see `rules/common/general-rules.md`); ORM configuration specifics (project may use Prisma, Drizzle, or Dexie local-first schema).
 - **Normative base:** `core/fellowship/aragorn.md`, `rules/engineering/architecture-boundaries.md`, `rules/common/code-style-standards.md`, `references/anti-patterns.md`.
@@ -43,7 +45,7 @@ antiPatternsPrevented:
 | Alter, drop, or backfill data             | YES   | Trigger fires, but executes only after approval. |
 | Read-only SQL query or report             | NO    | Not a migration.                                 |
 | Application business logic                | NO    | Out of scope.                                    |
-| Schema design from scratch                | NO    | Use `define-core-domains`.                      |
+| Schema design from scratch                | NO    | Use `define-core-domains`.                       |
 
 ## 3. Execution Workflow
 

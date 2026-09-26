@@ -67,9 +67,10 @@ fellowship:
     role: "Edge Case and Chaos Prober"
     alias: ["fuzzer", "chaos"]
 
-# Active Skill Domains (8 Functional Departments)
+# Active Skill Domains (9 Functional Departments)
 departments:
   architecture: true
+  ai-engineering: true
   backend: true
   database: true
   devops: true

@@ -1,97 +1,137 @@
 ---
 name: observability-telemetry
-description: Framework-agnostic baseline standard for structured logging, distributed tracing, metric instrumentations, alert design, OpenTelemetry collection, and incident visibility.
-origin: sauron
+description: Instruments structured logging, distributed tracing, RED and USE metrics, OTel collection, SLO alerts, and PII scrubbing. Excludes vendor dashboards and pager rosters.
 department: devops
+ownerAgent: boromir
+triggerCommand: /observability-telemetry
+antiPatternsPrevented:
+  - AP-1
+  - AP-4
+  - AP-26
+  - AP-28
+  - AP-44
 ---
 
-# Observability & Telemetry Principles
+# Observability Telemetry
 
-## When to Activate
+## 0. Identity
 
-- When creating, modifying, or reviewing code and architecture related to observability & telemetry principles.
-- When enforcing deterministic engineering standards and eliminating unverified code patterns.
-- When resolving architectural design questions or quality bottlenecks.
-
-## Core Concepts
-
-> **Purpose:** Baseline observability and telemetry rules. Reference this file when instrumenting application logs, defining metrics, configuring OpenTelemetry tracing, or setting up alert rules.
-
----
-
-## Role / Authority
-
-- **Role:** Framework-agnostic baseline standard for structured logging formats, distributed tracing span propagation, application metrics, alert hygiene, and OpenTelemetry collector integration.
-- **Authority:** Tier-3 shared engineering specification applicable across application runtimes, microservice networks, and monitoring infrastructure.
+- **Role:** Telemetry Auditor. Owns signal completeness with privacy-safe capture across services.
+- **Role source:** Appendix A of `skills/_template/skill-name/SKILL.md` (Telemetry Auditor).
+- **Seniority bar:** Staff (Appendix B). Records why symptom-based SLO alerts beat CPU-blip pages (customer impact pages, rejected infrastructure noise), why cardinality caps beat label freedom (unbounded labels bankrupt backends, rejected user-id labels), and why scrubbed streams beat raw logs.
+- **Authority:** Tier-5 normative skill for `skills/devops/observability-telemetry/`. Owns instrumentation guidance.
 - **Must not define:** Third-party vendor APM dashboard visual layouts or incident pager rotation schedules.
+- **Normative base:** `core/fellowship/boromir.md`, `rules/engineering/architecture-boundaries.md`, `rules/common/code-style-standards.md`, `references/anti-patterns.md`.
+- **Anti-pattern gate:** Blocks AP-1 (vague task), AP-4 (unscrubbed PII), AP-26 (no scope boundary), and AP-28 (no stop condition).
 
----
+## 1. Intent (9 Dimensions)
 
-## 1. Structured JSON Logging and Context Enrichment
+| #   | Dimension        | Value                                                                                          |
+| --- | ---------------- | ---------------------------------------------------------------------------------------------- |
+| 1   | Task             | Produce instrumentation plans with logs, traces, metrics, alerts, and scrubbing.               |
+| 2   | Target Tool      | OpenTelemetry, Prometheus, structured loggers, alert managers.                                 |
+| 3   | Output Format    | Observability plan with signal specs, SLO alerts, and scrub rules.                             |
+| 4   | Constraints      | JSON logs with trace ids. Cardinality capped. Zero em dashes. PII scrubbed.                    |
+| 5   | Input            | Service inventory, SLO targets, compliance needs, incident history.                             |
+| 6   | Context          | Prevents blind services, alert fatigue, and PII-laden telemetry.                                |
+| 7   | Audience         | SREs and backend engineers instrumenting services.                                              |
+| 8   | Success Criteria | Signals complete; alerts actionable; scrub verified; plan approved.                             |
+| 9   | Examples         | See Section 10.                                                                                 |
 
-- Emit all application logs as structured JSON strings to stdout/stderr; avoid plain unstructured text formatting in production environments.
-- Include standard envelope fields on every log entry: `timestamp` (ISO 8601 UTC), `level` (DEBUG, INFO, WARN, ERROR, FATAL), `service`, `environment`, and `trace_id`.
-- Enrich log context with relevant request identity attributes: `user_id`, `tenant_id`, `request_id`, and `http_method`.
-- Use appropriate log levels accurately: INFO for key business state events; WARN for recoverable operational issues; ERROR for actionable request failures.
-- Avoid logging inside high-frequency hot loops to prevent log buffer congestion and storage cost inflation.
+## 2. Trigger Matrix
 
----
+| Trigger                                      | Fire? | Notes                              |
+| -------------------------------------------- | ----- | ---------------------------------- |
+| "Instrument our services end to end"         | YES   | Core trigger.                      |
+| "Fix alert fatigue and noisy pages"          | YES   | Core trigger.                      |
+| "/observability-telemetry"                   | YES   | Slash command trigger.             |
+| "Design our vendor dashboards"               | NO    | Out of scope for this skill.       |
+| "Set our pager rotation"                     | NO    | Out of scope for this skill.       |
 
-## 2. Distributed Tracing and Context Propagation
+## 3. Execution Workflow
 
-- Instrument distributed tracing across all service entrypoints, outgoing HTTP requests, message queues, and database calls.
-- Propagate trace headers (W3C Trace Context `traceparent` and `tracestate`) across HTTP request headers and asynchronous message envelopes.
-- Maintain trace continuity: pass `trace_id` and `span_id` downstream through worker queues and external RPC calls.
-- Annotate spans with high-value domain attributes (`db.statement`, `http.status_code`, `rpc.method`) while avoiding unbounded cardinality attributes.
+### Step 1: Structure Logs and Traces
 
----
+- **Action:** Emit JSON logs with envelope fields plus trace ids, propagate W3C context across HTTP and queues, and annotate spans with bounded domain attributes.
+- **Input:** Service inventory from user.
+- **Stop Condition:** Halt when trace continuity breaks at queue boundaries.
+- **Validation:** Sample traces reviewed end to end.
 
-## 3. Metric Instrumentation and Framework Alignment
+### Step 2: Instrument Metrics with Caps
 
-- Instrument applications using standard metric types: Counters (monotonically increasing), Gauges (point-in-time state), and Histograms (distribution buckets).
-- Apply the RED method for request-driven services: Rate (requests/sec), Errors (failed requests/sec), and Duration (latency distribution).
-- Apply the USE method for infrastructure resources: Utilization (% busy), Saturation (queue depth), and Errors (fault counts).
-- Control metric cardinality strictly: never attach unbounded values (user IDs, emails, unique UUIDs, raw URLs with IDs) as metric label keys.
+- **Action:** Apply RED for request services and USE for resources with standard counter, gauge, and histogram types. Cap cardinality by banning unbounded label values.
+- **Input:** SLO targets from user.
+- **Stop Condition:** Halt on user-id or raw-URL labels; require removal.
+- **Validation:** Metric catalog reviewed with cardinality audit.
 
----
+### Step 3: Alert on Symptoms and Scrub Streams
 
-## 4. OpenTelemetry Standard Standardization
+- **Action:** Page on SLO burn with runbook links, ticket the rest, and scrub PII and credentials at framework level before emission.
+- **Input:** Incident history and compliance needs.
+- **Stop Condition:** Halt when alerts lack runbooks or streams carry PII.
+- **Validation:** Alert list reviewed with scrub verification.
 
-- Adopt OpenTelemetry (OTel) standards for vendor-neutral collection of traces, metrics, and logs.
-- Export telemetry data using OpenTelemetry Protocol (OTLP) to local OTel Collectors or telemetry agents.
-- Standardize semantic conventions across microservices following OpenTelemetry service and attribute naming specifications.
+### Step 4: Handoff and Human Review
 
----
+- **Action:** Present the plan and request approval before wiring.
+- **Input:** Completed plan.
+- **Stop Condition:** Await user approval.
+- **Validation:** Approval recorded; zero wiring performed by this skill.
 
-## 5. Alert Design and Noise Elimination
+## 4. Output Specification
 
-- Base alerts on actionable, customer-impacting Symptom-Based Service Level Indicators (SLIs) and Service Level Objectives (SLOs) rather than transient CPU blips.
-- Establish distinct alert severity levels: Page (requires immediate human response outside business hours) vs Ticket (requires next-business-day investigation).
-- Enforce runbook link requirements: every alert message must include a link to its corresponding troubleshooting runbook.
-- Continuously review and eliminate false-positive alerts to prevent on-call engineer fatigue.
+```markdown
+# Observability Plan
 
----
+- **Logs:** [JSON envelope with trace ids]
+- **Metrics:** [RED and USE catalog]
+- **Alerts:** [SLO pages with runbooks]
+- **Scrub:** [PII rules verified]
+```
 
-## 6. Data Privacy and Sensitive Telemetry Scrubbing
+## 5. Validation Gate
 
-- Sanitize all telemetry streams automatically to strip Personally Identifiable Information (PII), credentials, API keys, and credit card tokens.
-- Apply log redaction filters at the application framework level before writing to output streams.
-- Hash or mask sensitive user identifiers before emitting telemetry attributes.
+- [ ] Traces continuous across boundaries.
+- [ ] Cardinality capped per metric.
+- [ ] Alerts carry runbook links.
+- [ ] Zero em dashes in deliverable.
+- [ ] Human approval recorded before wiring.
 
-## Anti-Patterns
+## 6. Anti-Triggers and Calibration
 
-- **AP-1 (Vague task scope):** Implementing features without concrete, testable boundary contracts.
-- **AP-4 (Over-permissive agent execution):** Modifying underlying runtime configs or database structures without validation.
-- **AP-28 (No stop condition):** Unbounded refactoring loops that drift beyond defined domain requirements.
+- **Under-execution threshold:** Shipping services without trace ids.
+- **Over-execution threshold:** Wiring collectors unprompted.
+- **Calibration default:** Symptom alerts first; infra signals second.
 
-## Best Practices
+## 7. Anti-Pattern Compliance
 
-- Adhere to the core principles defined in this skill on every execution.
-- Maintain test-first validation before committing changes.
-- Keep module boundaries flat and avoid unnecessary indirection layers.
+| Step | Prevents AP            | Mechanism                                           |
+| ---- | ---------------------- | --------------------------------------------------- |
+| 1    | AP-1 (vague task)      | Requires service inventory first.                   |
+| 2    | AP-26 (no scope)       | Caps cardinality per metric.                        |
+| 3    | AP-44 (leaked secrets) | Scrubs PII before emission.                         |
+| 4    | AP-45 (no human review)| Halts for approval before wiring.                   |
 
-## Related Skills
+## 8. Versioning & Changelog
 
-- `clean-architecture`
-- `module-organization`
-- `writing-rules`
+- **Version:** 2.0.0
+- **Changelog:**
+  - `2.0.0` (2026-09-26) - Tier-5 conversion with Telemetry Auditor role, role source, and seniority bar.
+  - `1.0.0` - Legacy observability baseline.
+
+## 9. Portability Matrix
+
+| Runtime     | Status   | Notes                           |
+| ----------- | -------- | ------------------------------- |
+| Claude Code | verified | Direct slash command execution. |
+| Cursor      | verified | Rules and prompt loading.       |
+| Copilot     | verified | Custom instructions support.    |
+| Windsurf    | verified | Cascade flow integration.       |
+| Kiro        | verified | Steering model execution.       |
+| Cline       | verified | Task step-by-step flow.         |
+| Raw API     | verified | Model-agnostic execution.       |
+
+## 10. Examples
+
+**Input:** "Our pages fire on CPU blips and logs carry emails."
+**Output:** Plan with SLO burn alerts, cardinality-capped metrics, and framework-level PII scrubbing.

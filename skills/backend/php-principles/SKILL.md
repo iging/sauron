@@ -1,103 +1,138 @@
 ---
 name: php-principles
-description: Reusable, deterministic modern PHP (PHP 8.x, PSRs) architecture constraints, strict typing rules, security standards, and performance patterns.
-origin: sauron
+description: Modern PHP 8.x engineering rules covering strict typing, PSR architecture, security hardening, error discipline, and static analysis gates. Excludes frontend UI builds.
 department: backend
+ownerAgent: frodo
+triggerCommand: /php-principles
+antiPatternsPrevented:
+  - AP-1
+  - AP-4
+  - AP-6
+  - AP-26
+  - AP-28
 ---
 
-# Shared PHP Principles
+# PHP Principles
 
 ## 0. Identity
 
-- **Role:** Backend Engineering Specialist.
-- **Authority:** Enforces backend architectural boundaries and runtime safety.
+- **Role:** Service Builder. Owns type-safe PHP implementation with security hardening inside scoped files.
+- **Role source:** Appendix A of `skills/_template/skill-name/SKILL.md` (Service Builder).
+- **Seniority bar:** Staff (Appendix B).
+- **Authority:** Tier-5 normative skill for `skills/backend/php-principles/`. Owns typing, architecture, and security guidance.
 - **Must not define:** Frontend UI layout or client-side hydration routines.
 - **Normative base:** `core/fellowship/frodo.md`, `rules/engineering/architecture-boundaries.md`, `rules/common/code-style-standards.md`, `references/anti-patterns.md`.
+- **Anti-pattern gate:** Blocks AP-1 (vague task), AP-4 (over-permissive execution), AP-26 (no scope boundary), and AP-28 (no stop condition).
+- **Staff judgment:** Records why strict types plus static analysis beat dynamic convenience (entire bug classes die at CI time, rejected untyped velocity), why constructor injection beats facades in domain code (testability over brevity), and why prepared statements plus Argon2id are non-negotiable floors rather than aspirations.
 
-## When to Activate
+## 1. Intent (9 Dimensions)
 
-- When creating, modifying, or reviewing code and architecture related to shared php principles.
-- When enforcing deterministic engineering standards and eliminating unverified code patterns.
-- When resolving architectural design questions or quality bottlenecks.
+| #   | Dimension        | Value                                                                                 |
+| --- | ---------------- | ------------------------------------------------------------------------------------- |
+| 1   | Task             | Produce strictly typed, PSR-conformant PHP with security floors and analysis gates.   |
+| 2   | Target Tool      | Any agent runtime: Claude Code, Cursor, Copilot, Windsurf, Kiro, Cline, raw API.      |
+| 3   | Output Format    | Implementation plan with typing, architecture, security, and gate notes.              |
+| 4   | Constraints      | Strict types first line. PHPStan level 8 clean. Zero em dashes. No dynamic execution. |
+| 5   | Input            | Feature spec, domain model, threat surface, performance needs.                        |
+| 6   | Context          | Prevents untyped legacy sprawl and injection-class vulnerabilities.                   |
+| 7   | Audience         | Backend engineers shipping modern PHP 8.x codebases.                                  |
+| 8   | Success Criteria | Types complete; security floors met; analysis green; plan approved before coding.     |
+| 9   | Examples         | See Section 10.                                                                       |
 
-## Core Concepts
+## 2. Trigger Matrix
 
-> **Purpose:** Reusable, deterministic modern PHP (PHP 8.x, PSRs) architecture constraints, strict typing rules, security standards, and performance patterns for any prompt generating or modifying PHP codebases. Reference this file from your prompt to enforce strict software engineering paradigms, type safety, and defensive security.
+| Trigger                     | Fire? | Notes                             |
+| --------------------------- | ----- | --------------------------------- |
+| "Build this feature in PHP" | YES   | Core trigger.                     |
+| "Harden this PHP codebase"  | YES   | Core trigger.                     |
+| "/php-principles"           | YES   | Slash command trigger.            |
+| "Build a Vue SPA client"    | NO    | Out of scope for this skill.      |
+| "Administer our servers"    | NO    | Out of scope; ops runbook needed. |
 
----
+## 3. Execution Workflow
 
-## 1. Modern Language Features and Strict Typing (Hard Rules)
+### Step 1: Enforce Strict Typing
 
-Apply these rules strictly to all PHP file creation and modification to enforce runtime type safety and leverage modern PHP capabilities.
+- **Action:** Open every file with strict types, annotate all signatures with union, intersection, and nullable types, model DTOs as readonly classes, prefer backed enums over constants, and use match expressions over switch nests.
+- **Input:** Feature spec and domain model.
+- **Stop Condition:** Halt when untyped signatures appear; require annotations.
+- **Validation:** Typing audit complete with PHPStan level 8 target.
 
-- **Strict Type Declaration:** `declare(strict_types=1);` MUST be the first statement in every PHP file immediately after the opening `<?php` tag.
-- **Explicit Type Annotations:** All function parameters, return types, and class properties MUST have explicit scalar or class/interface types. Omission of type declarations is strictly BANNED. Use native Union types (`int|float`), Intersection types (`Countable&ArrayAccess`), Nullable types (`?string`), or Disjunctive Normal Form (DNF) types (`(A&B)|C`).
-- **Immutability & DTOs:** Use `readonly` classes or `readonly` properties for Data Transfer Objects (DTOs) and Value Objects to guarantee immutability after initialization.
-- **Enums over Magic Constants:** Use backed Enums (`enum OrderStatus: string`) instead of class constants or string/integer literals for fixed options or state flags.
-- **Modern Control Flow:** Use `match` expressions instead of `switch` statements or nested `if/else` checks for value mapping and strict type comparison.
-- **Constructor Property Promotion:** Use constructor promotion to declare and initialize class properties directly in the constructor signature, eliminating boilerplate property declarations.
-- **Property Hooks & Asymmetric Visibility:** In PHP 8.4+ environments, leverage Property Hooks (`get => ...; set => ...;`) and Asymmetric Visibility (`public private(set) string $id;`) to expose readable state safely without writing redundant getter boilerplate.
+### Step 2: Structure by Domain
 
----
+- **Action:** Follow PSR-12 and PER formatting with PSR-4 autoloading, inject dependencies through constructors, ban superglobals and extract in application logic, group by feature domains, and default concrete classes to final.
+- **Input:** Architecture needs from Step 1.
+- **Stop Condition:** Halt when globals or direct instantiations appear in domain code.
+- **Validation:** Architecture review complete per boundary.
 
-## 2. Code Architecture, PSR Standards, and SOLID Design
+### Step 3: Harden Security and Errors
 
-- **PSR-12 / PER Coding Standard:** Follow PSR-12 and PER CS guidelines strictly for formatting, single-space indentation, visibility modifiers (`public`, `protected`, `private`), and placement of braces.
-- **PSR-4 Autoloading:** All classes MUST follow PSR-4 folder structure and namespace mapping under the `src/` directory.
-- **Dependency Injection:** Use constructor dependency injection via interfaces (compatible with PSR-11 containers). Business logic MUST NOT instantiate concrete service dependencies directly (`new Service()`).
-- **No Global State:** Global variables (`global $var`), raw superglobals (`$_GET`, `$_POST`, `$_SERVER`, `$_SESSION`) inside application logic, and mutable singletons are strictly BANNED. Encapsulate HTTP requests in PSR-7 `ServerRequestInterface` or framework request objects.
-- **Ban on Scope-Polluting Functions:** Use of `extract()` is strictly BANNED because it injects dynamic variables into local scope and bypasses static analysis.
-- **Feature-First Domain Architecture:** Group code by domain or feature (for example `src/Domain/User/`) rather than technical type folders (`src/Controllers/`, `src/Models/`).
-- **Final Classes by Default:** Domain services, DTOs, and concrete implementations MUST be declared `final` by default unless explicitly designed for inheritance or extension, preventing fragile base class anti-patterns.
+- **Action:** Parameterize all SQL, escape all HTML output, hash passwords with Argon2id or Bcrypt, ban eval and shell execution, validate at boundaries with typed DTOs, verify CSRF tokens, and throw domain exceptions with redacted structured logs.
+- **Input:** Threat surface from user.
+- **Stop Condition:** Halt when any security floor stays unmet; mark as blocking.
+- **Validation:** Security checklist reviewed per surface.
 
----
+### Step 4: Gate Performance and Handoff
 
-## 3. Security and Input Validation
+- **Action:** Stream large sets with generators, eager-load relations, keep OPcache-compatible constructs, then present the plan for approval.
+- **Input:** Performance needs and test strategy.
+- **Stop Condition:** Await user approval.
+- **Validation:** Approval recorded; zero code written by this skill.
 
-- **Prepared Statements Mandatory:** Direct variable interpolation or string concatenation inside raw SQL queries is strictly BANNED. You MUST use PDO prepared statements with parameter binding or safe query builders.
-- **Context-Aware Escaping:** All output rendered to HTML MUST be escaped using `htmlspecialchars($data, ENT_QUOTES | ENT_SUBSTITUTE, 'UTF-8')` or template engine auto-escaping (Blade/Twig).
-- **Password Hashing:** Passwords MUST be hashed using `password_hash()` with `PASSWORD_ARGON2ID` or `PASSWORD_BCRYPT`. Legacy hashing functions (`md5`, `sha1`, `crypt`) are strictly BANNED.
-- **Ban on Unsafe Code and Shell Execution:** Use of `eval()`, `create_function()`, `exec()`, `shell_exec()`, `system()`, `passthru()`, or shell backtick operators (`` `command` ``) is strictly BANNED for web applications to prevent remote code execution vulnerabilities.
-- **Strict Boundary Validation:** Validate and sanitize all external data at API or web boundaries using typed DTOs, request validation schemas, or assertion libraries before passing data to domain services.
-- **CSRF Protection & Secure Cookies:** All state-modifying endpoints (POST, PUT, DELETE, PATCH) MUST enforce anti-CSRF token verification. Session cookies MUST explicitly set `SameSite=Lax` or `Strict`, `Secure`, and `HttpOnly` flags.
+## 4. Output Specification
 
----
+```markdown
+# PHP Plan
 
-## 4. Error Handling and Logging
+- **Typing:** [Strictness with analysis target]
+- **Architecture:** [Domain grouping with DI notes]
+- **Security:** [Floors per surface]
+- **Performance:** [Streaming and cache notes]
+```
 
-- **No Error Suppression:** The `@` error suppression operator is strictly BANNED.
-- **Domain-Specific Exceptions:** Throw explicit domain exceptions (for example `UserNotFoundException`) extending SPL exception types (`InvalidArgumentException`, `RuntimeException`). Never throw generic `\Exception` or return error status arrays.
-- **Structured Logging:** Log exceptional states using PSR-3 compliant loggers (`LoggerInterface`) with context arrays. Sensitive data (passwords, auth tokens, PII) MUST be redacted before logging.
+## 5. Validation Gate
 
----
+- [ ] Strict types enforced per file.
+- [ ] Domain grouped by feature.
+- [ ] Security floors met per surface.
+- [ ] Zero em dashes in deliverable.
+- [ ] Human approval recorded before coding.
 
-## 5. Performance and Memory Management
+## 6. Anti-Triggers and Calibration
 
-- **Generators for Streaming:** Use Generators (`yield`) when iterating through large data sets, file streams, or database cursors to maintain low memory footprints.
-- **N+1 Query Prevention:** Always eager-load ORM relations (for example `with()`) before iterating over model collections.
-- **OPcache & JIT Compatibility:** Avoid dynamic execution constructs (`eval()`, dynamic variable variable names `$$var`) that prevent OPcache optimization.
+- **Under-execution threshold:** Shipping untyped code with dynamic shortcuts.
+- **Over-execution threshold:** Rewriting working systems unprompted.
+- **Calibration default:** Strictness first; velocity follows.
 
----
+## 7. Anti-Pattern Compliance
 
-## 6. Static Analysis and Automated Testing
+| Step | Prevents AP             | Mechanism                             |
+| ---- | ----------------------- | ------------------------------------- |
+| 1    | AP-1 (vague task)       | Requires typing audit first.          |
+| 2    | AP-26 (no scope)        | Groups code by domain boundary.       |
+| 3    | AP-4 (over-permissive)  | Enforces security floors per surface. |
+| 4    | AP-45 (no human review) | Halts for approval before coding.     |
 
-- **Static Analysis Gate:** Code must pass PHPStan at Level 8 (or Psalm equivalent) with zero type errors.
-- **Automated Testing:** Write isolated unit and integration tests using Pest PHP or PHPUnit. Tests MUST be deterministic and mock external I/O boundaries.
+## 8. Versioning & Changelog
 
-## Anti-Patterns
+- **Version:** 2.0.0
+- **Changelog:**
+  - `2.0.0` (2026-09-26) - Tier-5 conversion with Service Builder role and Staff trade-off records.
+  - `1.0.0` - Legacy shared principles baseline.
 
-- **AP-1 (Vague task scope):** Implementing features without concrete, testable boundary contracts.
-- **AP-4 (Over-permissive agent execution):** Modifying underlying runtime configs or database structures without validation.
-- **AP-28 (No stop condition):** Unbounded refactoring loops that drift beyond defined domain requirements.
+## 9. Portability Matrix
 
-## Best Practices
+| Runtime     | Status   | Notes                           |
+| ----------- | -------- | ------------------------------- |
+| Claude Code | verified | Direct slash command execution. |
+| Cursor      | verified | Rules and prompt loading.       |
+| Copilot     | verified | Custom instructions support.    |
+| Windsurf    | verified | Cascade flow integration.       |
+| Kiro        | verified | Steering model execution.       |
+| Cline       | verified | Task step-by-step flow.         |
+| Raw API     | verified | Model-agnostic execution.       |
 
-- Adhere to the core principles defined in this skill on every execution.
-- Maintain test-first validation before committing changes.
-- Keep module boundaries flat and avoid unnecessary indirection layers.
+## 10. Examples
 
-## Related Skills
-
-- `clean-architecture`
-- `module-organization`
-- `writing-rules`
+**Input:** "Harden our PHP billing module and add tests."
+**Output:** Plan with typed DTO boundaries, parameterized queries, Argon2id hashing, and Pest specs on isolated databases.

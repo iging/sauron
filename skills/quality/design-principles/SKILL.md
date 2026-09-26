@@ -1,82 +1,135 @@
 ---
 name: design-principles
 description: Structural design axioms for application code covering SOLID, composition over inheritance, DRY, KISS, YAGNI, AHA, Law of Demeter, and object-data duality.
-origin: sauron
 department: quality
+ownerAgent: aragorn
+triggerCommand: /design-principles
+antiPatternsPrevented:
+  - AP-1
+  - AP-6
+  - AP-26
+  - AP-28
 ---
 
 # Design Principles
 
-## When to Activate
+## 0. Identity
 
-- When creating, modifying, or reviewing code and architecture related to design principles.
-- When enforcing deterministic engineering standards and eliminating unverified code patterns.
-- When resolving architectural design questions or quality bottlenecks.
+- **Role:** System Architect. Owns structural axiom enforcement with rent-paying abstractions.
+- **Role source:** Appendix A of `skills/_template/skill-name/SKILL.md` (System Architect).
+- **Seniority bar:** Staff (Appendix B). Records why SRP beats DRY in conflicts (one owner beats shared coupling, rejected clever sharing), why mild duplication beats wrong abstractions (cheap to carry, rejected premature coupling), and why every abstraction pays rent or gets deleted.
+- **Authority:** Tier-5 normative skill for structural design across repositories under `skills/quality/design-principles/`.
+- **Must not define:** Product backlog rankings or marketing requirements.
+- **Normative base:** `core/fellowship/aragorn.md`, `rules/engineering/architecture-boundaries.md`, `rules/common/code-style-standards.md`, `references/anti-patterns.md`.
+- **Anti-pattern gate:** Blocks AP-1 (vague task), AP-26 (no scope boundary), and AP-28 (no stop condition).
 
-## Core Concepts
+## 1. Intent (9 Dimensions)
 
-> **Purpose:** Classical structural heuristics governing abstraction decisions in any codebase. Reference this file when designing modules, components, or class hierarchies so structure decisions stay principled instead of accidental.
+| #   | Dimension        | Value                                                                                          |
+| --- | ---------------- | ---------------------------------------------------------------------------------------------- |
+| 1   | Task             | Apply structural axioms to modules, components, and hierarchies with explicit trade-offs.       |
+| 2   | Target Tool      | Any agent runtime: Claude Code, Cursor, Copilot, Windsurf, Kiro, Cline, raw API.                |
+| 3   | Output Format    | Design review with axiom verdicts and abstraction rent audit.                                   |
+| 4   | Constraints      | Axioms cited per decision. Abstractions pay rent. Zero em dashes.                              |
+| 5   | Input            | Modules, components, or hierarchies under review.                                               |
+| 6   | Context          | Prevents accidental structure that accrues abstraction debt.                                    |
+| 7   | Audience         | Engineers designing modules and class hierarchies.                                              |
+| 8   | Success Criteria | Decisions principled; abstractions justified; plan approved.                                     |
+| 9   | Examples         | See Section 10.                                                                                 |
 
----
+## 2. Trigger Matrix
 
-## 1. SOLID Principles Application
+| Trigger                                      | Fire? | Notes                              |
+| -------------------------------------------- | ----- | ---------------------------------- |
+| "Review this module structure"               | YES   | Core trigger.                      |
+| "Settle this abstraction debate"             | YES   | Core trigger.                      |
+| "/design-principles"                         | YES   | Slash command trigger.             |
+| "Rank our product backlog"                   | NO    | Out of scope for this skill.       |
+| "Write marketing requirements"               | NO    | Out of scope for this skill.       |
 
-- **Single Responsibility Principle (SRP):** Give each function, class, and component one reason to change. Keep presentation components decoupled from routing, data fetching, and state logic.
-- **Open/Closed Principle (OCP):** Extend behavior through composition or strategy patterns. Do not mutate established core components to add variants.
-- **Liskov Substitution Principle (LSP):** Subtypes and interface implementations must drop into any caller without breaking caller expectations or contracts.
-- **Interface Segregation Principle (ISP):** Prefer small, specific interfaces over bloated multi-purpose interfaces. Consumers depend strictly on members they call.
-- **Dependency Inversion Principle (DIP):** Depend on abstractions (interfaces, abstract contracts, types), not concrete implementations. Pass dependencies into functions or constructors.
-- **Polymorphism over Type Branching:** Replace repeated `switch` or `if` checks on type flags with discriminated unions, pattern matching, or polymorphic dispatch.
+## 3. Execution Workflow
 
----
+### Step 1: Apply SOLID per Decision
 
-## 2. Composition Over Inheritance
+- **Action:** Check single responsibility, extension by composition, substitutability, narrow interfaces, and dependency direction per structure under review.
+- **Input:** Modules from user.
+- **Stop Condition:** Halt when decisions lack cited axioms.
+- **Validation:** Axiom verdicts recorded per decision.
 
-- **Favor Object Composition:** Compose behavior using small, single-purpose objects or functions rather than inheriting from deep class hierarchies.
-- **Avoid Fragile Base Classes:** Deep inheritance binds subclasses tightly to parent implementation details, leading to fragile base class problems and LSP violations.
-- **Strategy & Delegation:** Encapsulate varying algorithms behind strategy interfaces and delegate work to composed dependencies.
+### Step 2: Price Every Abstraction
 
----
+- **Action:** Resolve SRP-versus-DRY toward SRP, prefer duplication over hasty coupling, demand YAGNI evidence for new surface, and audit rent per abstraction.
+- **Input:** Abstraction inventory from Step 1.
+- **Stop Condition:** Halt on speculative features; require current requirements.
+- **Validation:** Rent audit complete with keep-or-delete calls.
 
-## 3. DRY, KISS, YAGNI, and AHA Guidelines
+### Step 3: Bound Data and Behavior
 
-- **DRY (Don't Repeat Yourself) & Rule of Three:** Extract a shared abstraction only after a pattern repeats three distinct times. Premature extraction produces rigid code.
-- **AHA (Avoid Hasty Abstractions):** Prefer mild duplication over the wrong abstraction. Duplication is cheaper than a flawed abstraction that couples unrelated concerns.
-- **KISS (Keep It Simple):** Prefer the least complex design satisfying requirements. Avoid premature optimization, over-engineered abstractions, and unnecessary indirection layers.
-- **YAGNI (You Aren't Gonna Need It):** Build strictly what current requirements demand. Do not add features on speculation about future needs. Defer a capability until an explicit requirement triggers it.
+- **Action:** Enforce Demeter call limits, tell-don't-ask commands, true encapsulation, data-or-object purity, and pure cores with imperative shells.
+- **Input:** Type inventory from Step 2.
+- **Stop Condition:** Halt on anemic hybrids; require splits.
+- **Validation:** Boundary review complete per type.
 
----
+### Step 4: Handoff and Human Review
 
-## 4. Applying These Together
+- **Action:** Present the review and request approval before refactoring.
+- **Input:** Completed review.
+- **Stop Condition:** Await user approval.
+- **Validation:** Approval recorded; zero refactors performed by this skill.
 
-- When SRP and DRY conflict, resolve toward SRP first. A small duplicated block with one clear owner beats a shared abstraction with two reasons to change.
-- Treat every abstraction as a debt instrument. Each abstraction must pay rent through reduced duplication, isolated change, or simplified reasoning. Delete abstractions failing this test during refactoring passes.
-- Reject any feature lacking a current requirement regardless of its expected future value. Speculative features create maintenance cost before creating value.
+## 4. Output Specification
 
----
+```markdown
+# Design Review
 
-## 5. Data, Behavior, and Boundary Architecture
+- **Verdicts:** [Axiom per decision]
+- **Abstractions:** [Rent audit]
+- **Boundaries:** [Data and behavior notes]
+```
 
-- **Law of Demeter:** A method talks only to its own class, objects it creates, objects passed as arguments, and objects it holds as fields. Never chain calls through objects returned by other calls.
-- **Tell, Don't Ask:** Command objects to perform actions rather than querying internal state to make decisions outside the object.
-- **Encapsulation Has a Purpose:** Private state preserves freedom to change implementation representations later. Exposing fields through automatic getters/setters cancels that freedom.
-- **No Anemic Hybrids:** A type is either a plain data structure exposing shape OR an object hiding shape behind behavior: never both. Split mixed types along their axis of change.
-- **Functional Core, Imperative Shell:** Keep business logic pure and deterministic at the core. Push side effects (I/O, database access, external APIs) to system boundaries.
+## 5. Validation Gate
 
-## Anti-Patterns
+- [ ] Axioms cited per decision.
+- [ ] Abstractions pay rent or die.
+- [ ] Data and behavior separated.
+- [ ] Zero em dashes in deliverable.
+- [ ] Human approval recorded before refactoring.
 
-- **AP-1 (Vague task scope):** Implementing features without concrete, testable boundary contracts.
-- **AP-4 (Over-permissive agent execution):** Modifying underlying runtime configs or database structures without validation.
-- **AP-28 (No stop condition):** Unbounded refactoring loops that drift beyond defined domain requirements.
+## 6. Anti-Triggers and Calibration
 
-## Best Practices
+- **Under-execution threshold:** Structuring code without cited axioms.
+- **Over-execution threshold:** Refactoring codebases unprompted.
+- **Calibration default:** Simple structures first; abstractions earn entry.
 
-- Adhere to the core principles defined in this skill on every execution.
-- Maintain test-first validation before committing changes.
-- Keep module boundaries flat and avoid unnecessary indirection layers.
+## 7. Anti-Pattern Compliance
 
-## Related Skills
+| Step | Prevents AP            | Mechanism                                           |
+| ---- | ---------------------- | --------------------------------------------------- |
+| 1    | AP-1 (vague task)      | Requires axiom verdicts first.                      |
+| 2    | AP-26 (no scope)       | Prices abstractions explicitly.                     |
+| 3    | AP-28 (no stop)        | Bounds data and behavior.                           |
+| 4    | AP-45 (no human review)| Halts for approval before refactoring.              |
 
-- `clean-architecture`
-- `module-organization`
-- `writing-rules`
+## 8. Versioning & Changelog
+
+- **Version:** 2.0.0
+- **Changelog:**
+  - `2.0.0` (2026-09-26) - Tier-5 conversion with System Architect role, role source, and seniority bar.
+  - `1.0.0` - Legacy axioms baseline.
+
+## 9. Portability Matrix
+
+| Runtime     | Status   | Notes                           |
+| ----------- | -------- | ------------------------------- |
+| Claude Code | verified | Direct slash command execution. |
+| Cursor      | verified | Rules and prompt loading.       |
+| Copilot     | verified | Custom instructions support.    |
+| Windsurf    | verified | Cascade flow integration.       |
+| Kiro        | verified | Steering model execution.       |
+| Cline       | verified | Task step-by-step flow.         |
+| Raw API     | verified | Model-agnostic execution.       |
+
+## 10. Examples
+
+**Input:** "Should we abstract these three similar flows?"
+**Output:** Review settling on duplication until the third repeat, with rent audit scheduled.

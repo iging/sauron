@@ -16,7 +16,10 @@ antiPatternsPrevented:
 
 ## 0. Identity
 
-- **Role:** Codebase Intelligence and Dependency Cartographer. Extracts deterministic AST relationships, maps module fan-in and fan-out, identifies god nodes and circular dependencies, and provides interactive visual navigation.
+- **Role:** Retrieval Architect. Owns index topology and query routing over AST dependency graphs for token-efficient navigation.
+- **Role source:** Appendix A of `skills/_template/skill-name/SKILL.md` (Retrieval Architect).
+- **Seniority bar:** Staff (Appendix B).
+- **Staff judgment:** Records why graph-index navigation beats full-file context dumps (deterministic fan-in and fan-out at fractions of the token cost, rejected whole-repo scans) and why god-node detection precedes refactoring.
 - **Authority:** Tier-4 operational skill within `skills/architecture/codebase-knowledge-graph/` under System Architect supervision (`core/fellowship/aragorn.md`).
 - **Must not define:** Runtime production business logic or database schemas.
 - **Normative base:** `core/fellowship/aragorn.md`, `rules/engineering/architecture-boundaries.md`, `references/anti-patterns.md`.

@@ -1,78 +1,135 @@
 ---
 name: html-css-principles
-description: Reusable, deterministic semantic HTML and CSS architecture constraints for generating robust frontend interfaces.
-origin: sauron
+description: Semantic HTML and modern CSS architecture rules covering native elements, cascade layers, container queries, and interaction primitives. Excludes JavaScript frameworks.
 department: frontend
+ownerAgent: legolas
+triggerCommand: /html-css-principles
+antiPatternsPrevented:
+  - AP-1
+  - AP-6
+  - AP-26
+  - AP-28
 ---
 
-# Shared HTML/CSS Principles
+# HTML CSS Principles
 
-## When to Activate
+## 0. Identity
 
-- When creating, modifying, or reviewing code and architecture related to shared html/css principles.
-- When enforcing deterministic engineering standards and eliminating unverified code patterns.
-- When resolving architectural design questions or quality bottlenecks.
+- **Role:** Interface Builder. Owns markup semantics and style architecture for robust interfaces.
+- **Role source:** Appendix A of `skills/_template/skill-name/SKILL.md` (Interface Builder).
+- **Seniority bar:** Staff (Appendix B). Records why native elements beat div-soup (free accessibility and AI parseability, rejected custom re-implementations), why cascade layers beat important flags (ordered priority, rejected specificity wars), and why container queries beat viewport queries for components.
+- **Authority:** Tier-5 normative skill for `skills/frontend/html-css-principles/`. Owns markup and style guidance.
+- **Must not define:** JavaScript framework internals.
+- **Normative base:** `core/fellowship/legolas.md`, `rules/engineering/architecture-boundaries.md`, `rules/common/code-style-standards.md`, `references/anti-patterns.md`.
+- **Anti-pattern gate:** Blocks AP-1 (vague task), AP-26 (no scope boundary), and AP-28 (no stop condition).
 
-## Core Concepts
+## 1. Intent (9 Dimensions)
 
-> **Purpose:** Reusable, deterministic semantic HTML and CSS architecture constraints. Reference this file from your prompt to enforce strict machine-readable markup and scalable CSS design.
+| #   | Dimension        | Value                                                                                          |
+| --- | ---------------- | ---------------------------------------------------------------------------------------------- |
+| 1   | Task             | Produce semantic markup with layered, responsive, interactive styles.                           |
+| 2   | Target Tool      | Any agent runtime: Claude Code, Cursor, Copilot, Windsurf, Kiro, Cline, raw API.                |
+| 3   | Output Format    | Markup plan with semantics, layers, layout, and interaction notes.                             |
+| 4   | Constraints      | Native elements first. No important flags. Zero em dashes. Focus visible always.                |
+| 5   | Input            | Page structure, responsive needs, interaction list.                                             |
+| 6   | Context          | Prevents div-soup, specificity wars, and layout shift regressions.                              |
+| 7   | Audience         | Frontend engineers writing markup and styles.                                                   |
+| 8   | Success Criteria | Semantics valid; layers ordered; plan approved before coding.                                   |
+| 9   | Examples         | See Section 10.                                                                                 |
 
----
+## 2. Trigger Matrix
 
-## 1. Semantic HTML, Native Controls, and AI Readability
+| Trigger                                      | Fire? | Notes                              |
+| -------------------------------------------- | ----- | ---------------------------------- |
+| "Fix our div-soup markup"                    | YES   | Core trigger.                      |
+| "Stabilize our CSS specificity"              | YES   | Core trigger.                      |
+| "/html-css-principles"                       | YES   | Slash command trigger.             |
+| "Build a React component system"             | NO    | Route to `react-principles`.       |
+| "Write JavaScript business logic"            | NO    | Out of scope for this skill.       |
 
-Apply these rules strictly to ensure the Document Object Model (DOM) is parseable by screen readers and AI agents.
+## 3. Execution Workflow
 
-- **Native First:** Enforce native HTML5 sectioning elements (`<article>`, `<section>`, `<nav>`, `<aside>`, `<main>`). Do not use `<div>` or `<span>` for structural layout boundaries.
-- **Strict Heading Hierarchy:** Enforce strict sequential order (`<h1>` through `<h6>`). Never skip heading levels for visual formatting. Use CSS exclusively for font sizing.
-- **Native Dialogs and Interactivity:** Use native `<dialog>` for modals (calling `.showModal()` for automatic focus trapping) and `<details>`/`<summary>` for accordions. Do not re-implement accessible dialog or disclosure patterns in JavaScript when native elements exist.
-- **Form Semantics:** Mandate `<label>` elements linked to native inputs through `for` attributes matching input `id` attributes, or by wrapping inputs inside labels. Avoid custom pseudo-inputs unless required for complex custom controls.
-- **Layout Stability and Media CLS Guardrails:** Reserve layout space for images and media by specifying explicit `width` and `height` attributes or setting `aspect-ratio` in CSS to prevent Cumulative Layout Shift (CLS).
-- **Document Foundation:** Place exactly one `<main>` tag per page to identify the primary content payload.
+### Step 1: Semantify Markup
 
----
+- **Action:** Replace structural divs with sectioning elements, enforce heading order, use native dialog and details elements, wire labels to inputs, and reserve media space against layout shifts.
+- **Input:** Page structure from user.
+- **Stop Condition:** Halt when interactive divs lack native replacements with reasons.
+- **Validation:** Markup audit complete per page region.
 
-## 2. Modern CSS Architecture
+### Step 2: Layer and Scope Styles
 
-Apply these rules to eliminate specificity conflicts and prevent style regressions in large codebases.
+- **Action:** Order cascade layers explicitly, ban important flags, scope components with modules or utilities, and keep globals to tokens plus resets.
+- **Input:** Stylesheet inventory from Step 1.
+- **Stop Condition:** Halt on important flags; require layer ordering.
+- **Validation:** Layer map reviewed with scope notes.
 
-- **Cascade Layers:** Enforce the CSS `@layer` directive (for example `reset`, `base`, `components`, `utilities`) to explicitly manage style priority across the cascade.
-- **Ban `!important`:** The `!important` flag is strictly BANNED. Resolve conflicts using proper `@layer` ordering or increased selector specificity.
-- **Component Scoping:** Mandate component-level scoping using CSS Modules or utility-first frameworks (for example Tailwind CSS v4 `@theme`). Global CSS stylesheets, excluding root custom properties and resets, are BANNED.
+### Step 3: Lay Out Responsively with Native Interaction
 
----
+- **Action:** Prefer container queries for components, fluid functions for type and space, logical properties for direction support, Grid plus subgrid for pages, and native has, popover, and guarded animations for interaction.
+- **Input:** Responsive needs and interaction list.
+- **Stop Condition:** Halt when focus outlines vanish without replacements.
+- **Validation:** Layout review complete per breakpoint.
 
-## 3. Advanced Layouts, Subgrid, and Responsiveness
+### Step 4: Handoff and Human Review
 
-- **Container Queries:** Require `@container` queries instead of viewport-based `@media` queries for component-level layout shifts. Components remain modular regardless of parent container width.
-- **Fluid Typography and Spacing:** Mandate CSS math functions like `clamp()` for responsive text sizing and fluid spacing. Avoid writing dozens of static breakpoints for minor screen shifts.
-- **Logical Properties:** Replace physical CSS properties (for example `margin-left`, `padding-right`) with logical CSS properties (for example `margin-inline-start`, `padding-inline-end`). This supports internationalization and right-to-left (RTL) rendering automatically.
-- **Modern Layout Modules & CSS Subgrid:** Use CSS Grid for two-dimensional page layouts, Flexbox for one-dimensional component alignment, and **CSS Subgrid** (`grid-template-rows: subgrid`) to align internal card headers, bodies, and footers across multi-column card grids.
+- **Action:** Present the plan and request approval before coding.
+- **Input:** Completed plan.
+- **Stop Condition:** Await user approval.
+- **Validation:** Approval recorded; zero code written by this skill.
 
----
+## 4. Output Specification
 
-## 4. Interactive CSS and Entry Transitions
+```markdown
+# Markup Plan
 
-- **The `:has()` Selector:** Enforce the CSS `:has()` pseudo-class to style parent containers based on child state. Avoid writing JavaScript for basic state-driven visual updates.
-- **Native Interactivity:** Prioritize native HTML/CSS features over importing heavy third-party JavaScript libraries. The Popover API (`popover` attribute with `popovertarget`) is Baseline 2024 and safe across engines.
-- **Entry Transitions (`@starting-style`):** Animate native popover and dialog openings using CSS `@starting-style` and `transition-behavior: allow-discrete` without JavaScript animation libraries.
-- **Feature-Guarded Animations:** Guard scroll-driven animations (`animation-timeline: scroll()` or `view()`) behind `@supports (animation-timeline: scroll())`. They are supported in Chrome (since 115) and Safari (since 26), while other engines are catching up.
-- **Focus Rings:** Enforce distinct focus rings using `:focus-visible` meeting WCAG 2.2 contrast rules. Never suppress focus outlines (`outline: none`) without providing a visible replacement.
+- **Semantics:** [Native element map]
+- **Layers:** [Cascade order with scopes]
+- **Layout:** [Responsive with interaction notes]
+```
 
-## Anti-Patterns
+## 5. Validation Gate
 
-- **AP-1 (Vague task scope):** Implementing features without concrete, testable boundary contracts.
-- **AP-4 (Over-permissive agent execution):** Modifying underlying runtime configs or database structures without validation.
-- **AP-28 (No stop condition):** Unbounded refactoring loops that drift beyond defined domain requirements.
+- [ ] Semantics native per region.
+- [ ] Layers ordered without important.
+- [ ] Focus visible with contrast.
+- [ ] Zero em dashes in deliverable.
+- [ ] Human approval recorded before coding.
 
-## Best Practices
+## 6. Anti-Triggers and Calibration
 
-- Adhere to the core principles defined in this skill on every execution.
-- Maintain test-first validation before committing changes.
-- Keep module boundaries flat and avoid unnecessary indirection layers.
+- **Under-execution threshold:** Styling div-soup without semantic repair.
+- **Over-execution threshold:** Building JS frameworks unprompted.
+- **Calibration default:** Native first; libraries last.
 
-## Related Skills
+## 7. Anti-Pattern Compliance
 
-- `clean-architecture`
-- `module-organization`
-- `writing-rules`
+| Step | Prevents AP            | Mechanism                                           |
+| ---- | ---------------------- | --------------------------------------------------- |
+| 1    | AP-1 (vague task)      | Requires markup audit first.                        |
+| 2    | AP-26 (no scope)       | Orders layers explicitly.                           |
+| 3    | AP-28 (no stop)        | Guards animations with support checks.              |
+| 4    | AP-45 (no human review)| Halts for approval before coding.                   |
+
+## 8. Versioning & Changelog
+
+- **Version:** 2.0.0
+- **Changelog:**
+  - `2.0.0` (2026-09-26) - Tier-5 conversion with Interface Builder role, role source, and seniority bar.
+  - `1.0.0` - Legacy markup baseline.
+
+## 9. Portability Matrix
+
+| Runtime     | Status   | Notes                           |
+| ----------- | -------- | ------------------------------- |
+| Claude Code | verified | Direct slash command execution. |
+| Cursor      | verified | Rules and prompt loading.       |
+| Copilot     | verified | Custom instructions support.    |
+| Windsurf    | verified | Cascade flow integration.       |
+| Kiro        | verified | Steering model execution.       |
+| Cline       | verified | Task step-by-step flow.         |
+| Raw API     | verified | Model-agnostic execution.       |
+
+## 10. Examples
+
+**Input:** "Our pages shift on load and screen readers struggle."
+**Output:** Plan with semantic repairs, reserved media space, layered styles, and focus-visible audit.

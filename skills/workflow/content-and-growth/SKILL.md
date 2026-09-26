@@ -2,7 +2,7 @@
 name: content-and-growth
 description: Root router and lifecycle dispatcher for Tier-5 Content & Growth AI Agent Skills.
 department: workflow
-ownerAgent: samwise
+ownerAgent: gandalf
 triggerCommand: /content-and-growth
 antiPatternsPrevented:
   - AP-1
@@ -14,7 +14,9 @@ antiPatternsPrevented:
 
 ## 0. Identity
 
-- **Role:** Content & Growth Lifecycle Dispatcher.
+- **Role:** Content Strategist. Owns staged growth content lifecycles with audience-mapped outputs.
+- **Role source:** Appendix A of `skills/_template/skill-name/SKILL.md` (Content Strategist).
+- **Seniority bar:** Staff (Appendix B). Records why staged lifecycles beat one-shot dumps (review gates per stage, rejected unreviewed output) and why audience mapping precedes drafting.
 - **Authority:** Tier-5 normative root skill for `skills/content-and-growth/`.
 - **Must not define:** Direct text drafting or visual rendering.
 - **Normative base:** `rules/common/code-style-standards.md`, `references/anti-patterns.md`, `docs/06-safety-and-governance/skill-standard.md`.

@@ -2,7 +2,7 @@
 name: api-design
 description: REST API design patterns including resource naming, HTTP method semantics, status codes, cursor pagination, filtering, rate limiting, versioning, and deterministic error envelopes.
 department: architecture
-ownerAgent: gimli
+ownerAgent: aragorn
 triggerCommand: /api-design
 antiPatternsPrevented:
   - AP-1
@@ -16,7 +16,10 @@ antiPatternsPrevented:
 
 ## 0. Identity
 
-- **Role:** Principal API and Systems Architect. Enforces uniform RESTful standards, semantic HTTP status codes, structured response envelopes, pagination models, and contract versioning lifecycle.
+- **Role:** API Designer. Owns service contracts and versioning policy across REST resources, envelopes, and error shapes.
+- **Role source:** Appendix A of `skills/_template/skill-name/SKILL.md` (API Designer).
+- **Seniority bar:** Staff (Appendix B).
+- **Staff judgment:** Records why cursor pagination beats offset (stable under concurrent writes, rejected offset for deep-page drift) and why versioned contracts beat unversioned evolution (explicit breakage over silent breakage).
 - **Authority:** Normative tier-4 standard for API contract definitions under `skills/architecture/api-design/`.
 - **Must not define:** Client-side React components or direct database migration scripts (see `skills/database/database-migration/`).
 - **Normative base:** `core/fellowship/aragorn.md`, `rules/engineering/architecture-boundaries.md`, `rules/common/code-style-standards.md`, `references/anti-patterns.md`.

@@ -7,18 +7,21 @@ triggerCommand: /testing-principles
 antiPatternsPrevented:
   - AP-1
   - AP-3
+  - AP-6
   - AP-9
   - AP-16
   - AP-18
   - AP-28
 ---
 
-# Testing Principles & Reliability Architecture
+# Testing Principles
 
 ## 0. Identity
 
-- **Role:** Principal Test Architect and Quality Engineer. Governs the testing pyramid, unit test isolation, database transaction rollbacks, Page Object Model (POM) patterns, and automated CI test gates.
-- **Authority:** Normative tier-4 standard for automated testing across repositories under `skills/quality/testing-principles/`.
+- **Role:** Test Strategist. Owns coverage plans matched to risk areas across the testing pyramid.
+- **Role source:** Appendix A of `skills/_template/skill-name/SKILL.md` (Test Strategist).
+- **Seniority bar:** Staff (Appendix B). Records why 70/20/10 allocation beats E2E-heavy suites (fast feedback compounds daily, rejected slow brittle pyramids), why isolation beats shared fixtures (order independence, rejected state bleeding), and why auto-retry beats fixed sleeps.
+- **Authority:** Tier-5 normative skill for automated testing across repositories under `skills/quality/testing-principles/`.
 - **Must not define:** Application UI styles or backend persistence schemas.
 - **Normative base:** `core/fellowship/merry.md`, `rules/engineering/architecture-boundaries.md`, `rules/common/code-style-standards.md`, `references/anti-patterns.md`, `context/core-domains/testing-strategy.md`.
 - **Anti-pattern gate:** Blocks AP-1 (unbounded test suites), AP-9 (declaring success without verification), and AP-16 (leaking shared state between test runs).
@@ -35,7 +38,7 @@ antiPatternsPrevented:
 | 6   | Context          | Prevents flaky builds, untestable monolithic code, regression escapes, and slow CI feedback loops.   |
 | 7   | Audience         | Software development engineers in test (SDET), developers, QA leads, release managers.               |
 | 8   | Success Criteria | 80 percent plus critical path coverage; sub-10ms unit test execution; zero flaky test retries in CI. |
-| 9   | Examples         | See Section 5.                                                                                       |
+| 9   | Examples         | See Section 10.                                                                                       |
 
 ## 2. Trigger Matrix
 
@@ -46,108 +49,89 @@ antiPatternsPrevented:
 | Authoring specific test files or mock fixtures               | NO    | Route to `skills/quality/write-a-test/`.                             |
 | Running formal evaluation harnesses on AI agent transcripts  | NO    | Route to `skills/quality/evaluation-harness-framework/`.             |
 
-## 3. Core Architectural Directives
+## 3. Execution Workflow
 
-1. **The 70/20/10 Testing Pyramid:**
-   - **Unit Tests (70 percent):** Fast, in-memory tests verifying pure domain functions and components in isolation. Zero disk or network I/O.
-   - **Integration Tests (20 percent):** Test interactions between service layers, repositories, and databases. Wrap DB operations in rollback transactions.
-   - **End-to-End Tests (10 percent):** Verify critical user journeys (authentication, checkout) in headless browsers using Playwright.
-2. **Strict Test Isolation:** Each test must run in complete isolation. Never rely on state left behind by a previous test. Use test factories rather than shared global fixtures.
-3. **Arrange-Act-Assert (AAA) Discipline:** Structure test cases into three visible blocks: Arrange (setup), Act (execution), and Assert (verification). Test exactly one logical concept per test case.
-4. **Zero Arbitrary Timeouts:** Never write `page.waitForTimeout(5000)` or `sleep(2)`. Rely on auto-retrying assertions (`await expect(locator).toBeVisible()`) or explicit event responses (`page.waitForResponse(...)`).
-5. **Mock What You Do Not Own:** Mock external third-party APIs (Stripe, Twilio, external OAuth providers). Do not mock internal domain business logic or database repositories in integration tests.
+### Step 1: Allocate the Pyramid
 
-## 4. Execution Workflow
+- **Action:** Assign 70 percent unit (pure, isolated, sub-10ms), 20 percent integration (DB rollbacks, service seams), 10 percent E2E (critical journeys in browsers).
+- **Input:** Feature requirements from user.
+- **Stop Condition:** Halt when suites invert toward E2E-heavy; require rebalancing.
+- **Validation:** Allocation recorded with layer owners.
 
-### Step 1: Layer Assignment
+### Step 2: Isolate Every Test
 
-- **Action:** Classify requirement into Unit, Integration, or E2E layer.
-- **Stop Condition:** Halt if UI components are being spun up to test pure calculation formulas.
-- **Validation:** Test assigned to lowest viable layer in the pyramid.
+- **Action:** Enforce AAA structure with one concept per test, factory-built fixtures, and zero shared state between runs.
+- **Input:** Test inventory from Step 1.
+- **Stop Condition:** Halt on order-dependent tests; require isolation.
+- **Validation:** Isolation audit complete per suite.
 
-### Step 2: Isolation & Data Preparation
+### Step 3: Kill Flakiness at the Source
 
-- **Action:** Formulate localized test data using factory functions.
-- **Validation:** Running test in random order produces identical results.
+- **Action:** Replace fixed waits with auto-retry locators and event responses. Mock unowned externals only; never mock domain logic under test.
+- **Input:** Flake reports from CI.
+- **Stop Condition:** Halt when sleeps persist; require predicates.
+- **Validation:** Zero arbitrary timeouts evidenced by search.
 
-### Step 3: Assertion Verification
+### Step 4: Handoff and Human Review
 
-- **Action:** Verify assertions target user-visible behavior rather than internal private variables.
-- **Validation:** Test fails cleanly when business logic is inverted.
+- **Action:** Present the test architecture and request approval before wiring CI gates.
+- **Input:** Completed architecture.
+- **Stop Condition:** Await user approval.
+- **Validation:** Approval recorded; zero gates wired by this skill.
 
-## 5. Reference Implementation
+## 4. Output Specification
 
-### TypeScript (Isolated Unit Test & Integration Transaction Rollback Pattern)
+```markdown
+# Test Architecture
 
-```typescript
-import { describe, it, expect, beforeEach, afterEach } from "vitest";
-import { OrderService } from "@/services/order.service";
-import { TestDatabase } from "@/tests/test-db";
-
-// UNIT TEST: Pure Domain Logic Isolation
-describe("OrderService Unit Tests", () => {
-  it("calculates total price including discount and sales tax", () => {
-    // Arrange
-    const items = [
-      { productId: "prod-1", quantity: 2, unitPriceCents: 1000 },
-      { productId: "prod-2", quantity: 1, unitPriceCents: 3000 },
-    ];
-    const discountCents = 500;
-    const taxRate = 0.1;
-
-    // Act
-    const total = OrderService.computeTotal({ items, discountCents, taxRate });
-
-    // Assert: (5000 - 500) * 1.10 = 4950
-    expect(total).toBe(4950);
-  });
-});
-
-// INTEGRATION TEST: Database Transaction Rollback Pattern
-describe("OrderRepository Integration Tests", () => {
-  let db: TestDatabase;
-
-  beforeEach(async () => {
-    db = await TestDatabase.startTransaction();
-  });
-
-  afterEach(async () => {
-    await db.rollback(); // Guarantees zero persistent state leakage
-  });
-
-  it("persists order record atomically", async () => {
-    const repo = db.getOrderRepository();
-    const orderId = await repo.createOrder({
-      customerId: "cust-1",
-      totalCents: 4950,
-    });
-
-    const fetched = await repo.findById(orderId);
-    expect(fetched).not.toBeNull();
-    expect(fetched?.totalCents).toBe(4950);
-  });
-});
+- **Pyramid:** [Allocation with owners]
+- **Isolation:** [Factory and state rules]
+- **Gates:** [CI enforcement notes]
 ```
 
-## 6. Validation Gate
+## 5. Validation Gate
 
-Run before accepting test suite changes:
+- [ ] Pyramid allocated 70/20/10.
+- [ ] Tests isolated with factories.
+- [ ] Zero arbitrary timeouts.
+- [ ] Zero em dashes in deliverable.
+- [ ] Human approval recorded before gates.
 
-- [ ] Suite maintains the 70/20/10 pyramid distribution.
-- [ ] Tests execute independently without state bleeding across cases.
-- [ ] Zero arbitrary sleep or timeout statements exist in test files.
-- [ ] UI assertions utilize semantic user-facing locators (`getByRole`).
-- [ ] Integration tests roll back database state upon completion.
+## 6. Anti-Triggers and Calibration
 
-## 7. Versioning & Portability Matrix
+- **Under-execution threshold:** Writing suites without allocation plan.
+- **Over-execution threshold:** Wiring CI gates unprompted.
+- **Calibration default:** Fast units first; journeys last.
+
+## 7. Anti-Pattern Compliance
+
+| Step | Prevents AP            | Mechanism                                           |
+| ---- | ---------------------- | --------------------------------------------------- |
+| 1    | AP-3 (no success)      | Allocates pyramid numerically.                      |
+| 2    | AP-16 (state leaks)    | Isolates with factories.                            |
+| 3    | AP-18 (hidden flakes)  | Replaces sleeps with predicates.                    |
+| 4    | AP-45 (no human review)| Halts for approval before gates.                    |
+
+## 8. Versioning & Changelog
 
 - **Version:** 2.0.0
 - **Changelog:**
-  - `2.0.0` (2026-09-20): Elevated to Sauron Tier-5 specification with Testing Pyramid allocation and transaction rollback patterns.
+  - `2.0.0` (2026-09-26) - Tier-5 conversion with Test Strategist role, role source, and seniority bar.
+  - `1.0.0` - Legacy testing baseline.
 
-| Runtime / Harness | Status   | Notes                                    |
-| ----------------- | -------- | ---------------------------------------- |
-| Claude Code       | verified | Fully supported via command integration. |
-| Cursor            | verified | Compatible with editor rule context.     |
-| Windsurf          | verified | Fully functional.                        |
-| Antigravity       | verified | Certified.                               |
+## 9. Portability Matrix
+
+| Runtime     | Status   | Notes                           |
+| ----------- | -------- | ------------------------------- |
+| Claude Code | verified | Direct slash command execution. |
+| Cursor      | verified | Rules and prompt loading.       |
+| Copilot     | verified | Custom instructions support.    |
+| Windsurf    | verified | Cascade flow integration.       |
+| Kiro        | verified | Steering model execution.       |
+| Cline       | verified | Task step-by-step flow.         |
+| Raw API     | verified | Model-agnostic execution.       |
+
+## 10. Examples
+
+**Input:** "Our suite is slow, flaky, and E2E-heavy."
+**Output:** Rebalanced 70/20/10 architecture with isolated tests and predicate-based waits.

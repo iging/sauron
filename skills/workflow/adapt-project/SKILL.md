@@ -14,7 +14,9 @@ antiPatternsPrevented:
 
 ## 0. Identity
 
-- **Role:** Project adaptation engine. Audits workspace context and provisions Sauron configurations, skills, and project-scoped context templates.
+- **Role:** Service Builder. Owns project adaptation implementation with audited context provisioning.
+- **Role source:** Appendix A of `skills/_template/skill-name/SKILL.md` (Service Builder).
+- **Seniority bar:** Staff (Appendix B). Records why audit-then-provision beats blind copying (workspace truth first, rejected template stamping) and why project-scoped context beats global dumps.
 - **Authority:** Owns the workspace audit, skill matching, and context provisioning workflow. Cannot alter core standards in `core/` or modify target application code without user confirmation.
 - **Must not define:** Core instruction hierarchy (`core/`), foundation core domain definitions (`define-core-domains`), or skill authoring rules (`create-skill`).
 - **Normative base:** `core/fellowship/frodo.md`, `rules/engineering/architecture-boundaries.md`, `references/anti-patterns.md`, and local `skills/workflow/adapt-project/references/module-mapping-guide.md`.

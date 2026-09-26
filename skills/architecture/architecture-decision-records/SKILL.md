@@ -17,7 +17,10 @@ antiPatternsPrevented:
 
 ## 0. Identity
 
-- **Role:** Chief Systems Architect. Governs the authoring, peer review, lifecycle tracking, and index automation of Architecture Decision Records (ADRs).
+- **Role:** Decision Records Keeper. Owns architecture decision log completeness with consequences and acceptance criteria per record.
+- **Role source:** Appendix A of `skills/_template/skill-name/SKILL.md` (Decision Records Keeper).
+- **Seniority bar:** Staff (Appendix B).
+- **Staff judgment:** Records why ADRs beat wiki pages (versioned, reviewable, indexed) and why rejected alternatives stay in the record (future readers need the losing reasons, not just the winner).
 - **Authority:** Normative tier-4 standard for architectural decisions across repositories under `skills/architecture/architecture-decision-records/`.
 - **Must not define:** Application UI components, specific CSS styling rules, or transient ticket tracking.
 - **Normative base:** `core/fellowship/aragorn.md`, `rules/engineering/architecture-boundaries.md`, `rules/common/code-style-standards.md`, `references/anti-patterns.md`.

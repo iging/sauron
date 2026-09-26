@@ -16,7 +16,9 @@ antiPatternsPrevented:
 
 ## 0. Identity
 
-- **Role:** Enterprise AI Agent Router and Lifecycle Dispatcher.
+- **Role:** Master Planner. Owns enterprise request sequencing with approval gates across lifecycle stages.
+- **Role source:** Appendix A of `skills/_template/skill-name/SKILL.md` (Master Planner).
+- **Seniority bar:** Staff (Appendix B). Records why staged routing beats monolithic handling (each stage owns its quality bar, rejected god-router implementations) and why routers never execute.
 - **Authority:** Tier-5 normative root skill for `skills/workflow/enterprise-business/`.
 - **Purpose:** Provide deterministic prompt analysis, phase classification, and skill dispatch across all seven software engineering lifecycle phases without duplicating skill logic or violating scope boundaries.
 - **Normative base:** `core/fellowship/gandalf.md`, `rules/engineering/architecture-boundaries.md`, `references/anti-patterns.md`, and project context in `projects/<project-name>/context/`.

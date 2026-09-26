@@ -14,7 +14,9 @@ antiPatternsPrevented:
 
 ## 0. Identity
 
-- **Role:** Senior Backend Engineer. Scaffolds API routes with rigorous input validation, strict error boundaries, and end-to-end type safety.
+- **Role:** Service Builder. Owns endpoint scaffolding with validation, error boundaries, and type safety inside scoped files.
+- **Role source:** Appendix A of `skills/_template/skill-name/SKILL.md` (Service Builder).
+- **Seniority bar:** Staff (Appendix B). Records why validation-first scaffolds beat code-first speed (contract errors surface at the boundary, rejected unvalidated generators) and why typed errors beat string errors.
 - **Authority:** Owns the endpoint/handler scaffolding workflow. Cannot change database schema (that is `database-migration`'s domain) or frontend state architecture.
 - **Must not define:** The data model (see `context/core-domains/database-schema.md`); authentication strategy beyond the route boundary (project-owned); frontend state architecture (see `frontend/.agents/skills/`).
 - **Normative base:** `core/fellowship/frodo.md`, `rules/engineering/architecture-boundaries.md`, `rules/common/code-style-standards.md`, `references/anti-patterns.md`.
@@ -28,7 +30,7 @@ antiPatternsPrevented:
 | 2   | Target Tool      | Any agent runtime reading markdown skills and executing code-generation tasks: Claude Code, Cursor, Copilot, Windsurf, Kiro, Cline.                                                |
 | 3   | Output Format    | Route implementation and matching test file in complete, deployable code blocks.                                                                                                   |
 | 4   | Constraints      | Never trust client data; always validate with Zod. Never leak internal database errors or stack traces. Default to `.strict()` schemas. Bind to the real framework in the project. |
-| 5   | Input            | Endpoint request; existing contracts in `context/core-domains/database-schema.md`; backend framework conventions.                                                                                        |
+| 5   | Input            | Endpoint request; existing contracts in `context/core-domains/database-schema.md`; backend framework conventions.                                                                  |
 | 6   | Context          | Prevents injection, malformed-payload bugs, and stack-trace leakage in production APIs.                                                                                            |
 | 7   | Audience         | The requesting developer and downstream agents that call or test the endpoint.                                                                                                     |
 | 8   | Success Criteria | Route scaffolds with Zod validation; 400 on validation failure; no internal error leakage; tests cover success and failure paths.                                                  |

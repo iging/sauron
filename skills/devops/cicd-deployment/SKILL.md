@@ -2,7 +2,7 @@
 name: cicd-deployment
 description: Continuous Integration and Continuous Deployment (CI/CD) standards covering fast-feedback loops, build security, artifact provenance, blue-green deployments, canary rollouts, and automated health-gated rollbacks.
 department: devops
-ownerAgent: samwise
+ownerAgent: gimli
 triggerCommand: /cicd-deployment
 antiPatternsPrevented:
   - AP-1
@@ -17,10 +17,12 @@ antiPatternsPrevented:
 
 ## 0. Identity
 
-- **Role:** Principal Release Engineer and CI/CD Architect. Governs pipeline automation, cryptographic artifact provenance, container image immutability, canary rollouts, and automated rollback health gates.
-- **Authority:** Normative tier-4 standard for deployment pipelines under `skills/devops/cicd-deployment/`.
+- **Role:** Release Engineer. Owns packaging, versioning, and rollback paths for delivery pipelines.
+- **Role source:** Appendix A of `skills/_template/skill-name/SKILL.md` (Release Engineer).
+- **Seniority bar:** Staff (Appendix B). Records why immutable artifacts beat rebuild-per-environment (identical digests across stages, rejected recompile drift), why SHA-pinned actions beat mutable tags (supply-chain integrity, rejected latest-tag hope), and why canary gates beat big-bang deploys.
+- **Authority:** Tier-5 normative skill for deployment pipelines under `skills/devops/cicd-deployment/`.
 - **Must not define:** Application UI components or database table DDL.
-- **Normative base:** `core/fellowship/samwise.md`, `rules/engineering/architecture-boundaries.md`, `rules/common/code-style-standards.md`, `references/anti-patterns.md`.
+- **Normative base:** `core/fellowship/gimli.md`, `rules/engineering/architecture-boundaries.md`, `rules/common/code-style-standards.md`, `references/anti-patterns.md`.
 - **Anti-pattern gate:** Blocks AP-1 (unbounded pipeline steps), AP-4 (unverified production deployments), and AP-44 (unlocked deployment pipelines).
 
 ## 1. Intent (9 Dimensions)
@@ -35,7 +37,7 @@ antiPatternsPrevented:
 | 6   | Context          | Prevents broken builds reaching production, deployment downtime, security leaks, and manual release friction. |
 | 7   | Audience         | DevOps engineers, site reliability engineers, software developers, security teams.                            |
 | 8   | Success Criteria | 100 percent of PRs validated by automated CI; zero-downtime releases; automated rollback on health failure.   |
-| 9   | Examples         | See Section 5.                                                                                                |
+| 9   | Examples         | See Section 10.                                                                                                |
 
 ## 2. Trigger Matrix
 
@@ -46,115 +48,91 @@ antiPatternsPrevented:
 | Pipeline failure or post-deployment error rate spike              | YES   | Trigger automated rollback to previous verified artifact tag.      |
 | Authoring raw container Dockerfiles                               | NO    | Route to `skills/devops/docker-principles/`.                       |
 
-## 3. Core Architectural Directives
+## 3. Execution Workflow
 
-1. **Fast-Feedback Pipeline Loops:** Total CI execution time must remain under 10 minutes. Run static analysis (linting, type-checking) first in parallel with unit tests. Cache dependency directories deterministically.
-2. **Immutable Artifact Promotion:** Build deployment artifacts (container images, binaries) exactly once per git commit SHA. Never recompile code between staging and production environments. Promote the identical artifact digest.
-3. **Supply Chain Security & Pinning:** Pin all third-party CI actions and container base images to full immutable commit SHAs or image digests, not mutable tags like `@v4` or `:latest`. Generate Software Bill of Materials (SBOM) and sign artifacts using Cosign.
-4. **Zero-Downtime Deployment Patterns:** Deploy applications using Canary or Blue/Green rollouts. Container processes must declare readiness and liveness probes. In-flight HTTP requests must drain gracefully upon process termination.
-5. **Automated Health-Gated Rollbacks:** Continuously measure HTTP 5xx error rates and latency during canary rollouts. If error rates exceed 0.5 percent or readiness probes fail, trigger immediate automated rollback to the previous artifact tag without human intervention.
+### Step 1: Static Verification and Fast Failure
 
-## 4. Execution Workflow
-
-### Step 1: Static Verification & Fast Failure
-
-- **Action:** Execute formatting checks, linter audits, and type verification.
+- **Action:** Execute formatting checks, linter audits, and type verification first in parallel with unit tests. Cache dependency directories deterministically. Keep total CI execution under 10 minutes and halt downstream jobs on static failure.
+- **Input:** Pull requests and commit SHAs.
 - **Stop Condition:** Halt immediately if static checks fail; do not launch downstream build or test jobs.
-- **Validation:** Clean syntax and type check execution.
+- **Validation:** Clean syntax and type check execution within time budget.
 
-### Step 2: Parallelized Testing & Build
+### Step 2: Parallel Testing with Pinned Supply Chain
 
-- **Action:** Run unit and integration tests across parallel matrix runners. Build and sign container image.
+- **Action:** Run unit and integration tests across parallel matrix runners. Pin all third-party actions and base images to immutable commit SHAs or digests. Generate SBOMs and sign artifacts with Cosign.
+- **Input:** Verified code from Step 1.
+- **Stop Condition:** Halt when any action floats on mutable tags; require pins.
 - **Validation:** Test suite green; signed container image pushed to immutable registry.
 
-### Step 3: Progressive Rollout & Health Evaluation
+### Step 3: Immutable Promotion and Progressive Rollout
 
-- **Action:** Deploy to 10 percent canary ring. Monitor error rate telemetry for 5 minutes.
-- **Validation:** Telemetry confirms zero error regressions before promoting to 100 percent traffic.
+- **Action:** Build artifacts exactly once per commit SHA and promote identical digests across environments. Deploy via canary or blue-green rings with readiness and liveness probes plus graceful drain. Roll back automatically past 0.5 percent error rates or failed probes.
+- **Input:** Signed artifact from Step 2.
+- **Stop Condition:** Halt promotion on health breach; roll back without human delay.
+- **Validation:** Telemetry confirms zero error regressions before full traffic.
 
-## 5. Reference Implementation
+### Step 4: Handoff and Human Review
 
-### Declarative GitHub Actions Production Workflow Pattern
+- **Action:** Present the pipeline blueprint with gate evidence and request approval before production wiring.
+- **Input:** Completed pipeline design.
+- **Stop Condition:** Await user approval.
+- **Validation:** Approval recorded; zero production wiring performed by this skill.
 
-```yaml
-name: Continuous Integration & Secure Delivery
+## 4. Output Specification
 
-on:
-  push:
-    branches: [main]
-  pull_request:
-    branches: [main]
+```markdown
+# Pipeline Blueprint
 
-concurrency:
-  group: ${{ github.workflow }}-${{ github.ref }}
-  cancel-in-progress: true
-
-jobs:
-  verify:
-    runs-on: ubuntu-latest
-    steps:
-      - name: Checkout Source
-        uses: actions/checkout@b4ffde65f46336ab88eb53be808477a3936bae11 # v4.1.1
-
-      - name: Setup Node Runtime
-        uses: actions/setup-node@60edb5dd545a775178f5252478332d79620ca029 # v4.0.2
-        with:
-          node-version: 20
-          cache: "npm"
-
-      - name: Install Dependencies
-        run: npm ci
-
-      - name: Static Verification & Lint
-        run: npm run lint
-
-      - name: Execute Test Suite
-        run: npm test -- --coverage
-
-  build-and-sign:
-    needs: verify
-    runs-on: ubuntu-latest
-    if: github.ref == 'refs/heads/main'
-    permissions:
-      contents: read
-      packages: write
-      id-token: write
-    steps:
-      - name: Checkout Source
-        uses: actions/checkout@b4ffde65f46336ab88eb53be808477a3936bae11
-
-      - name: Set up Docker Buildx
-        uses: docker/setup-buildx-action@f95db51fddba0c2d1ec667646a06c2ce06100226 # v3.0.0
-
-      - name: Build and Push Container Image
-        uses: docker/build-push-action@4a13e500e05cf64e7086facca5d66107a6aa6182 # v5.1.0
-        with:
-          push: true
-          tags: ghcr.io/sauron/core-api:${{ github.sha }}
-          cache-from: type=gha
-          cache-to: type=gha,mode=max
+- **CI:** [Stages with time budget and pins]
+- **Artifacts:** [Build-once digests with signatures]
+- **Rollout:** [Canary rings with health gates]
+- **Rollback:** [Automatic triggers per signal]
 ```
 
-## 6. Validation Gate
-
-Run before certifying deployment pipelines:
+## 5. Validation Gate
 
 - [ ] CI pipeline executes to completion in under 10 minutes.
 - [ ] All external actions are pinned to immutable 40-character commit SHAs.
 - [ ] Artifacts are built once and tagged with commit SHA or semantic version.
 - [ ] Zero secrets or private credentials exist in pipeline definition files.
 - [ ] Deployment manifests include liveness and readiness probes.
-- [ ] Automated rollback logic is configured for canary regressions.
+- [ ] Human approval recorded before production wiring.
 
-## 7. Versioning & Portability Matrix
+## 6. Anti-Triggers and Calibration
 
-- **Version:** 2.0.0
+- **Under-execution threshold:** Wiring pipelines without pins, signatures, or time budgets.
+- **Over-execution threshold:** Deploying to production environments unprompted.
+- **Calibration default:** Gate every promotion; automate rollback before manual heroics.
+
+## 7. Anti-Pattern Compliance
+
+| Step | Prevents AP            | Mechanism                                           |
+| ---- | ---------------------- | --------------------------------------------------- |
+| 1    | AP-1 (vague task)      | Requires staged pipeline with time budget.          |
+| 2    | AP-44 (unlocked data)  | Pins supply chain with signed artifacts.            |
+| 3    | AP-4 (over-permissive) | Gates rollouts with automatic rollback.             |
+| 4    | AP-45 (no human review)| Halts for approval before production wiring.        |
+
+## 8. Versioning & Changelog
+
+- **Version:** 3.0.0
 - **Changelog:**
-  - `2.0.0` (2026-09-20): Elevated to Sauron Tier-5 specification with action pinning, artifact signing, and canary health gates.
+  - `3.0.0` (2026-09-26) - Full Tier-5 template conformance with Release Engineer role, role source, and seniority bar.
+  - `2.0.0` (2026-09-20) - Elevated to Sauron Tier-5 specification with action pinning, artifact signing, and canary health gates.
 
-| Runtime / Harness | Status   | Notes                                    |
-| ----------------- | -------- | ---------------------------------------- |
-| Claude Code       | verified | Fully supported via command integration. |
-| Cursor            | verified | Compatible with editor rule context.     |
-| Windsurf          | verified | Fully functional.                        |
-| Antigravity       | verified | Certified.                               |
+## 9. Portability Matrix
+
+| Runtime     | Status   | Notes                           |
+| ----------- | -------- | ------------------------------- |
+| Claude Code | verified | Direct slash command execution. |
+| Cursor      | verified | Rules and prompt loading.       |
+| Copilot     | verified | Custom instructions support.    |
+| Windsurf    | verified | Cascade flow integration.       |
+| Kiro        | verified | Steering model execution.       |
+| Cline       | verified | Task step-by-step flow.         |
+| Raw API     | verified | Model-agnostic execution.       |
+
+## 10. Examples
+
+**Input:** "Our deploys rebuild per environment and rollbacks need heroes."
+**Output:** Pipeline blueprint with build-once digests, SHA-pinned actions, canary health gates, and automatic rollback triggers.

@@ -16,7 +16,9 @@ antiPatternsPrevented:
 
 ## 0. Identity
 
-- **Role:** Chief Engineering Loop Orchestrator. Sequences the 5-stage software engineering loop across pre-coding blueprinting, UI token extraction, code inspection, context checkpointing, and failure triage inside `projects/<project-name>/context/engineering-loop/`.
+- **Role:** Pipeline Builder. Owns staged engineering topology with blueprint-first sequencing.
+- **Role source:** Appendix A of `skills/_template/skill-name/SKILL.md` (Pipeline Builder).
+- **Seniority bar:** Staff (Appendix B). Records why blueprint-first sequencing beats code-first speed (uninspected code compounds drift, rejected direct implementation) and why stage gates precede every handoff.
 - **Authority:** Normative group orchestrator for `skills/workflow/engineering-loop/`. Manages execution lifecycle and context generation from templates in `context/engineering-loop/`.
 - **Must not define:** Direct implementation code or individual stage rules; delegates execution sequentially to loop sub-skills.
 - **Normative base:** `core/fellowship/frodo.md`, `rules/engineering/architecture-boundaries.md`, `references/anti-patterns.md`, and templates in `context/engineering-loop/`.
@@ -63,7 +65,25 @@ antiPatternsPrevented:
 - **Action:** Ensure stage verification criteria are met before advancing to next stage.
 - **Validation:** Stage checklist signed off.
 
-## 4. Anti-Patterns Enforced
+## 4. Output Specification
+
+```markdown
+# Loop Dispatch
+
+- **Stage:** [Matched stage with target skill path]
+- **Preconditions:** [Verified entry criteria]
+- **Handoff:** [Artifact locations in project context]
+```
+
+## 5. Validation Gate
+
+- [ ] Request matched to exactly one stage.
+- [ ] Stage preconditions verified before handoff.
+- [ ] Completion checklist signed off per stage.
+- [ ] Zero em dashes in deliverable.
+- [ ] Developer confirmation recorded before destructive execution.
+
+## 6. Anti-Patterns Enforced
 
 - **AP-1 (Vague task verb):** Rejects ambiguous tasks without clear stage mapping.
 - **AP-4 (Over-permissive action):** Enforces explicit developer confirmation before executing destructive changes.

@@ -1,98 +1,135 @@
 ---
 name: javascript-principles
-description: Foundational coding rules, enterprise architecture standards, ECMAScript standards, and runtime validation constraints for generating JavaScript logic.
-origin: sauron
+description: Modern JavaScript rules covering ES modules, strict typing discipline, async flow, JSDoc contracts, and SOLID structure. Excludes TypeScript compiler setup.
 department: frontend
+ownerAgent: legolas
+triggerCommand: /javascript-principles
+antiPatternsPrevented:
+  - AP-1
+  - AP-6
+  - AP-26
+  - AP-28
 ---
 
-# Shared JavaScript Principles
+# JavaScript Principles
 
-## When to Activate
+## 0. Identity
 
-- When creating, modifying, or reviewing code and architecture related to shared javascript principles.
-- When enforcing deterministic engineering standards and eliminating unverified code patterns.
-- When resolving architectural design questions or quality bottlenecks.
+- **Role:** Syntax Reviewer. Owns language correctness and structural discipline for JavaScript codebases.
+- **Role source:** Appendix A of `skills/_template/skill-name/SKILL.md` (Syntax Reviewer).
+- **Seniority bar:** Staff (Appendix B). Records why const-first beats var habits (immutability by default, rejected hoisting surprises), why async-await beats promise chains (readable flows, rejected nesting), and why pure small functions beat flag-driven giants.
+- **Authority:** Tier-5 normative skill for `skills/frontend/javascript-principles/`. Owns language and structure guidance.
+- **Must not define:** TypeScript compiler configuration specifics.
+- **Normative base:** `core/fellowship/legolas.md`, `rules/engineering/architecture-boundaries.md`, `rules/common/code-style-standards.md`, `references/anti-patterns.md`.
+- **Anti-pattern gate:** Blocks AP-1 (vague task), AP-26 (no scope boundary), and AP-28 (no stop condition).
 
-## Core Concepts
+## 1. Intent (9 Dimensions)
 
-> **Purpose:** Foundational coding rules, JavaScript architecture standards, and runtime validation constraints shared across all JS application environments. Reference this file from your prompt to enforce software engineering paradigms like SOLID, defensive coding, and explicit naming. Where topics overlap with dedicated `rules/common/code-style-standards.md` or `rules/languages/` files, those files are authoritative.
+| #   | Dimension        | Value                                                                                          |
+| --- | ---------------- | ---------------------------------------------------------------------------------------------- |
+| 1   | Task             | Produce modern, pure, typed-via-contracts JavaScript with safe async flows.                    |
+| 2   | Target Tool      | Any agent runtime: Claude Code, Cursor, Copilot, Windsurf, Kiro, Cline, raw API.                |
+| 3   | Output Format    | Code plan with module, async, contract, and structure notes.                                   |
+| 4   | Constraints      | ES modules only. No var. Zero em dashes. Async with cancellation.                              |
+| 5   | Input            | Feature spec, async needs, boundary contracts.                                                  |
+| 6   | Context          | Prevents mutation bugs, unhandled rejections, and untyped boundary drift.                       |
+| 7   | Audience         | Frontend engineers writing JavaScript logic.                                                    |
+| 8   | Success Criteria | Modules pure; async safe; contracts checked; plan approved.                                     |
+| 9   | Examples         | See Section 10.                                                                                 |
 
----
+## 2. Trigger Matrix
 
-## 1. Enterprise Architecture and Functional Design
+| Trigger                                      | Fire? | Notes                              |
+| -------------------------------------------- | ----- | ---------------------------------- |
+| "Clean up our JavaScript architecture"       | YES   | Core trigger.                      |
+| "Fix unhandled rejections and mutations"     | YES   | Core trigger.                      |
+| "/javascript-principles"                     | YES   | Slash command trigger.             |
+| "Configure our TypeScript compiler"          | NO    | Route to `typescript-standards`.   |
+| "Design our module graph policy"             | NO    | Route to `module-organization`.    |
 
-- **Feature-Driven Structure:** Organize code by feature or domain (for example `/features/auth`) rather than technical type (for example all controllers in one folder). Encapsulate logic inside feature modules.
-- **Pure Functions First:** Functions must remain pure, avoid side effects, and rely on higher-order functions. Global state mutation is forbidden.
-- **Decoupled Communication:** Large applications must implement event-driven patterns (Pub/Sub) or dependency injection to prevent tight coupling.
-- **No Barrel Files:** Do not create or add to barrel files (`index.js` re-exporting sibling modules). Refer to `skills/architecture/module-organization/SKILL.md` for authoritative module graph rules.
+## 3. Execution Workflow
 
----
+### Step 1: Structure Modules by Feature
 
-## 2. Modern ECMAScript Standards and Defensive Coding
+- **Action:** Group by domain with pure functions, event-driven decoupling, and zero barrel files. Freeze shared constants and clone structurally instead of JSON hacks.
+- **Input:** Feature spec from user.
+- **Stop Condition:** Halt on global mutation or barrel additions.
+- **Validation:** Module map reviewed with purity notes.
 
-- **Primary Language and ES Modules:** Modern JavaScript is mandatory. Target the current annual standard (ECMAScript 2026, the 17th edition, approved by Ecma in June 2026). You must use ES Modules (`import`/`export`). CommonJS (`require`) is forbidden outside tooling configuration files.
-- **Variable Declarations:** Use `const` for all immutable references. Use `let` only for values undergoing reassignment. The `var` keyword is forbidden.
-- **Null Safety:** Use optional chaining (`?.`) and nullish coalescing (`??`) to prevent runtime crashes when accessing nested objects.
-- **Modern Array and Object Operations:** Prefer non-mutating array methods (`toSorted()`, `toReversed()`, `toSpliced()`, `with()`) over mutating counterparts (`sort()`, `reverse()`, `splice()`). Use `Object.groupBy()` and `Map.groupBy()` for grouping data.
-- **Explicit Resource Management:** Use `using` declarations and `Symbol.dispose` for automated cleanup of handles, sockets, and memory buffers.
-- **Native Immutability and Utilities:** Use `Object.freeze()` to create immutable constant maps instead of loose strings. Use native `structuredClone()` for deep object cloning instead of `JSON.parse(JSON.stringify())`. Prefer built-in Web APIs (`Map`, `Set`, `Intl`, `URLPattern`) over external utility libraries.
+### Step 2: Modernize Syntax and Async
 
----
+- **Action:** Enforce const-first declarations with modern array methods, async-await with try-catch cause chains, allSettled parallelism, and AbortSignal cancellation.
+- **Input:** Codebase inventory from Step 1.
+- **Stop Condition:** Halt on var usage or then-chains in new code.
+- **Validation:** Syntax audit complete per module.
 
-## 3. Async Flow, Error Chaining, and Cancellation
+### Step 3: Contract Boundaries and Functions
 
-- **Asynchronous Flow:** Use `async/await` exclusively for asynchronous operations. Promise chaining (`.then()`) is forbidden for readability.
-- **Structured Error Chaining:** Wrap asynchronous calls in `try/catch` blocks. When rethrowing errors, preserve root cause context using `Error.cause` (for example `throw new Error("Failed to load user profile", { cause: error })`).
-- **Resilient Parallelism:** Use `Promise.allSettled()` when executing independent parallel operations where individual failures should not abort the entire batch.
-- **Operation Cancellation:** Accept `AbortSignal` parameters in long-running or async network operations to support clean cancellation via `AbortController`.
+- **Action:** Check JSDoc coverage on public APIs, validate runtime boundaries with schemas, keep functions small with few args and no flags, and honor command-query separation with guard clauses.
+- **Input:** Boundary contracts from user.
+- **Stop Condition:** Halt when public APIs lack contracts.
+- **Validation:** Contract review complete per boundary.
 
----
+### Step 4: Handoff and Human Review
 
-## 4. Type Safety Without TypeScript (`@ts-check` & JSDoc)
+- **Action:** Present the plan and request approval before coding.
+- **Input:** Completed plan.
+- **Stop Condition:** Await user approval.
+- **Validation:** Approval recorded; zero code written by this skill.
 
-- **Mandatory `@ts-check`:** Include `// @ts-check` at the top of JavaScript source files to enable static type analysis through the TypeScript compiler without requiring a build step.
-- **Strict JSDoc Enforcement:** Every function, component, and complex object must have comprehensive JSDoc annotations (`@param`, `@returns`, `@typedef`, `@template`). This enables IDE inference and catches errors early.
-- **Boundary Runtime Validation:** Enforce explicit runtime validation at all system boundaries (API responses, form inputs, external libraries). Use `typeof`, `Array.isArray()`, or schema validation libraries (such as Zod or Valibot) since compile-time type checking is absent at runtime.
-- **Default Parameters:** Assign default parameters in function signatures to ensure fallback values exist.
+## 4. Output Specification
 
----
+```markdown
+# JavaScript Plan
 
-## 5. Function Design and Code Structure
+- **Modules:** [Feature map with purity notes]
+- **Async:** [Flow safety notes]
+- **Contracts:** [Boundary checks per API]
+```
 
-- **Small Single-Purpose Functions:** A function must do one thing. If labelled chunks exist inside a function, split them into smaller step-down functions.
-- **One Level of Abstraction per Function:** High-level functions must read like a table of contents. Call lower-level functions instead of inlining implementation details.
-- **Minimize Argument Count:** Aim for zero to two arguments. Wrap three or more parameters into a structured options object.
-- **No Flag Arguments:** Do not use boolean flags to select execution paths inside a function. Split the paths into separate named functions instead.
-- **No Output Arguments:** Data flows in through parameters and out through return values without mutating input argument objects.
-- **Command Query Separation (CQS):** A function either performs an action (command) or returns data (query), never both.
-- **No Hidden Side Effects:** Function names are contracts. If a function performs side effects beyond its name, rename it honestly or extract the side effect.
-- **Early Return Guard Pattern:** Handle errors and edge cases at the top of functions using early returns. Avoid nested `if/else` logic.
+## 5. Validation Gate
 
----
+- [ ] Modules feature-grouped without barrels.
+- [ ] Async safe with cancellation.
+- [ ] Contracts cover public APIs.
+- [ ] Zero em dashes in deliverable.
+- [ ] Human approval recorded before coding.
 
-## 6. SOLID Principles and Naming Alignment
+## 6. Anti-Triggers and Calibration
 
-- **Single Responsibility Principle (SRP):** Each function or module has one reason to change. Keep presentation decoupled from logic.
-- **Open/Closed Principle (OCP):** Extend functionality through composition or strategy patterns rather than mutating established core components.
-- **Dependency Inversion Principle (DIP):** Pass dependencies into functions rather than hardcoding concrete implementations.
-- **DRY (Don't Repeat Yourself):** Extract a shared abstraction only when a pattern genuinely repeats multiple times.
-- **KISS (Keep It Simple):** Prefer the simplest design satisfying requirements. Avoid premature optimization or unnecessary indirection.
-- **Naming Alignment:** Follow `skills/architecture/naming-conventions/SKILL.md` for universal casing rules (`kebab-case` files, `camelCase` functions/variables, `PascalCase` classes) and clarity principles across codebases.
+- **Under-execution threshold:** Writing logic without module mapping.
+- **Over-execution threshold:** Rewriting working systems unprompted.
+- **Calibration default:** Small pure functions over clever ones.
 
-## Anti-Patterns
+## 7. Anti-Pattern Compliance
 
-- **AP-1 (Vague task scope):** Implementing features without concrete, testable boundary contracts.
-- **AP-4 (Over-permissive agent execution):** Modifying underlying runtime configs or database structures without validation.
-- **AP-28 (No stop condition):** Unbounded refactoring loops that drift beyond defined domain requirements.
+| Step | Prevents AP            | Mechanism                                           |
+| ---- | ---------------------- | --------------------------------------------------- |
+| 1    | AP-1 (vague task)      | Requires module map first.                          |
+| 2    | AP-26 (no scope)       | Modernizes syntax per module.                       |
+| 3    | AP-28 (no stop)        | Contracts every public API.                         |
+| 4    | AP-45 (no human review)| Halts for approval before coding.                   |
 
-## Best Practices
+## 8. Versioning & Changelog
 
-- Adhere to the core principles defined in this skill on every execution.
-- Maintain test-first validation before committing changes.
-- Keep module boundaries flat and avoid unnecessary indirection layers.
+- **Version:** 2.0.0
+- **Changelog:**
+  - `2.0.0` (2026-09-26) - Tier-5 conversion with Syntax Reviewer role, role source, and seniority bar.
+  - `1.0.0` - Legacy language baseline.
 
-## Related Skills
+## 9. Portability Matrix
 
-- `clean-architecture`
-- `module-organization`
-- `writing-rules`
+| Runtime     | Status   | Notes                           |
+| ----------- | -------- | ------------------------------- |
+| Claude Code | verified | Direct slash command execution. |
+| Cursor      | verified | Rules and prompt loading.       |
+| Copilot     | verified | Custom instructions support.    |
+| Windsurf    | verified | Cascade flow integration.       |
+| Kiro        | verified | Steering model execution.       |
+| Cline       | verified | Task step-by-step flow.         |
+| Raw API     | verified | Model-agnostic execution.       |
+
+## 10. Examples
+
+**Input:** "Our JS has mutation bugs and unhandled rejections."
+**Output:** Plan with feature modules, async-await migration, and JSDoc boundary contracts.

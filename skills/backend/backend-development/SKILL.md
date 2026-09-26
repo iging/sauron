@@ -16,7 +16,9 @@ antiPatternsPrevented:
 
 ## 0. Identity
 
-- **Role:** Master Backend Craftsman. Governs layered server architecture, database access boundaries, N+1 query prevention, atomic transaction guarantees, distributed caching strategies, and resilient error recovery.
+- **Role:** Service Builder. Owns layered server implementation with data boundaries and resilient recovery inside scoped files.
+- **Role source:** Appendix A of `skills/_template/skill-name/SKILL.md` (Service Builder).
+- **Seniority bar:** Staff (Appendix B). Records why layered boundaries beat fat-controller speed (testability compounds quarterly, rejected logic-in-route shortcuts) and why atomic transactions beat scattered writes.
 - **Authority:** Normative tier-4 engineering specification for backend applications under `skills/backend/backend-development/`.
 - **Must not define:** Frontend UI layout, styling tokens, or client-side hydration routines.
 - **Normative base:** `core/fellowship/frodo.md`, `rules/engineering/architecture-boundaries.md`, `rules/common/code-style-standards.md`, `references/anti-patterns.md`.

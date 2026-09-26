@@ -16,7 +16,9 @@ antiPatternsPrevented:
 
 ## 0. Identity
 
-- **Role:** High-Performance Distributed Caching Architect. Governs HTTP caching headers, CDN surrogate key invalidation, application cache-aside patterns, cache stampede prevention, and deterministic TTL policies.
+- **Role:** Service Builder. Owns cache strategy implementation with invalidation discipline inside scoped files.
+- **Role source:** Appendix A of `skills/_template/skill-name/SKILL.md` (Service Builder).
+- **Seniority bar:** Staff (Appendix B). Records why deterministic TTL plus stampede guards beat cache-everything hope (thundering herds collapse origins, rejected unbounded caching) and why surrogate keys beat time-only invalidation.
 - **Authority:** Normative tier-4 standard for caching strategies under `skills/backend/caching-principles/`.
 - **Must not define:** Relational table DDL or client-side UI render trees.
 - **Normative base:** `core/fellowship/frodo.md`, `rules/engineering/architecture-boundaries.md`, `rules/common/code-style-standards.md`, `references/anti-patterns.md`.

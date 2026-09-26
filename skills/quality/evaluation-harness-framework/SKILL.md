@@ -7,6 +7,7 @@ triggerCommand: /evaluation-harness-framework
 antiPatternsPrevented:
   - AP-1
   - AP-3
+  - AP-6
   - AP-9
   - AP-18
   - AP-28
@@ -17,8 +18,10 @@ antiPatternsPrevented:
 
 ## 0. Identity
 
-- **Role:** Agent Reliability and Evaluation Specialist. Designs deterministic eval suites, capability test matrices, pass@k metrics, and regression test suites for autonomous AI agents.
-- **Authority:** Normative tier-4 standard for agent evaluation under `skills/quality/evaluation-harness-framework/`.
+- **Role:** Quality Gatekeeper. Owns eval verdicts on agent capability with deterministic grading evidence.
+- **Role source:** Appendix A of `skills/_template/skill-name/SKILL.md` (Quality Gatekeeper).
+- **Seniority bar:** Staff (Appendix B). Records why evals precede code (acceptance defined before implementation, rejected build-then-measure), why code graders beat model graders where verifiable (exit codes over opinions, rejected LLM judges for checkable outcomes), and why pass^k governs critical paths.
+- **Authority:** Tier-5 normative skill for `skills/quality/evaluation-harness-framework/`. Owns eval design guidance.
 - **Must not define:** Application UI components or database table schemas.
 - **Normative base:** `core/fellowship/merry.md`, `rules/engineering/architecture-boundaries.md`, `rules/common/code-style-standards.md`, `references/anti-patterns.md`, `context/core-domains/testing-strategy.md`.
 - **Anti-pattern gate:** Blocks AP-3 (unclear success criteria), AP-9 (declaring success without verified execution), and AP-53 (blind tool confidence).
@@ -35,7 +38,7 @@ antiPatternsPrevented:
 | 6   | Context          | Prevents silent capability drift, brittle prompt edits, and unreliable agent task completion.              |
 | 7   | Audience         | Quality engineers, agent platform architects, autonomous workflow operators.                               |
 | 8   | Success Criteria | 100 percent deterministic grading for code tasks; minimum pass@3 score of 90 percent on critical paths.    |
-| 9   | Examples         | See Section 5.                                                                                             |
+| 9   | Examples         | See Section 10.                                                                                             |
 
 ## 2. Trigger Matrix
 
@@ -44,105 +47,91 @@ antiPatternsPrevented:
 | Designing acceptance criteria for complex autonomous agent workflows | YES   | Formulate Capability and Regression Evals.                                                 |
 | Measuring agent consistency across repeated trials                   | YES   | Calculate pass@k and pass^k reliability metrics.                                           |
 | Testing application business logic or backend endpoints              | NO    | Route to `skills/workflow/autonomous-dev/05-quality-and-testing/test-driven-development/`. |
-| Running security audits or vulnerability scans                       | NO    | Route to `skills/security/security-auditor/`.                                              |
+| Running security audits or vulnerability scans                        | NO    | Route to `skills/security/security-auditor/`.                                              |
 
-## 3. Core Architectural Directives
+## 3. Execution Workflow
 
-1. **Eval-Driven Development (EDD):** Define the evaluation criteria and grading logic before starting feature implementation. Evals serve as unit tests for AI agent behavior.
-2. **Deterministic Code-Based Grading:** Prioritize exit-code and regex checks over probabilistic LLM-as-a-judge graders. If an outcome can be verified via command exit code or compiler check, do not use an LLM grader.
-3. **Three-Tier Grader Hierarchy:**
-   - **Tier 1 (Code Grader):** Automated Bash/Node/Python scripts checking test exit codes, schema validity, or file changes.
-   - **Tier 2 (Model Grader):** Scored rubric (1 to 5) evaluating open-ended prose quality or architectural trade-offs.
-   - **Tier 3 (Human Grader):** Explicit manual review gates for high-risk security or financial code paths.
-4. **Reliability Metrics:**
-   - `pass@k`: Probability of at least one success across k independent trials.
-   - `pass^k`: Probability that all k consecutive trials succeed (mandatory for high-severity core operations).
+### Step 1: Define Evals Before Code
 
-## 4. Execution Workflow
+- **Action:** Write capability evals with grading logic and regression evals with baselines before implementation starts.
+- **Input:** Capability specifications from user.
+- **Stop Condition:** Halt when success criteria stay verbal; require measurable evals.
+- **Validation:** Eval definitions reviewed with grading tiers.
 
-### Step 1: Eval Definition
+### Step 2: Grade Deterministically First
 
-- **Action:** Author evaluation definition file containing capability criteria, regression baselines, and scoring metrics.
-- **Stop Condition:** Halt if success criteria are subjective or lack measurable validation thresholds.
-- **Validation:** Clear list of binary pass/fail checks defined.
+- **Action:** Apply code graders (exit codes, schemas, file diffs) wherever verifiable. Reserve model graders with scored rubrics for open-ended quality, and human gates for high-risk paths.
+- **Input:** Agent outputs from trial runs.
+- **Stop Condition:** Halt when LLM judges grade checkable outcomes; require code graders.
+- **Validation:** Grader tier justified per eval.
 
-### Step 2: Implementation Run
+### Step 3: Score Reliability and Regressions
 
-- **Action:** Agent executes the targeted engineering task against the workspace.
-- **Validation:** Agent completes work and signals readiness for verification.
+- **Action:** Compute pass@k across trials and pass^k on critical paths. Track capability drift across prompt edits with regression suites.
+- **Input:** Trial results from Step 2.
+- **Stop Condition:** Halt below reliability bars; require remediation.
+- **Validation:** Score report reviewed with drift notes.
 
-### Step 3: Automated Grading & Reporting
+### Step 4: Handoff and Human Review
 
-- **Action:** Trigger the evaluation harness scripts across multiple test iterations.
-- **Validation:** Generate structured evaluation report with pass rates.
+- **Action:** Present the eval report and request approval for threshold changes.
+- **Input:** Completed report.
+- **Stop Condition:** Await user approval.
+- **Validation:** Approval recorded; zero thresholds changed by this skill.
 
-## 5. Reference Implementation
+## 4. Output Specification
 
-### Eval Definition and Automated Code Grader Template
+```markdown
+# Eval Report
 
-````markdown
-# Eval Definition: PostgreSQL Partitioning Migration
-
-## 1. Capability Criteria
-
-- [ ] Table partitioned into monthly range tables without data loss.
-- [ ] Default partition exists to capture out-of-range records.
-- [ ] Database queries targeting 'created_at' perform partition pruning.
-
-## 2. Deterministic Code Graders
-
-```bash
-# Grader 1: Verify partition syntax in migration script
-grep -q "PARTITION BY RANGE (created_at)" migrations/001_partition.sql \
-  && echo "GRADER 1: PASS" || echo "GRADER 1: FAIL"
-
-# Grader 2: Run migration and verify tables in test database
-npm run migrate:test \
-  && echo "GRADER 2: PASS" || echo "GRADER 2: FAIL"
-
-# Grader 3: Run execution plan verification test
-npm test -- tests/database/partition-pruning.test.ts \
-  && echo "GRADER 3: PASS" || echo "GRADER 3: FAIL"
-```
-````
-
-## 3. Evaluation Summary Report Format
-
-```text
-EVALUATION REPORT: PostgreSQL Partitioning Migration
-===================================================
-Trial 1: PASS (3/3 graders)
-Trial 2: PASS (3/3 graders)
-Trial 3: PASS (3/3 graders)
-
-Reliability Score:
-- pass@1: 100%
-- pass^3: 100%
-
-Status: VERIFIED FOR PRODUCTION PROMOTION
+- **Definitions:** [Capability with grading tiers]
+- **Scores:** [pass@k with drift notes]
+- **Verdict:** [Pass or fail with evidence]
 ```
 
-```
+## 5. Validation Gate
 
-## 6. Validation Gate
+- [ ] Evals defined before code.
+- [ ] Deterministic grading preferred.
+- [ ] Reliability scored with bars.
+- [ ] Zero em dashes in deliverable.
+- [ ] Human approval recorded for threshold changes.
 
-Run before accepting an evaluation harness definition:
+## 6. Anti-Triggers and Calibration
 
-- [ ] Capability criteria are expressed as unambiguous binary checks.
-- [ ] All code-based graders rely on deterministic shell exit codes or test runners.
-- [ ] Evals include regression checks against existing baseline features.
-- [ ] Reliability thresholds (pass@k) are established and enforced.
+- **Under-execution threshold:** Shipping agent behavior without evals.
+- **Over-execution threshold:** Changing thresholds unprompted.
+- **Calibration default:** Code graders first; models last.
 
-## 7. Versioning & Portability Matrix
+## 7. Anti-Pattern Compliance
 
-- **Version:** 1.0.0
+| Step | Prevents AP            | Mechanism                                           |
+| ---- | ---------------------- | --------------------------------------------------- |
+| 1    | AP-3 (no success)      | Demands measurable evals first.                     |
+| 2    | AP-53 (blind trust)    | Prefers verifiable graders.                         |
+| 3    | AP-9 (unverified wins) | Scores reliability with bars.                       |
+| 4    | AP-45 (no human review)| Halts for approval on threshold changes.            |
+
+## 8. Versioning & Changelog
+
+- **Version:** 2.0.0
 - **Changelog:**
-  - `1.0.0` (2026-09-20): Created Sauron Tier-5 skill aligned with ECC eval-harness specifications.
+  - `2.0.0` (2026-09-26) - Tier-5 conversion with Quality Gatekeeper role, role source, and seniority bar.
+  - `1.0.0` - Legacy eval baseline.
 
-| Runtime / Harness | Status | Notes |
-|---|---|---|
-| Claude Code | verified | Fully supported. |
-| Cursor | verified | Tested with test runner. |
-| Windsurf | verified | Fully supported. |
-| Antigravity | verified | Certified. |
-```
+## 9. Portability Matrix
+
+| Runtime     | Status   | Notes                           |
+| ----------- | -------- | ------------------------------- |
+| Claude Code | verified | Direct slash command execution. |
+| Cursor      | verified | Rules and prompt loading.       |
+| Copilot     | verified | Custom instructions support.    |
+| Windsurf    | verified | Cascade flow integration.       |
+| Kiro        | verified | Steering model execution.       |
+| Cline       | verified | Task step-by-step flow.         |
+| Raw API     | verified | Model-agnostic execution.       |
+
+## 10. Examples
+
+**Input:** "Our agent passes once then fails twice on the same task."
+**Output:** Eval harness with pass@3 scoring proving inconsistency and gating promotion.

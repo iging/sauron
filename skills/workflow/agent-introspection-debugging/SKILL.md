@@ -2,7 +2,7 @@
 name: agent-introspection-debugging
 description: Structured self-debugging workflow for autonomous agents covering failure state capture, context pressure analysis, root-cause diagnosis, and contained recovery.
 department: workflow
-ownerAgent: gandalf
+ownerAgent: legolas
 triggerCommand: /agent-introspection-debugging
 antiPatternsPrevented:
   - AP-1
@@ -17,25 +17,27 @@ antiPatternsPrevented:
 
 ## 0. Identity
 
-- **Role:** Autonomous Agent Diagnostics and Introspection Specialist. Investigates recursive tool loops, context window degradation, token burnout, and state mismatches before executing contained recoveries.
-- **Authority:** Normative tier-4 standard under `skills/workflow/agent-introspection-debugging/`.
+- **Role:** Diagnostic Analyst. Owns agent failure classification with evidence spans and contained recovery.
+- **Role source:** Appendix A of `skills/_template/skill-name/SKILL.md` (Diagnostic Analyst).
+- **Seniority bar:** Staff (Appendix B). Records why single-hypothesis checks beat blind retries (verified state before mutation, rejected identical replays), why world-state grounding beats session memory (files and processes over recollection, rejected memory-trust), and why trimming preserves goals while dropping bulk.
+- **Authority:** Tier-5 normative skill for `skills/workflow/agent-introspection-debugging/`. Owns self-debug protocol guidance.
 - **Must not define:** General code refactoring or external infrastructure provisioning.
-- **Normative base:** `core/fellowship/gandalf.md`, `rules/engineering/architecture-boundaries.md`, and `references/anti-patterns.md`.
+- **Normative base:** `core/fellowship/legolas.md`, `rules/engineering/architecture-boundaries.md`, and `references/anti-patterns.md`.
 - **Anti-pattern gate:** Blocks AP-28 (unbounded loops), AP-53 (blind tool execution without verification), and AP-4 (over-permissive execution).
 
 ## 1. Intent (9 Dimensions)
 
-| #   | Dimension        | Value                                                                                      |
-| --- | ---------------- | ------------------------------------------------------------------------------------------ |
-| 1   | Task             | Intercept and diagnose agent task failures, infinite loops, and token exhaustion.          |
-| 2   | Target Tool      | Autonomous agents across Claude Code, Codex, Cursor, Windsurf, and Antigravity.            |
-| 3   | Output Format    | Structured Failure Capture blocks, Diagnosis findings, and Contained Recovery action logs. |
-| 4   | Constraints      | Banish blind retries. Require single-action hypotheses before modifying environment.       |
-| 5   | Input            | Execution transcripts, tool call history, error traces, working directory state.           |
-| 6   | Context          | Prevents runaway token burn, catastrophic hallucinated edits, and state desynchronization. |
-| 7   | Audience         | Autonomous agents, human operators, debugging subagents.                                   |
-| 8   | Success Criteria | Deterministic root cause identified in under 2 iterations; zero repetitive tool loops.     |
-| 9   | Examples         | See Section 5.                                                                             |
+| #   | Dimension        | Value                                                                                          |
+| --- | ---------------- | ---------------------------------------------------------------------------------------------- |
+| 1   | Task             | Intercept and diagnose agent failures with capture, classification, and contained recovery.     |
+| 2   | Target Tool      | Autonomous agents across Claude Code, Codex, Cursor, Windsurf, and Antigravity.                |
+| 3   | Output Format    | Structured Failure Capture blocks, Diagnosis findings, and Contained Recovery action logs.     |
+| 4   | Constraints      | Banish blind retries. Single-action hypotheses only. Zero em dashes.                           |
+| 5   | Input            | Execution transcripts, tool call history, error traces, working directory state.               |
+| 6   | Context          | Prevents runaway token burn, hallucinated edits, and state desynchronization.                  |
+| 7   | Audience         | Autonomous agents, human operators, debugging subagents.                                        |
+| 8   | Success Criteria | Deterministic root cause in under 2 iterations; zero repetitive tool loops.                     |
+| 9   | Examples         | See Section 10.                                                                                 |
 
 ## 2. Trigger Matrix
 
@@ -47,85 +49,89 @@ antiPatternsPrevented:
 | Standard application unit test failure during feature build | NO    | Route to `skills/workflow/autonomous-dev/05-quality-and-testing/test-driven-development/`. |
 | General codebase security scan                              | NO    | Route to `skills/security/security-auditor/`.                                              |
 
-## 3. Core Architectural Directives
+## 3. Execution Workflow
 
-1. **Banish Blind Retries:** Never repeat a failed tool invocation with identical parameters. Each retry must be preceded by an explicit state verification check.
-2. **Four-Phase Diagnosis Protocol:**
-   - **Phase 1: Failure Capture:** Record exact error message, stack trace, tool call sequence, and environment assumptions.
-   - **Phase 2: Root-Cause Diagnosis:** Match observed pattern against known failure classes (Tool loop, Context overflow, Network fault, File system drift).
-   - **Phase 3: Contained Recovery:** Execute the smallest reversible action that tests the diagnosis hypothesis.
-   - **Phase 4: Introspection Report:** Summarize root cause, corrective intervention, and prevention directives.
-3. **Context Trimming Discipline:** When context approaches saturation thresholds, eliminate duplicate command outputs and dead-end transcripts while preserving active goals and file paths.
-4. **World State Grounding:** Verify file existence, git branch, and active processes via direct shell observations rather than relying on session memory.
+### Step 1: Capture Failure State
 
-## 4. Execution Workflow
+- **Action:** Record failing command, error payload, last three tool operations, and environment assumptions in a structured block.
+- **Input:** Execution transcripts from user.
+- **Stop Condition:** Halt if failure details stay indeterminable; query operator for logs.
+- **Validation:** Capture block populated with concrete data.
 
-### Step 1: Failure Capture
+### Step 2: Classify Root Cause
 
-- **Action:** Record the failing command, error payload, and the last three tool operations.
-- **Stop Condition:** Halt if failure details cannot be determined; query operator for logs.
-- **Validation:** Failure capture block populated with concrete data.
+- **Action:** Match symptoms against loop, overflow, network, and drift classes. Form one crisp hypothesis per failure.
+- **Input:** Capture block from Step 1.
+- **Stop Condition:** Halt on speculative multi-cause lists; require single hypothesis.
+- **Validation:** Hypothesis recorded with discriminating check.
 
-### Step 2: Root-Cause Classification
+### Step 3: Recover Minimally
 
-- **Action:** Compare symptoms against diagnostic taxonomy:
-  - Repeated identical tool calls: Observer loop or missing exit criteria.
-  - Degraded reasoning: Excessive low-signal context.
-  - File missing after write: Working directory mismatch or branch desynchronization.
-- **Validation:** Single crisp root-cause hypothesis formulated.
+- **Action:** Execute the smallest reversible check validating the hypothesis. Trim context preserving goals and paths. Ground world state via direct observation.
+- **Input:** Hypothesis from Step 2.
+- **Stop Condition:** Halt before irreparable actions; require reversibility.
+- **Validation:** Check confirms cause before fixes proceed.
 
-### Step 3: Contained Action and Recovery
+### Step 4: Handoff and Human Review
 
-- **Action:** Execute a single minimal check (for example `git status` or path verification) to validate the hypothesis.
-- **Validation:** Verification check confirms root cause before proceeding with fixes.
+- **Action:** Present the introspection report with prevention guidance and request operator review on repeated failures.
+- **Input:** Completed report.
+- **Stop Condition:** Await operator input on escalations.
+- **Validation:** Report recorded; loops broken verifiably.
 
-## 5. Reference Implementation
-
-### Structured Self-Debug and Introspection Templates
+## 4. Output Specification
 
 ```markdown
-## Failure Capture
+# Introspection Report
 
-- Session / Task: Order fulfillment API migration
-- Goal in progress: Add database transaction wrapper to checkout service
-- Error: FileNotFoundError: [Errno 2] No such file or directory: 'src/services/checkout.ts'
-- Last successful step: Read schema definitions in 'src/db/schema.ts'
-- Last failed tool / command: view_file on 'src/services/checkout.ts'
-- Repeated pattern seen: None (first occurrence)
-- Environment assumptions to verify: Current working directory and file path location
-
-## Root Cause Diagnosis
-
-- Observed symptom: Target file path does not exist at expected relative location.
-- Hypothesis: File resides under 'src/modules/checkout/checkout.service.ts' per modular organization.
-- Discriminating check: Run glob search for '_checkout_' across the repository.
-
-## Recovery Action
-
-- Smallest action taken: Executed directory listing to verify true path.
-- Result: Confirmed path is 'src/modules/checkout/checkout.service.ts'.
-- Resolution: Resumed inspection with corrected path.
+- **Capture:** [Failure block]
+- **Diagnosis:** [Hypothesis with check]
+- **Recovery:** [Minimal action log]
 ```
 
-## 6. Validation Gate
+## 5. Validation Gate
 
-Run before marking self-debug resolution complete:
+- [ ] Failure captured with concrete data.
+- [ ] Single hypothesis classified.
+- [ ] Recovery minimal and reversible.
+- [ ] Zero em dashes in deliverable.
+- [ ] Operator review on escalations.
 
-- [ ] Exact error message and failing step recorded in Failure Capture.
-- [ ] Root cause classified without speculative guessing.
-- [ ] Direct file system or process observation executed to verify state.
-- [ ] Zero unverified blind retries performed.
-- [ ] Introspection report delivers actionable prevention guidance for future sessions.
+## 6. Anti-Triggers and Calibration
 
-## 7. Versioning & Portability Matrix
+- **Under-execution threshold:** Retrying failures without capture.
+- **Over-execution threshold:** Refactoring codebases unprompted.
+- **Calibration default:** Capture first; hypothesize once; act small.
 
-- **Version:** 1.0.0
+## 7. Anti-Pattern Compliance
+
+| Step | Prevents AP            | Mechanism                                           |
+| ---- | ---------------------- | --------------------------------------------------- |
+| 1    | AP-1 (vague task)      | Requires capture block first.                       |
+| 2    | AP-53 (blind tools)    | Demands single hypothesis.                          |
+| 3    | AP-28 (no stop)        | Bounds recovery to reversible acts.                 |
+| 4    | AP-45 (no human review)| Escalates repeats to operators.                     |
+
+## 8. Versioning & Changelog
+
+- **Version:** 2.0.0
 - **Changelog:**
-  - `1.0.0` (2026-09-20): Created Sauron Tier-5 skill aligned with ECC agent-introspection-debugging patterns.
+  - `2.0.0` (2026-09-26) - Tier-5 conversion with Diagnostic Analyst role, role source, and seniority bar.
+  - `1.0.0` (2026-09-20) - Created Sauron Tier-5 skill aligned with ECC agent-introspection-debugging patterns.
 
-| Runtime / Harness | Status   | Notes                   |
-| ----------------- | -------- | ----------------------- |
-| Claude Code       | verified | Native diagnostic loop. |
-| Cursor            | verified | Fully supported.        |
-| Windsurf          | verified | Fully supported.        |
-| Antigravity       | verified | Certified.              |
+## 9. Portability Matrix
+
+| Runtime     | Status   | Notes                           |
+| ----------- | -------- | ------------------------------- |
+| Claude Code | verified | Direct slash command execution. |
+| Cursor      | verified | Rules and prompt loading.       |
+| Copilot     | verified | Custom instructions support.    |
+| Windsurf    | verified | Cascade flow integration.       |
+| Kiro        | verified | Steering model execution.       |
+| Cline       | verified | Task step-by-step flow.         |
+| Raw API     | verified | Model-agnostic execution.       |
+
+## 10. Examples
+
+**Input:** "Agent loops on missing checkout.ts with repeated views."
+**Output:** Capture block with corrected modular path, verified by glob, resuming inspection.

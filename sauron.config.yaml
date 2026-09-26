@@ -70,7 +70,9 @@ fellowship:
 # Active Skill Domains
 departments:
   architecture: true
+  ai-engineering: true
   backend: true
+  database: true
   devops: true
   frontend: true
   quality: true

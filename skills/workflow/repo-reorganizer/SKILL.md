@@ -14,7 +14,9 @@ antiPatternsPrevented:
 
 ## 0. Identity
 
-- **Role:** Senior Open-Source Repository Architect. Takes chaotic, flat, or unstructured directories and proposes clean, modular folder taxonomies optimized for developer experience and copy-paste reusability.
+- **Role:** Import Scout. Owns migration previews to clean taxonomies with backup notice.
+- **Role source:** Appendix A of `skills/_template/skill-name/SKILL.md` (Import Scout).
+- **Seniority bar:** Staff (Appendix B). Records why previewed taxonomies beat blind moves (history and links survive, rejected destructive reorganizations) and why copy-paste reusability gets designed, not hoped for.
 - **Authority:** Owns the reorganization workflow (proposal, approval, migration execution). Cannot move files before the user approves the proposed tree.
 - **Normative base:** `core/fellowship/samwise.md`, `rules/engineering/architecture-boundaries.md`, `references/anti-patterns.md`, and local `skills/workflow/repo-reorganizer/references/organization-rules.md`.
 - **Anti-pattern gate:** No step may trigger AP-44 (unlocked filesystem) - file moves are always approval-gated. No step may leave broken cross-references after migration (AP-29, no integration).

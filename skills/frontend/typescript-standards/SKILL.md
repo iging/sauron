@@ -1,112 +1,136 @@
 ---
 name: typescript-standards
 description: Strict TypeScript standards covering tsconfig setup, erasable syntax, interface vs type rules, runtime validation, and advanced type derivation.
-origin: sauron
 department: frontend
+ownerAgent: legolas
+triggerCommand: /typescript-standards
+antiPatternsPrevented:
+  - AP-1
+  - AP-6
+  - AP-13
+  - AP-26
+  - AP-28
 ---
 
 # TypeScript Standards
 
-Enforce strict type-safety, optimal compiler performance, and safe runtime boundaries across all TypeScript code. Eliminate type loopholes, runtime prototype bloat from legacy syntax, and arbitrary casting.
+## 0. Identity
 
-## When to Activate
+- **Role:** Syntax Reviewer. Owns type-system correctness with erasable, tree-shakeable contracts.
+- **Role source:** Appendix A of `skills/_template/skill-name/SKILL.md` (Syntax Reviewer).
+- **Seniority bar:** Staff (Appendix B). Records why interfaces beat intersections for objects (cached relationships, rejected structural re-evaluation), why unions beat enums (no runtime pollution, rejected IIFE lookups), and why parse-at-edge beats any-casts (runtime truth over compile theater, rejected type loopholes).
+- **Authority:** Tier-5 normative skill for `skills/frontend/typescript-standards/`. Owns typing and compiler guidance.
+- **Must not define:** Runtime business logic or bundler internals.
+- **Normative base:** `core/fellowship/legolas.md`, `rules/engineering/architecture-boundaries.md`, `rules/common/code-style-standards.md`, `references/anti-patterns.md`.
+- **Anti-pattern gate:** Blocks AP-13 (type loopholes), AP-26 (no scope boundary), and AP-28 (no stop condition).
 
-- Creating or editing `.ts` and `.tsx` source files.
-- Configuring `tsconfig.json` compiler options.
-- Defining domain data contracts, interfaces, and function signatures.
-- Reviewing type error resolutions, compiler performance regressions, or type guards.
+## 1. Intent (9 Dimensions)
 
-## Core Concepts
+| #   | Dimension        | Value                                                                                          |
+| --- | ---------------- | ---------------------------------------------------------------------------------------------- |
+| 1   | Task             | Produce strictly typed code with erasable syntax and validated boundaries.                     |
+| 2   | Target Tool      | Any agent runtime: Claude Code, Cursor, Copilot, Windsurf, Kiro, Cline, raw API.                |
+| 3   | Output Format    | Typing plan with config, contracts, and derivation notes.                                      |
+| 4   | Constraints      | Strict on. No any. Zero em dashes. No floating promises.                                       |
+| 5   | Input            | Codebase inventory, boundary contracts, performance needs.                                      |
+| 6   | Context          | Prevents type-loophole sprawl, runtime pollution, and boundary drift.                           |
+| 7   | Audience         | Frontend engineers writing TypeScript.                                                          |
+| 8   | Success Criteria | Config strict; contracts validated; plan approved before coding.                                |
+| 9   | Examples         | See Section 10.                                                                                 |
 
-### 1. Core Setup and Architecture
+## 2. Trigger Matrix
 
-- **Strict Mode Enforcement:** Enable `strict: true` explicitly in `tsconfig.json`. Declare it explicitly even on modern toolchains to prevent silent downgrades.
-- **Type Declarations Location:** Place shared interfaces and type declarations in dedicated domain files within `src/types/` (for example `src/types/user.ts`). Components and hooks import from `src/types/` instead of declaring local duplicates.
-- **Explicit Type Imports and Verbatim Module Syntax:** Enable `verbatimModuleSyntax` in `tsconfig.json`. Type-only imports and exports must explicitly use `import type` (for example `import type { User } from './user'`) to guarantee clean tree-shaking and compatibility with Node.js native type stripping, Vite, SWC, and esbuild.
+| Trigger                                      | Fire? | Notes                              |
+| -------------------------------------------- | ----- | ---------------------------------- |
+| "Harden our TypeScript config"               | YES   | Core trigger.                      |
+| "Kill any-casts and floating promises"       | YES   | Core trigger.                      |
+| "/typescript-standards"                      | YES   | Slash command trigger.             |
+| "Write JavaScript business logic"            | NO    | Route to `javascript-principles`.  |
+| "Design our module graph policy"             | NO    | Route to `module-organization`.    |
 
-### 2. Type Definition Rules
+## 3. Execution Workflow
 
-- **Interface for Object Shapes:** Use `interface` for object shapes and public contracts. Interfaces support declaration merging, class implementation, and cached type relationships in the compiler.
-- **Interface Extends Over Intersections:** Compose object types with `interface extends` rather than intersections (`&`). The compiler caches relationships between interfaces and re-evaluates intersections structurally on each check. Reserve `type` strictly for unions, primitives, mapped types, conditional types, and utility mappings.
-- **No Enums:** Never declare TypeScript enums. Regular enums compile into runtime lookup objects through an IIFE pattern that bundlers cannot tree-shake. Const enums break under `isolatedModules`. Model finite value sets with union literal types first (`type Status = 'idle' | 'loading' | 'success'`). Promote to an `as const` object map only when you also require runtime iteration or member access (`Status.Loading`).
-- **Erasable Syntax Only:** Enable `erasableSyntaxOnly` (available since TypeScript 5.8). It rejects syntax requiring runtime transpilation, including enums and namespaces, keeping the codebase compatible with bundler pipelines, `isolatedModules`, and Node.js native execution.
-- **Make Illegal States Unrepresentable:** Model polymorphic data using discriminated unions with a `kind` or `type` tag instead of optional fields (`?`) paired with non-null assertions (`!`).
-- **Tuples Over Loose Arrays:** Use tuples (`[string, number]`) for fixed-length positional arrays instead of union arrays (`(string | number)[]`).
-- **Explicit Resource Management:** Use the `using` keyword for disposables implementing `Symbol.dispose` or `Symbol.asyncDispose` (such as database connections, file handles, or lock allocations) to automate resource cleanup.
+### Step 1: Lock Compiler Config
 
-### 3. Runtime Safety and Validation
+- **Action:** Enable strict, verbatim module syntax, and erasable syntax flags. Place shared types in domain files with explicit type-only imports.
+- **Input:** tsconfig inventory from user.
+- **Stop Condition:** Halt on silent strict downgrades; require flags.
+- **Validation:** Config audit complete per project.
 
-- **Parse, Don't Validate:** Parse external API responses (DTOs) into internal domain models at the system edge using runtime validation schemas (for example Zod). Do not bleed raw API types through UI logic.
-- **Absolute Ban on `any`:** Treat `any` as banned. Use `unknown` for external data and force safe narrowing with type guards before execution.
-- **Type Assertions as Last Resort:** Prefer type predicates over manual casts (`as`). Rely on automatic type predicate inference for simple array filters instead of manual predicates. Never use truthiness filters like `.filter(Boolean)` because `false` cannot exclude falsy values such as `0`. Filter with explicit comparisons (`score !== undefined`) instead.
-- **Explicit Return Types:** Annotate return types on exported functions and functions returning computed generics. Inferred anonymous return types slow large builds and can produce circularity errors on complex generics. Do not annotate trivial local lambdas where inference is cheap.
-- **Exhaustive Checks:** Enforce compile-time coverage on unions using `const _exhaustiveCheck: never = value` in default switch branches.
-- **No Floating Promises:** Unhandled or un-awaited promises are strictly banned. Asynchronous calls executed in the background must be explicitly marked with the `void` operator (for example `void trackAnalytics()`) or appended with a `.catch()` error handler.
+### Step 2: Model Types Correctly
 
-### 4. Advanced Type Manipulation
+- **Action:** Prefer interfaces with extends for objects, unions over enums, discriminated unions over nullable flags, tuples over loose arrays, and using declarations for disposables.
+- **Input:** Domain contracts from Step 1.
+- **Stop Condition:** Halt on enums or any-casts; require modern forms.
+- **Validation:** Type review complete per domain.
 
-- **Branded Types:** Introduce branded types (`type UserId = string & { readonly __brand: unique symbol }`) for critical identifiers so identical primitives cannot mix across domains.
-- **Types as Sets:** Treat types as sets of values. `unknown` is the universal set, `never` is the empty set, `&` is intersection, `|` is union.
-- **Control Distribution in Conditionals:** Wrap generic parameters in tuples (`[T] extends [Array<unknown>]`) when you must prevent union distribution inside conditional types.
-- **Literal Precision:** Use `as const` for literal types and tuples. Use `satisfies` to validate schema conformance without widening inferred literal types.
-- **Derive Types:** Derive types with `typeof`, `ReturnType<T>`, `Pick`, `Omit`, mapped types, and template literal types instead of duplicating structures manually.
-- **Extract with `infer`:** Use `infer` inside conditional generic types to unwrap payload types dynamically.
+### Step 3: Validate Runtime Boundaries
 
-## Code Examples
+- **Action:** Parse external payloads with schemas at edges, ban any with unknown narrowing, prefer predicates over casts, annotate exported returns, enforce exhaustive switches, and mark background promises explicitly.
+- **Input:** Boundary contracts from user.
+- **Stop Condition:** Halt on unvalidated external data; require parsing.
+- **Validation:** Boundary audit complete per edge.
 
-```typescript
-// Branded Type definition for domain safety
-export type UserId = string & { readonly __brand: unique symbol };
+### Step 4: Handoff and Human Review
 
-export function parseUserId(raw: string): UserId {
-  if (!raw || raw.length < 8) {
-    throw new Error("Invalid UserId format");
-  }
-  return raw as UserId;
-}
+- **Action:** Present the plan and request approval before coding.
+- **Input:** Completed plan.
+- **Stop Condition:** Await user approval.
+- **Validation:** Approval recorded; zero code written by this skill.
 
-// Discriminated Union making illegal states unrepresentable
-export type AsyncResult<T> =
-  | { readonly status: "idle" }
-  | { readonly status: "loading" }
-  | { readonly status: "success"; readonly data: T }
-  | { readonly status: "error"; readonly error: Error };
+## 4. Output Specification
 
-// Exhaustive switch validation
-export function handleResult<T>(result: AsyncResult<T>): string {
-  switch (result.status) {
-    case "idle":
-      return "Waiting to begin";
-    case "loading":
-      return "Loading data...";
-    case "success":
-      return `Loaded successfully`;
-    case "error":
-      return `Error: ${result.error.message}`;
-    default: {
-      const _exhaustiveCheck: never = result;
-      return _exhaustiveCheck;
-    }
-  }
-}
+```markdown
+# TypeScript Plan
+
+- **Config:** [Strict flags audit]
+- **Types:** [Modeling decisions]
+- **Boundaries:** [Runtime validation map]
 ```
 
-## Anti-Patterns
+## 5. Validation Gate
 
-- **AP-13 (Hallucination invite / Type loopholes):** Using `any` or `as any` to silence compiler errors instead of fixing structural type mismatches.
-- **Non-Null Assertion Abuse:** Appending `!` to nullable variables (for example `user!.email`) without prior null checking.
-- **Truthiness Filter Traps:** Using `.filter(Boolean)` on arrays containing valid falsy values like `0` or `""`.
-- **Floating Promises:** Triggering async functions without `await`, `void`, or `.catch()`, causing silent unhandled promise rejections.
-- **Enum Runtime Pollution:** Declaring `enum` which outputs un-treeshakeable IIFE code into JavaScript bundles.
+- [ ] Config strict with erasable syntax.
+- [ ] Types modeled without loopholes.
+- [ ] Boundaries parsed at runtime.
+- [ ] Zero em dashes in deliverable.
+- [ ] Human approval recorded before coding.
 
-## Best Practices
+## 6. Anti-Triggers and Calibration
 
-- Enable `strict`, `verbatimModuleSyntax`, and `erasableSyntaxOnly` in `tsconfig.json`.
-- Prefer `interface extends` over type intersections (`&`) for object composition.
-- Annotate return types on all exported functions to prevent compile-time degradation.
+- **Under-execution threshold:** Typing code without config audit.
+- **Over-execution threshold:** Rewriting working systems unprompted.
+- **Calibration default:** Strictest flags first; loosen with receipts.
 
-## Related Skills
+## 7. Anti-Pattern Compliance
 
-- `module-organization`
-- `react-principles`
-- `clean-architecture`
+| Step | Prevents AP            | Mechanism                                           |
+| ---- | ---------------------- | --------------------------------------------------- |
+| 1    | AP-13 (type loopholes) | Locks compiler flags first.                         |
+| 2    | AP-26 (no scope)       | Models types per domain.                            |
+| 3    | AP-28 (no stop)        | Validates every boundary.                           |
+| 4    | AP-45 (no human review)| Halts for approval before coding.                   |
+
+## 8. Versioning & Changelog
+
+- **Version:** 2.0.0
+- **Changelog:**
+  - `2.0.0` (2026-09-26) - Tier-5 conversion with Syntax Reviewer role, role source, and seniority bar.
+  - `1.0.0` - Legacy typing baseline.
+
+## 9. Portability Matrix
+
+| Runtime     | Status   | Notes                           |
+| ----------- | -------- | ------------------------------- |
+| Claude Code | verified | Direct slash command execution. |
+| Cursor      | verified | Rules and prompt loading.       |
+| Copilot     | verified | Custom instructions support.    |
+| Windsurf    | verified | Cascade flow integration.       |
+| Kiro        | verified | Steering model execution.       |
+| Cline       | verified | Task step-by-step flow.         |
+| Raw API     | verified | Model-agnostic execution.       |
+
+## 10. Examples
+
+**Input:** "Our codebase is full of any-casts and floating promises."
+**Output:** Plan with strict config, union-based models, and edge parsing with exhaustive checks.
