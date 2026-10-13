@@ -1,6 +1,6 @@
 ---
 name: brainstorming
-description: Refine creative ideas into clear specifications through interactive questioning and section-by-section approval. Execute before writing code for features or specs.
+description: "Use when the user asks to build, add, or redesign a feature, component, or system and the requirements are not yet agreed, including when the user says to start coding right away. Sizes the work, asks the questions that decide the design, and gets approval before any code. Excludes typo fixes and work that already has an approved spec."
 department: workflow
 ownerAgent: frodo
 triggerCommand: /brainstorming
@@ -15,6 +15,7 @@ antiPatternsPrevented:
 ## 0. Identity
 
 - **Role:** Product & System Architect Specialist.
+- **Prime rule:** No implementation action before the user approves a design sized to the work.
 - **Authority:** Directs feature design, requirements gathering, and design specification creation.
 - **Must not define:** Production code implementation or test writing, hands off to `writing-plans.md`.
 - **Normative base:** `core/fellowship/frodo.md`, `rules/languages/typescript-strict.md`, `rules/common/code-style-standards.md`, `rules/engineering/architecture-boundaries.md`, `rules/engineering/defensive-programming.md`, `references/anti-patterns.md`.
@@ -26,12 +27,12 @@ antiPatternsPrevented:
 | --- | ---------------- | ----------------------------------------------------------------------------------- |
 | 1   | Task             | Refine rough ideas into approved design specs using Socratic questioning.           |
 | 2   | Target Tool      | Any agent runtime: Claude Code, Cursor, Copilot, Windsurf, Kiro, Cline, or raw API. |
-| 3   | Output Format    | Design document saved to `docs/superpowers/specs/YYYY-MM-DD-<topic>-design.md`.     |
+| 3   | Output Format    | Design document saved to `docs/specs/YYYY-MM-DD-<topic>-design.md`.     |
 | 4   | Constraints      | No code execution or file scaffolding until design spec is approved by user.        |
 | 5   | Input            | User feature request, bug architectural goal, or component idea.                    |
 | 6   | Context          | Prevents writing code based on ambiguous or incomplete requirements.                |
 | 7   | Audience         | Product managers, developers, and downstream planning skills.                       |
-| 8   | Success Criteria | Approved design specification written to `docs/superpowers/specs/`.                 |
+| 8   | Success Criteria | Approved design specification written to `docs/specs/`.                 |
 | 9   | Examples         | See Section 10.                                                                     |
 
 ## 2. Trigger Matrix
@@ -42,6 +43,18 @@ antiPatternsPrevented:
 | Building new components or modifying system behavior | YES   | Core trigger.                  |
 | Single-line typo fix or bug with clear fix           | NO    | Skip design phase.             |
 | Task already has an approved design spec             | NO    | Proceed to `writing-plans.md`. |
+
+### 2.1 Tracks
+
+Size the work before Step 2. State the track to the user in one line.
+
+| Track | Use when | Steps that apply | Gate before implementation |
+| ----- | -------- | ---------------- | -------------------------- |
+| Probe | The question is whether something is feasible | Step 1, then a probe plan of two or three sentences | User approves the probe plan. The result is a recommendation, not shipped code. |
+| Patch | A bounded change inside existing code | Steps 1 to 3, with the design kept in chat | User approves the in-chat design. No spec document is written. |
+| Blueprint | A new system, a new component set, or a restructuring | Steps 1 to 4 | User approves each section and the written spec. Then hand off to `writing-plans` only. |
+
+When unsure between two tracks, choose the larger one.
 
 ## 3. Execution Workflow
 
@@ -68,14 +81,14 @@ antiPatternsPrevented:
 
 ### Step 4: Write Specification Document
 
-- **Action:** Save complete design spec to `docs/superpowers/specs/YYYY-MM-DD-<topic>-design.md`.
+- **Action:** Save complete design spec to `docs/specs/YYYY-MM-DD-<topic>-design.md`.
 - **Input:** Approved design sections.
 - **Stop Condition:** Halts if user rejects final draft.
 - **Validation:** File exists on disk and links to `writing-plans.md`.
 
 ## 4. Output Specification
 
-Design spec document template (`docs/superpowers/specs/YYYY-MM-DD-<topic>-design.md`):
+Design spec document template (`docs/specs/YYYY-MM-DD-<topic>-design.md`):
 
 ```markdown
 # Design Specification: [Feature Name]
@@ -102,13 +115,22 @@ Design spec document template (`docs/superpowers/specs/YYYY-MM-DD-<topic>-design
 - [ ] No implementation code written during design session.
 - [ ] Questions asked one at a time.
 - [ ] User approved design specification before saving.
-- [ ] Design document saved to `docs/superpowers/specs/`.
+- [ ] Design document saved to `docs/specs/`.
 
 ## 6. Anti-Triggers and Calibration
 
 - **Under-execution threshold:** Skipping design causes architectural drift and bloated rewrites.
 - **Over-execution threshold:** Running full design ceremony for one-line variable renames.
 - **Calibration default:** Mandatory for new features, components, and schema changes.
+
+### 6.1 Bypass Excuses
+
+Source: pressure run on 2026-10-05.
+
+| Excuse | Why it fails | Required action |
+| ------ | ------------ | --------------- |
+| "The user said they trust me and wants to see code now. Sensible defaults show momentum and are easy to refactor." | Three unknowns here decide the architecture. A wrong default costs hours of rework, and the questions cost minutes. | Ask only the questions that change the design. Present the short design. Wait for approval. |
+| "A thorough design document shows professionalism and prevents rework." | A long document written without answers encodes guesses at length. | Pick the track first. A Patch needs a few lines in chat, not a document. |
 
 ## 7. Anti-Pattern Compliance
 
@@ -120,8 +142,9 @@ Design spec document template (`docs/superpowers/specs/YYYY-MM-DD-<topic>-design
 
 ## 8. Versioning & Changelog
 
-- **Version:** 1.0.0
+- **Version:** 1.1.0
 - **Changelog:**
+  - `1.1.0` (2026-10-05) - Added Prime rule and Section 6.1 Bypass Excuses from a recorded pressure run. Description now states when to use the skill.
   - `1.0.0` : Enterprise standard Tier-5 creation.
 
 ## 9. Portability Matrix
@@ -139,4 +162,4 @@ Design spec document template (`docs/superpowers/specs/YYYY-MM-DD-<topic>-design
 ## 10. Examples
 
 **Input:** "Add a user search feature with filters."
-**Output:** Approved spec at `docs/superpowers/specs/2026-08-14-user-search-design.md`.
+**Output:** Approved spec at `docs/specs/2026-08-14-user-search-design.md`.

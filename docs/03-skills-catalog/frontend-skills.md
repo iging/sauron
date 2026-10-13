@@ -12,20 +12,20 @@ The Frontend domain houses skills governing user interface architecture, aesthet
 
 ### Stages of Design Engineering:
 
-1. **Foundations & Systems (`01-foundations-and-systems`)**:
+1. **Foundations & Systems (`01-foundations`)**:
    - `core-design-principles`: Establishes visual hierarchy, whitespace rules, and typographic scales.
    - `design-tokens`: Generates and syncs color, spacing, and elevation variables.
-   - `ui-ux-stack-compliance-auditor`: Audits frontend setups against design system requirements.
-2. **Aesthetic Engines & Styles (`02-aesthetic-engines-and-styles`)**:
-   - Dedicated engines for distinct aesthetics: `anti-slop-aesthetic-tuning-engine`, `apple-human-interface-motion-spec`, `codex-aida-landing-structure-engine`, `ethereal-glass-agency-aesthetic`, `industrial-brutalist-telemetry-hud`, `utilitarian-minimalist-layout-engine`, `high-craft-gpu-performance-auditor`.
-3. **Brand Presets & Visual Identity (`03-brand-presets-and-visual-identity`)**:
-   - Moodboards and identity generators (`brandkit-moodboard-prompt-generator`).
-4. **Motion & Interaction (`04-motion-and-interaction`)**:
-   - Micro-interactions, spring curves, and gap scanners (`codebase-motion-gap-scanner`, `motion-codebase-refactor-planner`, `pull-request-motion-review-gate`).
-5. **Vision & Code Generation (`05-vision-and-code-generation`)**:
-   - Converts visual mockups and screenshots into clean component code (`visual-comp-image-to-code-converter`).
-6. **Audit & Refactor (`06-audit-refactor-and-enforcement`)**:
-   - Visual redesign audits and placeholder removal (`zero-placeholder-code-enforcer`).
+   - `component-audit-and-fix`: Audits frontend setups against design system requirements.
+2. **Aesthetic Engines & Styles (`02-styles`)**:
+   - Dedicated engines for distinct aesthetics: `anti-slop-ui-builder`, `apple-style-motion`, `aida-landing-page-structure`, `style-glass-agency`, `style-brutalist`, `style-minimalist`, `motion-component-polish`.
+3. **Brand Presets & Visual Identity (`03-brand`)**:
+   - Moodboards and identity generators (`brand-moodboard-prompts`).
+4. **Motion & Interaction (`04-motion`)**:
+   - Micro-interactions, spring curves, and gap scanners (`motion-gap-scanner`, `motion-refactor-planner`, `motion-pr-review`).
+5. **Vision & Code Generation (`05-image-to-code`)**:
+   - Converts visual mockups and screenshots into clean component code (`image-to-code-builder`).
+6. **Audit & Refactor (`06-audit`)**:
+   - Visual redesign audits and placeholder removal (`complete-code-enforcer`).
 
 ---
 

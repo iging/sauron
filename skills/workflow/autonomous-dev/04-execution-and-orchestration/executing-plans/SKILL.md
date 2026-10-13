@@ -1,6 +1,6 @@
 ---
 name: executing-plans
-description: Execute implementation plans sequentially within main context with interactive batching and user checkpoints.
+description: "Use when an approved implementation plan exists and the tasks will be run in the current session, in small batches with a user checkpoint after each. Stops at the first failed verification. Excludes work with no written plan and plans better run with subagents."
 department: workflow
 ownerAgent: frodo
 triggerCommand: /executing-plans
@@ -15,6 +15,7 @@ antiPatternsPrevented:
 ## 0. Identity
 
 - **Role:** Sequential Implementation Task Executor.
+- **Prime rule:** A failed verification stops the batch. Nothing after it runs until the user answers.
 - **Authority:** Controls step-by-step plan execution within main agent session.
 - **Must not define:** Unplanned structural edits, strictly follows implementation plan tasks.
 - **Normative base:** `core/fellowship/frodo.md`, `rules/languages/typescript-strict.md`, `rules/common/code-style-standards.md`, `rules/engineering/architecture-boundaries.md`, `rules/engineering/defensive-programming.md`, `references/anti-patterns.md`.
@@ -28,7 +29,7 @@ antiPatternsPrevented:
 | 2 | Target Tool | Any agent runtime: Claude Code, Cursor, Copilot, Windsurf, Kiro, Cline, or raw API. |
 | 3 | Output Format | Completed code changes with updated plan checkboxes and test execution logs. |
 | 4 | Constraints | Must halt after batch of 1-3 tasks for user verification. Must follow TDD cycles. |
-| 5 | Input | Implementation plan path from `docs/superpowers/plans/`. |
+| 5 | Input | Implementation plan path from `docs/plans/`. |
 | 6 | Context | Prevents runaway context expansion during sequential execution. |
 | 7 | Audience | Developers performing guided plan execution. |
 | 8 | Success Criteria | Plan tasks completed sequentially with zero skipped verification checks. |
@@ -38,7 +39,7 @@ antiPatternsPrevented:
 
 | Trigger | Fire? | Notes |
 |---------|-------|-------|
-| Implementation plan ready in `docs/superpowers/plans/` | YES | Core trigger. |
+| Implementation plan ready in `docs/plans/` | YES | Core trigger. |
 | User requests direct sequential plan execution | YES | Core trigger. |
 | Autonomous subagent orchestration requested | NO | Use `subagent-driven-development.md`. |
 | No implementation plan exists | NO | Run `writing-plans.md` first. |
@@ -78,7 +79,7 @@ antiPatternsPrevented:
 ```markdown
 # Execution Batch Report
 
-- Plan File: `docs/superpowers/plans/2026-08-14-user-search.md`
+- Plan File: `docs/plans/2026-08-14-user-search.md`
 - Tasks Completed In Batch: Step 1, Step 2
 - Test Suite Status: 100% Passing (14 tests)
 - Awaiting User Direction: Ready for Step 3 batch.
@@ -97,6 +98,15 @@ antiPatternsPrevented:
 - **Over-execution threshold:** Asking user permission for every single line of code.
 - **Calibration default:** Batch size of 1-3 tasks per checkpoint.
 
+### 6.1 Bypass Excuses
+
+Source: pressure run on 2026-10-05.
+
+| Excuse | Why it fails | Required action |
+| ------ | ------------ | --------------- |
+| "Task 3 is independent, so we maximize productivity and report everything together at the checkpoint." | The plan was written assuming task 2 works. Work stacked on a failed task hides the failure and enlarges the rollback. | Stop. Report the failure with the command output. Wait. |
+| "The code looks right to me. Verification tools are sometimes flaky, so marking it complete avoids false delays." | "Looks right" is not evidence. Marking a failed task complete is a false completion report (AP-57). | Leave the task open. Report the output as it is. |
+
 ## 7. Anti-Pattern Compliance
 
 | Step | Prevents AP | Mechanism |
@@ -107,8 +117,9 @@ antiPatternsPrevented:
 
 ## 8. Versioning & Changelog
 
-- **Version:** 1.0.0
+- **Version:** 1.1.0
 - **Changelog:**
+  - `1.1.0` (2026-10-05) - Added Prime rule and Section 6.1 Bypass Excuses from a recorded pressure run. Description now states when to use the skill.
   - `1.0.0` : Enterprise standard Tier-5 creation.
 
 ## 9. Portability Matrix
@@ -125,5 +136,5 @@ antiPatternsPrevented:
 
 ## 10. Examples
 
-**Input:** "Execute batch 1 of plan docs/superpowers/plans/2026-08-14-user-search.md."
+**Input:** "Execute batch 1 of plan docs/plans/2026-08-14-user-search.md."
 **Output:** Step 1 and Step 2 executed, tested, checked off, and presented for review.

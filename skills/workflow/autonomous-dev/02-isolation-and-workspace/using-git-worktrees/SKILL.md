@@ -1,6 +1,6 @@
 ---
 name: using-git-worktrees
-description: Create isolated git worktree environments before implementation to protect main worktrees.
+description: "Use before starting any multi-file feature or plan execution, and whenever the working tree holds uncommitted changes that are not part of the task. Creates an isolated worktree on a new branch and confirms the baseline tests pass before the first edit. Excludes single-file edits the user asked to make in place."
 department: workflow
 ownerAgent: frodo
 triggerCommand: /using-git-worktrees
@@ -15,6 +15,7 @@ antiPatternsPrevented:
 ## 0. Identity
 
 - **Role:** Git Workspace & Branch Isolation Specialist.
+- **Prime rule:** No first edit of multi-file work outside an isolated worktree with a passing baseline.
 - **Authority:** Controls creation of isolated git worktrees and branch environments.
 - **Must not define:** Implementation planning or coding logic, hands off to `writing-plans.md`.
 - **Normative base:** `core/fellowship/frodo.md`, `rules/languages/typescript-strict.md`, `rules/common/code-style-standards.md`, `rules/engineering/architecture-boundaries.md`, `rules/engineering/defensive-programming.md`, `references/anti-patterns.md`.
@@ -96,6 +97,15 @@ antiPatternsPrevented:
 - **Over-execution threshold:** Creating worktrees when already operating in an isolated branch.
 - **Calibration default:** Mandatory for multi-task feature implementations.
 
+### 6.1 Bypass Excuses
+
+Source: pressure run on 2026-10-05.
+
+| Excuse | Why it fails | Required action |
+| ------ | ------------ | --------------- |
+| "Skip setup. Working in place starts now, and the user asked for speed." | The user's uncommitted changes get mixed into your commits, and a failing baseline is found after you have changed six files. | Create the worktree and run the baseline. It takes minutes. |
+| "Stashing clears the workspace in seconds without the worktree overhead." | A stash moves the user's work without their consent and is easy to lose or to pop into conflicts. | Never stash or move the user's changes. Isolate your own work instead. |
+
 ## 7. Anti-Pattern Compliance
 
 | Step | Prevents AP | Mechanism |
@@ -106,8 +116,9 @@ antiPatternsPrevented:
 
 ## 8. Versioning & Changelog
 
-- **Version:** 1.0.0
+- **Version:** 1.1.0
 - **Changelog:**
+  - `1.1.0` (2026-10-05) - Added Prime rule and Section 6.1 Bypass Excuses from a recorded pressure run. Description now states when to use the skill.
   - `1.0.0` : Enterprise standard Tier-5 creation.
 
 ## 9. Portability Matrix

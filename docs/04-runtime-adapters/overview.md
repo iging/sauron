@@ -21,7 +21,7 @@ Sauron supports 17 runtimes grouped into three operational categories:
    - Cline (`.clinerules`)
    - OpenAI Codex (`.codex/instructions.md`)
    - OpenCode (`.opencode/instructions.md`)
-   - OpenClaude (`.openclaude/config.json`)
+   - OpenClaw (`.openclaw/config.json`)
    - Pi (`.pirules`)
 
 3. **Web & Model Interfaces**:

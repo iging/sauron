@@ -30,11 +30,11 @@ This guide covers Sauron's integration with terminal-based autonomous coding age
 
 ---
 
-## 4. OpenCode & OpenClaude
+## 4. OpenCode & OpenClaw
 
 - **Generated Files**:
   - OpenCode: `.opencode/instructions.md`.
-  - OpenClaude: `.openclaude/config.json`.
+  - OpenClaw: `.openclaw/config.json`.
 - **Behavior**:
   - Provides structured instructions and JSON configuration for open-source terminal agents.
 

@@ -29,7 +29,7 @@ graph TD
   Adapters --> OutCline["Cline (.clinerules)"]
   Adapters --> OutTrae["Trae (.traerules)"]
   Adapters --> OutZed["Zed (.zed/prompts/)"]
-  Adapters --> OutOthers["Codex, Gemini, Hermes, Kimi, Kiro, OpenClaude, OpenCode, Pi, Qwen, Adal, CodeBuddy"]
+  Adapters --> OutOthers["Codex, Gemini, Hermes, Kimi, Kiro, OpenClaw, OpenCode, Pi, Qwen, Adal, CodeBuddy"]
 ```
 
 ---
@@ -87,7 +87,7 @@ sauron/
 │   ├── cline.ts             # Cline adapter (.clinerules)
 │   ├── trae.ts              # Trae adapter (.traerules)
 │   ├── zed.ts               # Zed editor adapter (.zed/prompts/ & settings)
-│   └── generic.ts           # Adapters for Codex, Gemini, Hermes, Kimi, Kiro, OpenClaude, OpenCode, Pi, Qwen, Adal, CodeBuddy
+│   └── generic.ts           # Adapters for Codex, Gemini, Hermes, Kimi, Kiro, OpenClaw, OpenCode, Pi, Qwen, Adal, CodeBuddy
 ├── bin/                     # CLI executable entry points
 │   └── sauron.mjs           # Node.js CLI binary
 ├── commands/                # 94 universal markdown slash command definitions
@@ -154,7 +154,7 @@ sauron/
 | 10  | **Hermes**                    | `.hermesrules`                        | Markdown Rules               |
 | 11  | **Kimi**                      | `.kimi/prompt.md`                     | Markdown System Prompt       |
 | 12  | **Kiro**                      | `.kirorules`                          | Markdown Rules               |
-| 13  | **OpenClaude**                | `.openclaude/config.json`             | JSON and Markdown            |
+| 13  | **OpenClaw**                | `.openclaw/config.json`             | JSON and Markdown            |
 | 14  | **OpenCode**                  | `.opencode/instructions.md`           | Markdown Instructions        |
 | 15  | **Pi**                        | `.pirules`                            | Plaintext and Markdown       |
 | 16  | **Qwen**                      | `.qwen/system.md`                     | Markdown System Prompt       |

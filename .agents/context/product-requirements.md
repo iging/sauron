@@ -83,7 +83,7 @@ Translates `sauron.config.yaml` into native rule and command configurations acro
 10. Hermes (`.hermesrules`)
 11. Kimi (`.kimi/prompt.md`)
 12. Kiro (`.kirorules`)
-13. OpenClaude (`.openclaude/config.json`)
+13. OpenClaw (`.openclaw/config.json`)
 14. OpenCode (`.opencode/instructions.md`)
 15. Pi (`.pirules`)
 16. Qwen (`.qwen/system.md`)

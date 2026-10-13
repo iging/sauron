@@ -1,6 +1,6 @@
 ---
 name: writing-plans
-description: Decompose design specs into granular, bite-sized tasks with explicit interfaces and verification steps.
+description: "Use when a design or spec is approved and the work spans several files or tasks, before any implementation starts. Writes a plan with exact file paths, interfaces, and one verification step per task, then gets it approved. Excludes single-file changes and work with no approved design."
 department: workflow
 ownerAgent: frodo
 triggerCommand: /writing-plans
@@ -15,6 +15,7 @@ antiPatternsPrevented:
 ## 0. Identity
 
 - **Role:** Implementation Planning & Task Architecture Specialist.
+- **Prime rule:** No multi-file implementation without a written plan, unless the user waives it in plain words.
 - **Authority:** Translates approved design specs into bite-sized, testable tasks.
 - **Must not define:** Direct production code edits, hands off to `subagent-driven-development.md` or `executing-plans.md`.
 - **Normative base:** `core/fellowship/frodo.md`, `rules/languages/typescript-strict.md`, `rules/common/code-style-standards.md`, `rules/engineering/architecture-boundaries.md`, `rules/engineering/defensive-programming.md`, `references/anti-patterns.md`.
@@ -26,9 +27,9 @@ antiPatternsPrevented:
 |---|-----------|-------|
 | 1 | Task | Decompose design specs into bite-sized engineering tasks (2-5 minutes each). |
 | 2 | Target Tool | Any agent runtime: Claude Code, Cursor, Copilot, Windsurf, Kiro, Cline, or raw API. |
-| 3 | Output Format | Plan document saved to `docs/superpowers/plans/YYYY-MM-DD-<feature-name>.md`. |
+| 3 | Output Format | Plan document saved to `docs/plans/YYYY-MM-DD-<feature-name>.md`. |
 | 4 | Constraints | Every task must specify exact file paths, interfaces, tests, and verification steps. |
-| 5 | Input | Approved design spec from `docs/superpowers/specs/`. |
+| 5 | Input | Approved design spec from `docs/specs/`. |
 | 6 | Context | Prevents vague, un-testable, or oversized tasks that degrade subagent execution. |
 | 7 | Audience | Implementer agents, reviewers, and developers. |
 | 8 | Success Criteria | Plan document contains zero placeholder markers and passes self-review gate. |
@@ -38,7 +39,7 @@ antiPatternsPrevented:
 
 | Trigger | Fire? | Notes |
 |---------|-------|-------|
-| Approved design spec exists in `docs/superpowers/specs/` | YES | Core trigger. |
+| Approved design spec exists in `docs/specs/` | YES | Core trigger. |
 | User requests task breakdown for a feature | YES | Core trigger. |
 | Design specification has not been approved | NO | Run `brainstorming.md` first. |
 | Implementation is already in progress | NO | Use existing plan. |
@@ -68,19 +69,19 @@ antiPatternsPrevented:
 
 ### Step 4: Write Plan Document
 
-- **Action:** Save implementation plan to `docs/superpowers/plans/YYYY-MM-DD-<feature-name>.md`.
+- **Action:** Save implementation plan to `docs/plans/YYYY-MM-DD-<feature-name>.md`.
 - **Input:** Formulated tasks.
 - **Stop Condition:** Halts if plan contains vague statements or missing paths.
 - **Validation:** File written to disk and verified.
 
 ## 4. Output Specification
 
-Plan document format (`docs/superpowers/plans/YYYY-MM-DD-<feature-name>.md`):
+Plan document format (`docs/plans/YYYY-MM-DD-<feature-name>.md`):
 
 ```markdown
 # Implementation Plan: [Feature Name]
 
-**Spec Reference:** `docs/superpowers/specs/YYYY-MM-DD-<feature>-design.md`
+**Spec Reference:** `docs/specs/YYYY-MM-DD-<feature>-design.md`
 
 ## Global Constraints
 - Primary Language: TypeScript / Node.js
@@ -105,13 +106,23 @@ Plan document format (`docs/superpowers/plans/YYYY-MM-DD-<feature-name>.md`):
 - [ ] Every task limited to 2-5 minutes execution scope.
 - [ ] Every task names exact file paths and test files.
 - [ ] Plan contains zero vague placeholders or un-scoped tasks.
-- [ ] Plan saved to `docs/superpowers/plans/`.
+- [ ] Plan saved to `docs/plans/`.
 
 ## 6. Anti-Triggers and Calibration
 
 - **Under-execution threshold:** Oversized tasks cause subagent context rot and timeouts.
 - **Over-execution threshold:** Creating tasks for single-line typos.
 - **Calibration default:** Mandatory before running `subagent-driven-development.md`.
+
+### 6.1 Bypass Excuses
+
+Source: pressure run on 2026-10-05.
+
+| Excuse | Why it fails | Required action |
+| ------ | ------------ | --------------- |
+| "The design is approved and well remembered. A six-file feature can go straight to coding, and tests give verification at the end." | Recorded baseline failure. Memory holds the design and not the file list, the order, or the per-task checks. End-of-work verification finds the defect after it has spread across six files. | Write the plan. Keep it short: files, order, one verification per task. |
+| "The user said a plan is overhead." | A user waiver is valid, because user instructions outrank skills. Acting on a waiver the user did not give is not. | If the user waived the plan in plain words, state in one line what is lost, then follow the user. If the user only sounds rushed, write the plan. |
+| "Keeping a three-bullet plan in my head is enough." | A plan that is not written cannot be reviewed, approved, or resumed after context compaction. | Write it to `docs/plans/`. |
 
 ## 7. Anti-Pattern Compliance
 
@@ -123,8 +134,9 @@ Plan document format (`docs/superpowers/plans/YYYY-MM-DD-<feature-name>.md`):
 
 ## 8. Versioning & Changelog
 
-- **Version:** 1.0.0
+- **Version:** 1.1.0
 - **Changelog:**
+  - `1.1.0` (2026-10-05) - Added Prime rule and Section 6.1 Bypass Excuses from a recorded pressure run. Description now states when to use the skill.
   - `1.0.0` : Enterprise standard Tier-5 creation.
 
 ## 9. Portability Matrix
@@ -142,4 +154,4 @@ Plan document format (`docs/superpowers/plans/YYYY-MM-DD-<feature-name>.md`):
 ## 10. Examples
 
 **Input:** "Create implementation plan for user search spec."
-**Output:** Plan saved to `docs/superpowers/plans/2026-08-14-user-search.md`.
+**Output:** Plan saved to `docs/plans/2026-08-14-user-search.md`.

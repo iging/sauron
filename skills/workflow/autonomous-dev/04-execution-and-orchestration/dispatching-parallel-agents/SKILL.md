@@ -1,6 +1,6 @@
 ---
 name: dispatching-parallel-agents
-description: Dispatch concurrent subagents for independent, non-overlapping tasks with conflict check gates.
+description: "Use when two or more tasks are ready to hand to subagents and the user wants them done at the same time or as fast as possible. Checks file overlap first, runs disjoint tasks in parallel, and sequences tasks that share a file. Excludes single tasks and tasks with ordering dependencies."
 department: workflow
 ownerAgent: frodo
 triggerCommand: /dispatching-parallel-agents
@@ -15,6 +15,7 @@ antiPatternsPrevented:
 ## 0. Identity
 
 - **Role:** Concurrent Multi-Agent Dispatcher & Conflict Arbiter.
+- **Prime rule:** No two agents edit the same file at the same time.
 - **Authority:** Handles parallel subagent task distribution for non-overlapping modules.
 - **Must not define:** Direct production code editing within root process.
 - **Normative base:** `core/fellowship/frodo.md`, `rules/languages/typescript-strict.md`, `rules/common/code-style-standards.md`, `rules/engineering/architecture-boundaries.md`, `rules/engineering/defensive-programming.md`, `references/anti-patterns.md`.
@@ -55,7 +56,7 @@ antiPatternsPrevented:
 ### Step 2: Dispatch Concurrent Subagents
 
 - **Action:** Issue parallel execution commands to separate subagent workers.
-- **Input:** Independent task briefs and prompt specs (`skills/workflow/autonomous-dev/references/implementer-prompt.md`).
+- **Input:** Independent task briefs and prompt specs (`skills/workflow/autonomous-dev/references/builder-brief.md`).
 - **Stop Condition:** If any subagent worker encounters an error, halt remaining workers.
 - **Validation:** All subagent processes launched concurrently.
 
@@ -100,6 +101,15 @@ antiPatternsPrevented:
 - **Over-execution threshold:** Dispatching parallel subagents on shared state files causes merge conflicts.
 - **Calibration default:** Use parallel dispatch strictly when file boundaries are disjoint.
 
+### 6.1 Bypass Excuses
+
+Source: pressure run on 2026-10-05.
+
+| Excuse | Why it fails | Required action |
+| ------ | ------------ | --------------- |
+| "Dispatch all four in parallel. Modern systems handle concurrency, and we hit the deadline faster." | Two agents writing one file produce overwrites or a conflict that costs more time than the sequencing saved. | List the files per task. Run disjoint tasks in parallel. Sequence the ones that overlap. |
+| "I will run all four myself in sequence. Zero conflicts and full control." | It gives up the parallel time the user asked for and fills one context with four tasks. | Parallelize what is disjoint. |
+
 ## 7. Anti-Pattern Compliance
 
 | Step | Prevents AP                  | Mechanism                                           |
@@ -110,8 +120,9 @@ antiPatternsPrevented:
 
 ## 8. Versioning & Changelog
 
-- **Version:** 1.0.0
+- **Version:** 1.1.0
 - **Changelog:**
+  - `1.1.0` (2026-10-05) - Added Prime rule and Section 6.1 Bypass Excuses from a recorded pressure run. Description now states when to use the skill.
   - `1.0.0` : Enterprise standard Tier-5 creation.
 
 ## 9. Portability Matrix

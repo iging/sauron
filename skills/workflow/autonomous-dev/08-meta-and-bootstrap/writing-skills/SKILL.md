@@ -1,6 +1,6 @@
 ---
 name: writing-skills
-description: Meta-skill standard for authoring, evaluating, and elevating skills to Tier-5 enterprise compliance.
+description: "Use when creating a new skill, editing an existing skill, or reviewing one for the Tier-5 template, including when the author is sure the content is right. Requires a recorded pressure run before a discipline skill is written. Excludes one-off prompts that are not saved as skills."
 department: workflow
 ownerAgent: frodo
 triggerCommand: /writing-skills
@@ -15,6 +15,7 @@ antiPatternsPrevented:
 ## 0. Identity
 
 - **Role:** Meta-Skill Architect & Spec Author.
+- **Prime rule:** No discipline skill is written or changed without a recorded pressure run.
 - **Authority:** Controls creation, elevation, and auditing of skill files against Tier-5 standard.
 - **Must not define:** Direct production code edits outside skill documents, validates markdown skill files.
 - **Normative base:** `core/fellowship/frodo.md`, `rules/languages/typescript-strict.md`, `rules/common/code-style-standards.md`, `rules/engineering/architecture-boundaries.md`, `rules/engineering/defensive-programming.md`, `references/anti-patterns.md`.
@@ -73,6 +74,13 @@ antiPatternsPrevented:
 - **Stop Condition:** Halt if audit script exits with code 1.
 - **Validation:** Script logs success with 0 issues detected.
 
+### Pressure Test Procedure (discipline skills, before the skill is written or changed)
+
+- **Action:** 1. Write one scenario with a situation, three options, and at least two pressures (time, sunk cost, authority, fatigue). 2. Give the scenario to a fresh agent with no skill loaded and without the expected choice. 3. Record the choice, the date, the model, and the arguments for each rejected option. 4. Write the Prime rule and Section 6.1 from that record. 5. When the baseline choice was wrong, run the scenario again with the skill loaded and record the result.
+- **Input:** Skill purpose and one realistic situation.
+- **Stop Condition:** If the baseline agent chooses the expected option, record that the scenario did not discriminate. Do not claim the skill changed behavior.
+- **Validation:** A dated run record exists for the skill.
+
 ## 4. Output Specification
 
 ```markdown
@@ -97,6 +105,15 @@ antiPatternsPrevented:
 - **Over-execution threshold:** Applying 10-section meta ceremony to simple project README files.
 - **Calibration default:** Mandatory for all files inside `skills/`.
 
+### 6.1 Bypass Excuses
+
+Source: pressure run on 2026-10-05.
+
+| Excuse                                                                                                     | Why it fails                                                                                                                           | Required action                                                                      |
+| ---------------------------------------------------------------------------------------------------------- | -------------------------------------------------------------------------------------------------------------------------------------- | ------------------------------------------------------------------------------------ |
+| "I am confident the content is correct and we need velocity. Shipping now gets the skill into use faster." | Confidence about the topic says nothing about how an agent fails at it. A skill written without that record answers imagined failures. | Run the scenario without the skill. Record the choice and the arguments. Then write. |
+| "Format checks guarantee integration. No scenario run is needed if the skill parses and registers."        | A format check proves the file loads. It does not prove an agent changes behavior.                                                     | Run the format check and the pressure run. They test different things.               |
+
 ## 7. Anti-Pattern Compliance
 
 | Step | Prevents AP                 | Mechanism                                                |
@@ -107,8 +124,9 @@ antiPatternsPrevented:
 
 ## 8. Versioning & Changelog
 
-- **Version:** 1.0.0
+- **Version:** 1.1.0
 - **Changelog:**
+  - `1.1.0` (2026-10-05) - Added Prime rule and Section 6.1 Bypass Excuses from a recorded pressure run. Description now states when to use the skill.
   - `1.0.0` : Enterprise standard Tier-5 creation.
 
 ## 9. Portability Matrix

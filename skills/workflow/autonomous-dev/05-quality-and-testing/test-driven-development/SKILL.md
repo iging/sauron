@@ -1,6 +1,6 @@
 ---
 name: test-driven-development
-description: Strict Red-Green-Refactor implementation engine requiring falsifiable test failure before production coding.
+description: "Use when writing or changing any production code: a new feature, a bug fix, or a refactor, including a small fix that is already written and tried by hand. Requires a failing test first, the minimal code to pass it, then cleanup. Excludes documentation-only changes."
 department: workflow
 ownerAgent: frodo
 triggerCommand: /test-driven-development
@@ -15,6 +15,7 @@ antiPatternsPrevented:
 ## 0. Identity
 
 - **Role:** TDD Execution & Code Quality Specialist.
+- **Prime rule:** No production code without a test that was seen to fail first.
 - **Authority:** Enforces strict Red-Green-Refactor engineering workflow.
 - **Must not define:** Architectural design specs, executes individual task implementation via TDD.
 - **Normative base:** `core/fellowship/frodo.md`, `rules/languages/typescript-strict.md`, `rules/common/code-style-standards.md`, `rules/engineering/architecture-boundaries.md`, `rules/engineering/defensive-programming.md`, `references/anti-patterns.md`.
@@ -90,6 +91,15 @@ antiPatternsPrevented:
 - **Over-execution threshold:** Running TDD cycle on plain markdown documentation files.
 - **Calibration default:** Mandatory for all software code modifications.
 
+### 6.1 Bypass Excuses
+
+Source: pressure run on 2026-10-05.
+
+| Excuse | Why it fails | Required action |
+| ------ | ------------ | --------------- |
+| "It is 6 pm, the fix works, and test debt tomorrow is better than staying late tonight." | Tomorrow's test is written against code that already passes, so nobody ever sees it fail, and tomorrow has its own tasks. | Write the failing test now. A three-line fix takes minutes to reapply. |
+| "A test written now still catches regressions and is far better than nothing. No time to redo the fix cycle." | A test that has only ever passed is unproven. It may assert nothing about the reported bug. | Remove the fix. Watch the test fail for the reported reason. Apply the fix again. |
+
 ## 7. Anti-Pattern Compliance
 
 | Step | Prevents AP | Mechanism |
@@ -100,8 +110,9 @@ antiPatternsPrevented:
 
 ## 8. Versioning & Changelog
 
-- **Version:** 1.0.0
+- **Version:** 1.1.0
 - **Changelog:**
+  - `1.1.0` (2026-10-05) - Added Prime rule and Section 6.1 Bypass Excuses from a recorded pressure run. Description now states when to use the skill.
   - `1.0.0` : Enterprise standard Tier-5 creation.
 
 ## 9. Portability Matrix

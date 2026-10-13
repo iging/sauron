@@ -27,7 +27,7 @@ import { QwenAdapter } from "./qwen.js";
 import { KimiAdapter } from "./kimi.js";
 import { KiroAdapter } from "./kiro.js";
 import { HermesAdapter } from "./hermes.js";
-import { OpenClaudeAdapter } from "./openclaude.js";
+import { OpenClawAdapter } from "./openclaw.js";
 import { OpenCodeAdapter } from "./opencode.js";
 import { PiAdapter } from "./pi.js";
 import { AdalAdapter } from "./adal.js";
@@ -124,7 +124,7 @@ export class Transpiler {
       new KimiAdapter(),
       new KiroAdapter(),
       new HermesAdapter(),
-      new OpenClaudeAdapter(),
+      new OpenClawAdapter(),
       new OpenCodeAdapter(),
       new PiAdapter(),
       new AdalAdapter(),

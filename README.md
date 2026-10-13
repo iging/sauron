@@ -17,6 +17,7 @@ and in your codebase bind them.
 [![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](./licenses/LICENSE-MIT)
 [![License: Apache 2.0](https://img.shields.io/badge/License-Apache%202.0-blue.svg)](./licenses/LICENSE-APACHE-2.0)
 [![Status: Open Source](https://img.shields.io/badge/Status-100%25%20Free%20%26%20Open%20Source-green.svg)](./licenses/)
+[![Website](https://img.shields.io/badge/Website-sauron--cli.vercel.app-f59e0b.svg)](https://sauron-cli.vercel.app/)
 
 ---
 
@@ -166,7 +167,7 @@ Sauron generates native configuration files for:
 10. Hermes (`.hermesrules`)
 11. Kimi (`.kimi/prompt.md`)
 12. Kiro (`.kirorules`)
-13. OpenClaude (`.openclaude/config.json`)
+13. OpenClaw (`.openclaw/config.json`)
 14. OpenCode (`.opencode/instructions.md`)
 15. Pi (`.pirules`)
 16. Qwen (`.qwen/system.md`)
@@ -251,26 +252,26 @@ For developers and designers aiming for top-tier execution, Sauron provides an e
 
 #### The 6-Stage Design Engineering Pipeline:
 
-- **1. Foundations & Tokens (`01-foundations-and-systems`)**:
+- **1. Foundations & Tokens (`01-foundations`)**:
   - **Overview**: Establishes Nielsen heuristics, accessible color tokens, and layout wireframes.
   - **Why it matters**: Eliminates arbitrary styling values by enforcing a mathematically harmonious 4px baseline rhythm, fluid typography scales (`clamp()`), and semantic surface hierarchies.
 
-- **2. Aesthetic Engines & Anti-Slop Tuning (`02-aesthetic-engines-and-styles`)**:
+- **2. Aesthetic Engines & Anti-Slop Tuning (`02-styles`)**:
   - **Overview**: Replaces generic templates with signature agency-grade styles: _Ethereal Glass_ ($150k+ studio look), _Swiss Print Brutalism_, _Utilitarian Minimalist_, and _Apple Human Interface Spring Physics_.
   - **Anti-Slop Tuning**: Regulates visual complexity via 3 dials: **Information Density**, **Visual Polish / Restraint**, and **Motion Budget**.
 
-- **3. Curated Brand Presets (`03-brand-presets-and-visual-identity`)**:
+- **3. Curated Brand Presets (`03-brand`)**:
   - **Overview**: Ships with 65+ production-tested brand identities.
   - **Pre-configured styles**: Linear, Vercel, Stripe, Raycast, Warp, Apple HIG, Cursor, GitHub Dark Pro, and Tailwind UI. Agents adopt exact typography stacks, border radiuses, and border contrasts matching the chosen brand.
 
-- **4. Micro-Interactions & Spring Motion (`04-motion-and-interaction`)**:
+- **4. Micro-Interactions & Spring Motion (`04-motion`)**:
   - **Overview**: Replaces clumsy CSS linear transitions with GPU-accelerated hardware springs (`transform`, `opacity`).
   - **Tactile feedback**: Implements tactile micro-scale clicks (`transform: scale(0.97)`), spring-driven drawer transitions, and strict `prefers-reduced-motion` fallbacks.
 
-- **5. Vision & Comp Translation (`05-vision-and-code-generation`)**:
+- **5. Vision & Comp Translation (`05-image-to-code`)**:
   - **Overview**: Ingests UI screenshots or Figma mockups and translates them directly into semantic, responsive HTML/Tailwind/React code with zero hallucinated placeholders.
 
-- **6. Code Quality & WCAG 2.2 Gatekeeper (`06-audit-refactor-and-enforcement`)**:
+- **6. Code Quality & WCAG 2.2 Gatekeeper (`06-audit`)**:
   - **Overview**: Audits frontend code for accessibility and clean architecture.
   - **Enforcement rules**: 44px minimum touch targets, proper heading hierarchies (`h1` through `h6`), `:focus-visible` ring offsets, zero clickable `div`s, and full screen reader compatibility.
 

@@ -1,6 +1,6 @@
 ---
 name: verification-before-completion
-description: Mandatory audit gate requiring fresh command execution and falsifiable evidence before marking work complete.
+description: "Use before saying that work is done, fixed, or passing, before checking off a plan task, and before any commit or pull request, including after a change that seems too small to matter. Requires running the proving command now and reading its output. Excludes status updates that make no completion claim."
 department: workflow
 ownerAgent: frodo
 triggerCommand: /verification-before-completion
@@ -15,6 +15,7 @@ antiPatternsPrevented:
 ## 0. Identity
 
 - **Role:** Quality Assurance & Task Completion Auditor.
+- **Prime rule:** No completion claim without a command run now and its output read.
 - **Authority:** Enforces strict verification policies before declaring tasks or plans complete.
 - **Must not define:** Implementation planning, evaluates completed work state.
 - **Normative base:** `core/fellowship/frodo.md`, `rules/languages/typescript-strict.md`, `rules/common/code-style-standards.md`, `rules/engineering/architecture-boundaries.md`, `rules/engineering/defensive-programming.md`, `references/anti-patterns.md`.
@@ -97,6 +98,15 @@ antiPatternsPrevented:
 - **Over-execution threshold:** Running complete integration suite after typing single doc comments.
 - **Calibration default:** Mandatory prior to setting any plan task checkbox to `[x]`.
 
+### 6.1 Bypass Excuses
+
+Source: pressure run on 2026-10-05.
+
+| Excuse | Why it fails | Required action |
+| ------ | ------------ | --------------- |
+| "Comments and log strings never break tests. We passed 15 minutes ago, so it is still passing." | The claim is about the code as it is now. A log string change can break a snapshot or an assertion on output. | Run the command again. Quote the result. |
+| "Tests almost certainly still pass, so saying it should be done keeps momentum." | "Should" hands the verification to the user without telling them. | Replace "should" with the command and its output. |
+
 ## 7. Anti-Pattern Compliance
 
 | Step | Prevents AP                | Mechanism                                  |
@@ -107,8 +117,9 @@ antiPatternsPrevented:
 
 ## 8. Versioning & Changelog
 
-- **Version:** 1.0.0
+- **Version:** 1.1.0
 - **Changelog:**
+  - `1.1.0` (2026-10-05) - Added Prime rule and Section 6.1 Bypass Excuses from a recorded pressure run. Description now states when to use the skill.
   - `1.0.0` : Enterprise standard Tier-5 creation.
 
 ## 9. Portability Matrix

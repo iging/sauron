@@ -58,7 +58,7 @@ describe("Transpiler 17-Runtime Generation (Milestone 6.2)", () => {
       ".kimi/prompt.md",
       ".kirorules",
       ".hermesrules",
-      ".openclaude/config.json",
+      ".openclaw/config.json",
       ".opencode/instructions.md",
       ".pirules",
       ".adalrules",

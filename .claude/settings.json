@@ -1,6 +1,24 @@
 {
   "hooks": {
-    "preCommand": ".claude/hooks/guard.sh"
+    "PreToolUse": [
+      {
+        "matcher": "Bash",
+        "hooks": [
+          { "type": "command", "command": "bash .claude/hooks/guard.sh" }
+        ]
+      }
+    ],
+    "SessionStart": [
+      {
+        "matcher": "startup|compact",
+        "hooks": [
+          {
+            "type": "command",
+            "command": "node scripts/hooks/session-bootstrap.mjs"
+          }
+        ]
+      }
+    ]
   },
   "permissions": {
     "allow": [
