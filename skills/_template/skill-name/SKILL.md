@@ -17,6 +17,7 @@ antiPatternsPrevented:
 ## 0. Identity
 
 - **Role:** [Defines the skill's explicit operational role and job title]
+- **Prime rule:** [Optional, discipline skills only. One absolute sentence the skill enforces when the agent is under time, cost, or authority pressure.]
 - **Authority:** [Normative tier level and exact ownership boundaries within Sauron]
 - **Must not define:** [Clear boundaries of what this skill does not own; cross-references to other skills/rules]
 - **Normative base:** `core/fellowship/[ownerAgent].md`, `rules/engineering/architecture-boundaries.md`, `references/anti-patterns.md`, and applicable project context in `projects/<project-name>/context/`.
@@ -100,6 +101,14 @@ antiPatternsPrevented:
 - **Over-execution threshold:** Modifying files outside the declared scope or executing tasks owned by other departments.
 - **Calibration default:** Keep changes tightly scoped, deterministic, and traceable to explicit user requests.
 
+### 6.1 Bypass Excuses (optional, discipline skills only)
+
+List the excuses an agent gives for skipping this skill. Take each excuse from a recorded pressure run, never from memory.
+
+| Excuse | Why it fails | Required action |
+| ------ | ------------ | --------------- |
+| "[Excuse in the agent's words]" | [Concrete cost of acting on it] | [The step to run instead] |
+
 ## 7. Anti-Pattern Compliance
 
 | Step | Prevents AP                | Mechanism                                                   |
@@ -111,8 +120,9 @@ antiPatternsPrevented:
 
 ## 8. Versioning & Changelog
 
-- **Version:** 1.0.0
+- **Version:** 1.1.0
 - **Changelog:**
+  - `1.1.0` (2026-10-05) - Added optional `Prime rule` field and optional Section 6.1 Bypass Excuses for discipline skills.
   - `1.0.0` (2026-09-21) - Initial enterprise Tier-5 standard release for Sauron.
 
 ## 9. Portability Matrix

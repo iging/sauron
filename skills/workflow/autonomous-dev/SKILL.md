@@ -54,7 +54,7 @@ antiPatternsPrevented:
 | Debugging       | `06-debugging-and-investigation` | `06-debugging-and-investigation/systematic-debugging/SKILL.md`        |
 | Pre-review      | `07-code-review-and-feedback`    | `07-code-review-and-feedback/requesting-code-review/SKILL.md`         |
 | Review feedback | `07-code-review-and-feedback`    | `07-code-review-and-feedback/receiving-code-review/SKILL.md`          |
-| Bootstrap       | `08-meta-and-bootstrap`          | `08-meta-and-bootstrap/using-superpowers/SKILL.md`                    |
+| Bootstrap       | `08-meta-and-bootstrap`          | `08-meta-and-bootstrap/skill-first-protocol/SKILL.md`                    |
 | Meta authoring  | `08-meta-and-bootstrap`          | `08-meta-and-bootstrap/writing-skills/workflow/create-skill/SKILL.md` |
 
 ## 3. Execution Workflow

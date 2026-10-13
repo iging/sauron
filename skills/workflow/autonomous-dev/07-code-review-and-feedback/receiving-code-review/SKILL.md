@@ -1,6 +1,6 @@
 ---
 name: receiving-code-review
-description: Systematic feedback processing engine for executing requested code review modifications via TDD.
+description: "Use when review comments or pull request feedback arrive, before changing any code in response, including feedback from a senior reviewer that seems wrong or unclear. Requires checking each comment against the code and tests, then answering with evidence. Excludes automated lint output."
 department: workflow
 ownerAgent: frodo
 triggerCommand: /receiving-code-review
@@ -15,6 +15,7 @@ antiPatternsPrevented:
 ## 0. Identity
 
 - **Role:** Code Review Feedback Execution Specialist.
+- **Prime rule:** No review comment is implemented or dismissed before it is checked against the code.
 - **Authority:** Processes code review comments and executes requested modifications cleanly.
 - **Must not define:** Blind unverified code changes, validates reviewer requests against requirements.
 - **Normative base:** `core/fellowship/frodo.md`, `rules/languages/typescript-strict.md`, `rules/common/code-style-standards.md`, `rules/engineering/architecture-boundaries.md`, `rules/engineering/defensive-programming.md`, `references/anti-patterns.md`.
@@ -103,6 +104,15 @@ antiPatternsPrevented:
 - **Over-execution threshold:** Re-architecting entire systems for minor code style feedback.
 - **Calibration default:** Mandatory when addressing PR review comments.
 
+### 6.1 Bypass Excuses
+
+Source: pressure run on 2026-10-05.
+
+| Excuse | Why it fails | Required action |
+| ------ | ------------ | --------------- |
+| "The reviewer has far more experience and said it is simpler. I should trust their judgment and implement it." | Experience does not change what the existing test asserts. Implementing a change you believe breaks a covered case ships a known defect. | Run the test against the suggestion. Reply with the result. |
+| "I cannot push back on a senior reviewer, so I will leave it alone to avoid conflict." | Silence reads as agreement or neglect, and the comment stays open. | Answer every comment: done, declined with evidence, or a question. |
+
 ## 7. Anti-Pattern Compliance
 
 | Step | Prevents AP                  | Mechanism                                                   |
@@ -113,8 +123,9 @@ antiPatternsPrevented:
 
 ## 8. Versioning & Changelog
 
-- **Version:** 1.0.0
+- **Version:** 1.1.0
 - **Changelog:**
+  - `1.1.0` (2026-10-05) - Added Prime rule and Section 6.1 Bypass Excuses from a recorded pressure run. Description now states when to use the skill.
   - `1.0.0` : Enterprise standard Tier-5 creation.
 
 ## 9. Portability Matrix

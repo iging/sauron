@@ -1,5 +1,5 @@
 ---
-name: task-reviewer-prompt
+name: task-review-brief
 description: Dual spec-compliance and code-quality reviewer prompt template for autonomous subagent tasks.
 version: 1.0.0
 ---

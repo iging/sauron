@@ -1,6 +1,6 @@
 ---
 name: requesting-code-review
-description: Pre-review audit protocol for summarizing pull request changes and verifying submission readiness.
+description: "Use before opening a pull request or asking anyone to review a branch, including right after a rebase or when the reviewer is about to leave. Requires fresh passing tests and a self-review of the diff against the spec first. Excludes draft branches shared only for discussion."
 department: workflow
 ownerAgent: frodo
 triggerCommand: /requesting-code-review
@@ -15,6 +15,7 @@ antiPatternsPrevented:
 ## 0. Identity
 
 - **Role:** Pre-Review Quality Auditor & PR Specialist.
+- **Prime rule:** No review request without tests run after the last change and a self-review of the diff.
 - **Authority:** Prepares code changes for peer or automated review.
 - **Must not define:** Direct production code edits during review packaging.
 - **Normative base:** `core/fellowship/frodo.md`, `rules/languages/typescript-strict.md`, `rules/common/code-style-standards.md`, `rules/engineering/architecture-boundaries.md`, `rules/engineering/defensive-programming.md`, `references/anti-patterns.md`.
@@ -84,7 +85,7 @@ antiPatternsPrevented:
 
 ## Spec Reference
 
-`docs/superpowers/specs/2026-08-14-user-search-design.md`
+`docs/specs/2026-08-14-user-search-design.md`
 
 ## Verification Evidence
 
@@ -111,6 +112,15 @@ antiPatternsPrevented:
 - **Over-execution threshold:** Requesting full formal code review for single-word doc fixes.
 - **Calibration default:** Mandatory before creating any GitHub pull request or code review task.
 
+### 6.1 Bypass Excuses
+
+Source: pressure run on 2026-10-05.
+
+| Excuse | Why it fails | Required action |
+| ------ | ------------ | --------------- |
+| "The reviewer leaves in minutes. We must open it now to catch them." | A rebase changes the code under test. A 900-line diff that fails wastes the reviewer's time and yours. | Run the tests and read your diff. Request the review when ready, even if it waits a day. |
+| "A draft lets us start early. Tests most likely pass, and we update the status later." | "Most likely pass" is a completion claim with no evidence. | State only what was run. Open the draft after the tests, or label it untested in plain words. |
+
 ## 7. Anti-Pattern Compliance
 
 | Step | Prevents AP                  | Mechanism                                           |
@@ -121,8 +131,9 @@ antiPatternsPrevented:
 
 ## 8. Versioning & Changelog
 
-- **Version:** 1.0.0
+- **Version:** 1.1.0
 - **Changelog:**
+  - `1.1.0` (2026-10-05) - Added Prime rule and Section 6.1 Bypass Excuses from a recorded pressure run. Description now states when to use the skill.
   - `1.0.0` : Enterprise standard Tier-5 creation.
 
 ## 9. Portability Matrix

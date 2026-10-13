@@ -1,6 +1,6 @@
 ---
 name: finishing-a-development-branch
-description: Verify test suites, present merge or pull request options, and safely clean up worktrees.
+description: "Use when all plan tasks are complete and the branch is ready to merge, open as a pull request, keep, or discard, including when the user said to merge when done. Runs the full tests, presents the options, and cleans the worktree. Excludes work with unfinished tasks."
 department: workflow
 ownerAgent: frodo
 triggerCommand: /finishing-a-development-branch
@@ -15,6 +15,7 @@ antiPatternsPrevented:
 ## 0. Identity
 
 - **Role:** Release Engineering & Worktree Shutdown Specialist.
+- **Prime rule:** No merge, push, or pull request while any test fails, whoever owns the failing test.
 - **Authority:** Handles branch closeout, pull request options, and worktree removal.
 - **Must not define:** Direct code edits, handles lifecycle closeout only.
 - **Normative base:** `core/fellowship/frodo.md`, `rules/languages/typescript-strict.md`, `rules/common/code-style-standards.md`, `rules/engineering/architecture-boundaries.md`, `rules/engineering/defensive-programming.md`, `references/anti-patterns.md`.
@@ -97,6 +98,15 @@ antiPatternsPrevented:
 - **Over-execution threshold:** Running branch shutdown when implementation tasks remain open.
 - **Calibration default:** Trigger only after plan tasks are 100% complete and verified.
 
+### 6.1 Bypass Excuses
+
+Source: pressure run on 2026-10-05.
+
+| Excuse | Why it fails | Required action |
+| ------ | ------------ | --------------- |
+| "The user said merge when done. Tasks are complete, we did not touch that module, and a flaky test in other code is not our blocker." | "Merge when done" assumes passing tests. A failure you did not cause still lands on the main branch under your merge. | Do not merge. Report the failing test with its output and the options. Wait. |
+| "Flaky tests are known problems. Skipping it clears the gate without changing our logic." | Skipping a test to pass a gate is a fake fix (AP-57). It hides the signal from the next person. | Leave the test as is. Report it. |
+
 ## 7. Anti-Pattern Compliance
 
 | Step | Prevents AP | Mechanism |
@@ -107,8 +117,9 @@ antiPatternsPrevented:
 
 ## 8. Versioning & Changelog
 
-- **Version:** 1.0.0
+- **Version:** 1.1.0
 - **Changelog:**
+  - `1.1.0` (2026-10-05) - Added Prime rule and Section 6.1 Bypass Excuses from a recorded pressure run. Description now states when to use the skill.
   - `1.0.0` : Enterprise standard Tier-5 creation.
 
 ## 9. Portability Matrix
