@@ -45,7 +45,7 @@ Browse the documentation by topic:
 
 - [Adapters Overview](04-runtime-adapters/overview.md) : Universal transpilation pipeline and single-source-of-truth doctrine.
 - [Desktop and IDE Tools](04-runtime-adapters/desktop-and-ide.md) : Cursor, Windsurf, Trae, Zed, VS Code, and Kiro.
-- [CLI Coding Agents](04-runtime-adapters/cli-agents.md) : Claude Code, Cline, Codex, OpenCode, OpenClaude, and Pi.
+- [CLI Coding Agents](04-runtime-adapters/cli-agents.md) : Claude Code, Cline, Codex, OpenCode, OpenClaw, and Pi.
 - [Web and Model Interfaces](04-runtime-adapters/web-and-models.md) : Gemini, Copilot, Hermes, Kimi, Qwen, and Adal / CodeBuddy.
 
 ### [05. Token Optimization (Caveman Mode)](05-token-optimization/caveman-mode.md)
