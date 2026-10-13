@@ -28,7 +28,7 @@ Sauron solves this by compiling a single declarative configuration (`sauron.conf
 | 10  | **Hermes**           | `.hermesrules`                    | `.hermes/`                  | Markdown        |       ❌        |   🟡 Limited   | Spartan execution rules for Hermes agent harness          |
 | 11  | **Kimi**             | `.kimi/prompt.md`                 | `.kimi/context/`            | Markdown        |       ❌        |   🟡 Limited   | High-density long-context prompt for Moonshot Kimi        |
 | 12  | **Kiro**             | `.kirorules`                      | `.kiro/hooks/`              | Markdown        |       ❌        |    ✅ Hooks    | Autonomous agent guidelines and execution bounds          |
-| 13  | **OpenClaude**       | `.openclaude/config.json`         | `.openclaude/instructions/` | JSON / Markdown |       ❌        |  ✅ Commands   | Open-source Claude API harness instructions               |
+| 13  | **OpenClaw**       | `.openclaw/config.json`         | `.openclaw/instructions/` | JSON / Markdown |       ❌        |  ✅ Commands   | Open-source Claude API harness instructions               |
 | 14  | **OpenCode**         | `.opencode/instructions.md`       | `.opencode/rules/`          | Markdown        |       ❌        |    ✅ Modes    | Universal open-source terminal coding harness             |
 | 15  | **Pi**               | `.pirules`                        | `.pi/`                      | Plaintext       |       ❌        |   🟡 Limited   | Spartan plain-text instruction constraints                |
 | 16  | **Qwen**             | `.qwen/system.md`                 | `.qwen/`                    | Markdown        |       ❌        |   🟡 Limited   | System instructions optimized for Alibaba Qwen-Coder      |

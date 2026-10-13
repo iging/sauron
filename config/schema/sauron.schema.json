@@ -50,7 +50,7 @@
         "hermes": { "type": "boolean" },
         "kimi": { "type": "boolean" },
         "kiro": { "type": "boolean" },
-        "openclaude": { "type": "boolean" },
+        "openclaw": { "type": "boolean" },
         "opencode": { "type": "boolean" },
         "pi": { "type": "boolean" },
         "qwen": { "type": "boolean" },

@@ -115,9 +115,9 @@
       "lastUpdated": "2026-09-19T08:13:52.890Z"
     },
     {
-      "path": ".openclaude/config.json",
-      "runtime": "openclaude",
-      "backupPath": ".sauron\\backups\\.openclaude_config.json.2026-09-19T08-13-52-893Z.bak",
+      "path": ".openclaw/config.json",
+      "runtime": "openclaw",
+      "backupPath": ".sauron\\backups\\.openclaw_config.json.2026-09-19T08-13-52-893Z.bak",
       "checksum": "sha256:67eec9eb067ba73eb48e89568b4dfacc8c490da0da1a6ade01d3a454a0cb3f20",
       "lastUpdated": "2026-09-19T08:13:52.895Z"
     },

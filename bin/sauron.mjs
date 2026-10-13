@@ -85,9 +85,9 @@ const RUNTIMES = Object.freeze([
   Object.freeze({ id: "kimi", name: "Kimi", file: ".kimi/prompt.md" }),
   Object.freeze({ id: "kiro", name: "Kiro", file: ".kirorules" }),
   Object.freeze({
-    id: "openclaude",
-    name: "OpenClaude",
-    file: ".openclaude/config.json",
+    id: "openclaw",
+    name: "OpenClaw",
+    file: ".openclaw/config.json",
   }),
   Object.freeze({
     id: "opencode",
@@ -220,6 +220,9 @@ function printHelpMenu() {
     "  status       Display registered runtimes, Fellowship agents, and skills",
   );
   console.log("  list-skills  List all registered skills organized by domain");
+  console.log(
+    "  find-skill <task> Rank skills for a task (--limit n, --json, --root dir)",
+  );
   console.log(
     "  sync         Synchronize master configuration into target runtimes",
   );
@@ -774,6 +777,98 @@ async function executeImportCommand(args) {
 }
 
 /**
+ * Resolves the skills directory to search: explicit root, then the workspace, then the Sauron package.
+ *
+ * @param {string | undefined} explicitRoot - Value of --root, when given.
+ * @returns {{ skillsRoot: string, baseDir: string }}
+ */
+function resolveFinderRoot(explicitRoot) {
+  const cwd = process.cwd();
+  if (explicitRoot !== undefined) {
+    return { skillsRoot: path.resolve(cwd, explicitRoot), baseDir: cwd };
+  }
+  for (const candidate of [".agents/skills", "skills"]) {
+    const full = path.join(cwd, candidate);
+    if (fs.existsSync(full) && fs.statSync(full).isDirectory()) {
+      return { skillsRoot: full, baseDir: cwd };
+    }
+  }
+  return { skillsRoot: path.join(SAURON_ROOT, "skills"), baseDir: SAURON_ROOT };
+}
+
+/**
+ * Handles the `find-skill` command by ranking local skills against a task description.
+ *
+ * @param {string[]} args - Arguments after the command name.
+ * @returns {Promise<void>}
+ */
+async function executeFindSkillCommand(args) {
+  const asJson = args.includes("--json");
+  /** @type {string[]} */
+  const queryParts = [];
+  let limit = 5;
+  /** @type {string | undefined} */
+  let explicitRoot;
+  for (let index = 0; index < args.length; index += 1) {
+    const arg = args[index];
+    if (arg === "--json") continue;
+    if (arg === "--limit") {
+      limit = Number(args[index + 1]);
+      index += 1;
+    } else if (arg === "--root") {
+      explicitRoot = args[index + 1];
+      index += 1;
+    } else if (arg !== undefined) {
+      queryParts.push(arg);
+    }
+  }
+  const query = queryParts.join(" ").trim();
+
+  try {
+    if (query === "") {
+      throw new Error('Missing task. Usage: sauron find-skill "<task>"');
+    }
+    const { loadSkillCatalog, rankSkills, formatFinderReport } = await import(
+      "../dist/adapters/skill-finder.js"
+    );
+    const { skillsRoot, baseDir } = resolveFinderRoot(explicitRoot);
+    const catalog = loadSkillCatalog(skillsRoot, baseDir);
+    const results = rankSkills(catalog.documents, query, limit);
+
+    if (asJson) {
+      console.log(
+        JSON.stringify(
+          {
+            query,
+            indexed: catalog.documents.length,
+            rejected: catalog.rejected,
+            results,
+          },
+          null,
+          2,
+        ),
+      );
+      return;
+    }
+    console.log(formatFinderReport(results, query));
+    console.log(
+      `
+[INFO] Searched ${catalog.documents.length} skills in ${path.relative(process.cwd(), skillsRoot) || "."}.`,
+    );
+    if (catalog.rejected.length > 0) {
+      console.log(
+        `[WARN] Skipped ${catalog.rejected.length} skill files with invalid frontmatter. Run with --json for the list.`,
+      );
+    }
+  } catch (error) {
+    console.error(
+      `[ERROR] Find skill failed: ${error instanceof Error ? error.message : String(error)}`,
+    );
+    process.exit(1);
+  }
+}
+
+/**
  * Handles the `registry-build` command by exporting approved catalog entries.
  *
  * @returns {Promise<void>}
@@ -893,6 +988,9 @@ function main(commandLineArguments) {
       break;
     case "list-skills":
       executeListSkillsCommand();
+      break;
+    case "find-skill":
+      executeFindSkillCommand(commandLineArguments.slice(1));
       break;
     case "diff":
       executeDiffCommand();

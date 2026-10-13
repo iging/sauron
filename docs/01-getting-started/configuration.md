@@ -58,7 +58,7 @@ runtimes:
   hermes: true # Generates .hermesrules
   kimi: true # Generates .kimi/prompt.md
   kiro: true # Generates .kirorules
-  openclaude: true # Generates .openclaude/config.json
+  openclaw: true # Generates .openclaw/config.json
   opencode: true # Generates .opencode/instructions.md
   pi: true # Generates .pirules
   qwen: true # Generates .qwen/system.md

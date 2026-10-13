@@ -43,7 +43,7 @@ RUNTIMES: tuple[RuntimeTarget, ...] = (
     RuntimeTarget("hermes", "Hermes", ".hermesrules"),
     RuntimeTarget("kimi", "Kimi", ".kimi/prompt.md"),
     RuntimeTarget("kiro", "Kiro", ".kirorules"),
-    RuntimeTarget("openclaude", "OpenClaude", ".openclaude/config.json"),
+    RuntimeTarget("openclaw", "OpenClaw", ".openclaw/config.json"),
     RuntimeTarget("opencode", "OpenCode", ".opencode/instructions.md"),
     RuntimeTarget("pi", "Pi", ".pirules"),
     RuntimeTarget("qwen", "Qwen", ".qwen/system.md"),

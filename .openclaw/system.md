@@ -1,4 +1,4 @@
-# OpenClaude System Directives
+# OpenClaw System Directives
 
 Sauron Universal Harness.
 

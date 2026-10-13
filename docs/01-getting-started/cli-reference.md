@@ -70,6 +70,25 @@ Displays alphabetical domains (Architecture, Backend, Database, DevOps, Frontend
 
 ---
 
+### `find-skill`
+
+Ranks local skills against a task description and prints the files to read.
+
+```bash
+node ./bin/sauron.mjs find-skill "<task>" [--limit n] [--json] [--root dir]
+```
+
+**Options:**
+
+- `--limit n`: Maximum results. Default 5.
+- `--json`: Machine-readable output with `indexed`, `rejected`, and `results`.
+- `--root dir`: Skills directory to search. Default order: `.agents/skills` in the working directory, then `skills`, then the skills bundled with Sauron.
+
+**Output Structure:**
+Each result shows name, score, trigger command, path, and description. The last line is a paste-ready instruction that names the top file. Scoring is weighted BM25 over skill name, Trigger Matrix phrases marked YES, and description. The command reads files only and writes nothing.
+
+---
+
 ### `sync`
 
 Synchronizes changes from `sauron.config.yaml` and skill directories into all enabled runtime adapter files.

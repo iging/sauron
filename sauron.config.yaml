@@ -21,7 +21,7 @@ runtimes:
   hermes: true
   kimi: true
   kiro: true
-  openclaude: true
+  openclaw: true
   opencode: true
   pi: true
   qwen: true

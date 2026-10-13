@@ -1,5 +1,5 @@
 /**
- * @fileoverview OpenClaude adapter generating .openclaude/config.json file.
+ * @fileoverview OpenClaw adapter generating .openclaw/config.json file.
  */
 
 import type {
@@ -8,10 +8,10 @@ import type {
   TranspileOutput,
 } from "./types.js";
 
-export class OpenClaudeAdapter implements RuntimeAdapter {
-  public readonly id = "openclaude";
-  public readonly name = "OpenClaude";
-  public readonly targetFiles = [".openclaude/config.json"];
+export class OpenClawAdapter implements RuntimeAdapter {
+  public readonly id = "openclaw";
+  public readonly name = "OpenClaw";
+  public readonly targetFiles = [".openclaw/config.json"];
 
   public transpile(context: TranspileContext): TranspileOutput[] {
     const config = {
@@ -36,7 +36,7 @@ export class OpenClaudeAdapter implements RuntimeAdapter {
 
     return [
       {
-        relativePath: ".openclaude/config.json",
+        relativePath: ".openclaw/config.json",
         content: JSON.stringify(config, null, 2),
         format: "json",
       },
