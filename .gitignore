@@ -34,3 +34,6 @@ Thumbs.db
 progress-report-result.md
 .sauron/graph/
 
+
+# Claude Code agent worktrees
+.claude/worktrees/
