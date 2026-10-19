@@ -49,7 +49,7 @@ describe("Transpiler 17-Runtime Generation (Milestone 6.2)", () => {
       ".clinerules",
       ".traerules",
       ".zed/settings.json",
-      ".zed/prompts/sauron.md",
+      ".rules",
       ".codex/instructions.md",
       ".vscode/settings.json",
       ".vscode/sauron.instructions.md",
@@ -62,7 +62,8 @@ describe("Transpiler 17-Runtime Generation (Milestone 6.2)", () => {
       ".opencode/instructions.md",
       ".pirules",
       ".adalrules",
-      ".codebuddy/rules.md",
+      ".codebuddy/rules/sauron.md",
+      ".codebuddy/skills/README.md",
     ];
 
     for (const relPath of expectedPaths) {
@@ -78,5 +79,38 @@ describe("Transpiler 17-Runtime Generation (Milestone 6.2)", () => {
         `File should mention sauron: ${relPath}`,
       );
     }
+
+    for (const legacy of [".codebuddy/rules.md", ".zed/prompts/sauron.md"]) {
+      assert.ok(
+        !fs.existsSync(path.join(tempWorkspace, legacy)),
+        `Legacy file must not be generated: ${legacy}`,
+      );
+    }
+  });
+});
+
+describe("CodeBuddy + Zed scaffold paths", () => {
+  it("emits official scaffold paths and drops legacy files", async () => {
+    const { CodeBuddyAdapter } = await import("../../dist/adapters/codebuddy.js");
+    const { ZedAdapter } = await import("../../dist/adapters/zed.js");
+    const ctx = {
+      projectName: "demo",
+      version: "0.0.0",
+      rules: ["r"],
+      antiPatterns: ["a"],
+      fellowship: [],
+      skills: [],
+    };
+    const cb = new CodeBuddyAdapter()
+      .transpile(/** @type {any} */ (ctx))
+      .map((o) => o.relativePath);
+    assert.deepEqual(cb, [
+      ".codebuddy/rules/sauron.md",
+      ".codebuddy/skills/README.md",
+    ]);
+    const zed = new ZedAdapter()
+      .transpile(/** @type {any} */ (ctx))
+      .map((o) => o.relativePath);
+    assert.deepEqual(zed, [".zed/settings.json", ".rules"]);
   });
 });

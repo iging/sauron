@@ -52,7 +52,7 @@ runtimes:
   copilot: true # Generates .github/copilot-instructions.md and hooks
   cline: true # Generates .clinerules
   trae: true # Generates .traerules
-  zed: true # Generates .zed/settings.json and .zed/prompts/sauron.md
+  zed: true # Generates .rules and .zed/settings.json
   codex: true # Generates .codex/instructions.md
   gemini: true # Generates GEMINI.md
   hermes: true # Generates .hermesrules
@@ -63,7 +63,7 @@ runtimes:
   pi: true # Generates .pirules
   qwen: true # Generates .qwen/system.md
   adal: true # Generates .adalrules
-  codebuddy: true # Generates .codebuddy/rules.md
+  codebuddy: true # Generates .codebuddy/rules/sauron.md and .codebuddy/skills/README.md
 ```
 
 When you run `sauron sync`, Sauron only touches runtimes marked `true`.

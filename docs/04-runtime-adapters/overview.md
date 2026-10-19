@@ -12,7 +12,7 @@ Sauron supports 17 runtimes grouped into three operational categories:
    - Cursor (`.cursorrules`, `.cursor/rules/sauron.mdc`)
    - Windsurf (`.windsurfrules`)
    - Trae (`.traerules`)
-   - Zed (`.zed/settings.json`, `.zed/prompts/sauron.md`)
+   - Zed (`.rules`, `.zed/settings.json`)
    - VS Code (`.vscode/settings.json`, `.vscode/sauron.instructions.md`)
    - Kiro (`.kirorules`)
 
@@ -30,7 +30,7 @@ Sauron supports 17 runtimes grouped into three operational categories:
    - Hermes (`.hermesrules`)
    - Moonshot Kimi (`.kimi/prompt.md`)
    - Qwen (`.qwen/system.md`)
-   - Adal / CodeBuddy (`.adalrules`, `.codebuddy/rules.md`)
+   - Adal / CodeBuddy (`.adalrules`, `.codebuddy/rules/sauron.md`, `.codebuddy/skills/README.md`)
 
 ---
 
