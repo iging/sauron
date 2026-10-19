@@ -19,7 +19,7 @@ Sauron supports 17 runtimes grouped into three operational categories:
 2. **CLI Coding Agents**:
    - Claude Code (`CLAUDE.md`)
    - Cline (`.clinerules`)
-   - OpenAI Codex (`.codex/instructions.md`)
+   - OpenAI Codex (`.codex/config.toml`, `.codex/README.md`)
    - OpenCode (`.opencode/instructions.md`)
    - OpenClaw (`.openclaw/config.json`)
    - Pi (`.pirules`)
