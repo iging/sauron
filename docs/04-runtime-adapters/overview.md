@@ -25,11 +25,11 @@ Sauron supports 17 runtimes grouped into three operational categories:
    - Pi (`.pirules`)
 
 3. **Web & Model Interfaces**:
-   - Google Gemini (`GEMINI.md`)
+   - Google Gemini (`GEMINI.md`, `.gemini/settings.json`, `.gemini/README.md`)
    - GitHub Copilot (`.github/copilot-instructions.md`, hooks)
    - Hermes (`.hermesrules`)
    - Moonshot Kimi (`.kimi/prompt.md`)
-   - Qwen (`.qwen/system.md`)
+   - Qwen (`QWEN.md`, `.qwen/skills/README.md`)
    - Adal / CodeBuddy (`.adalrules`, `.codebuddy/rules.md`)
 
 ---
