@@ -36,6 +36,7 @@ import { AgentsMdAdapter } from "./agents-md.js";
 
 import { parse as parseYaml } from "yaml";
 import { CAVEMAN_MODES } from "./types.js";
+import type { InstallOutput } from "./installer.js";
 import type {
   CavemanMode,
   FellowshipAgentIR,
@@ -330,35 +331,49 @@ export class Transpiler {
    * @returns Detailed TranspileReport with per-file write results.
    */
   public transpileAll(
-    options: { dryRun?: boolean; targetRuntimes?: string[] } = {},
+    options: {
+      dryRun?: boolean;
+      targetRuntimes?: string[];
+      extras?: InstallOutput[];
+    } = {},
   ): TranspileReport {
     const dryRun = options.dryRun ?? false;
     const context = this.buildContext();
     const results: WriteFileResult[] = [];
 
-    // Filter to specific runtimes if user requested, otherwise compile all 17 runtimes.
+    // Filter to specific runtimes if requested, otherwise compile every runtime.
+    // The shared AGENTS.md core is always generated.
     const activeAdapterIds =
       options.targetRuntimes && options.targetRuntimes.length > 0
-        ? options.targetRuntimes
+        ? [...new Set([...options.targetRuntimes, "agents-md"])]
         : Array.from(this.adapters.keys());
 
-    for (const adapterId of activeAdapterIds) {
-      const adapter = this.adapters.get(adapterId);
-      if (!adapter) {
-        continue;
+    this.conflictManager.beginBatch();
+    try {
+      for (const adapterId of activeAdapterIds) {
+        const adapter = this.adapters.get(adapterId);
+        if (!adapter) {
+          continue;
+        }
+
+        const outputs: TranspileOutput[] = adapter.transpile(context);
+        for (const out of outputs) {
+          // Enforce zero-destructive overwrites across every generated file.
+          results.push(
+            this.conflictManager.safeWrite(out.relativePath, out.content, adapter.id, dryRun),
+          );
+        }
       }
 
-      const outputs: TranspileOutput[] = adapter.transpile(context);
-      for (const out of outputs) {
-        // Enforce zero-destructive overwrites across every generated file.
-        const result = this.conflictManager.safeWrite(
-          out.relativePath,
-          out.content,
-          adapter.id,
-          dryRun,
+      for (const extra of options.extras ?? []) {
+        results.push(
+          this.conflictManager.safeWrite(extra.relativePath, extra.content, "install", dryRun, {
+            raw: extra.raw,
+          }),
         );
-        results.push(result);
       }
+    } finally {
+      this.conflictManager.endBatch();
     }
 
     return {

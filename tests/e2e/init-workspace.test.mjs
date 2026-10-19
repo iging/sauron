@@ -47,9 +47,9 @@ describe("E2E: Workspace Bootstrap & Transpilation (init-workspace)", () => {
     }
   });
 
-  it("bootstraps sauron in a new workspace, creating config and 17 runtimes", async () => {
-    // Act: Execute sauron init
-    const { stdout } = await execFileAsync("node", [CLI_PATH, "init"], {
+  it("bootstraps sauron in a new workspace, creating config and all 19 runtimes", async () => {
+    // Act: Execute sauron init with every runtime and no skill copies
+    const { stdout } = await execFileAsync("node", [CLI_PATH, "init", "--yes", "--runtimes=all", "--skills=none"], {
       cwd: tempWorkspace,
     });
 
@@ -95,8 +95,8 @@ describe("E2E: Workspace Bootstrap & Transpilation (init-workspace)", () => {
   });
 
   it("verifies idempotency: re-running init preserves existing user config without crashing", async () => {
-    // Act: Re-run sauron init on already initialized workspace
-    const { stdout } = await execFileAsync("node", [CLI_PATH, "init"], {
+    // Act: Re-run sauron init; saved choices (all runtimes) are reused
+    const { stdout } = await execFileAsync("node", [CLI_PATH, "init", "--yes"], {
       cwd: tempWorkspace,
     });
 

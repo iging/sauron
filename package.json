@@ -15,7 +15,8 @@
     "rules",
     "skills",
     "references",
-    "docs"
+    "docs",
+    "commands"
   ],
   "scripts": {
     "build": "tsc",

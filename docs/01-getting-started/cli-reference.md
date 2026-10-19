@@ -25,18 +25,51 @@ sauron <command> [options]
 Initializes the Sauron harness within the current working directory.
 
 ```bash
-node ./bin/sauron.mjs init [options]
+npx sauron-ai init [options]        # or: pnpm dlx sauron-ai init
 ```
+
+In a terminal, `init` asks a few questions, shows a plan, and writes nothing until you confirm:
+
+```
+? Setup        1) Recommended  2) Custom
+? Runtimes     claude, cursor, ... or all          (Custom)
+? Subagents    fellowship | core | both | none     (Custom, Claude Code)
+? Skills       all | none | <departments>          (Custom)
+? Commands     y | n                               (Custom, Claude Code)
+? Caveman tier off | lite | full | ultra
+? Write these files (y/n)
+```
+
+**Recommended** installs the shared `AGENTS.md` core, Claude Code, every skill, and the 9 Fellowship subagents.
 
 **Actions Performed:**
 
-1. Verifies existing project configuration. If missing, writes a default `sauron.config.yaml`.
-2. Transpiles universal instructions to all enabled target runtimes.
-3. Records written files, SHA-256 hashes, and timestamps in `.sauron/manifest.json`.
+1. Resolves the plan from prompts, flags, or the saved `init:` section of `sauron.config.yaml`.
+2. Writes `AGENTS.md`, `.agents/skills/`, `.agents/anti-patterns.md`, and the scaffold of each selected runtime.
+3. With Claude Code selected: installs skills into `.claude/skills/`, subagents into `.claude/agents/`, slash commands into `.claude/commands/`, and the Caveman output style.
+4. Merges into existing files instead of replacing them (managed `sauron:start/end` blocks; JSON keys you set always win). Copied skills you edited are skipped. Every change is backed up to `.sauron/backups/`.
+5. Saves the choices under `init:` in `sauron.config.yaml` and records files in `.sauron/manifest.json`.
 
 **Options:**
 
-- `--dry-run`: Simulates the initialization without writing files or modifying git state.
+- `--yes`, `-y`: No prompts. Uses the saved choices, or the Recommended preset.
+- `--runtimes=claude,cursor` or `--runtimes=all`: Runtimes to generate. `AGENTS.md` is always included.
+- `--agents=fellowship|core|both|none`: Subagents for `.claude/agents/`.
+- `--skills=all|none|<dept,...>`: Skills to install.
+- `--caveman=off|lite|full|ultra`: Default Caveman tier.
+- `--no-commands`: Skip `.claude/commands/`.
+- `--interactive`: Ask the questions even without a terminal (piped answers).
+- `--dry-run`: Simulates the initialization without writing files.
+
+Without a terminal and without flags, `init` uses the Recommended preset and prints a notice. An invalid flag value exits with code 1.
+
+### `sync`
+
+Re-applies the saved `init:` choices without prompts. Files you edited are merged or skipped, never replaced.
+
+```bash
+npx sauron-ai sync
+```
 
 ---
 

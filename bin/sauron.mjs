@@ -15,7 +15,25 @@ import fs from "node:fs";
 import path from "node:path";
 import process from "node:process";
 import { fileURLToPath } from "node:url";
+import { parse as parseYaml } from "yaml";
 import { Transpiler } from "../dist/adapters/transpiler.js";
+import {
+  AGENT_SETS,
+  InitPlanError,
+  PRESET_RECOMMENDED,
+  RUNTIME_IDS,
+  parseAgents,
+  parseCaveman,
+  parseInitFlags,
+  parseRuntimes,
+  parseSkills,
+  planFromConfig,
+  resolvePlan,
+} from "../dist/adapters/init-plan.js";
+import {
+  buildInstallOutputs,
+  listDepartments,
+} from "../dist/adapters/installer.js";
 
 // Determine canonical package root dynamically to ensure path resolution works
 // identically regardless of whether installed globally or executed from within a submodule.
@@ -54,7 +72,8 @@ const LOTR_BANNER = Object.freeze(`
 /**
  * @typedef {Object} InitOptions
  * @property {boolean} dryRun - Whether to simulate execution without modifying disk files.
- * @property {string} [cavemanMode] - Caveman tier from `--caveman=<off|lite|full|ultra>`.
+ * @property {string[]} argv - Arguments after the command name (flags).
+ * @property {boolean} isSync - True for `sauron sync` (never prompts, reuses saved choices).
  */
 
 /**
@@ -236,8 +255,27 @@ function printHelpMenu() {
     "  init         Initialize sauron configuration and transpile to 19 runtimes",
   );
   console.log(
-    "               --caveman=<off|lite|full|ultra>  Default Caveman tier (asked on first init)",
+    "               Interactive setup (Recommended or Custom). Flags skip questions:",
   );
+  console.log(
+    "               --yes                           Use Recommended (or saved choices), no prompts",
+  );
+  console.log(
+    "               --runtimes=claude,cursor|all    Runtimes to generate (AGENTS.md always included)",
+  );
+  console.log(
+    "               --agents=fellowship|core|both|none  Subagents for .claude/agents/",
+  );
+  console.log(
+    "               --skills=all|none|<dept,...>    Skills for .agents/skills/ (+ .claude/skills/)",
+  );
+  console.log(
+    "               --caveman=off|lite|full|ultra   Default Caveman tier",
+  );
+  console.log(
+    "               --no-commands                   Skip .claude/commands/",
+  );
+  console.log("  sync         Re-apply saved init choices without prompts");
   console.log(
     "  add <skill>  Add one or more modular skills to local project workspace",
   );
@@ -472,28 +510,242 @@ function executeAddCommand(skillNames, options) {
 const CAVEMAN_TIERS = Object.freeze(["off", "lite", "full", "ultra"]);
 
 /**
- * Asks the user which Caveman tier to enable by default. Empty input keeps `full`.
+ * Detects the package runner the user invoked Sauron with, for next-step hints.
  *
- * @returns {Promise<string>} The chosen tier.
+ * @returns {string} Command prefix such as `npx sauron-ai` or `pnpm dlx sauron-ai`.
  */
-async function promptCavemanMode() {
-  const { createInterface } = await import("node:readline/promises");
-  const rl = createInterface({ input: process.stdin, output: process.stdout });
-  try {
-    console.log("Caveman Mode trims filler from agent replies. Code, paths, and commands stay verbatim.");
-    console.log("  off   : normal replies");
-    console.log("  lite  : no filler, full sentences");
-    console.log("  full  : terse fragments (recommended)");
-    console.log("  ultra : maximum compression");
-    for (;;) {
-      const answer = (await rl.question("Default Caveman tier [full]: ")).trim().toLowerCase();
-      if (answer === "") return "full";
-      if (CAVEMAN_TIERS.includes(answer)) return answer;
-      console.log(`  Choose one of: ${CAVEMAN_TIERS.join(", ")}`);
+function detectRunner() {
+  const agent = process.env["npm_config_user_agent"] ?? "";
+  if (agent.startsWith("pnpm")) return "pnpm dlx sauron-ai";
+  if (agent.startsWith("yarn")) return "yarn dlx sauron-ai";
+  if (agent.startsWith("bun")) return "bunx sauron-ai";
+  return "npx sauron-ai";
+}
+
+/**
+ * Line reader shared by every init question. Buffers piped input so answers are
+ * never lost between questions, and aborts cleanly on Ctrl+C or end of input.
+ *
+ * @returns {Promise<{ question: (text: string) => Promise<string>, close: () => void }>}
+ */
+async function createPrompter() {
+  const { createInterface } = await import("node:readline");
+  const rl = createInterface({
+    input: process.stdin,
+    output: process.stdout,
+    terminal: process.stdin.isTTY === true,
+  });
+  /** @type {string[]} */
+  const lines = [];
+  /** @type {((line: string | null) => void) | null} */
+  let waiter = null;
+  let closed = false;
+  rl.on("line", (line) => {
+    if (waiter) {
+      const resolve = waiter;
+      waiter = null;
+      resolve(line);
+    } else {
+      lines.push(line);
     }
-  } finally {
-    rl.close();
+  });
+  rl.on("close", () => {
+    closed = true;
+    if (waiter) waiter(null);
+  });
+  rl.on("SIGINT", () => {
+    console.log("\n[ABORTED] Nothing was written.");
+    process.exit(130);
+  });
+  return {
+    question(text) {
+      process.stdout.write(text);
+      const buffered = lines.shift();
+      if (buffered !== undefined) {
+        // Echo piped answers so the transcript reads like an interactive session.
+        if (process.stdin.isTTY !== true) process.stdout.write(`${buffered}\n`);
+        return Promise.resolve(buffered);
+      }
+      if (closed)
+        return Promise.reject(
+          new Error("Input ended before setup finished. Nothing was written."),
+        );
+      return new Promise((resolve, reject) => {
+        waiter = (line) =>
+          line === null
+            ? reject(
+                new Error(
+                  "Input ended before setup finished. Nothing was written.",
+                ),
+              )
+            : resolve(line);
+      });
+    },
+    close() {
+      rl.close();
+    },
+  };
+}
+
+/**
+ * Asks one question; empty input returns the default.
+ *
+ * @param {{ question: (text: string) => Promise<string> }} prompter - Shared line reader.
+ * @param {string} question - Prompt text.
+ * @param {string} fallback - Value returned for empty input.
+ * @param {(answer: string) => boolean} isValid - Validator for non-empty input.
+ * @param {string} hint - Message shown on invalid input.
+ * @returns {Promise<string>} The accepted answer.
+ */
+async function ask(prompter, question, fallback, isValid, hint) {
+  for (;;) {
+    const answer = (await prompter.question(`? ${question} [${fallback}]: `))
+      .trim()
+      .toLowerCase();
+    if (answer === "") return fallback;
+    if (isValid(answer)) return answer;
+    console.log(`  ${hint}`);
   }
+}
+
+/**
+ * Runs the shadcn-style init questions. Flags already given are not asked again.
+ *
+ * @param {{ question: (text: string) => Promise<string> }} rl - Shared line reader.
+ * @param {import("../dist/adapters/init-plan.js").InitFlags} flags - Parsed flags.
+ * @param {string[]} departments - Available skill departments.
+ * @param {string} defaultCaveman - Caveman tier to offer as default.
+ * @returns {Promise<import("../dist/adapters/init-plan.js").InitPlan>} Final plan.
+ */
+async function promptInitPlan(rl, flags, departments, defaultCaveman) {
+  {
+    console.log("Setup presets:");
+    console.log(
+      "  1) Recommended : AGENTS.md + Claude Code + all skills (.agents/skills) + Fellowship agents",
+    );
+    console.log("  2) Custom      : pick runtimes, agents, and skills");
+    const preset = await ask(
+      rl,
+      "Setup",
+      "1",
+      (a) => a === "1" || a === "2",
+      "Type 1 or 2.",
+    );
+
+    /** @type {import("../dist/adapters/init-plan.js").InitFlags} */
+    const answers = { ...flags };
+    if (preset === "2") {
+      if (!answers.runtimes) {
+        console.log("\nRuntimes (AGENTS.md is always included):");
+        RUNTIME_IDS.forEach((id, i) =>
+          console.log(`  ${String(i + 1).padStart(2)}) ${id}`),
+        );
+        const pick = await ask(
+          rl,
+          "Runtimes (numbers or ids, comma separated, or 'all')",
+          "claude",
+          (a) => {
+            try {
+              parseRuntimes(
+                a.replace(/\b(\d+)\b/g, (n) => RUNTIME_IDS[Number(n) - 1] ?? n),
+              );
+              return true;
+            } catch {
+              return false;
+            }
+          },
+          `Use numbers 1-${RUNTIME_IDS.length}, ids like claude,cursor, or 'all'.`,
+        );
+        answers.runtimes = parseRuntimes(
+          pick.replace(/\b(\d+)\b/g, (n) => RUNTIME_IDS[Number(n) - 1] ?? n),
+        );
+      }
+      if (!answers.agents && answers.runtimes.includes("claude")) {
+        console.log("\nSubagents for .claude/agents/:");
+        console.log(
+          "  fellowship : 9 Fellowship agents (/gandalf, /frodo, ...)",
+        );
+        console.log("  core       : 69 specialist agents");
+        console.log("  both | none");
+        answers.agents = parseAgents(
+          await ask(
+            rl,
+            "Subagents",
+            "fellowship",
+            (a) => AGENT_SETS.includes(a),
+            `Choose: ${AGENT_SETS.join(", ")}.`,
+          ),
+        );
+      }
+      if (!answers.skills) {
+        console.log(
+          `\nSkills: all, none, or departments (${departments.join(", ")})`,
+        );
+        answers.skills = parseSkills(
+          await ask(
+            rl,
+            "Skills",
+            "all",
+            (a) => {
+              try {
+                parseSkills(a, departments);
+                return true;
+              } catch {
+                return false;
+              }
+            },
+            "Use all, none, or a comma list of departments.",
+          ),
+          departments,
+        );
+      }
+      if (
+        answers.commands === undefined &&
+        answers.runtimes.includes("claude")
+      ) {
+        answers.commands =
+          (await ask(
+            rl,
+            "Install Sauron slash commands into .claude/commands/ (y/n)",
+            "y",
+            (a) => a === "y" || a === "n",
+            "Type y or n.",
+          )) === "y";
+      }
+    }
+
+    if (!answers.caveman) {
+      console.log(
+        "\nCaveman Mode trims filler from agent replies. Code, paths, and commands stay verbatim.",
+      );
+      console.log(
+        "  off : normal | lite : no filler | full : terse fragments | ultra : maximum compression",
+      );
+      answers.caveman = parseCaveman(
+        await ask(
+          rl,
+          "Caveman tier",
+          defaultCaveman,
+          (a) => CAVEMAN_TIERS.includes(a),
+          `Choose: ${CAVEMAN_TIERS.join(", ")}.`,
+        ),
+      );
+    }
+    return resolvePlan(answers);
+  }
+}
+
+/**
+ * Asks for a final yes/no confirmation. Defaults to yes.
+ *
+ * @param {{ question: (text: string) => Promise<string> }} prompter - Shared line reader.
+ * @returns {Promise<boolean>} True when the user confirms.
+ */
+async function confirmPlan(prompter) {
+  const answer = (await prompter.question("? Write these files (y/n) [y]: "))
+    .trim()
+    .toLowerCase();
+  return answer === "" || answer === "y" || answer === "yes";
 }
 
 /**
@@ -515,21 +767,68 @@ function setCavemanModeInConfig(configPath, mode) {
 }
 
 /**
- * Initializes a repository with sauron configuration and generates 19 runtime adapter scaffolds.
+ * Saves the init choices under a top-level `init:` key so `sauron sync` reuses them.
+ *
+ * @param {string} configPath - Absolute path to sauron.config.yaml.
+ * @param {import("../dist/adapters/init-plan.js").InitPlan} plan - Choices to persist.
+ * @returns {void}
+ */
+function setInitPlanInConfig(configPath, plan) {
+  const raw = fs.readFileSync(configPath, "utf8");
+  const skills = Array.isArray(plan.skills)
+    ? `[${plan.skills.join(", ")}]`
+    : plan.skills;
+  const block = [
+    "init:",
+    `  runtimes: [${plan.runtimes.join(", ")}]`,
+    `  agents: ${plan.agents}`,
+    `  skills: ${skills}`,
+    `  commands: ${plan.commands}`,
+    "",
+  ].join("\n");
+  const pattern = /^init:\r?\n(?:[ \t]+.*(?:\r?\n|$))*/m;
+  const next = pattern.test(raw)
+    ? raw.replace(pattern, block)
+    : `${raw.replace(/\s*$/, "")}\n\n# Choices from \`sauron init\`; \`sauron sync\` reuses them.\n${block}`;
+  if (next !== raw) {
+    fs.writeFileSync(configPath, next, "utf8");
+  }
+}
+
+/**
+ * Reads sauron.config.yaml, or returns an empty object when missing or invalid.
+ *
+ * @param {string} configPath - Absolute path to sauron.config.yaml.
+ * @returns {Record<string, unknown>} Parsed config.
+ */
+function readConfig(configPath) {
+  if (!fs.existsSync(configPath)) return {};
+  try {
+    const parsed = parseYaml(fs.readFileSync(configPath, "utf8"));
+    return parsed && typeof parsed === "object" ? parsed : {};
+  } catch {
+    return {};
+  }
+}
+
+/**
+ * Initializes a repository: asks for (or reads) the install plan, then writes the
+ * shared AGENTS.md core, the selected runtime scaffolds, skills, subagents, and commands.
  *
  * Execution flow:
- * 1. Verifies or bootstraps `sauron.config.yaml` in the current working directory.
- * 2. Instantiates the Transpiler engine with the active workspace context.
- * 3. Compiles all runtime adapters and displays safe file mutation results.
+ * 1. Resolve the plan from flags, prompts (TTY), or the saved `init:` config (sync).
+ * 2. Show a summary and confirm (interactive only). Nothing is written before this.
+ * 3. Bootstrap `sauron.config.yaml` and persist the choices.
+ * 4. Write every file through ConflictManager (merge, never replace user files).
  *
- * @param {InitOptions} options - Options controlling execution (dryRun flag, caveman tier).
+ * @param {InitOptions} options - Execution options.
  * @returns {Promise<void>}
  */
 async function executeInitCommand(options) {
-  const { dryRun } = options;
+  const { dryRun, argv, isSync } = options;
   console.log(LOTR_BANNER);
   console.log(
-    `[INIT] Initializing sauron in current workspace${dryRun ? " (DRY-RUN MODE)" : ""}...\n`,
+    `[${isSync ? "SYNC" : "INIT"}] ${isSync ? "Re-syncing" : "Initializing"} sauron in current workspace${dryRun ? " (DRY-RUN MODE)" : ""}...\n`,
   );
 
   const currentWorkingDirectory = process.cwd();
@@ -542,63 +841,163 @@ async function executeInitCommand(options) {
     "config",
     "sauron.config.yaml",
   );
-
   const isNewConfig = !fs.existsSync(targetConfigPath);
-  let cavemanMode = options.cavemanMode;
-  // Ask once on a fresh install when the user did not pass --caveman.
-  if (!cavemanMode && isNewConfig && process.stdin.isTTY) {
-    cavemanMode = await promptCavemanMode();
+  const config = readConfig(targetConfigPath);
+  const departments = listDepartments(SAURON_ROOT);
+
+  const flags = parseInitFlags(argv, departments);
+  const savedPlan = planFromConfig(config["init"], departments);
+  const savedCaveman = /** @type {Record<string, unknown> | undefined} */ (
+    config["caveman"]
+  )?.["default_mode"];
+  const defaultCaveman =
+    typeof savedCaveman === "string" && CAVEMAN_TIERS.includes(savedCaveman)
+      ? savedCaveman
+      : "full";
+  const assumeYes = argv.includes("--yes") || argv.includes("-y");
+  // `--interactive` forces the prompts without a TTY (piped answers, tests).
+  const interactive =
+    !isSync &&
+    !assumeYes &&
+    (process.stdin.isTTY === true || argv.includes("--interactive"));
+
+  /** @type {import("../dist/adapters/init-plan.js").InitPlan} */
+  let plan;
+  /** @type {{ question: (text: string) => Promise<string>, close: () => void } | undefined} */
+  let prompter;
+  if (interactive) {
+    prompter = await createPrompter();
+    plan = await promptInitPlan(prompter, flags, departments, defaultCaveman);
+  } else {
+    plan = resolvePlan(
+      { caveman: /** @type {any} */ (defaultCaveman), ...flags },
+      savedPlan ??
+        (isSync
+          ? resolvePlan({
+              runtimes: [...RUNTIME_IDS],
+              skills: "none",
+              agents: "none",
+              commands: false,
+            })
+          : PRESET_RECOMMENDED),
+    );
+    if (!isSync && !assumeYes && Object.keys(flags).length === 0) {
+      console.log(
+        "  [NOTICE] No terminal detected and no flags given: using the Recommended preset.",
+      );
+    }
+  }
+
+  const extras = buildInstallOutputs(SAURON_ROOT, plan);
+  const skillCount = new Set(
+    extras
+      .filter((e) => e.relativePath.startsWith(".agents/skills/"))
+      .map((e) => e.relativePath.split("/")[2]),
+  ).size;
+  const agentCount = extras.filter((e) =>
+    e.relativePath.startsWith(".claude/agents/"),
+  ).length;
+  const commandCount = extras.filter((e) =>
+    e.relativePath.startsWith(".claude/commands/"),
+  ).length;
+
+  console.log("\nPlan:");
+  console.log(`  Runtimes  : AGENTS.md + ${plan.runtimes.join(", ")}`);
+  console.log(
+    `  Skills    : ${skillCount} into .agents/skills/${plan.runtimes.includes("claude") && skillCount > 0 ? " and .claude/skills/" : ""}`,
+  );
+  console.log(
+    `  Subagents : ${agentCount} into .claude/agents/ (${plan.runtimes.includes("claude") ? plan.agents : "Claude Code not selected"})`,
+  );
+  console.log(`  Commands  : ${commandCount} into .claude/commands/`);
+  console.log(`  Caveman   : ${plan.caveman}`);
+  console.log(
+    "  Safety    : existing files are merged, never replaced; backups in .sauron/backups/\n",
+  );
+
+  const confirmed = prompter ? await confirmPlan(prompter) : true;
+  prompter?.close();
+  if (!confirmed) {
+    console.log("[ABORTED] Nothing was written.");
+    return;
   }
 
   // Preserve existing user configuration if already present; copy template if new.
-  if (isNewConfig) {
-    if (fs.existsSync(defaultTemplatePath)) {
-      if (!dryRun) {
-        fs.copyFileSync(defaultTemplatePath, targetConfigPath);
-      }
-      console.log(
-        `  [CONFIG] sauron.config.yaml ${dryRun ? "(simulated)" : "created"} at ${targetConfigPath}`,
-      );
+  if (isNewConfig && fs.existsSync(defaultTemplatePath)) {
+    if (!dryRun) {
+      fs.copyFileSync(defaultTemplatePath, targetConfigPath);
     }
-  } else {
+    console.log(
+      `  [CONFIG] sauron.config.yaml ${dryRun ? "(simulated)" : "created"} at ${targetConfigPath}`,
+    );
+  } else if (!isNewConfig) {
     console.log(
       "  [CONFIG] Existing sauron.config.yaml detected. Preserving user configuration.",
     );
   }
-
-  if (cavemanMode && !dryRun && fs.existsSync(targetConfigPath)) {
-    setCavemanModeInConfig(targetConfigPath, cavemanMode);
-  }
-  if (cavemanMode) {
-    console.log(`  [CAVEMAN] Default tier: ${cavemanMode}`);
+  if (!dryRun && fs.existsSync(targetConfigPath)) {
+    setCavemanModeInConfig(targetConfigPath, plan.caveman);
+    setInitPlanInConfig(targetConfigPath, plan);
   }
 
-  console.log("\n[TRANSPILING] Transpiling to 19 target runtime adapters...");
+  console.log(
+    `\n[WRITING] AGENTS.md core + ${plan.runtimes.length} runtime(s) + ${extras.length} skill/agent/command file(s)...`,
+  );
 
   const transpiler = new Transpiler({
     workspaceRoot: currentWorkingDirectory,
-    ...(cavemanMode ? { cavemanMode } : {}),
+    cavemanMode: plan.caveman,
     sauronRoot: SAURON_ROOT,
     dryRun,
   });
+  const report = transpiler.transpileAll({
+    dryRun,
+    targetRuntimes: plan.runtimes,
+    extras,
+  });
 
-  const report = transpiler.transpileAll({ dryRun });
-
-  // Output formatted audit log showing whether files were created, updated with backup, or unchanged.
+  // Runtime files are listed one by one; installed assets are summarized by action.
+  /** @type {Record<string, number>} */
+  const installCounts = {};
   for (const file of report.files) {
-    const actionTag = file.action.toUpperCase();
+    if (
+      file.runtime === "install" &&
+      file.action !== "merged" &&
+      file.action !== "skipped"
+    ) {
+      installCounts[file.action] = (installCounts[file.action] ?? 0) + 1;
+      continue;
+    }
     const backupNotice = file.backupPath
       ? ` [backed up -> ${file.backupPath}]`
       : "";
     console.log(
-      `  [${actionTag.padEnd(9)}] ${file.runtime.padEnd(12)} -> ${file.filePath}${backupNotice}`,
+      `  [${file.action.toUpperCase().padEnd(9)}] ${file.runtime.padEnd(12)} -> ${file.filePath}${backupNotice}`,
     );
   }
+  const installSummary = Object.entries(installCounts)
+    .map(([action, count]) => `${count} ${action}`)
+    .join(", ");
+  if (installSummary) {
+    console.log(`  [INSTALL  ] skills, agents, commands -> ${installSummary}`);
+  }
 
-  const completionMessage = dryRun
-    ? `\n[COMPLETE] Dry-run simulated ${report.totalGenerated} runtime targets. Zero files modified.`
-    : `\n[COMPLETE] sauron initialization synchronized ${report.totalGenerated} runtime targets.`;
-  console.log(completionMessage);
+  console.log(
+    dryRun
+      ? `\n[COMPLETE] Dry-run simulated ${report.totalGenerated} files. Zero files modified.`
+      : `\n[COMPLETE] sauron synchronized ${report.totalGenerated} files.`,
+  );
+  if (!dryRun && !isSync) {
+    const runner = detectRunner();
+    console.log("\nNext steps:");
+    console.log(`  - Add a skill later:   ${runner} add <skill>`);
+    console.log(`  - Re-apply after edits: ${runner} sync`);
+    if (plan.runtimes.includes("claude")) {
+      console.log(
+        "  - In Claude Code: try /gandalf <goal>, or @frodo, or /<skill-name>",
+      );
+    }
+  }
 }
 
 /**
@@ -1048,23 +1447,18 @@ function main(commandLineArguments) {
   switch (primaryCommand) {
     case "init":
     case "sync":
-    {
-      const cavemanArg = commandLineArguments.find((arg) =>
-        arg.startsWith("--caveman="),
-      );
-      const cavemanMode = cavemanArg?.slice("--caveman=".length).toLowerCase();
-      if (cavemanMode !== undefined && !CAVEMAN_TIERS.includes(cavemanMode)) {
+      executeInitCommand({
+        dryRun: isDryRun,
+        argv: commandLineArguments.slice(1),
+        isSync: primaryCommand === "sync",
+      }).catch((error) => {
+        const message = error instanceof Error ? error.message : String(error);
         console.error(
-          `[ERROR] Invalid --caveman value '${cavemanMode}'. Use one of: ${CAVEMAN_TIERS.join(", ")}.`,
+          `${error instanceof InitPlanError ? "[INVALID FLAG]" : "[ERROR]"} ${message}`,
         );
-        process.exit(1);
-      }
-      executeInitCommand({ dryRun: isDryRun, cavemanMode }).catch((error) => {
-        console.error(`[ERROR] ${error instanceof Error ? error.message : String(error)}`);
         process.exit(1);
       });
       break;
-    }
     case "graph": {
       const targetDir = commandLineArguments[1] || ".";
       executeGraphCommand(targetDir);

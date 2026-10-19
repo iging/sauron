@@ -117,7 +117,7 @@ function renderRootReadme(): string {
     "",
     "## Legacy",
     "",
-    "`.claude/commands/` is legacy. Use `.claude/skills/<name>/SKILL.md` instead.",
+    "`.claude/commands/` is the older slash-command format. It still works, and Sauron installs its commands there; for new workflows prefer `.claude/skills/<name>/SKILL.md`.",
     "",
     "## Official docs",
     "",
@@ -140,6 +140,7 @@ export class ClaudeAdapter implements RuntimeAdapter {
     "CLAUDE.md",
     ".claude/README.md",
     ".claude/settings.json",
+    ".claude/output-styles/caveman.md",
     ...CLAUDE_FOLDERS.map((folder) => `.claude/${folder.name}/README.md`),
   ];
 
@@ -158,32 +159,18 @@ export class ClaudeAdapter implements RuntimeAdapter {
       `> Managed by Sauron v${context.version}. Persistent instruction manual for Claude Code.`,
     );
     lines.push("");
-    lines.push("## Common Commands");
-    lines.push("");
-    lines.push("- **Build Engine**: `npm run build`");
-    lines.push("- **Run Test Suite**: `npm test`");
-    lines.push("- **Typecheck**: `npx tsc --noEmit`");
-    lines.push(
-      "- **Run Single Test**: `node --test tests/<filename>.test.mjs`",
-    );
-    lines.push("");
-    lines.push("## Architecture & Code Organization");
+    lines.push("## Where Things Live");
     lines.push("");
     lines.push(
-      `- Context: ${context.projectDescription || "Universal AI agent workspace governed by Sauron."}`,
+      "- Skills: `.claude/skills/` (invoke with `/<skill-name>`). Shared copy for other tools: `.agents/skills/`.",
     );
     lines.push(
-      "- `adapters/`: 17 runtime transpilation adapters, types, and safe conflict manager.",
+      "- Subagents: `.claude/agents/` (invoke with `@<agent-id>` or let Claude delegate).",
     );
-    lines.push("- `bin/`: CLI orchestrator and runtime entry points.");
+    lines.push("- Slash commands: `.claude/commands/`.");
+    lines.push("- Anti-patterns reference: `.agents/anti-patterns.md`.");
     lines.push(
-      "- `core/`: Fellowship sub-agent specifications and department skill metadata.",
-    );
-    lines.push(
-      "- `skills/`: 44 ECC-standard modular skills across 7 functional departments.",
-    );
-    lines.push(
-      "- `tests/`: Automated test suite executed with native Node.js test runner.",
+      "- Add your own project notes (build commands, architecture) outside the Sauron block in this file.",
     );
     lines.push("");
     lines.push("## Code Style & Conventions");
@@ -202,6 +189,29 @@ export class ClaudeAdapter implements RuntimeAdapter {
     lines.push("");
     lines.push(...formatCavemanSection("##", context.cavemanMode));
 
+    const cavemanOn = (context.cavemanMode ?? "full") !== "off";
+    const settings: Record<string, unknown> = {
+      $schema: "https://json.schemastore.org/claude-code-settings.json",
+      ...(cavemanOn ? { outputStyle: "Caveman" } : {}),
+    };
+    const outputStyle: TranspileOutput[] = cavemanOn
+      ? [
+          {
+            relativePath: ".claude/output-styles/caveman.md",
+            content: [
+              "---",
+              "name: Caveman",
+              `description: Terse replies at tier ${context.cavemanMode ?? "full"}. Code, paths, and commands stay verbatim.`,
+              "keep-coding-instructions: true",
+              "---",
+              "",
+              ...formatCavemanSection("##", context.cavemanMode),
+            ].join("\n"),
+            format: "markdown",
+          },
+        ]
+      : [];
+
     return [
       {
         relativePath: "CLAUDE.md",
@@ -215,9 +225,10 @@ export class ClaudeAdapter implements RuntimeAdapter {
       },
       {
         relativePath: ".claude/settings.json",
-        content: `${JSON.stringify({ $schema: "https://json.schemastore.org/claude-code-settings.json" }, null, 2)}\n`,
+        content: `${JSON.stringify(settings, null, 2)}\n`,
         format: "json",
       },
+      ...outputStyle,
       ...CLAUDE_FOLDERS.map(
         (folder): TranspileOutput => ({
           relativePath: `.claude/${folder.name}/README.md`,

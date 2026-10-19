@@ -141,6 +141,31 @@ export class ConflictManager {
    *
    * @param workspaceRoot - The target project directory root path.
    */
+  /** In-memory manifest while a batch is open; saved once by `endBatch()`. */
+  private batchManifest: SauronManifest | undefined;
+  /** True when the batch manifest has unsaved changes. */
+  private batchDirty = false;
+
+  /**
+   * Starts a batch: manifest updates stay in memory until `endBatch()`.
+   * Avoids rewriting the manifest once per file when installing thousands of files.
+   */
+  public beginBatch(): void {
+    this.batchManifest = this.loadManifest();
+    this.batchDirty = false;
+  }
+
+  /** Ends a batch and saves the manifest once if anything changed. */
+  public endBatch(): void {
+    const manifest = this.batchManifest;
+    const dirty = this.batchDirty;
+    this.batchManifest = undefined;
+    this.batchDirty = false;
+    if (manifest && dirty) {
+      this.saveManifest(manifest);
+    }
+  }
+
   public constructor(workspaceRoot: string) {
     this.workspaceRoot = path.resolve(workspaceRoot);
     this.sauronDir = path.join(this.workspaceRoot, ".sauron");
@@ -170,6 +195,9 @@ export class ConflictManager {
    * @returns Parsed SauronManifest state object.
    */
   public loadManifest(): SauronManifest {
+    if (this.batchManifest) {
+      return this.batchManifest;
+    }
     if (!fs.existsSync(this.manifestPath)) {
       return {
         installedAt: new Date().toISOString(),
@@ -231,6 +259,8 @@ export class ConflictManager {
    * @param content - Rendered file content to write.
    * @param runtime - Identifier of the AI runtime generating the file.
    * @param dryRun - When true, evaluates changes without modifying disk. Defaults to false.
+   * @param options - `raw: true` copies the content verbatim (no managed block) and
+   *   skips the file when the user has changed it.
    * @returns Detailed WriteFileResult summarizing action taken and backup location.
    */
   public safeWrite(
@@ -238,10 +268,12 @@ export class ConflictManager {
     content: string,
     runtime: string,
     dryRun: boolean = false,
+    options: { raw?: boolean } = {},
   ): WriteFileResult {
     const targetPath = path.join(this.workspaceRoot, relativePath);
-    const isJson = relativePath.toLowerCase().endsWith(".json");
-    const rendered = isJson ? content : wrapManagedBlock(relativePath, content);
+    const raw = options.raw === true;
+    const isJson = !raw && relativePath.toLowerCase().endsWith(".json");
+    const rendered = raw || isJson ? content : wrapManagedBlock(relativePath, content);
     const result = (
       action: WriteFileResult["action"],
       backupPath: string | null = null,
@@ -287,6 +319,9 @@ export class ConflictManager {
     if (ownedByUs) {
       next = rendered;
       action = "updated";
+    } else if (raw) {
+      // Verbatim assets (skills, agents, commands) the user changed are kept as is.
+      return result("skipped");
     } else if (isJson) {
       const merged = mergeJsonPreservingUser(content, existing);
       if (merged === null) {
@@ -366,6 +401,10 @@ export class ConflictManager {
       manifest.managedFiles.push(record);
     }
 
+    if (this.batchManifest) {
+      this.batchDirty = true;
+      return;
+    }
     this.saveManifest(manifest);
   }
 }
