@@ -1,5 +1,5 @@
 /**
- * @fileoverview Kiro adapter generating .kirorules file.
+ * @fileoverview Kiro adapter generating .kiro/steering/sauron.md and .kiro/skills/README.md.
  */
 
 import {
@@ -12,12 +12,16 @@ import {
 export class KiroAdapter implements RuntimeAdapter {
   public readonly id = "kiro";
   public readonly name = "Kiro";
-  public readonly targetFiles = [".kirorules"];
+  public readonly targetFiles = [".kiro/steering/sauron.md", ".kiro/skills/README.md"];
 
   public transpile(context: TranspileContext): TranspileOutput[] {
     const lines: string[] = [];
 
-    lines.push(`# .kirorules for ${context.projectName}`);
+    lines.push("---");
+    lines.push("inclusion: always");
+    lines.push("---");
+    lines.push("");
+    lines.push(`# Sauron Steering for ${context.projectName}`);
     lines.push(`Configured by Sauron v${context.version}`);
     lines.push("");
     lines.push("## Rules and Axioms");
@@ -37,12 +41,27 @@ export class KiroAdapter implements RuntimeAdapter {
     }
     lines.push("");
 
+    const readme = [
+      "# Kiro Skills",
+      "",
+      `Scaffolded by Sauron v${context.version} for ${context.projectName}.`,
+      "",
+      "## Purpose",
+      "Project-scoped agent skills that Kiro loads on demand.",
+      "",
+      "## How to add a file",
+      "Create one folder per skill containing a `SKILL.md`, e.g. `my-skill/SKILL.md`. Frontmatter requires `name` and `description`, followed by the skill instructions.",
+      "",
+      "## Notes",
+      "Always-on project guidance lives in `.kiro/steering/` (markdown with `inclusion: always | fileMatch | manual` frontmatter).",
+      "",
+      "Official docs: https://kiro.dev/docs/skills",
+      "",
+    ];
+
     return [
-      {
-        relativePath: ".kirorules",
-        content: lines.join("\n"),
-        format: "text",
-      },
+      { relativePath: ".kiro/steering/sauron.md", content: lines.join("\n"), format: "markdown" },
+      { relativePath: ".kiro/skills/README.md", content: readme.join("\n"), format: "markdown" },
     ];
   }
 }

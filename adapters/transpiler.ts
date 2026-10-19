@@ -32,6 +32,7 @@ import { OpenCodeAdapter } from "./opencode.js";
 import { PiAdapter } from "./pi.js";
 import { AdalAdapter } from "./adal.js";
 import { CodeBuddyAdapter } from "./codebuddy.js";
+import { AgentsMdAdapter } from "./agents-md.js";
 
 import type {
   FellowshipAgentIR,
@@ -129,6 +130,7 @@ export class Transpiler {
       new PiAdapter(),
       new AdalAdapter(),
       new CodeBuddyAdapter(),
+      new AgentsMdAdapter(),
     ];
 
     for (const adapter of adapterList) {
@@ -213,6 +215,19 @@ export class Transpiler {
   }
 
   /**
+   * Loads `references/anti-patterns.md` relative to sauronRoot.
+   * Fail-closed: returns undefined when the file is missing or unreadable.
+   */
+  private loadAntiPatternsDoc(): string | undefined {
+    const docPath = path.join(this.sauronRoot, "references", "anti-patterns.md");
+    try {
+      return fs.readFileSync(docPath, "utf8");
+    } catch {
+      return undefined;
+    }
+  }
+
+  /**
    * Assembles the unified TranspileContext Intermediate Representation.
    *
    * Merges project properties, loaded fellowship personas, discovered skills,
@@ -224,7 +239,10 @@ export class Transpiler {
   public buildContext(
     configOverrides?: Partial<TranspileContext>,
   ): TranspileContext {
+    const antiPatternsDoc =
+      configOverrides?.antiPatternsDoc ?? this.loadAntiPatternsDoc();
     return {
+      ...(antiPatternsDoc !== undefined ? { antiPatternsDoc } : {}),
       projectName:
         configOverrides?.projectName || path.basename(this.workspaceRoot),
       projectDescription:

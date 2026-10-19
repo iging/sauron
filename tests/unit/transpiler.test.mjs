@@ -11,7 +11,7 @@ const __filename = fileURLToPath(import.meta.url);
 const __dirname = path.dirname(__filename);
 const SAURON_ROOT = path.resolve(__dirname, "../..");
 
-describe("Transpiler 17-Runtime Generation (Milestone 6.2)", () => {
+describe("Transpiler 19-Runtime Generation (Milestone 6.2)", () => {
   /** @type {string} */
   let tempWorkspace;
 
@@ -25,7 +25,7 @@ describe("Transpiler 17-Runtime Generation (Milestone 6.2)", () => {
     }
   });
 
-  it("successfully transpiles and generates files for all 17 runtimes in isolation", () => {
+  it("successfully transpiles and generates files for all 19 runtimes in isolation", () => {
     const transpiler = new Transpiler({
       workspaceRoot: tempWorkspace,
       sauronRoot: SAURON_ROOT,
@@ -42,27 +42,49 @@ describe("Transpiler 17-Runtime Generation (Milestone 6.2)", () => {
 
     const expectedPaths = [
       "CLAUDE.md",
-      ".cursorrules",
       ".cursor/rules/sauron.mdc",
-      ".windsurfrules",
+      ".cursor/rules/README.md",
+      ".cursor/skills/README.md",
+      ".windsurf/rules/sauron.md",
+      ".windsurf/workflows/README.md",
+      ".windsurf/skills/README.md",
       ".github/copilot-instructions.md",
-      ".clinerules",
-      ".traerules",
+      ".cline/rules/sauron.md",
+      ".cline/README.md",
+      ".cline/workflows/README.md",
+      ".cline/skills/README.md",
+      ".cline/hooks/README.md",
+      ".trae/rules/project_rules.md",
       ".zed/settings.json",
-      ".zed/prompts/sauron.md",
-      ".codex/instructions.md",
+      ".codex/config.toml",
+      ".codex/README.md",
+      ".rules",
       ".vscode/settings.json",
-      ".vscode/sauron.instructions.md",
+      ".github/instructions/sauron.instructions.md",
+      ".github/instructions/README.md",
+      ".github/prompts/README.md",
+      ".github/agents/README.md",
+      ".github/skills/README.md",
       "GEMINI.md",
-      ".qwen/system.md",
+      "AGENTS.md",
+      ".agents/skills/README.md",
+      ".agents/anti-patterns.md",
+      ".gemini/README.md",
+      "QWEN.md",
+      ".qwen/skills/README.md",
       ".kimi/prompt.md",
-      ".kirorules",
+      ".kiro/steering/sauron.md",
+      ".kiro/skills/README.md",
       ".hermesrules",
       ".openclaw/config.json",
-      ".opencode/instructions.md",
-      ".pirules",
+      ".opencode/agents/README.md",
+      ".opencode/commands/README.md",
+      ".opencode/skills/README.md",
+      ".pi/prompts/README.md",
+      ".pi/skills/README.md",
       ".adalrules",
-      ".codebuddy/rules.md",
+      ".codebuddy/rules/sauron.md",
+      ".codebuddy/skills/README.md",
     ];
 
     for (const relPath of expectedPaths) {
@@ -77,6 +99,68 @@ describe("Transpiler 17-Runtime Generation (Milestone 6.2)", () => {
         content.toLowerCase().includes("sauron"),
         `File should mention sauron: ${relPath}`,
       );
+    }
+
+    for (const legacy of [".codebuddy/rules.md", ".zed/prompts/sauron.md"]) {
+      assert.ok(
+        !fs.existsSync(path.join(tempWorkspace, legacy)),
+        `Legacy file must not be generated: ${legacy}`,
+      );
+    }
+  });
+});
+
+describe("CodeBuddy + Zed scaffold paths", () => {
+  it("emits official scaffold paths and drops legacy files", async () => {
+    const { CodeBuddyAdapter } = await import("../../dist/adapters/codebuddy.js");
+    const { ZedAdapter } = await import("../../dist/adapters/zed.js");
+    const ctx = {
+      projectName: "demo",
+      version: "0.0.0",
+      rules: ["r"],
+      antiPatterns: ["a"],
+      fellowship: [],
+      skills: [],
+    };
+    const cb = new CodeBuddyAdapter()
+      .transpile(/** @type {any} */ (ctx))
+      .map((o) => o.relativePath);
+    assert.deepEqual(cb, [
+      ".codebuddy/rules/sauron.md",
+      ".codebuddy/skills/README.md",
+    ]);
+    const zed = new ZedAdapter()
+      .transpile(/** @type {any} */ (ctx))
+      .map((o) => o.relativePath);
+    assert.deepEqual(zed, [".zed/settings.json", ".rules"]);
+  });
+
+  it("emits Cline scaffold without colliding with a legacy .clinerules file", () => {
+    const ws = fs.mkdtempSync(path.join(os.tmpdir(), "sauron-cline-"));
+    try {
+      fs.writeFileSync(path.join(ws, ".clinerules"), "legacy user rules\n");
+      const transpiler = new Transpiler({
+        workspaceRoot: ws,
+        sauronRoot: SAURON_ROOT,
+        dryRun: false,
+      });
+      transpiler.transpileAll({ dryRun: false });
+      for (const rel of [
+        ".cline/rules/sauron.md",
+        ".cline/README.md",
+        ".cline/workflows/README.md",
+        ".cline/skills/README.md",
+        ".cline/hooks/README.md",
+      ]) {
+        assert.ok(fs.existsSync(path.join(ws, rel)), `Missing ${rel}`);
+      }
+      assert.equal(
+        fs.readFileSync(path.join(ws, ".clinerules"), "utf8"),
+        "legacy user rules\n",
+        "Legacy .clinerules file must be left untouched",
+      );
+    } finally {
+      fs.rmSync(ws, { recursive: true, force: true });
     }
   });
 });

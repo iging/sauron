@@ -135,6 +135,8 @@ export interface TranspileContext {
   rules: string[];
   /** Linux Foundation anti-patterns actively guarded against. */
   antiPatterns: string[];
+  /** Full anti-patterns reference document (`references/anti-patterns.md`), if available. */
+  antiPatternsDoc?: string;
 }
 
 /**

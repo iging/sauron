@@ -9,16 +9,20 @@ Sauron operates as a single source of truth for AI instructions. Instead of manu
 Sauron supports 17 runtimes grouped into three operational categories:
 
 1. **Desktop & IDE Environments**:
-   - Cursor (`.cursorrules`, `.cursor/rules/sauron.mdc`)
+   - Cursor (`.cursor/rules/sauron.mdc`, `.cursor/rules/README.md`, `.cursor/skills/README.md`)
    - Windsurf (`.windsurfrules`)
    - Trae (`.traerules`)
    - Zed (`.zed/settings.json`, `.zed/prompts/sauron.md`)
+   - VS Code (`.vscode/settings.json`)
+   - Zed (`.rules`, `.zed/settings.json`)
    - VS Code (`.vscode/settings.json`, `.vscode/sauron.instructions.md`)
    - Kiro (`.kirorules`)
 
 2. **CLI Coding Agents**:
    - Claude Code (`CLAUDE.md`)
    - Cline (`.clinerules`)
+   - OpenAI Codex (`.codex/config.toml`, `.codex/README.md`)
+   - Cline (`.cline/rules/sauron.md` + `.cline/` scaffold)
    - OpenAI Codex (`.codex/instructions.md`)
    - OpenCode (`.opencode/instructions.md`)
    - OpenClaw (`.openclaw/config.json`)
@@ -26,11 +30,23 @@ Sauron supports 17 runtimes grouped into three operational categories:
 
 3. **Web & Model Interfaces**:
    - Google Gemini (`GEMINI.md`)
+   - GitHub Copilot (`.github/copilot-instructions.md`, hooks, `.github/{instructions,prompts,agents,skills}/` with READMEs and a sample `sauron.instructions.md`)
+   - Google Gemini (`GEMINI.md`, `.gemini/settings.json`, `.gemini/README.md`)
    - GitHub Copilot (`.github/copilot-instructions.md`, hooks)
    - Hermes (`.hermesrules`)
    - Moonshot Kimi (`.kimi/prompt.md`)
-   - Qwen (`.qwen/system.md`)
+   - Qwen (`QWEN.md`, `.qwen/skills/README.md`)
    - Adal / CodeBuddy (`.adalrules`, `.codebuddy/rules.md`)
+   - Qwen (`.qwen/system.md`)
+   - Adal / CodeBuddy (`.adalrules`, `.codebuddy/rules/sauron.md`, `.codebuddy/skills/README.md`)
+
+### Shared AGENTS.md Core
+
+The `agents-md` adapter emits files shared across runtimes:
+
+- `AGENTS.md`: root instructions (rules, Caveman Mode, Fellowship, anti-pattern guardrails). Read by Codex, Cursor, GitHub Copilot, Windsurf, Cline, OpenCode, Kiro, Zed, CodeBuddy, and Pi.
+- `.agents/skills/README.md`: explains the Agent Skills format (`<name>/SKILL.md` with `name` and `description` frontmatter) and how `sauron add <skill>` installs there.
+- `.agents/anti-patterns.md`: copy of `references/anti-patterns.md`. Omitted when that reference is missing.
 
 ---
 

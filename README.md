@@ -40,7 +40,7 @@ and in your codebase bind them.
    Long-running agent sessions burn up to 75% of context window limits on conversational filler, pleasantries, and redundant narration. As token budgets deplete, model attention degrades, leading to forgotten requirements, catastrophic forgetfulness, and expensive API bills.
 
    **Sauron solves this with Built-in Token Conservation & Caveman Transpilation**:
-   Sauron embeds **Caveman Mode**—a native compression engine with multiple intensity tiers (`lite`, `full`, `ultra`) that slashes conversational waste by 40% to 75% while strictly preserving technical precision, code blocks, diffs, and negative boolean logic. Crucially, Sauron transpiles explicit `/caveman` token-conservation directives directly into the instruction manuals and system rules of all **17 target runtimes** (`CLAUDE.md`, `.cursorrules`, `.windsurfrules`, `.clinerules`, etc.). Coupled with zero-install modular skill injection via `npx`, developers load only what the agent needs, eliminating memory bloat.
+   Sauron embeds **Caveman Mode**—a native compression engine with multiple intensity tiers (`lite`, `full`, `ultra`) that slashes conversational waste by 40% to 75% while strictly preserving technical precision, code blocks, diffs, and negative boolean logic. Crucially, Sauron transpiles explicit `/caveman` token-conservation directives directly into the instruction manuals and system rules of all **17 target runtimes** (`CLAUDE.md`, `.cursorrules`, `.windsurfrules`, `.cline/rules/`, etc.). Coupled with zero-install modular skill injection via `npx`, developers load only what the agent needs, eliminating memory bloat.
 
 4. **Blind Multi-File Hallucination & Hidden Architectural Drift**:
    Large-language models lack holistic codebase perception. When instructed to modify a component, agents frequently introduce silent circular imports, break cross-module boundaries, and create cascading dependency failures because they cannot visualize the full system topology.
@@ -87,7 +87,7 @@ npx sauron-ai list-skills
 
 ### 2. Full Harness Synchronization (All 17 Runtimes & Fellowship)
 
-Synchronize the master specification and generate native instruction files (`CLAUDE.md`, `.cursorrules`, `.windsurfrules`, `.clinerules`, etc.) across your entire repo:
+Synchronize the master specification and generate native instruction files (`CLAUDE.md`, `.cursorrules`, `.windsurfrules`, `.cline/rules/`, etc.) across your entire repo:
 
 ```bash
 # Using NPX (Zero-install, recommended for web developers)
@@ -159,7 +159,7 @@ Sauron generates native configuration files for:
 2. Cursor (`.cursorrules`, `.cursor/rules/*.mdc`)
 3. Windsurf (`.windsurfrules`)
 4. GitHub Copilot and VSCode (`.github/copilot-instructions.md`)
-5. Cline (`.clinerules`)
+5. Cline (`.cline/rules/`)
 6. Trae (`.traerules`, `.trae/`)
 7. Zed (`.zed/prompts/`, `.zed/settings.json`)
 8. Codex (`.codex/instructions.md`)

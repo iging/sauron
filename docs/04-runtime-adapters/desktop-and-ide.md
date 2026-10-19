@@ -7,8 +7,9 @@ This guide details how Sauron configures and manages rules for desktop IDE envir
 ## 1. Cursor
 
 - **Generated Files**:
-  - `.cursorrules`: Root instruction file loaded automatically on every prompt.
-  - `.cursor/rules/sauron.mdc`: Advanced rules file with frontmatter metadata.
+  - `.cursor/rules/sauron.mdc`: Project rule with `alwaysApply: true` frontmatter, loaded on every chat.
+  - `.cursor/rules/README.md` and `.cursor/skills/README.md`: Folder guides (see https://cursor.com/docs/context/rules and https://cursor.com/docs/skills).
+  - The legacy root `.cursorrules` file is no longer generated.
 - **Features Handled**:
   - Automatically maps project rules, banned patterns, and file scope boundaries.
   - Provides direct slash command triggers for Fellowship agents.
@@ -37,7 +38,7 @@ This guide details how Sauron configures and manages rules for desktop IDE envir
 
 - **Generated Files**:
   - `.zed/settings.json`: Editor configuration enforcing strict assistant defaults.
-  - `.zed/prompts/sauron.md`: Contextual prompt template accessible within Zed's Assistant Panel.
+  - `.rules`: Project rules file. Zed loads only the first match of `.rules`, `.cursorrules`, ..., `AGENTS.md`, so `.rules` takes priority.
 - **Features Handled**:
   - Formats instructions cleanly for Zed's native AI panel.
 
@@ -47,7 +48,7 @@ This guide details how Sauron configures and manages rules for desktop IDE envir
 
 - **Generated Files**:
   - `.vscode/settings.json`: Workspace recommendations and editor preferences.
-  - `.vscode/sauron.instructions.md`: Structured instruction file for VS Code language models and extensions.
+  - Instruction files now live under `.github/instructions/` (emitted by the GitHub Copilot adapter).
 
 ---
 

@@ -16,17 +16,17 @@ This guide covers Sauron's integration with terminal-based autonomous coding age
 
 ## 2. Cline
 
-- **Generated File**: `.clinerules` at project root.
+- **Generated Files**: `.cline/rules/sauron.md` plus scaffold READMEs in `.cline/`, `.cline/workflows/`, `.cline/skills/`, `.cline/hooks/`. Rules go to `.cline/rules/` (not `.clinerules/`) so a legacy `.clinerules` file never collides; move custom content from it into `.cline/rules/` and delete it.
 - **Behavior**:
-  - Cline reads `.clinerules` to enforce strict tool use, file access boundaries, and test verification before completion.
+  - Cline loads every Markdown file in `.cline/rules/` to enforce strict tool use, file access boundaries, and test verification before completion.
 
 ---
 
 ## 3. OpenAI Codex
 
-- **Generated File**: `.codex/instructions.md`.
+- **Generated Files**: `.codex/config.toml` (commented template) and `.codex/README.md`.
 - **Behavior**:
-  - Guides Codex executions with project-specific language and architecture constraints.
+  - Codex reads rules from `AGENTS.md` and skills from `.agents/skills`; `.codex/` holds only project config.
 
 ---
 

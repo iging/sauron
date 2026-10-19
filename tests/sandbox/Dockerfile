@@ -65,7 +65,7 @@ RUN node /workspace/sauron/bin/sauron.mjs status \
 # Assert primary generated adapter outputs exist in sandbox
 RUN test -f CLAUDE.md \
   && test -f .cursorrules \
-  && test -f .windsurfrules \
+  && test -f .windsurf/rules/sauron.md \
   && test -f .clinerules \
   && test -f GEMINI.md
 

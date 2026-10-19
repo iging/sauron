@@ -1,5 +1,8 @@
 /**
- * @fileoverview CodeBuddy adapter generating .codebuddy/rules.md file.
+ * @fileoverview CodeBuddy adapter generating .codebuddy/rules/sauron.md and .codebuddy/skills/README.md.
+ * CodeBuddy reads CODEBUDDY.md (falling back to AGENTS.md); project rules live in
+ * .codebuddy/rules/ and skills in .codebuddy/skills/<name>/SKILL.md.
+ * @see https://www.tencentcloud.com/document/product/1256/77282
  */
 
 import {
@@ -12,7 +15,10 @@ import {
 export class CodeBuddyAdapter implements RuntimeAdapter {
   public readonly id = "codebuddy";
   public readonly name = "CodeBuddy";
-  public readonly targetFiles = [".codebuddy/rules.md"];
+  public readonly targetFiles = [
+    ".codebuddy/rules/sauron.md",
+    ".codebuddy/skills/README.md",
+  ];
 
   public transpile(context: TranspileContext): TranspileOutput[] {
     const lines: string[] = [];
@@ -39,8 +45,20 @@ export class CodeBuddyAdapter implements RuntimeAdapter {
 
     return [
       {
-        relativePath: ".codebuddy/rules.md",
+        relativePath: ".codebuddy/rules/sauron.md",
         content: lines.join("\n"),
+        format: "markdown",
+      },
+      {
+        relativePath: ".codebuddy/skills/README.md",
+        content: [
+          "# CodeBuddy Skills",
+          `Managed by Sauron v${context.version} for ${context.projectName}.`,
+          "",
+          "Each skill lives in its own folder: `.codebuddy/skills/<name>/SKILL.md`.",
+          "Start SKILL.md with YAML frontmatter (`name`, `description`), then the instructions.",
+          "",
+        ].join("\n"),
         format: "markdown",
       },
     ];

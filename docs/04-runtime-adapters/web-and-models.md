@@ -6,7 +6,7 @@ This guide covers Sauron's adapters for web-based AI coding interfaces, hosted m
 
 ## 1. Google Gemini
 
-- **Generated File**: `GEMINI.md` at project root.
+- **Generated Files**: `GEMINI.md` at project root, plus `.gemini/settings.json` (`context.fileName` loads `GEMINI.md` and `AGENTS.md`) and `.gemini/README.md` (skills alias `.agents/skills/`, Antigravity CLI note).
 - **Behavior**:
   - Gemini loads `GEMINI.md` to ground its large context window in project architecture and Fellowship agent directives.
 
@@ -32,7 +32,7 @@ This guide covers Sauron's adapters for web-based AI coding interfaces, hosted m
 
 ## 4. Qwen
 
-- **Generated File**: `.qwen/system.md`.
+- **Generated Files**: `QWEN.md` at project root (replaces legacy `.qwen/system.md`) and `.qwen/skills/README.md` (layout unverified against official docs).
 - **Behavior**:
   - Sets system-level instructions for Qwen coding models.
 
@@ -42,6 +42,6 @@ This guide covers Sauron's adapters for web-based AI coding interfaces, hosted m
 
 - **Generated Files**:
   - Adal: `.adalrules`.
-  - CodeBuddy: `.codebuddy/rules.md`.
+  - CodeBuddy: `.codebuddy/rules/sauron.md`, `.codebuddy/skills/README.md` (skills go in `.codebuddy/skills/<name>/SKILL.md`).
 - **Behavior**:
   - Configures lightweight developer extensions with Sauron rules and safety boundaries.

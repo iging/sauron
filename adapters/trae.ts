@@ -1,5 +1,6 @@
 /**
- * @fileoverview Trae AI IDE adapter generating .traerules file.
+ * @fileoverview Trae AI IDE adapter generating .trae/rules/project_rules.md.
+ * Unverified source: https://www.trae.ai/blog/trae_tutorial_0825
  */
 
 import {
@@ -9,15 +10,19 @@ import {
   type TranspileOutput,
 } from "./types.js";
 
+const TRAE_RULES_PATH = ".trae/rules/project_rules.md";
+const TRAE_SOURCE = "https://www.trae.ai/blog/trae_tutorial_0825";
+
 export class TraeAdapter implements RuntimeAdapter {
   public readonly id = "trae";
   public readonly name = "Trae";
-  public readonly targetFiles = [".traerules"];
+  public readonly targetFiles = [TRAE_RULES_PATH];
 
   public transpile(context: TranspileContext): TranspileOutput[] {
     const lines: string[] = [];
 
-    lines.push(`# .traerules for ${context.projectName}`);
+    lines.push(`<!-- unverified: ${TRAE_SOURCE} -->`);
+    lines.push(`# Trae Project Rules for ${context.projectName}`);
     lines.push(`Configured by Sauron v${context.version}`);
     lines.push("");
     lines.push("## Workspace Governance");
@@ -44,9 +49,9 @@ export class TraeAdapter implements RuntimeAdapter {
 
     return [
       {
-        relativePath: ".traerules",
+        relativePath: TRAE_RULES_PATH,
         content: lines.join("\n"),
-        format: "text",
+        format: "markdown",
       },
     ];
   }
