@@ -635,7 +635,7 @@ function ingestEngineeringLoop() {
 - **Role:** Chief Engineering Loop Orchestrator. Sequences the 5-stage software engineering loop across pre-coding blueprinting, UI token extraction, code inspection, context checkpointing, and failure triage.
 - **Authority:** Normative group orchestrator for \`skills/workflow/engineering-loop/\`.
 - **Must not define:** Direct implementation code or individual stage rules; delegates execution sequentially to loop sub-skills.
-- **Normative base:** \`core/decision-framework.md\`, \`shared/writing/writing-rules.md\`, \`docs/anti-patterns.md\`.
+- **Normative base:** \`core/decision-framework.md\`, \`skills/workflow/writing-rules/SKILL.md\`, \`docs/anti-patterns.md\`.
 
 ## 1. Intent (9 Dimensions)
 

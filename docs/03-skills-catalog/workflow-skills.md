@@ -50,6 +50,7 @@ The Workflow domain houses skills that govern project lifecycles, feature decomp
 | **handoff**                                 | Samwise | `/handoff`                                 | Packages session context and next steps for team handoffs.                          |
 | **repo-reorganizer**                        | Samwise | `/repo-reorganizer`                        | Cleans up and structures directories according to standard patterns.                |
 | **spec-reviewer**                           | Legolas | `/spec-reviewer`                           | Audits markdown documentation against writing rules and anti-patterns.              |
+| **writing-rules** | Legolas | `/writing-rules` | Sauron's single writing standard: style, banned words, truth protocol, and a review checklist. |
 | **compact-command-output** | Legolas | `/compact-command-output` | Makes shell commands return short output by using each tool's own quiet flags, filters, and limits. |
 | **split-file**                              | Legolas | `/split-file`                              | Refactors large, unwieldy source files into smaller, focused modules.               |
 | **prompt-auditor**                          | Legolas | `/prompt-auditor`                          | Evaluates prompts for clarity, constraints, and scope boundaries.                   |

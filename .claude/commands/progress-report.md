@@ -49,7 +49,7 @@ Write the formatted results directly to `progress-report-result.md` in the repos
 - `skills/workflow/prompt-engineering/prompts-by-category/dev-workflow/git-analyzer-and-progress-report-generator/SKILL.md`
 - `skills/workflow/prompt-engineering/prompts-by-category/dev-workflow/commit-message-generator/SKILL.md`
 - `skills/workflow/prompt-engineering/prompts-by-category/dev-workflow/pull-request-description-generator/SKILL.md`
-- `skills/workflow/define-core-domains/references/writing-rules.md`
+- `skills/workflow/writing-rules/SKILL.md`
 - `references/anti-patterns.md`
 - `AGENTS.md`
 - `CLAUDE.md`
