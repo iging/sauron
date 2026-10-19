@@ -24,9 +24,9 @@ This guide covers Sauron's integration with terminal-based autonomous coding age
 
 ## 3. OpenAI Codex
 
-- **Generated File**: `.codex/instructions.md`.
+- **Generated Files**: `.codex/config.toml` (commented template) and `.codex/README.md`.
 - **Behavior**:
-  - Guides Codex executions with project-specific language and architecture constraints.
+  - Codex reads rules from `AGENTS.md` and skills from `.agents/skills`; `.codex/` holds only project config.
 
 ---
 
