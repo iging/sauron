@@ -68,7 +68,9 @@ describe("E2E: Workspace Bootstrap & Transpilation (init-workspace)", () => {
     const expectedFiles = [
       "CLAUDE.md",
       ".cursorrules",
-      ".windsurfrules",
+      path.join(".windsurf", "rules", "sauron.md"),
+      path.join(".windsurf", "workflows", "README.md"),
+      path.join(".windsurf", "skills", "README.md"),
       ".clinerules",
       "GEMINI.md",
       path.join(".github", "copilot-instructions.md"),
