@@ -48,7 +48,7 @@ This guide details how Sauron configures and manages rules for desktop IDE envir
 
 - **Generated Files**:
   - `.vscode/settings.json`: Workspace recommendations and editor preferences.
-  - `.vscode/sauron.instructions.md`: Structured instruction file for VS Code language models and extensions.
+  - Instruction files now live under `.github/instructions/` (emitted by the GitHub Copilot adapter).
 
 ---
 

@@ -1,5 +1,6 @@
 /**
- * @fileoverview GitHub Copilot adapter generating .github/copilot-instructions.md.
+ * @fileoverview GitHub Copilot adapter generating the official `.github/` customization scaffold.
+ * @see https://code.visualstudio.com/docs/copilot/customization/overview
  */
 
 import {
@@ -22,6 +23,11 @@ export class CopilotAdapter implements RuntimeAdapter {
   public readonly targetFiles = [
     ".github/copilot-instructions.md",
     ".github/hooks/agent-guard.json",
+    ".github/instructions/README.md",
+    ".github/instructions/sauron.instructions.md",
+    ".github/prompts/README.md",
+    ".github/agents/README.md",
+    ".github/skills/README.md",
   ];
 
   /**
@@ -102,6 +108,135 @@ export class CopilotAdapter implements RuntimeAdapter {
         content: `${hookContent}\n`,
         format: "json",
       },
+      {
+        relativePath: ".github/instructions/sauron.instructions.md",
+        content: [
+          "---",
+          'applyTo: "**"',
+          `description: ${JSON.stringify(`Sauron v${context.version} baseline rules for ${context.projectName}`)}`,
+          "---",
+          "",
+          "# Sauron Baseline Rules",
+          "",
+          ...context.rules.map((rule) => `- ${rule}`),
+          "",
+        ].join("\n"),
+        format: "markdown",
+      },
+      ...SCAFFOLD_READMES.map((readme) => ({
+        relativePath: `${readme.folder}/README.md`,
+        content: formatReadme(readme),
+        format: "markdown" as const,
+      })),
     ];
   }
+}
+
+/** Folder README specification for the Copilot customization scaffold. */
+interface ScaffoldReadme {
+  readonly folder: string;
+  readonly title: string;
+  readonly purpose: string;
+  readonly howToAdd: string;
+  readonly format: readonly string[];
+  readonly docUrl: string;
+}
+
+const SCAFFOLD_READMES: readonly ScaffoldReadme[] = [
+  {
+    folder: ".github/instructions",
+    title: "Copilot Instruction Files",
+    purpose:
+      "Scoped custom instructions applied automatically to files matching an `applyTo` glob.",
+    howToAdd: "Create `<name>.instructions.md` in this folder.",
+    format: [
+      "---",
+      'applyTo: "src/**/*.ts"',
+      'description: "TypeScript conventions"',
+      "---",
+      "",
+      "- Use strict mode.",
+    ],
+    docUrl:
+      "https://code.visualstudio.com/docs/copilot/customization/custom-instructions",
+  },
+  {
+    folder: ".github/prompts",
+    title: "Copilot Prompt Files",
+    purpose: "Reusable prompts invoked in chat with `/<name>`.",
+    howToAdd: "Create `<name>.prompt.md` in this folder.",
+    format: [
+      "---",
+      'description: "Generate a unit test"',
+      "agent: agent",
+      "---",
+      "",
+      "Write a unit test for ${file}.",
+    ],
+    docUrl:
+      "https://code.visualstudio.com/docs/copilot/customization/prompt-files",
+  },
+  {
+    folder: ".github/agents",
+    title: "Copilot Custom Agents",
+    purpose:
+      "Custom agent personas with their own instructions and tool sets. Replaces deprecated `.chatmode.md` files.",
+    howToAdd: "Create `<name>.agent.md` in this folder.",
+    format: [
+      "---",
+      'description: "Plan features without editing code"',
+      "tools: ['search', 'fetch']",
+      "---",
+      "",
+      "You are a planning agent.",
+    ],
+    docUrl:
+      "https://code.visualstudio.com/docs/copilot/customization/custom-agents",
+  },
+  {
+    folder: ".github/skills",
+    title: "Copilot Agent Skills",
+    purpose:
+      "Agent Skills loaded on demand. Each skill lives in its own folder with a `SKILL.md`.",
+    howToAdd: "Create `<skill-name>/SKILL.md` in this folder.",
+    format: [
+      "---",
+      "name: skill-name",
+      'description: "What the skill does and when to use it"',
+      "---",
+      "",
+      "Step-by-step instructions.",
+    ],
+    docUrl:
+      "https://code.visualstudio.com/docs/copilot/customization/agent-skills",
+  },
+];
+
+/**
+ * Renders a folder README describing purpose, usage, format, and docs.
+ *
+ * @param readme - Folder README specification.
+ * @returns Markdown README content.
+ */
+function formatReadme(readme: ScaffoldReadme): string {
+  return [
+    `# ${readme.title}`,
+    "",
+    readme.purpose,
+    "",
+    "## How to add a file",
+    "",
+    readme.howToAdd,
+    "",
+    "## Format",
+    "",
+    "```markdown",
+    ...readme.format,
+    "```",
+    "",
+    `Docs: ${readme.docUrl}`,
+    "",
+    "> Scaffolded by Sauron.",
+    "",
+  ].join("\n");
 }

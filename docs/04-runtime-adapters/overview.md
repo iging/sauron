@@ -13,7 +13,7 @@ Sauron supports 17 runtimes grouped into three operational categories:
    - Windsurf (`.windsurfrules`)
    - Trae (`.traerules`)
    - Zed (`.zed/settings.json`, `.zed/prompts/sauron.md`)
-   - VS Code (`.vscode/settings.json`, `.vscode/sauron.instructions.md`)
+   - VS Code (`.vscode/settings.json`)
    - Kiro (`.kirorules`)
 
 2. **CLI Coding Agents**:
@@ -26,7 +26,7 @@ Sauron supports 17 runtimes grouped into three operational categories:
 
 3. **Web & Model Interfaces**:
    - Google Gemini (`GEMINI.md`)
-   - GitHub Copilot (`.github/copilot-instructions.md`, hooks)
+   - GitHub Copilot (`.github/copilot-instructions.md`, hooks, `.github/{instructions,prompts,agents,skills}/` with READMEs and a sample `sauron.instructions.md`)
    - Hermes (`.hermesrules`)
    - Moonshot Kimi (`.kimi/prompt.md`)
    - Qwen (`.qwen/system.md`)
