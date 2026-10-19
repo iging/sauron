@@ -14,6 +14,8 @@ Sauron supports 17 runtimes grouped into three operational categories:
    - Trae (`.traerules`)
    - Zed (`.zed/settings.json`, `.zed/prompts/sauron.md`)
    - VS Code (`.vscode/settings.json`)
+   - Zed (`.rules`, `.zed/settings.json`)
+   - VS Code (`.vscode/settings.json`, `.vscode/sauron.instructions.md`)
    - Kiro (`.kirorules`)
 
 2. **CLI Coding Agents**:
@@ -35,6 +37,8 @@ Sauron supports 17 runtimes grouped into three operational categories:
    - Moonshot Kimi (`.kimi/prompt.md`)
    - Qwen (`QWEN.md`, `.qwen/skills/README.md`)
    - Adal / CodeBuddy (`.adalrules`, `.codebuddy/rules.md`)
+   - Qwen (`.qwen/system.md`)
+   - Adal / CodeBuddy (`.adalrules`, `.codebuddy/rules/sauron.md`, `.codebuddy/skills/README.md`)
 
 ### Shared AGENTS.md Core
 

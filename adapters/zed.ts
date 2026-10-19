@@ -1,5 +1,9 @@
 /**
- * @fileoverview Zed editor adapter generating .zed/settings.json and .zed/prompts/sauron.md.
+ * @fileoverview Zed editor adapter generating .rules and .zed/settings.json.
+ * Zed loads only the FIRST match of .rules, .cursorrules, .windsurfrules, .clinerules,
+ * .github/copilot-instructions.md, AGENT.md, AGENTS.md, CLAUDE.md, GEMINI.md — so
+ * .rules wins over AGENTS.md and the other runtime files.
+ * @see https://zed.dev/docs/ai/rules
  */
 
 import {
@@ -14,12 +18,12 @@ export class ZedAdapter implements RuntimeAdapter {
   public readonly name = "Zed";
   public readonly targetFiles = [
     ".zed/settings.json",
-    ".zed/prompts/sauron.md",
+    ".rules",
   ];
 
   public transpile(context: TranspileContext): TranspileOutput[] {
     const promptLines: string[] = [];
-    promptLines.push(`# Sauron Assistant Prompt for Zed`);
+    promptLines.push(`# Sauron Rules for Zed`);
     promptLines.push(`Project: ${context.projectName}`);
     promptLines.push("");
     promptLines.push("## Rules");
@@ -60,7 +64,7 @@ export class ZedAdapter implements RuntimeAdapter {
         format: "json",
       },
       {
-        relativePath: ".zed/prompts/sauron.md",
+        relativePath: ".rules",
         content: promptLines.join("\n"),
         format: "markdown",
       },

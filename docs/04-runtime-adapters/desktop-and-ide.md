@@ -38,7 +38,7 @@ This guide details how Sauron configures and manages rules for desktop IDE envir
 
 - **Generated Files**:
   - `.zed/settings.json`: Editor configuration enforcing strict assistant defaults.
-  - `.zed/prompts/sauron.md`: Contextual prompt template accessible within Zed's Assistant Panel.
+  - `.rules`: Project rules file. Zed loads only the first match of `.rules`, `.cursorrules`, ..., `AGENTS.md`, so `.rules` takes priority.
 - **Features Handled**:
   - Formats instructions cleanly for Zed's native AI panel.
 

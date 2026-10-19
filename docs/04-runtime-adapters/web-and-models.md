@@ -42,6 +42,6 @@ This guide covers Sauron's adapters for web-based AI coding interfaces, hosted m
 
 - **Generated Files**:
   - Adal: `.adalrules`.
-  - CodeBuddy: `.codebuddy/rules.md`.
+  - CodeBuddy: `.codebuddy/rules/sauron.md`, `.codebuddy/skills/README.md` (skills go in `.codebuddy/skills/<name>/SKILL.md`).
 - **Behavior**:
   - Configures lightweight developer extensions with Sauron rules and safety boundaries.
