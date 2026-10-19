@@ -68,6 +68,39 @@ describe("E2E: init presets and flags", () => {
     assert.match(stdout, /SKIPPED.*\.claude\/skills\/plan-feature\/SKILL\.md/);
   });
 
+  it("CLAUDE.md lists only the subagents and commands that were installed", async () => {
+    const other = fs.mkdtempSync(path.join(os.tmpdir(), "sauron-e2e-noagents-"));
+    try {
+      await execFileAsync(
+        "node",
+        [CLI_PATH, "init", "--yes", "--runtimes=claude", "--agents=none", "--skills=none", "--no-commands"],
+        { cwd: other },
+      );
+      const claudeMd = fs.readFileSync(path.join(other, "CLAUDE.md"), "utf8");
+      assert.doesNotMatch(claudeMd, /\/gandalf/);
+      assert.match(claudeMd, /Not installed in this project/);
+    } finally {
+      fs.rmSync(other, { recursive: true, force: true });
+    }
+  });
+
+  it("add copies a skill to .claude/skills too and keeps edited files", async () => {
+    const other = fs.mkdtempSync(path.join(os.tmpdir(), "sauron-e2e-add-"));
+    try {
+      await execFileAsync("node", [CLI_PATH, "init", "--yes", "--runtimes=claude", "--skills=none"], { cwd: other });
+      await execFileAsync("node", [CLI_PATH, "add", "plan-feature"], { cwd: other });
+      const claudeSkill = path.join(other, ".claude/skills/plan-feature/SKILL.md");
+      assert.ok(fs.existsSync(path.join(other, ".agents/skills/plan-feature/SKILL.md")));
+      assert.ok(fs.existsSync(claudeSkill));
+      fs.appendFileSync(claudeSkill, "\nMine.\n");
+      const { stdout } = await execFileAsync("node", [CLI_PATH, "add", "plan-feature"], { cwd: other });
+      assert.match(stdout, /PARTIAL/);
+      assert.match(fs.readFileSync(claudeSkill, "utf8"), /Mine\./);
+    } finally {
+      fs.rmSync(other, { recursive: true, force: true });
+    }
+  });
+
   it("rejects an unknown runtime with exit code 1", async () => {
     await assert.rejects(
       execFileAsync("node", [CLI_PATH, "init", "--yes", "--runtimes=claude,nope"], { cwd: dir }),

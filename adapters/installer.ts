@@ -84,6 +84,25 @@ function listFiles(root: string, rel = ""): string[] {
   return files;
 }
 
+/**
+ * Builds verbatim outputs for every file of one skill folder, once per base
+ * directory (for example `.agents/skills` and `.claude/skills`).
+ */
+export function skillFileOutputs(
+  skillDir: string,
+  skillName: string,
+  baseDirs: readonly string[],
+): InstallOutput[] {
+  const outputs: InstallOutput[] = [];
+  for (const file of listFiles(skillDir)) {
+    const content = fs.readFileSync(path.join(skillDir, file), "utf8");
+    for (const base of baseDirs) {
+      outputs.push({ relativePath: `${base}/${skillName}/${file}`, content, raw: true });
+    }
+  }
+  return outputs;
+}
+
 /** Splits a markdown file into parsed YAML frontmatter and body. */
 function readFrontmatter(raw: string): { data: Record<string, unknown>; body: string } {
   const match = /^---\r?\n([\s\S]*?)\r?\n---\r?\n?/.exec(raw);
@@ -155,14 +174,9 @@ export function buildInstallOutputs(sauronRoot: string, plan: InitPlan): Install
       : plan.skills === "none"
         ? []
         : plan.skills;
+  const skillBases = claude ? [".agents/skills", ".claude/skills"] : [".agents/skills"];
   for (const skill of listSkills(sauronRoot, departments)) {
-    for (const file of listFiles(skill.dir)) {
-      const content = fs.readFileSync(path.join(skill.dir, file), "utf8");
-      outputs.push({ relativePath: `.agents/skills/${skill.name}/${file}`, content, raw: true });
-      if (claude) {
-        outputs.push({ relativePath: `.claude/skills/${skill.name}/${file}`, content, raw: true });
-      }
-    }
+    outputs.push(...skillFileOutputs(skill.dir, skill.name, skillBases));
   }
 
   if (!claude) {

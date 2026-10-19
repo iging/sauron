@@ -179,11 +179,24 @@ export class ClaudeAdapter implements RuntimeAdapter {
       lines.push(`- ${rule}`);
     }
     lines.push("");
+    const install = context.claudeInstall ?? { agents: "fellowship", commands: true };
+    const fellowshipInstalled = install.agents === "fellowship" || install.agents === "both";
     lines.push("## Fellowship Sub-Agents");
     lines.push("");
-    for (const agent of context.fellowship) {
+    if (fellowshipInstalled) {
+      for (const agent of context.fellowship) {
+        const id = agent.slashCommand.replace(/^\//, "");
+        const invoke = install.commands ? `\`@${id}\` or \`${agent.slashCommand}\`` : `\`@${id}\``;
+        lines.push(`- **${agent.name}** (${invoke}): ${agent.role}`);
+      }
+    } else {
       lines.push(
-        `- **${agent.name}** (\`${agent.slashCommand}\`): ${agent.role}`,
+        "- Not installed in this project. Add them with `npx sauron-ai init --agents=fellowship`.",
+      );
+    }
+    if (install.agents === "core" || install.agents === "both") {
+      lines.push(
+        "- Specialist subagents are installed in `.claude/agents/`. Invoke one with `@<agent-id>`.",
       );
     }
     lines.push("");

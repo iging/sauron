@@ -71,6 +71,22 @@ Re-applies the saved `init:` choices without prompts. Files you edited are merge
 npx sauron-ai sync
 ```
 
+In `CLAUDE.md`, the Fellowship list shows only what is installed: `@<id>` for each subagent, plus `/<id>` when slash commands are installed. With `--agents=none` it explains how to add them.
+
+### `add`
+
+Adds one or more skills from the bundled catalog.
+
+```bash
+npx sauron-ai add plan-feature clean-architecture
+npx sauron-ai add tdd-workflow --to .cursor/skills
+```
+
+- By default, copies into `.agents/skills/<name>/`. When Claude Code is in use (chosen during `init`, or a `.claude/` folder exists), it also copies into `.claude/skills/<name>/` so `/<name>` works in Claude Code.
+- `--to <dir>` copies into that directory only.
+- Writes go through the conflict manager: new files are created, files you edited are kept and reported as `PARTIAL`.
+- `--dry-run` shows what would be copied.
+
 ---
 
 ### `status`

@@ -34,7 +34,9 @@ import {
 import {
   buildInstallOutputs,
   listDepartments,
+  skillFileOutputs,
 } from "../dist/adapters/installer.js";
+import { ConflictManager } from "../dist/adapters/conflict-manager.js";
 
 // Determine canonical package root dynamically to ensure path resolution works
 // identically regardless of whether installed globally or executed from within a submodule.
@@ -464,41 +466,86 @@ function executeAddCommand(skillNames, options) {
   }
 
   const cwd = process.cwd();
-  const defaultDir = options.targetDir || ".agents/skills";
-  const destinationBase = path.isAbsolute(defaultDir)
-    ? defaultDir
-    : path.resolve(cwd, defaultDir);
+  // Default: the shared .agents/skills, plus .claude/skills when Claude Code is in use
+  // (chosen during init, or a .claude/ folder already exists).
+  /** @type {string[]} */
+  let baseDirs;
+  if (options.targetDir) {
+    const absolute = path.resolve(cwd, options.targetDir);
+    baseDirs = [path.relative(cwd, absolute).split(path.sep).join("/") || "."];
+  } else {
+    const saved = planFromConfig(
+      readConfig(path.join(cwd, "sauron.config.yaml"))["init"],
+      listDepartments(SAURON_ROOT),
+    );
+    const claude = saved
+      ? saved.runtimes.includes("claude")
+      : fs.existsSync(path.join(cwd, ".claude"));
+    baseDirs = claude
+      ? [".agents/skills", ".claude/skills"]
+      : [".agents/skills"];
+  }
 
   const modeTag = options.dryRun ? " (DRY-RUN MODE)" : "";
   const defaultNote = options.targetDir
     ? ""
     : " (default; override with --to <dir>)";
   console.log(
-    `[ADD] Adding ${skillNames.length} skill(s) to ${path.relative(cwd, destinationBase) || destinationBase}${modeTag}${defaultNote}...\n`,
+    `[ADD] Adding ${skillNames.length} skill(s) to ${baseDirs.join(" and ")}${modeTag}${defaultNote}...\n`,
   );
 
+  // Files go through ConflictManager: new files are created, files you edited are skipped.
+  const manager = new ConflictManager(cwd);
   let addedCount = 0;
-  for (const requestedSkill of skillNames) {
-    const resolved = resolveSkillSource(SAURON_ROOT, requestedSkill);
-    if (!resolved) {
+  manager.beginBatch();
+  try {
+    for (const requestedSkill of skillNames) {
+      const resolved = resolveSkillSource(SAURON_ROOT, requestedSkill);
+      if (!resolved) {
+        console.log(
+          `  [NOT FOUND] "${requestedSkill}" could not be found in sauron skills registry.`,
+        );
+        continue;
+      }
+
+      /** @type {Record<string, number>} */
+      const counts = {};
+      for (const out of skillFileOutputs(
+        resolved.sourcePath,
+        resolved.skillName,
+        baseDirs,
+      )) {
+        const result = manager.safeWrite(
+          out.relativePath,
+          out.content,
+          "add",
+          options.dryRun === true,
+          {
+            raw: true,
+          },
+        );
+        counts[result.action] = (counts[result.action] ?? 0) + 1;
+      }
+      const summary = Object.entries(counts)
+        .map(([action, n]) => `${n} ${action}`)
+        .join(", ");
+      const statusLabel = options.dryRun
+        ? "SIMULATED"
+        : counts["skipped"]
+          ? "PARTIAL"
+          : "ADDED";
       console.log(
-        `  [NOT FOUND] "${requestedSkill}" could not be found in sauron skills registry.`,
+        `  [${statusLabel.padEnd(9)}] ${resolved.skillName.padEnd(28)} -> ${baseDirs.map((b) => `${b}/${resolved.skillName}`).join(", ")} (${summary})`,
       );
-      continue;
+      if (counts["skipped"]) {
+        console.log(
+          "              Files you edited were kept; delete them first to get the bundled version.",
+        );
+      }
+      addedCount++;
     }
-
-    const targetSkillDir = path.join(destinationBase, resolved.skillName);
-    const statusLabel = options.dryRun ? "SIMULATED" : "ADDED";
-
-    if (!options.dryRun) {
-      fs.mkdirSync(targetSkillDir, { recursive: true });
-      fs.cpSync(resolved.sourcePath, targetSkillDir, { recursive: true });
-    }
-
-    console.log(
-      `  [${statusLabel.padEnd(9)}] ${resolved.skillName.padEnd(28)} -> ${path.relative(cwd, targetSkillDir)}`,
-    );
-    addedCount++;
+  } finally {
+    manager.endBatch();
   }
 
   const completionMessage = options.dryRun
@@ -953,6 +1000,7 @@ async function executeInitCommand(options) {
   const transpiler = new Transpiler({
     workspaceRoot: currentWorkingDirectory,
     cavemanMode: plan.caveman,
+    claudeInstall: { agents: plan.agents, commands: plan.commands },
     sauronRoot: SAURON_ROOT,
     dryRun,
   });

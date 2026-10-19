@@ -63,6 +63,8 @@ export interface TranspileOptions {
   targetRuntimes?: string[];
   /** Caveman tier that overrides `sauron.config.yaml` (used by `init --caveman`). */
   cavemanMode?: CavemanMode;
+  /** What init installs for Claude Code (subagents, commands), passed to the Claude adapter. */
+  claudeInstall?: TranspileContext["claudeInstall"];
 }
 
 /**
@@ -94,6 +96,8 @@ export class Transpiler {
   private readonly sauronRoot: string;
   /** Caveman tier forced by the caller; wins over `sauron.config.yaml`. */
   private readonly cavemanOverride: CavemanMode | undefined;
+  /** Claude Code install choices forwarded into the context. */
+  private readonly claudeInstall: TranspileContext["claudeInstall"];
   /** Safe file mutation and backup manager. */
   private readonly conflictManager: ConflictManager;
   /** Map of registered adapters keyed by runtime ID. */
@@ -107,6 +111,7 @@ export class Transpiler {
   public constructor(options: TranspileOptions) {
     this.workspaceRoot = path.resolve(options.workspaceRoot);
     this.cavemanOverride = options.cavemanMode;
+    this.claudeInstall = options.claudeInstall;
     if (options.sauronRoot) {
       this.sauronRoot = path.resolve(options.sauronRoot);
     } else if (fs.existsSync(path.join(this.workspaceRoot, "core"))) {
@@ -286,6 +291,7 @@ export class Transpiler {
     return {
       ...(antiPatternsDoc !== undefined ? { antiPatternsDoc } : {}),
       cavemanMode,
+      ...(this.claudeInstall ? { claudeInstall: this.claudeInstall } : {}),
       projectName:
         configOverrides?.projectName || path.basename(this.workspaceRoot),
       projectDescription:
