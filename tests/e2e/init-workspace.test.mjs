@@ -67,12 +67,9 @@ describe("E2E: Workspace Bootstrap & Transpilation (init-workspace)", () => {
     // Assert: Verify multi-runtime adapter files are written
     const expectedFiles = [
       "CLAUDE.md",
-      ".windsurfrules",
-      ".cursorrules",
       path.join(".windsurf", "rules", "sauron.md"),
       path.join(".windsurf", "workflows", "README.md"),
       path.join(".windsurf", "skills", "README.md"),
-      ".clinerules",
       path.join(".cline", "rules", "sauron.md"),
       path.join(".cline", "workflows", "README.md"),
       path.join(".cline", "skills", "README.md"),

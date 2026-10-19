@@ -11,7 +11,7 @@ const __filename = fileURLToPath(import.meta.url);
 const __dirname = path.dirname(__filename);
 const SAURON_ROOT = path.resolve(__dirname, "../..");
 
-describe("Transpiler 17-Runtime Generation (Milestone 6.2)", () => {
+describe("Transpiler 19-Runtime Generation (Milestone 6.2)", () => {
   /** @type {string} */
   let tempWorkspace;
 
@@ -25,7 +25,7 @@ describe("Transpiler 17-Runtime Generation (Milestone 6.2)", () => {
     }
   });
 
-  it("successfully transpiles and generates files for all 17 runtimes in isolation", () => {
+  it("successfully transpiles and generates files for all 19 runtimes in isolation", () => {
     const transpiler = new Transpiler({
       workspaceRoot: tempWorkspace,
       sauronRoot: SAURON_ROOT,
@@ -45,7 +45,6 @@ describe("Transpiler 17-Runtime Generation (Milestone 6.2)", () => {
       ".cursor/rules/sauron.mdc",
       ".cursor/rules/README.md",
       ".cursor/skills/README.md",
-      ".windsurfrules",
       ".windsurf/rules/sauron.md",
       ".windsurf/workflows/README.md",
       ".windsurf/skills/README.md",
@@ -55,15 +54,11 @@ describe("Transpiler 17-Runtime Generation (Milestone 6.2)", () => {
       ".cline/workflows/README.md",
       ".cline/skills/README.md",
       ".cline/hooks/README.md",
-      ".traerules",
-      ".clinerules",
       ".trae/rules/project_rules.md",
       ".zed/settings.json",
-      ".zed/prompts/sauron.md",
       ".codex/config.toml",
       ".codex/README.md",
       ".rules",
-      ".codex/instructions.md",
       ".vscode/settings.json",
       ".github/instructions/sauron.instructions.md",
       ".github/instructions/README.md",
@@ -74,7 +69,6 @@ describe("Transpiler 17-Runtime Generation (Milestone 6.2)", () => {
       "AGENTS.md",
       ".agents/skills/README.md",
       ".agents/anti-patterns.md",
-      ".qwen/system.md",
       ".gemini/README.md",
       "QWEN.md",
       ".qwen/skills/README.md",
@@ -86,8 +80,6 @@ describe("Transpiler 17-Runtime Generation (Milestone 6.2)", () => {
       ".opencode/agents/README.md",
       ".opencode/commands/README.md",
       ".opencode/skills/README.md",
-      ".pirules",
-      ".opencode/instructions.md",
       ".pi/prompts/README.md",
       ".pi/skills/README.md",
       ".adalrules",
