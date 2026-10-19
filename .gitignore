@@ -37,3 +37,7 @@ progress-report-result.md
 
 # Claude Code agent worktrees
 .claude/worktrees/
+
+# Local-only reports
+RUNTIME-SCAFFOLDS-CHANGES.md
+TESTING-RUNTIME-SCAFFOLDS.md
