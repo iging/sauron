@@ -28,8 +28,8 @@
 **No.** While Sauron has a fast npm package (`npx sauron`), it supports three zero-Node distribution channels:
 
 1. **Standalone Shell Installers:**
-   - Linux/macOS: `curl -fsSL https://raw.githubusercontent.com/sauron-ai/sauron/main/bin/install.sh | bash`
-   - Windows PowerShell: `irm https://raw.githubusercontent.com/sauron-ai/sauron/main/bin/install.ps1 | iex`
+   - Linux/macOS: `curl -fsSL https://raw.githubusercontent.com/iging/sauron/main/bin/install.sh | bash`
+   - Windows PowerShell: `irm https://raw.githubusercontent.com/iging/sauron/main/bin/install.ps1 | iex`
 2. **Python PyPI:** `pip install sauron-ai && sauron init`
 3. **Hardened Docker Container:** Run directly with `docker compose run --rm sauron init` without installing anything on your host machine.
 

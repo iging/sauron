@@ -5,7 +5,8 @@
   "type": "module",
   "main": "./dist/adapters/transpiler.js",
   "bin": {
-    "sauron": "./bin/sauron.mjs"
+    "sauron": "./bin/sauron.mjs",
+    "sauron-ai": "./bin/sauron.mjs"
   },
   "files": [
     "bin",

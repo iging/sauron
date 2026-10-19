@@ -5,7 +5,7 @@ build-backend = "setuptools.build_meta"
 [project]
 name = "sauron-ai"
 version = "1.0.0"
-description = "Universal AI agent orchestrator and harness for 17 AI coding runtimes."
+description = "Universal AI agent harness for 19 AI coding runtimes (Python entry point for the Node.js CLI; requires Node.js 18+)."
 readme = "README.md"
 requires-python = ">=3.10"
 license = { text = "MIT" }

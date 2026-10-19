@@ -2,14 +2,13 @@
 # ===================================================================
 # Sauron Universal POSIX Installer
 # "One Harness to rule them all..."
-# Installs sauron CLI to ~/.local/bin or /usr/local/bin
+# Local clone: creates a `sauron` launcher in ~/.local/bin.
+# Remote (curl | bash): installs sauron-ai globally with pnpm or npm.
 # ===================================================================
 
 set -euo pipefail
 
-VERSION="1.0.0"
 INSTALL_DIR="${HOME}/.local/bin"
-SAURON_HOME="${HOME}/.sauron"
 
 echo "==================================================================="
 echo "                       S A U R O N"
@@ -17,7 +16,6 @@ echo "  One Harness to rule them all, One Harness to prompt them,"
 echo "  One Harness to sync them all, and in your codebase bind them."
 echo "==================================================================="
 echo ""
-echo "[INSTALLER] Installing sauron v${VERSION} for POSIX systems..."
 
 # Step 1: Verify prerequisites
 if ! command -v node >/dev/null 2>&1; then
@@ -32,16 +30,25 @@ if [ "${NODE_VERSION}" -lt 18 ]; then
   exit 1
 fi
 
-# Step 2: Create installation directories
-mkdir -p "${INSTALL_DIR}"
-mkdir -p "${SAURON_HOME}"
+# Step 2: Local clone (this script lives in <repo>/bin) or remote install.
+SCRIPT_DIR=""
+if [ -n "${BASH_SOURCE[0]:-}" ] && [ -f "${BASH_SOURCE[0]}" ]; then
+  SCRIPT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
+fi
+SAURON_MJS="${SCRIPT_DIR}/sauron.mjs"
+REPO_ROOT="${SCRIPT_DIR}/.."
 
-# Step 3: Global npm link or binary launcher creation
-SCRIPT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
-SAURON_MJS="${SCRIPT_DIR}/../../bin/sauron.mjs"
+if [ -n "${SCRIPT_DIR}" ] && [ -f "${SAURON_MJS}" ]; then
+  VERSION=$(node -p "require('${REPO_ROOT}/package.json').version")
+  echo "[INSTALLER] Installing sauron v${VERSION} from local clone..."
 
-if [ -f "${SAURON_MJS}" ]; then
-  # Local repository installation mode
+  # The CLI imports the compiled engine from dist/, so build it when missing.
+  if [ ! -f "${REPO_ROOT}/dist/adapters/transpiler.js" ]; then
+    echo "[INSTALLER] Building the engine (npm install && npm run build)..."
+    (cd "${REPO_ROOT}" && npm install --no-audit --no-fund && npm run build)
+  fi
+
+  mkdir -p "${INSTALL_DIR}"
   TARGET_BIN="${INSTALL_DIR}/sauron"
   cat <<EOF > "${TARGET_BIN}"
 #!/usr/bin/env bash
@@ -49,23 +56,26 @@ exec node "${SAURON_MJS}" "\$@"
 EOF
   chmod +x "${TARGET_BIN}"
   echo "[SUCCESS] Installed local launcher to ${TARGET_BIN}"
+
+  case ":${PATH}:" in
+    *:"${INSTALL_DIR}":*) ;;
+    *)
+      echo ""
+      echo "[NOTICE] ${INSTALL_DIR} is not currently in your PATH."
+      echo "Add the following line to your ~/.bashrc or ~/.zshrc:"
+      echo "  export PATH=\"${INSTALL_DIR}:\$PATH\""
+      ;;
+  esac
 else
-  # Remote curl installation fallback via npm
-  echo "[INSTALLER] Installing sauron-ai globally via npm..."
-  npm install -g sauron-ai
+  if command -v pnpm >/dev/null 2>&1; then
+    echo "[INSTALLER] Installing sauron-ai globally via pnpm..."
+    pnpm add -g sauron-ai
+  else
+    echo "[INSTALLER] Installing sauron-ai globally via npm..."
+    npm install -g sauron-ai
+  fi
 fi
 
-# Step 4: PATH Verification
-case ":${PATH}:" in
-  *:"${INSTALL_DIR}":*) ;;
-  *)
-    echo ""
-    echo "[NOTICE] ${INSTALL_DIR} is not currently in your PATH."
-    echo "Add the following line to your ~/.bashrc or ~/.zshrc:"
-    echo "  export PATH=\"${INSTALL_DIR}:\$PATH\""
-    ;;
-esac
-
 echo ""
-echo "[COMPLETE] sauron v${VERSION} installed successfully."
-echo "Run 'sauron status' to verify your installation."
+echo "[COMPLETE] sauron installed."
+echo "Run 'sauron init' inside your project (or without installing: npx sauron-ai init / pnpm dlx sauron-ai init)."

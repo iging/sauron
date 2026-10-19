@@ -1,5 +1,6 @@
 #!/usr/bin/env node
 // @ts-check
+/// <reference types="node" />
 
 /**
  * @fileoverview Main CLI entry point for sauron.
@@ -530,17 +531,22 @@ function detectRunner() {
  */
 async function createPrompter() {
   const { createInterface } = await import("node:readline");
+  /** @type {import("node:readline").Interface} */
   const rl = createInterface({
     input: process.stdin,
     output: process.stdout,
     terminal: process.stdin.isTTY === true,
   });
+  // Typed as an EventEmitter so editors without Node types still accept `.on`.
+  const events = /** @type {import("node:events").EventEmitter} */ (
+    /** @type {unknown} */ (rl)
+  );
   /** @type {string[]} */
   const lines = [];
   /** @type {((line: string | null) => void) | null} */
   let waiter = null;
   let closed = false;
-  rl.on("line", (line) => {
+  events.on("line", (/** @type {string} */ line) => {
     if (waiter) {
       const resolve = waiter;
       waiter = null;
@@ -549,11 +555,11 @@ async function createPrompter() {
       lines.push(line);
     }
   });
-  rl.on("close", () => {
+  events.on("close", () => {
     closed = true;
     if (waiter) waiter(null);
   });
-  rl.on("SIGINT", () => {
+  events.on("SIGINT", () => {
     console.log("\n[ABORTED] Nothing was written.");
     process.exit(130);
   });
@@ -672,7 +678,7 @@ async function promptInitPlan(rl, flags, departments, defaultCaveman) {
             rl,
             "Subagents",
             "fellowship",
-            (a) => AGENT_SETS.includes(a),
+            (a) => /** @type {readonly string[]} */ (AGENT_SETS).includes(a),
             `Choose: ${AGENT_SETS.join(", ")}.`,
           ),
         );

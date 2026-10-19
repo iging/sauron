@@ -85,19 +85,25 @@ npx sauron-ai list-skills
 
 > **Prefer Global CLI?** Install once with `npm install -g sauron-ai` and run `sauron add <skill>` anywhere.
 
-### 2. Full Harness Synchronization (All 17 Runtimes & Fellowship)
+### 2. Full Harness Synchronization (19 Runtimes & Fellowship)
 
-Synchronize the master specification and generate native instruction files (`CLAUDE.md`, `.cursorrules`, `.windsurfrules`, `.cline/rules/`, etc.) across your entire repo:
+`init` asks a few questions (Recommended or Custom: runtimes, subagents, skills, Caveman tier), shows a plan, and writes nothing until you confirm. It generates the shared `AGENTS.md` core plus native files for the runtimes you pick (`CLAUDE.md` + `.claude/`, `.cursor/rules/`, `.windsurf/rules/`, `.cline/rules/`, and more), and merges into files you already have instead of replacing them:
 
 ```bash
-# Using NPX (Zero-install, recommended for web developers)
+# Using NPX (zero-install, recommended)
 npx sauron-ai init
 
+# Using pnpm (zero-install)
+pnpm dlx sauron-ai init
+
+# No prompts (CI): Claude Code only, Fellowship subagents
+npx sauron-ai init --yes --runtimes=claude --agents=fellowship
+
 # Or install globally
-npm install -g sauron-ai
+npm install -g sauron-ai        # or: pnpm add -g sauron-ai
 sauron init
 
-# Using Python PIP
+# Using Python PIP (forwards to the Node.js CLI; Node.js 18+ required)
 pip install sauron-ai && sauron init
 
 # Direct Git Clone
@@ -109,10 +115,10 @@ cd sauron && npm install && npm run build
 
 ```bash
 # Linux / macOS
-curl -fsSL https://raw.githubusercontent.com/sauron-ai/sauron/main/bin/install.sh | bash
+curl -fsSL https://raw.githubusercontent.com/iging/sauron/main/bin/install.sh | bash
 
 # Windows PowerShell
-irm https://raw.githubusercontent.com/sauron-ai/sauron/main/bin/install.ps1 | iex
+irm https://raw.githubusercontent.com/iging/sauron/main/bin/install.ps1 | iex
 ```
 
 ### 4. Running via Docker (Zero Local Node.js Required)
