@@ -7,8 +7,9 @@ This guide details how Sauron configures and manages rules for desktop IDE envir
 ## 1. Cursor
 
 - **Generated Files**:
-  - `.cursorrules`: Root instruction file loaded automatically on every prompt.
-  - `.cursor/rules/sauron.mdc`: Advanced rules file with frontmatter metadata.
+  - `.cursor/rules/sauron.mdc`: Project rule with `alwaysApply: true` frontmatter, loaded on every chat.
+  - `.cursor/rules/README.md` and `.cursor/skills/README.md`: Folder guides (see https://cursor.com/docs/context/rules and https://cursor.com/docs/skills).
+  - The legacy root `.cursorrules` file is no longer generated.
 - **Features Handled**:
   - Automatically maps project rules, banned patterns, and file scope boundaries.
   - Provides direct slash command triggers for Fellowship agents.
