@@ -47,7 +47,7 @@ describe("Transpiler 17-Runtime Generation (Milestone 6.2)", () => {
       ".windsurfrules",
       ".github/copilot-instructions.md",
       ".clinerules",
-      ".traerules",
+      ".trae/rules/project_rules.md",
       ".zed/settings.json",
       ".zed/prompts/sauron.md",
       ".codex/instructions.md",
@@ -60,7 +60,8 @@ describe("Transpiler 17-Runtime Generation (Milestone 6.2)", () => {
       ".hermesrules",
       ".openclaw/config.json",
       ".opencode/instructions.md",
-      ".pirules",
+      ".pi/prompts/README.md",
+      ".pi/skills/README.md",
       ".adalrules",
       ".codebuddy/rules.md",
     ];
