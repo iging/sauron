@@ -32,6 +32,14 @@ Sauron supports 17 runtimes grouped into three operational categories:
    - Qwen (`.qwen/system.md`)
    - Adal / CodeBuddy (`.adalrules`, `.codebuddy/rules.md`)
 
+### Shared AGENTS.md Core
+
+The `agents-md` adapter emits files shared across runtimes:
+
+- `AGENTS.md`: root instructions (rules, Caveman Mode, Fellowship, anti-pattern guardrails). Read by Codex, Cursor, GitHub Copilot, Windsurf, Cline, OpenCode, Kiro, Zed, CodeBuddy, and Pi.
+- `.agents/skills/README.md`: explains the Agent Skills format (`<name>/SKILL.md` with `name` and `description` frontmatter) and how `sauron add <skill>` installs there.
+- `.agents/anti-patterns.md`: copy of `references/anti-patterns.md`. Omitted when that reference is missing.
+
 ---
 
 ## The Transpilation Engine
