@@ -46,7 +46,11 @@ describe("Transpiler 17-Runtime Generation (Milestone 6.2)", () => {
       ".cursor/rules/sauron.mdc",
       ".windsurfrules",
       ".github/copilot-instructions.md",
-      ".clinerules",
+      ".cline/rules/sauron.md",
+      ".cline/README.md",
+      ".cline/workflows/README.md",
+      ".cline/skills/README.md",
+      ".cline/hooks/README.md",
       ".traerules",
       ".zed/settings.json",
       ".zed/prompts/sauron.md",
@@ -77,6 +81,35 @@ describe("Transpiler 17-Runtime Generation (Milestone 6.2)", () => {
         content.toLowerCase().includes("sauron"),
         `File should mention sauron: ${relPath}`,
       );
+    }
+  });
+
+  it("emits Cline scaffold without colliding with a legacy .clinerules file", () => {
+    const ws = fs.mkdtempSync(path.join(os.tmpdir(), "sauron-cline-"));
+    try {
+      fs.writeFileSync(path.join(ws, ".clinerules"), "legacy user rules\n");
+      const transpiler = new Transpiler({
+        workspaceRoot: ws,
+        sauronRoot: SAURON_ROOT,
+        dryRun: false,
+      });
+      transpiler.transpileAll({ dryRun: false });
+      for (const rel of [
+        ".cline/rules/sauron.md",
+        ".cline/README.md",
+        ".cline/workflows/README.md",
+        ".cline/skills/README.md",
+        ".cline/hooks/README.md",
+      ]) {
+        assert.ok(fs.existsSync(path.join(ws, rel)), `Missing ${rel}`);
+      }
+      assert.equal(
+        fs.readFileSync(path.join(ws, ".clinerules"), "utf8"),
+        "legacy user rules\n",
+        "Legacy .clinerules file must be left untouched",
+      );
+    } finally {
+      fs.rmSync(ws, { recursive: true, force: true });
     }
   });
 });

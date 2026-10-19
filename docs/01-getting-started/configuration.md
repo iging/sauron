@@ -50,7 +50,7 @@ runtimes:
   cursor: true # Generates .cursorrules and .cursor/rules/sauron.mdc
   windsurf: true # Generates .windsurfrules
   copilot: true # Generates .github/copilot-instructions.md and hooks
-  cline: true # Generates .clinerules
+  cline: true # Generates .cline/ scaffold (rules, workflows, skills, hooks)
   trae: true # Generates .traerules
   zed: true # Generates .zed/settings.json and .zed/prompts/sauron.md
   codex: true # Generates .codex/instructions.md
