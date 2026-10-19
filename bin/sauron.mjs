@@ -63,14 +63,28 @@ const LOTR_BANNER = Object.freeze(`
  */
 
 /**
- * Catalog of all 17 supported AI coding runtimes and their default configuration files.
+ * Catalog of the shared AGENTS.md core plus all 19 supported AI coding runtimes and their primary scaffold paths.
+ * See docs/runtime-scaffolds.md for sources and verification status.
  * Sealed with Object.freeze to prevent runtime prototype pollution or accidental mutations.
  * @type {readonly RuntimeTarget[]}
  */
 const RUNTIMES = Object.freeze([
+  Object.freeze({
+    id: "agents",
+    name: "Shared Core",
+    file: "AGENTS.md",
+  }),
   Object.freeze({ id: "claude", name: "Claude Code", file: "CLAUDE.md" }),
-  Object.freeze({ id: "cursor", name: "Cursor", file: ".cursorrules" }),
-  Object.freeze({ id: "windsurf", name: "Windsurf", file: ".windsurfrules" }),
+  Object.freeze({
+    id: "cursor",
+    name: "Cursor",
+    file: ".cursor/rules/sauron.mdc",
+  }),
+  Object.freeze({
+    id: "windsurf",
+    name: "Windsurf",
+    file: ".windsurf/rules/sauron.md",
+  }),
   Object.freeze({
     id: "copilot",
     name: "GitHub Copilot",
@@ -80,23 +94,34 @@ const RUNTIMES = Object.freeze([
   Object.freeze({ id: "trae", name: "Trae", file: ".traerules" }),
   Object.freeze({ id: "zed", name: "Zed", file: ".zed/settings.json" }),
   Object.freeze({ id: "codex", name: "Codex", file: ".codex/instructions.md" }),
+  Object.freeze({
+    id: "vscode",
+    name: "VS Code",
+    file: ".vscode/settings.json",
+  }),
+    id: "trae",
+    name: "Trae",
+    file: ".trae/rules/project_rules.md",
+  Object.freeze({ id: "zed", name: "Zed", file: ".rules" }),
+  Object.freeze({ id: "codex", name: "Codex", file: ".codex/config.toml" }),
   Object.freeze({ id: "gemini", name: "Gemini", file: "GEMINI.md" }),
-  Object.freeze({ id: "hermes", name: "Hermes", file: ".hermesrules" }),
+  Object.freeze({ id: "qwen", name: "Qwen", file: "QWEN.md" }),
   Object.freeze({ id: "kimi", name: "Kimi", file: ".kimi/prompt.md" }),
-  Object.freeze({ id: "kiro", name: "Kiro", file: ".kirorules" }),
+  Object.freeze({ id: "kiro", name: "Kiro", file: ".kiro/steering/sauron.md" }),
+  Object.freeze({ id: "hermes", name: "Hermes", file: ".hermesrules" }),
   Object.freeze({
     id: "openclaw",
     name: "OpenClaw",
     file: ".openclaw/config.json",
   }),
+  Object.freeze({ id: "opencode", name: "OpenCode", file: "opencode.json" }),
+  Object.freeze({ id: "pi", name: "Pi", file: ".pi/prompts/README.md" }),
+  Object.freeze({ id: "adal", name: "AdaL", file: ".adalrules" }),
   Object.freeze({
-    id: "opencode",
-    name: "OpenCode",
-    file: ".opencode/instructions.md",
+    id: "codebuddy",
+    name: "CodeBuddy",
+    file: ".codebuddy/rules/sauron.md",
   }),
-  Object.freeze({ id: "pi", name: "Pi", file: ".pirules" }),
-  Object.freeze({ id: "qwen", name: "Qwen", file: ".qwen/system.md" }),
-  Object.freeze({ id: "adal", name: "Adal / CodeBuddy", file: ".adalrules" }),
 ]);
 
 /**
@@ -208,7 +233,7 @@ function printHelpMenu() {
   console.log("Usage: sauron <command> [options]\n");
   console.log("Commands:");
   console.log(
-    "  init         Initialize sauron configuration and transpile to 17 runtimes",
+    "  init         Initialize sauron configuration and transpile to 19 runtimes",
   );
   console.log(
     "  add <skill>  Add one or more modular skills to local project workspace",
@@ -256,7 +281,9 @@ function executeStatusCommand() {
   console.log(LOTR_BANNER);
   console.log(`[STATUS] sauron v${VERSION}\n`);
 
-  console.log("--- The 17 Runtimes Bound by sauron ---");
+  console.log(
+    "--- The 19 Runtimes Bound by sauron (+ shared AGENTS.md core) ---",
+  );
   for (const runtime of RUNTIMES) {
     console.log(`  [OK] ${runtime.name.padEnd(20)} -> ${runtime.file}`);
   }
@@ -439,7 +466,7 @@ function executeAddCommand(skillNames, options) {
 }
 
 /**
- * Initializes a repository with sauron configuration and generates 17 runtime adapter files.
+ * Initializes a repository with sauron configuration and generates 19 runtime adapter scaffolds.
  *
  * Execution flow:
  * 1. Verifies or bootstraps `sauron.config.yaml` in the current working directory.
@@ -828,9 +855,8 @@ async function executeFindSkillCommand(args) {
     if (query === "") {
       throw new Error('Missing task. Usage: sauron find-skill "<task>"');
     }
-    const { loadSkillCatalog, rankSkills, formatFinderReport } = await import(
-      "../dist/adapters/skill-finder.js"
-    );
+    const { loadSkillCatalog, rankSkills, formatFinderReport } =
+      await import("../dist/adapters/skill-finder.js");
     const { skillsRoot, baseDir } = resolveFinderRoot(explicitRoot);
     const catalog = loadSkillCatalog(skillsRoot, baseDir);
     const results = rankSkills(catalog.documents, query, limit);
