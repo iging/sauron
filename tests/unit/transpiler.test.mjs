@@ -42,8 +42,9 @@ describe("Transpiler 17-Runtime Generation (Milestone 6.2)", () => {
 
     const expectedPaths = [
       "CLAUDE.md",
-      ".cursorrules",
       ".cursor/rules/sauron.mdc",
+      ".cursor/rules/README.md",
+      ".cursor/skills/README.md",
       ".windsurfrules",
       ".github/copilot-instructions.md",
       ".clinerules",

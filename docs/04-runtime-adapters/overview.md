@@ -9,7 +9,7 @@ Sauron operates as a single source of truth for AI instructions. Instead of manu
 Sauron supports 17 runtimes grouped into three operational categories:
 
 1. **Desktop & IDE Environments**:
-   - Cursor (`.cursorrules`, `.cursor/rules/sauron.mdc`)
+   - Cursor (`.cursor/rules/sauron.mdc`, `.cursor/rules/README.md`, `.cursor/skills/README.md`)
    - Windsurf (`.windsurfrules`)
    - Trae (`.traerules`)
    - Zed (`.zed/settings.json`, `.zed/prompts/sauron.md`)

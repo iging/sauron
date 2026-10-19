@@ -67,7 +67,6 @@ describe("E2E: Workspace Bootstrap & Transpilation (init-workspace)", () => {
     // Assert: Verify multi-runtime adapter files are written
     const expectedFiles = [
       "CLAUDE.md",
-      ".cursorrules",
       ".windsurfrules",
       ".clinerules",
       "GEMINI.md",
@@ -104,6 +103,6 @@ describe("E2E: Workspace Bootstrap & Transpilation (init-workspace)", () => {
 
     // Assert: Verify files remain intact
     assert.ok(fs.existsSync(path.join(tempWorkspace, "CLAUDE.md")));
-    assert.ok(fs.existsSync(path.join(tempWorkspace, ".cursorrules")));
+    assert.ok(fs.existsSync(path.join(tempWorkspace, ".cursor", "rules", "sauron.mdc")));
   });
 });

@@ -47,7 +47,7 @@ The `runtimes` block enables or disables synchronization targets. Set any runtim
 ```yaml
 runtimes:
   claude: true # Generates CLAUDE.md
-  cursor: true # Generates .cursorrules and .cursor/rules/sauron.mdc
+  cursor: true # Generates .cursor/rules/sauron.mdc and .cursor/{rules,skills}/README.md
   windsurf: true # Generates .windsurfrules
   copilot: true # Generates .github/copilot-instructions.md and hooks
   cline: true # Generates .clinerules
