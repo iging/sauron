@@ -47,6 +47,7 @@ Browse the documentation by topic:
 - [Desktop and IDE Tools](04-runtime-adapters/desktop-and-ide.md) : Cursor, Windsurf, Trae, Zed, VS Code, and Kiro.
 - [CLI Coding Agents](04-runtime-adapters/cli-agents.md) : Claude Code, Cline, Codex, OpenCode, OpenClaw, and Pi.
 - [Web and Model Interfaces](04-runtime-adapters/web-and-models.md) : Gemini, Copilot, Hermes, Kimi, Qwen, and Adal / CodeBuddy.
+- [Runtime Scaffolds](runtime-scaffolds.md) : Verified per-runtime scaffold paths, official sources, and the needs-verification list.
 
 ### [05. Token Optimization (Caveman Mode)](05-token-optimization/caveman-mode.md)
 

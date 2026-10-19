@@ -12,7 +12,7 @@ describe("Sauron CLI Command Dispatcher", () => {
   it("executes 'status' and outputs fellowship agents and runtimes", async () => {
     const { stdout } = await execFileAsync("node", [CLI_PATH, "status"]);
     assert.ok(
-      stdout.includes("The 17 Runtimes Bound by sauron"),
+      stdout.includes("The 19 Runtimes Bound by sauron"),
       "Status header must be present",
     );
     assert.ok(
