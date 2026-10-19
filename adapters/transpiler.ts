@@ -34,7 +34,10 @@ import { AdalAdapter } from "./adal.js";
 import { CodeBuddyAdapter } from "./codebuddy.js";
 import { AgentsMdAdapter } from "./agents-md.js";
 
+import { parse as parseYaml } from "yaml";
+import { CAVEMAN_MODES } from "./types.js";
 import type {
+  CavemanMode,
   FellowshipAgentIR,
   SkillIR,
   TranspileContext,
@@ -57,6 +60,8 @@ export interface TranspileOptions {
   dryRun?: boolean;
   /** Optional array of adapter IDs to restrict transpilation to specific runtimes. */
   targetRuntimes?: string[];
+  /** Caveman tier that overrides `sauron.config.yaml` (used by `init --caveman`). */
+  cavemanMode?: CavemanMode;
 }
 
 /**
@@ -86,6 +91,8 @@ export class Transpiler {
   private readonly workspaceRoot: string;
   /** Absolute path to Sauron installation assets. */
   private readonly sauronRoot: string;
+  /** Caveman tier forced by the caller; wins over `sauron.config.yaml`. */
+  private readonly cavemanOverride: CavemanMode | undefined;
   /** Safe file mutation and backup manager. */
   private readonly conflictManager: ConflictManager;
   /** Map of registered adapters keyed by runtime ID. */
@@ -98,6 +105,7 @@ export class Transpiler {
    */
   public constructor(options: TranspileOptions) {
     this.workspaceRoot = path.resolve(options.workspaceRoot);
+    this.cavemanOverride = options.cavemanMode;
     if (options.sauronRoot) {
       this.sauronRoot = path.resolve(options.sauronRoot);
     } else if (fs.existsSync(path.join(this.workspaceRoot, "core"))) {
@@ -215,6 +223,35 @@ export class Transpiler {
   }
 
   /**
+   * Reads `caveman.default_mode` from the workspace `sauron.config.yaml`.
+   * Returns `full` when the file or key is absent. Fails closed on an invalid tier.
+   */
+  private loadCavemanMode(): CavemanMode {
+    const configPath = path.join(this.workspaceRoot, "sauron.config.yaml");
+    if (!fs.existsSync(configPath)) {
+      return "full";
+    }
+    const config: unknown = parseYaml(fs.readFileSync(configPath, "utf8"));
+    const caveman =
+      config && typeof config === "object"
+        ? (config as Record<string, unknown>)["caveman"]
+        : undefined;
+    const mode =
+      caveman && typeof caveman === "object"
+        ? (caveman as Record<string, unknown>)["default_mode"]
+        : undefined;
+    if (mode === undefined || mode === null) {
+      return "full";
+    }
+    if (!CAVEMAN_MODES.includes(mode as CavemanMode)) {
+      throw new Error(
+        `Invalid caveman.default_mode '${String(mode)}' in sauron.config.yaml. Use one of: ${CAVEMAN_MODES.join(", ")}.`,
+      );
+    }
+    return mode as CavemanMode;
+  }
+
+  /**
    * Loads `references/anti-patterns.md` relative to sauronRoot.
    * Fail-closed: returns undefined when the file is missing or unreadable.
    */
@@ -241,8 +278,13 @@ export class Transpiler {
   ): TranspileContext {
     const antiPatternsDoc =
       configOverrides?.antiPatternsDoc ?? this.loadAntiPatternsDoc();
+    const cavemanMode =
+      configOverrides?.cavemanMode ??
+      this.cavemanOverride ??
+      this.loadCavemanMode();
     return {
       ...(antiPatternsDoc !== undefined ? { antiPatternsDoc } : {}),
+      cavemanMode,
       projectName:
         configOverrides?.projectName || path.basename(this.workspaceRoot),
       projectDescription:
@@ -259,7 +301,9 @@ export class Transpiler {
         "Strict Red-Green-Refactor TDD required before touching production code.",
         "Zero untyped boundary parameters: enforce runtime validation (Zod, Pydantic).",
         "Zero hardcoded secrets, connection strings, or unredacted logging output.",
-        "Token Conservation & Caveman Mode: When invoked with '/caveman' (or 'lite', 'ultra'), eliminate conversational filler and pleasantries while preserving all code, commands, paths, and technical precision verbatim. Restore standard conversational style when requested with '/caveman off'.",
+        cavemanMode === "off"
+          ? "Token Conservation & Caveman Mode: off by default. Enable with '/caveman lite', '/caveman full', or '/caveman ultra'."
+          : `Token Conservation & Caveman Mode: active at tier '${cavemanMode}' from the first reply, no trigger needed. Preserve all code, commands, paths, and negations verbatim. Disable with '/caveman off'.`,
       ],
       antiPatterns: [
         "AP-1 (Vague task verb) : Always decompose requests into concrete atomic tasks.",

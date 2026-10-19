@@ -40,7 +40,7 @@ and in your codebase bind them.
    Long-running agent sessions burn up to 75% of context window limits on conversational filler, pleasantries, and redundant narration. As token budgets deplete, model attention degrades, leading to forgotten requirements, catastrophic forgetfulness, and expensive API bills.
 
    **Sauron solves this with Built-in Token Conservation & Caveman Transpilation**:
-   Sauron embeds **Caveman Mode**—a native compression engine with multiple intensity tiers (`lite`, `full`, `ultra`) that slashes conversational waste by 40% to 75% while strictly preserving technical precision, code blocks, diffs, and negative boolean logic. Crucially, Sauron transpiles explicit `/caveman` token-conservation directives directly into the instruction manuals and system rules of all **17 target runtimes** (`CLAUDE.md`, `.cursorrules`, `.windsurfrules`, `.cline/rules/`, etc.). Coupled with zero-install modular skill injection via `npx`, developers load only what the agent needs, eliminating memory bloat.
+   Sauron embeds **Caveman Mode**—a native compression engine with multiple intensity tiers (`lite`, `full`, `ultra`) that cuts conversational filler while strictly preserving technical precision, code blocks, diffs, and negations. `sauron init` asks which tier to turn on (or pass `--caveman=off|lite|full|ultra`) and writes it into the instruction files of all **19 runtimes** (`AGENTS.md`, `CLAUDE.md`, `.cursor/rules/`, `.windsurf/rules/`, `.cline/rules/`, and more), so the agent applies it from its first reply with no trigger command. Coupled with zero-install modular skill injection via `npx`, developers load only what the agent needs, eliminating memory bloat.
 
 4. **Blind Multi-File Hallucination & Hidden Architectural Drift**:
    Large-language models lack holistic codebase perception. When instructed to modify a component, agents frequently introduce silent circular imports, break cross-module boundaries, and create cascading dependency failures because they cannot visualize the full system topology.
@@ -199,17 +199,17 @@ Sauron ships with 374 modular skills across 9 functional departments, plus 114 C
 
 Long-running agent sessions suffer from context window bloat caused by conversational filler, repetitive apologies, and pleasantries. This burns LLM API credits and causes attention degradation over time.
 
-Sauron embeds **Caveman Mode** as its flagship token conservation suite to preserve technical precision while saving up to 75% of response tokens.
+Sauron embeds **Caveman Mode** as its flagship token conservation suite to cut filler from agent replies while preserving technical precision. It is on from the first reply at the tier chosen during `sauron init`; actual savings depend on the model and the task.
 
-| Command                         | Action                                                                    | Token Savings |
-| :------------------------------ | :------------------------------------------------------------------------ | :------------ |
-| `/caveman` (or `/caveman full`) | Activates default full compression (spartan, terse fragments)             | ~60%          |
-| `/caveman lite`                 | Eliminates filler while preserving complete grammatical sentences         | ~40%          |
-| `/caveman ultra`                | Extreme compression with minimal words for maximum context conservation   | ~75%          |
-| `/caveman-commit`               | Generates strict Conventional Commits under 70 characters without padding | Zero bloat    |
-| `/caveman-review`               | Emits dense, one-line actionable PR review findings                       | High density  |
-| `/caveman-compress`             | Compresses Markdown documentation without losing technical requirements   | ~50%          |
-| `/caveman off`                  | Restores standard conversational mode                                     | Baseline      |
+| Command                         | Action                                                                    |
+| :------------------------------ | :------------------------------------------------------------------------ |
+| `/caveman` (or `/caveman full`) | Terse fragments, no filler (default tier)                                 |
+| `/caveman lite`                 | Eliminates filler while preserving complete grammatical sentences         |
+| `/caveman ultra`                | Maximum compression with minimal words                                    |
+| `/caveman-commit`               | Generates strict Conventional Commits under 70 characters without padding |
+| `/caveman-review`               | Emits dense, one-line actionable PR review findings                       |
+| `/caveman-compress`             | Compresses Markdown documentation without losing technical requirements   |
+| `/caveman off`                  | Restores standard conversational mode                                     |
 
 ---
 

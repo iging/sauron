@@ -19,6 +19,104 @@ import type {
 } from "./types.js";
 export type { ManagedFileRecord, SauronManifest, WriteFileResult };
 
+/** Opening and closing marker text of the Sauron-managed block. */
+const MARKER_START =
+  "sauron:start (managed by Sauron; edit outside this block)";
+const MARKER_END = "sauron:end";
+
+/**
+ * Returns comment-wrapped markers matching the file's syntax.
+ * TOML and YAML use `#` comments; everything else uses HTML comments.
+ */
+function markersFor(relativePath: string): { start: string; end: string } {
+  if (/\.(toml|ya?ml)$/i.test(relativePath)) {
+    return { start: `# ${MARKER_START}`, end: `# ${MARKER_END}` };
+  }
+  return { start: `<!-- ${MARKER_START} -->`, end: `<!-- ${MARKER_END} -->` };
+}
+
+/** Splits leading YAML frontmatter (`---` ... `---`) from the body. */
+function splitFrontmatter(content: string): {
+  frontmatter: string;
+  body: string;
+} {
+  const match = /^---\r?\n[\s\S]*?\r?\n---\r?\n/.exec(content);
+  if (!match) {
+    return { frontmatter: "", body: content };
+  }
+  return { frontmatter: match[0], body: content.slice(match[0].length) };
+}
+
+/** Builds the managed block for a body of Sauron content. */
+function managedBlock(relativePath: string, body: string): string {
+  const { start, end } = markersFor(relativePath);
+  return `${start}\n${body.replace(/\s+$/, "")}\n${end}\n`;
+}
+
+/** Wraps new Sauron content in a managed block, keeping frontmatter first. */
+function wrapManagedBlock(relativePath: string, content: string): string {
+  const { frontmatter, body } = splitFrontmatter(content);
+  return frontmatter + managedBlock(relativePath, body);
+}
+
+/**
+ * Replaces the managed block inside a user file, or appends one when absent.
+ * Sauron frontmatter is dropped because the user file controls its own header.
+ */
+function mergeManagedBlock(
+  relativePath: string,
+  content: string,
+  existing: string,
+): string {
+  const { start, end } = markersFor(relativePath);
+  const block = managedBlock(relativePath, splitFrontmatter(content).body);
+  const startIndex = existing.indexOf(start);
+  const endIndex = startIndex >= 0 ? existing.indexOf(end, startIndex) : -1;
+  if (startIndex >= 0 && endIndex >= 0) {
+    let after = endIndex + end.length;
+    if (existing[after] === "\r") after += 1;
+    if (existing[after] === "\n") after += 1;
+    return existing.slice(0, startIndex) + block + existing.slice(after);
+  }
+  const separator =
+    existing.length === 0 || existing.endsWith("\n\n")
+      ? ""
+      : existing.endsWith("\n")
+        ? "\n"
+        : "\n\n";
+  return existing + separator + block;
+}
+
+/** Recursively merges plain objects; values from `user` always win. */
+function deepMergeUserWins(sauron: unknown, user: unknown): unknown {
+  const isPlain = (v: unknown): v is Record<string, unknown> =>
+    typeof v === "object" && v !== null && !Array.isArray(v);
+  if (!isPlain(sauron) || !isPlain(user)) {
+    return user;
+  }
+  const merged: Record<string, unknown> = { ...sauron };
+  for (const [key, value] of Object.entries(user)) {
+    merged[key] = key in sauron ? deepMergeUserWins(sauron[key], value) : value;
+  }
+  return merged;
+}
+
+/**
+ * Merges Sauron JSON into a user JSON file, keeping every user key and value.
+ * Returns null when either document is not valid JSON (the file must not be touched).
+ */
+function mergeJsonPreservingUser(
+  content: string,
+  existing: string,
+): string | null {
+  try {
+    const merged = deepMergeUserWins(JSON.parse(content), JSON.parse(existing));
+    return `${JSON.stringify(merged, null, 2)}\n`;
+  } catch {
+    return null;
+  }
+}
+
 /**
  * Manages file mutation safety across all AI tool runtime adapters.
  *
@@ -112,17 +210,24 @@ export class ConflictManager {
   }
 
   /**
-   * Writes content to a destination file with zero-destructive overwrite protection.
+   * Writes content to a destination file without destroying user content.
+   *
+   * Text files carry Sauron content inside a managed block delimited by
+   * `sauron:start` / `sauron:end` markers (placed after any YAML frontmatter).
+   * JSON files are deep-merged so that user keys always win.
    *
    * Evaluation lifecycle:
-   * 1. If target file does not exist: creates target file and registers in manifest.
-   * 2. If target exists and checksum matches: returns 'unchanged' without disk write.
-   * 3. If target exists and checksum differs:
-   *    - In dryRun mode: returns 'simulated' without altering filesystem.
-   *    - In execution mode: creates timestamped backup in `.sauron/backups/`,
-   *      writes new content, and records new checksum and backup path in manifest.
+   * 1. Target missing: writes the rendered content and registers it in the manifest.
+   * 2. Target identical to the merge result: returns 'unchanged'.
+   * 3. Dry run: returns 'simulated' without touching disk.
+   * 4. Target still byte-identical to what Sauron last wrote: replaced ('updated').
+   * 5. Otherwise the target belongs to the user:
+   *    - Text: only the managed block is replaced, or appended when absent ('merged').
+   *    - JSON: Sauron keys are added, user keys and values are kept ('merged').
+   *    - Unparseable JSON: left untouched ('skipped').
+   *    Every replace or merge first copies the old file to `.sauron/backups/`.
    *
-   * @param relativePath - Target file path relative to workspace root (e.g., '.cursorrules').
+   * @param relativePath - Target file path relative to workspace root (for example, 'CLAUDE.md').
    * @param content - Rendered file content to write.
    * @param runtime - Identifier of the AI runtime generating the file.
    * @param dryRun - When true, evaluates changes without modifying disk. Defaults to false.
@@ -135,86 +240,88 @@ export class ConflictManager {
     dryRun: boolean = false,
   ): WriteFileResult {
     const targetPath = path.join(this.workspaceRoot, relativePath);
-    const newChecksum = this.computeChecksum(content);
-
-    if (fs.existsSync(targetPath)) {
-      const existingContent = fs.readFileSync(targetPath, "utf8");
-      const existingChecksum = this.computeChecksum(existingContent);
-
-      // Idempotency check: avoid unnecessary disk write if file already has identical content.
-      if (existingChecksum === newChecksum) {
-        return {
-          filePath: relativePath,
-          runtime,
-          action: "unchanged",
-          backupPath: null,
-        };
-      }
-
-      // Dry-run simulation: abort before generating backups or writing files.
-      if (dryRun) {
-        return {
-          filePath: relativePath,
-          runtime,
-          action: "simulated",
-          backupPath: null,
-        };
-      }
-
-      // Existing file differs from incoming content.
-      // Sanitize delimiters (slashes, colons, dots) so backup filename is valid across Windows, Linux, and macOS.
-      const timestamp = new Date().toISOString().replace(/[:.]/g, "-");
-      const safeRelativeBackup = `${relativePath.replace(/[\/\\]/g, "_")}.${timestamp}.bak`;
-      const fullBackupPath = path.join(this.backupDir, safeRelativeBackup);
-
-      if (!fs.existsSync(this.backupDir)) {
-        fs.mkdirSync(this.backupDir, { recursive: true });
-      }
-
-      // Copy existing user file safely before writing new content.
-      fs.copyFileSync(targetPath, fullBackupPath);
-
-      // Ensure directory hierarchy exists for nested outputs (e.g., .github/hooks/ or .zed/)
-      const parentDir = path.dirname(targetPath);
-      if (!fs.existsSync(parentDir)) {
-        fs.mkdirSync(parentDir, { recursive: true });
-      }
-      fs.writeFileSync(targetPath, content, "utf8");
-
-      this.recordInManifest(relativePath, runtime, fullBackupPath, newChecksum);
-
-      return {
-        filePath: relativePath,
-        runtime,
-        action: "updated",
-        backupPath: path.relative(this.workspaceRoot, fullBackupPath),
-      };
-    }
-
-    if (dryRun) {
-      return {
-        filePath: relativePath,
-        runtime,
-        action: "simulated",
-        backupPath: null,
-      };
-    }
-
-    // Target does not exist yet: create directory hierarchy and write file directly.
-    const parentDir = path.dirname(targetPath);
-    if (!fs.existsSync(parentDir)) {
-      fs.mkdirSync(parentDir, { recursive: true });
-    }
-    fs.writeFileSync(targetPath, content, "utf8");
-
-    this.recordInManifest(relativePath, runtime, null, newChecksum);
-
-    return {
+    const isJson = relativePath.toLowerCase().endsWith(".json");
+    const rendered = isJson ? content : wrapManagedBlock(relativePath, content);
+    const result = (
+      action: WriteFileResult["action"],
+      backupPath: string | null = null,
+    ): WriteFileResult => ({
       filePath: relativePath,
       runtime,
-      action: "created",
-      backupPath: null,
-    };
+      action,
+      backupPath,
+    });
+
+    if (!fs.existsSync(targetPath)) {
+      if (dryRun) {
+        return result("simulated");
+      }
+      fs.mkdirSync(path.dirname(targetPath), { recursive: true });
+      fs.writeFileSync(targetPath, rendered, "utf8");
+      this.recordInManifest(
+        relativePath,
+        runtime,
+        null,
+        this.computeChecksum(rendered),
+      );
+      return result("created");
+    }
+
+    const existing = fs.readFileSync(targetPath, "utf8");
+    if (existing === rendered) {
+      return result("unchanged");
+    }
+
+    // Sauron owns the file only if it wrote the whole file (never merged into
+    // a user file) and nobody has edited it since.
+    const record = this.loadManifest().managedFiles.find(
+      (f) => f.path === relativePath,
+    );
+    const ownedByUs =
+      record !== undefined &&
+      record.merged !== true &&
+      record.checksum === this.computeChecksum(existing);
+
+    let next: string;
+    let action: WriteFileResult["action"];
+    if (ownedByUs) {
+      next = rendered;
+      action = "updated";
+    } else if (isJson) {
+      const merged = mergeJsonPreservingUser(content, existing);
+      if (merged === null) {
+        return result("skipped");
+      }
+      next = merged;
+      action = "merged";
+    } else {
+      next = mergeManagedBlock(relativePath, content, existing);
+      action = "merged";
+    }
+
+    if (next === existing) {
+      return result("unchanged");
+    }
+    if (dryRun) {
+      return result("simulated");
+    }
+
+    // Sanitize delimiters (slashes, colons, dots) so backup filename is valid across Windows, Linux, and macOS.
+    const timestamp = new Date().toISOString().replace(/[:.]/g, "-");
+    const safeRelativeBackup = `${relativePath.replace(/[\/\\]/g, "_")}.${timestamp}.bak`;
+    const fullBackupPath = path.join(this.backupDir, safeRelativeBackup);
+    fs.mkdirSync(this.backupDir, { recursive: true });
+    fs.copyFileSync(targetPath, fullBackupPath);
+
+    fs.writeFileSync(targetPath, next, "utf8");
+    this.recordInManifest(
+      relativePath,
+      runtime,
+      fullBackupPath,
+      this.computeChecksum(next),
+      action === "merged",
+    );
+    return result(action, path.relative(this.workspaceRoot, fullBackupPath));
   }
 
   /**
@@ -227,12 +334,14 @@ export class ConflictManager {
    * @param runtime - Runtime adapter identifier.
    * @param backupPath - Absolute path to backup file, or null if newly created.
    * @param checksum - SHA-256 digest of the new file.
+   * @param merged - True when Sauron content was merged into a user file.
    */
   private recordInManifest(
     relPath: string,
     runtime: string,
     backupPath: string | null,
     checksum: string,
+    merged: boolean = false,
   ): void {
     const manifest = this.loadManifest();
     const existingIndex = manifest.managedFiles.findIndex(
@@ -248,6 +357,7 @@ export class ConflictManager {
         : null,
       checksum,
       lastUpdated: new Date().toISOString(),
+      ...(merged ? { merged: true } : {}),
     };
 
     if (existingIndex >= 0) {

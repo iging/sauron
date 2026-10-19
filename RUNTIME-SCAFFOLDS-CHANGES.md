@@ -61,9 +61,23 @@ Before this change, `sauron init` wrote one legacy or invented file per runtime,
 - `npm run build`, `npx tsc --noEmit`, and `npm test` (86/86) all pass.
 - E2E: `sauron init` in an empty folder creates the full tree, 57 files. Running it again reports UNCHANGED. A user file at one of these paths is backed up to `.sauron/backups/` before it is replaced.
 
+## Fixed After the Merge (`feat/safe-merge-caveman`)
+
+**1. Safe merge: user files are no longer replaced.**
+- **Markdown and text files:** Sauron's content lives inside `<!-- sauron:start -->` … `<!-- sauron:end -->` (placed after any frontmatter). TOML and YAML files use `# sauron:start`. If a user file has no block, Sauron appends one at the end. Every later run updates only the inside of the block, so whatever the user writes outside it stays.
+- **JSON files** (`settings.json`, `opencode.json`): deep-merged. Sauron only adds missing keys. **User keys and values always win.**
+- **Broken JSON:** left untouched (`SKIPPED`).
+- New `init` output actions: `MERGED` and `SKIPPED`. Every change is still backed up to `.sauron/backups/`.
+
+**2. Caveman Mode is now automatic and configurable.**
+- **Before:** only active if the user typed `/caveman`. `caveman.default_mode` in the config was never read.
+- **Now:** the transpiler reads `caveman.default_mode`. Every runtime file says "ACTIVE at tier X from the first reply, no trigger needed."
+- On the first `init`, Sauron asks: `off`, `lite`, `full` (default), or `ultra`. Without a terminal, use `--caveman=<tier>`. An invalid value exits with code 1.
+- The 40%–75% savings claims were **removed** from the README and the config. No benchmark script or raw data in the repo can reproduce them.
+
 ## Known Issues (follow-ups)
 
-1. **Existing user files are replaced.** If a user already has their own `.claude/settings.json`, `.gemini/settings.json`, `.zed/settings.json`, `opencode.json`, or `AGENTS.md`, `init` replaces it. There is a backup, but their own setup stops applying. Planned fix: deep-merge JSON configs, and use a `<!-- sauron:start/end -->` section in markdown files.
+1. `docs/05-token-optimization/token-benchmarks.md` and `faq.md` still claim 60%–85%. There is no reproducible benchmark. Remove the claim or build a real benchmark script.
 2. Cursor may read `.cursor/rules/README.md` as a rule. Consider moving it to `.cursor/README.md`.
 3. `.cursorrules` still appears in `README.md`, `quickstart.md`, and `faq.md`.
 4. Kimi, Hermes, OpenClaw, AdaL, and Antigravity still need manual verification against official docs.

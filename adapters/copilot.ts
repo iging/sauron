@@ -51,7 +51,7 @@ export class CopilotAdapter implements RuntimeAdapter {
       lines.push(`- ${rule}`);
     }
     lines.push("");
-    lines.push(...formatCavemanSection("##"));
+    lines.push(...formatCavemanSection("##", context.cavemanMode));
     lines.push("## Fellowship Sub-Agents and Roles");
     lines.push("");
     for (const agent of context.fellowship) {

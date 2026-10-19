@@ -20,6 +20,7 @@ export class OpenClawAdapter implements RuntimeAdapter {
       governance: {
         rules: context.rules,
         antiPatterns: context.antiPatterns,
+        cavemanMode: context.cavemanMode ?? "full",
       },
       fellowship: context.fellowship.map((agent) => ({
         id: agent.id,

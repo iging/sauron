@@ -121,7 +121,7 @@ export class ClineAdapter implements RuntimeAdapter {
       lines.push(`1. ${rule}`);
     }
     lines.push("");
-    lines.push(...formatCavemanSection("##"));
+    lines.push(...formatCavemanSection("##", context.cavemanMode));
     lines.push("## Fellowship Sub-Agents Delegation Model");
     for (const agent of context.fellowship) {
       lines.push(`- ${agent.name} (${agent.role}): ${agent.slashCommand}`);

@@ -50,7 +50,7 @@ export class CursorAdapter implements RuntimeAdapter {
       mdcLines.push(`- ${ap}`);
     }
     mdcLines.push("");
-    mdcLines.push(...formatCavemanSection("##"));
+    mdcLines.push(...formatCavemanSection("##", context.cavemanMode));
     mdcLines.push("## Commands and Skills");
     mdcLines.push("");
     for (const skill of context.skills) {

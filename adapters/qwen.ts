@@ -48,7 +48,7 @@ export class QwenAdapter implements RuntimeAdapter {
       lines.push(`- ${rule}`);
     }
     lines.push("");
-    lines.push(...formatCavemanSection("##"));
+    lines.push(...formatCavemanSection("##", context.cavemanMode));
     lines.push("## Sub-Agents Hierarchy");
     for (const agent of context.fellowship) {
       lines.push(`- ${agent.name} (${agent.role}): ${agent.slashCommand}`);

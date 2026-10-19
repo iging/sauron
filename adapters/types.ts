@@ -24,6 +24,8 @@ export interface ManagedFileRecord {
   checksum: string;
   /** ISO-8601 UTC timestamp recording when this record was written or updated. */
   lastUpdated: string;
+  /** True when Sauron content lives inside a user-owned file; never replace it whole. */
+  merged?: boolean;
 }
 
 /**
@@ -55,8 +57,16 @@ export interface WriteFileResult {
    * - `updated`: Pre-existing file content differed; backup was generated before overwrite.
    * - `unchanged`: Pre-existing file matched SHA-256 hash exactly; disk write skipped.
    * - `simulated`: Dry-run mode active; no disk mutations performed.
+   * - `merged`: Pre-existing user file kept; Sauron content merged into it (backup generated).
+   * - `skipped`: Pre-existing user file could not be merged safely and was left untouched.
    */
-  action: "created" | "updated" | "unchanged" | "simulated";
+  action:
+    | "created"
+    | "updated"
+    | "unchanged"
+    | "simulated"
+    | "merged"
+    | "skipped";
   /** Path to the timestamped backup file if an existing file was updated, or null. */
   backupPath: string | null;
 }
@@ -137,6 +147,8 @@ export interface TranspileContext {
   antiPatterns: string[];
   /** Full anti-patterns reference document (`references/anti-patterns.md`), if available. */
   antiPatternsDoc?: string;
+  /** Default Caveman Mode tier, read from `caveman.default_mode` in `sauron.config.yaml`. */
+  cavemanMode?: CavemanMode;
 }
 
 /**
@@ -171,23 +183,61 @@ export interface RuntimeAdapter {
   transpile(context: TranspileContext): TranspileOutput[];
 }
 
+/** Caveman Mode intensity tiers. `off` disables the default-on behavior. */
+export type CavemanMode = "off" | "lite" | "full" | "ultra";
+
+/** All valid Caveman Mode tiers, in increasing compression order. */
+export const CAVEMAN_MODES: readonly CavemanMode[] = [
+  "off",
+  "lite",
+  "full",
+  "ultra",
+];
+
+/** Behavior definition for each active Caveman Mode tier. */
+const CAVEMAN_TIER_RULES: Record<Exclude<CavemanMode, "off">, string> = {
+  lite: "Drop filler, pleasantries, and hedging. Keep full grammatical sentences.",
+  full: "Drop filler, articles, and hedging. Fragments are fine. Prefer short words.",
+  ultra:
+    "Maximum compression: fragments, common abbreviations, arrows for cause and effect. One word when one word is enough.",
+};
+
 /**
  * Standard Token Optimization (Caveman Mode) instruction block.
  * Shared across all runtime adapters for 100% behavioral parity.
  *
+ * When `mode` is not `off`, the block instructs the agent to apply the tier
+ * from its first reply of every session, with no trigger command required.
+ *
  * @param headingLevel - Markdown heading level ('##' or '###').
+ * @param mode - Default tier from `sauron.config.yaml`. Defaults to `full`.
  * @returns Array of markdown lines specifying Caveman mode directives.
  */
 export function formatCavemanSection(
   headingLevel: "##" | "###" = "##",
+  mode: CavemanMode = "full",
 ): string[] {
+  const preserve = [
+    "- Never compress code blocks, diffs, commands, file paths, URLs, error messages, or quoted text. Copy them verbatim.",
+    "- Never drop negations (`not`, `never`, `no`). Compression must not flip meaning.",
+    "- Use normal prose for security warnings and confirmations of irreversible actions.",
+    "- Switch tiers on request: `/caveman lite`, `/caveman full`, `/caveman ultra`. Disable with `/caveman off`.",
+  ];
+  if (mode === "off") {
+    return [
+      `${headingLevel} Token Optimization & Caveman Mode`,
+      "",
+      "- Default: OFF. Reply in normal style until the user enables it.",
+      ...preserve,
+      "",
+    ];
+  }
   return [
     `${headingLevel} Token Optimization & Caveman Mode`,
     "",
-    "- When contributor triggers `/caveman` (or `lite`, `ultra`), enforce terse, spartan communication.",
-    "- Drop conversational pleasantries, filler phrases, and tool narration overhead.",
-    "- Never alter or compress code blocks, diffs, file paths, or commands.",
-    "- Restore normal conversational style immediately when requested with `/caveman off`.",
+    `- Default: ACTIVE at tier \`${mode}\` from the first reply of every session. No trigger command is needed.`,
+    `- Tier \`${mode}\`: ${CAVEMAN_TIER_RULES[mode]}`,
+    ...preserve,
     "",
   ];
 }

@@ -85,7 +85,7 @@ export class CodexAdapter implements RuntimeAdapter {
       "Uncomment the key in `config.toml` and set its value. Add MCP servers as `[mcp_servers.<name>]` tables.",
     );
     lines.push("");
-    lines.push(...formatCavemanSection("##"));
+    lines.push(...formatCavemanSection("##", context.cavemanMode));
     return lines.join("\n");
   }
 }

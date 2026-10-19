@@ -54,6 +54,7 @@ const LOTR_BANNER = Object.freeze(`
 /**
  * @typedef {Object} InitOptions
  * @property {boolean} dryRun - Whether to simulate execution without modifying disk files.
+ * @property {string} [cavemanMode] - Caveman tier from `--caveman=<off|lite|full|ultra>`.
  */
 
 /**
@@ -233,6 +234,9 @@ function printHelpMenu() {
   console.log("Commands:");
   console.log(
     "  init         Initialize sauron configuration and transpile to 19 runtimes",
+  );
+  console.log(
+    "               --caveman=<off|lite|full|ultra>  Default Caveman tier (asked on first init)",
   );
   console.log(
     "  add <skill>  Add one or more modular skills to local project workspace",
@@ -464,6 +468,52 @@ function executeAddCommand(skillNames, options) {
   console.log(completionMessage);
 }
 
+/** Valid Caveman Mode tiers accepted by `init --caveman`. */
+const CAVEMAN_TIERS = Object.freeze(["off", "lite", "full", "ultra"]);
+
+/**
+ * Asks the user which Caveman tier to enable by default. Empty input keeps `full`.
+ *
+ * @returns {Promise<string>} The chosen tier.
+ */
+async function promptCavemanMode() {
+  const { createInterface } = await import("node:readline/promises");
+  const rl = createInterface({ input: process.stdin, output: process.stdout });
+  try {
+    console.log("Caveman Mode trims filler from agent replies. Code, paths, and commands stay verbatim.");
+    console.log("  off   : normal replies");
+    console.log("  lite  : no filler, full sentences");
+    console.log("  full  : terse fragments (recommended)");
+    console.log("  ultra : maximum compression");
+    for (;;) {
+      const answer = (await rl.question("Default Caveman tier [full]: ")).trim().toLowerCase();
+      if (answer === "") return "full";
+      if (CAVEMAN_TIERS.includes(answer)) return answer;
+      console.log(`  Choose one of: ${CAVEMAN_TIERS.join(", ")}`);
+    }
+  } finally {
+    rl.close();
+  }
+}
+
+/**
+ * Rewrites `caveman.default_mode` in sauron.config.yaml, keeping comments intact.
+ *
+ * @param {string} configPath - Absolute path to sauron.config.yaml.
+ * @param {string} mode - Caveman tier to persist.
+ * @returns {void}
+ */
+function setCavemanModeInConfig(configPath, mode) {
+  const raw = fs.readFileSync(configPath, "utf8");
+  const pattern = /^(\s*default_mode:\s*)"?[a-z]+"?/m;
+  const next = pattern.test(raw)
+    ? raw.replace(pattern, `$1"${mode}"`)
+    : `${raw.replace(/\s*$/, "")}\n\ncaveman:\n  default_mode: "${mode}"\n`;
+  if (next !== raw) {
+    fs.writeFileSync(configPath, next, "utf8");
+  }
+}
+
 /**
  * Initializes a repository with sauron configuration and generates 19 runtime adapter scaffolds.
  *
@@ -472,10 +522,10 @@ function executeAddCommand(skillNames, options) {
  * 2. Instantiates the Transpiler engine with the active workspace context.
  * 3. Compiles all runtime adapters and displays safe file mutation results.
  *
- * @param {InitOptions} options - Options controlling execution (dryRun flag).
- * @returns {void}
+ * @param {InitOptions} options - Options controlling execution (dryRun flag, caveman tier).
+ * @returns {Promise<void>}
  */
-function executeInitCommand(options) {
+async function executeInitCommand(options) {
   const { dryRun } = options;
   console.log(LOTR_BANNER);
   console.log(
@@ -493,8 +543,15 @@ function executeInitCommand(options) {
     "sauron.config.yaml",
   );
 
+  const isNewConfig = !fs.existsSync(targetConfigPath);
+  let cavemanMode = options.cavemanMode;
+  // Ask once on a fresh install when the user did not pass --caveman.
+  if (!cavemanMode && isNewConfig && process.stdin.isTTY) {
+    cavemanMode = await promptCavemanMode();
+  }
+
   // Preserve existing user configuration if already present; copy template if new.
-  if (!fs.existsSync(targetConfigPath)) {
+  if (isNewConfig) {
     if (fs.existsSync(defaultTemplatePath)) {
       if (!dryRun) {
         fs.copyFileSync(defaultTemplatePath, targetConfigPath);
@@ -509,10 +566,18 @@ function executeInitCommand(options) {
     );
   }
 
-  console.log("\n[TRANSPILING] Transpiling to 17 target runtime adapters...");
+  if (cavemanMode && !dryRun && fs.existsSync(targetConfigPath)) {
+    setCavemanModeInConfig(targetConfigPath, cavemanMode);
+  }
+  if (cavemanMode) {
+    console.log(`  [CAVEMAN] Default tier: ${cavemanMode}`);
+  }
+
+  console.log("\n[TRANSPILING] Transpiling to 19 target runtime adapters...");
 
   const transpiler = new Transpiler({
     workspaceRoot: currentWorkingDirectory,
+    ...(cavemanMode ? { cavemanMode } : {}),
     sauronRoot: SAURON_ROOT,
     dryRun,
   });
@@ -983,8 +1048,23 @@ function main(commandLineArguments) {
   switch (primaryCommand) {
     case "init":
     case "sync":
-      executeInitCommand({ dryRun: isDryRun });
+    {
+      const cavemanArg = commandLineArguments.find((arg) =>
+        arg.startsWith("--caveman="),
+      );
+      const cavemanMode = cavemanArg?.slice("--caveman=".length).toLowerCase();
+      if (cavemanMode !== undefined && !CAVEMAN_TIERS.includes(cavemanMode)) {
+        console.error(
+          `[ERROR] Invalid --caveman value '${cavemanMode}'. Use one of: ${CAVEMAN_TIERS.join(", ")}.`,
+        );
+        process.exit(1);
+      }
+      executeInitCommand({ dryRun: isDryRun, cavemanMode }).catch((error) => {
+        console.error(`[ERROR] ${error instanceof Error ? error.message : String(error)}`);
+        process.exit(1);
+      });
       break;
+    }
     case "graph": {
       const targetDir = commandLineArguments[1] || ".";
       executeGraphCommand(targetDir);

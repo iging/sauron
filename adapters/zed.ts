@@ -31,7 +31,7 @@ export class ZedAdapter implements RuntimeAdapter {
       promptLines.push(`- ${rule}`);
     }
     promptLines.push("");
-    promptLines.push(...formatCavemanSection("##"));
+    promptLines.push(...formatCavemanSection("##", context.cavemanMode));
     promptLines.push("## Fellowship Sub-Agents");
     for (const agent of context.fellowship) {
       promptLines.push(

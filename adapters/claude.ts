@@ -200,7 +200,7 @@ export class ClaudeAdapter implements RuntimeAdapter {
       );
     }
     lines.push("");
-    lines.push(...formatCavemanSection("##"));
+    lines.push(...formatCavemanSection("##", context.cavemanMode));
 
     return [
       {

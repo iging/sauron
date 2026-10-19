@@ -66,14 +66,31 @@ git diff
 - [ ] An old `.clinerules` file is left untouched.
 - [ ] Old legacy files (`.cursorrules` and others) are **not deleted**. They are just no longer updated. Delete them yourself if you no longer need them.
 
-**Known issue: check this.** If the project already has its own `.claude/settings.json`, `.gemini/settings.json`, `.zed/settings.json`, `opencode.json`, or `AGENTS.md`, `init` **replaces** it. The old content goes to `.sauron/backups/`. Check with:
+**Safe merge (must PASS):**
+- [ ] Your own `AGENTS.md` / `CLAUDE.md` is reported as `MERGED`. Your text is still at the top, and Sauron's content is inside the `<!-- sauron:start -->` … `<!-- sauron:end -->` block at the end.
+- [ ] Your own `.claude/settings.json` (or `.gemini/settings.json`, `opencode.json`) is `MERGED`. All your keys and values are still there; Sauron only added missing keys such as `$schema`.
+- [ ] Edit something outside the Sauron block, then run `init` again. Your edit is still there.
 
 ```bash
-git diff .claude/settings.json AGENTS.md
+git diff AGENTS.md .claude/settings.json
 ls .sauron/backups
 ```
 
-To restore: `git checkout -- <file>`, or copy it back from `.sauron/backups/`.
+## Test C: Caveman Mode
+
+```bash
+# Interactive: on the first init in a new project you are asked for a tier
+npx --yes C:/Users/IGING/Documents/GitHub/sauron/sauron-ai-2.0.0.tgz init
+
+# Non-interactive
+npx --yes C:/Users/IGING/Documents/GitHub/sauron/sauron-ai-2.0.0.tgz init --caveman=ultra
+grep default_mode sauron.config.yaml        # "ultra"
+grep "ACTIVE at tier" AGENTS.md CLAUDE.md   # tier `ultra`
+```
+
+- [ ] `--caveman=bogus` exits with an error.
+- [ ] `--caveman=off` makes the files say `Default: OFF`.
+- [ ] Open Claude Code or Cursor and ask something without typing `/caveman`. The reply is already terse.
 
 **Cleanup after the test:**
 ```bash

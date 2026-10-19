@@ -80,7 +80,7 @@ function buildRule(context: TranspileContext): string {
     "## Architectural Constraints",
     ...context.rules.map((rule) => `- ${rule}`),
     "",
-    ...formatCavemanSection("##"),
+    ...formatCavemanSection("##", context.cavemanMode),
     "## Fellowship Sub-Agents Execution Hierarchy",
     ...context.fellowship.map(
       (a) => `- ${a.name} [${a.role}] : invoke with ${a.slashCommand}`,

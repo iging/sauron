@@ -81,7 +81,7 @@ departments:
 
 # Token Optimization Engine (Caveman Mode)
 caveman:
-  default_mode: "full" # full (~60% token savings) | lite (~40%) | ultra (~75%) | off
+  default_mode: "full" # off | lite | full | ultra : active from the first reply (set by `sauron init --caveman`)
   enforce_on_commits: true
 
 # Security & Command Firewall

@@ -43,7 +43,7 @@ export class PiAdapter implements RuntimeAdapter {
     prompts.push("Do the task for $ARGUMENTS.");
     prompts.push("```");
     prompts.push("");
-    prompts.push(...formatCavemanSection("##"));
+    prompts.push(...formatCavemanSection("##", context.cavemanMode));
     prompts.push("## Sub-Agents");
     for (const agent of context.fellowship) {
       prompts.push(`- ${agent.name} (${agent.role}) : ${agent.slashCommand}`);
