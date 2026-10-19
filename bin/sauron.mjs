@@ -1,5 +1,6 @@
 #!/usr/bin/env node
 // @ts-check
+/// <reference types="node" />
 
 /**
  * @fileoverview Main CLI entry point for sauron.
