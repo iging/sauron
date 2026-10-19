@@ -76,7 +76,7 @@ const RUNTIMES = Object.freeze([
     name: "GitHub Copilot",
     file: ".github/copilot-instructions.md",
   }),
-  Object.freeze({ id: "cline", name: "Cline", file: ".clinerules" }),
+  Object.freeze({ id: "cline", name: "Cline", file: ".cline/rules/sauron.md" }),
   Object.freeze({ id: "trae", name: "Trae", file: ".traerules" }),
   Object.freeze({ id: "zed", name: "Zed", file: ".zed/settings.json" }),
   Object.freeze({ id: "codex", name: "Codex", file: ".codex/instructions.md" }),
