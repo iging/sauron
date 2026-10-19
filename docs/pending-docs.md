@@ -13,3 +13,4 @@ All entries must be resolved (this section must have no pending bullet points) b
 <!-- Add items below this line in the format: - [ ] Feature/Change description (Author, Date) -->
 - [ ] Claude adapter now emits .claude/ scaffold (README per folder, settings.json); document in docs/runtime-scaffolds.md (Miguel Enrique Dasalla, 2026-10-19)
 - [ ] Windsurf scaffold: document .windsurf/{rules,workflows,skills} output in docs/runtime-scaffolds.md (Miguel Enrique Dasalla, 2026-10-19)
+- [ ] OpenCode/Kiro scaffold paths (opencode.json, .opencode/{agents,commands,skills}/README.md, .kiro/steering/sauron.md, .kiro/skills/README.md) to be documented in docs/runtime-scaffolds.md by unit 12 (Claude, 2026-10-19)
