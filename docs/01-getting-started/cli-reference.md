@@ -28,17 +28,21 @@ Initializes the Sauron harness within the current working directory.
 npx sauron-ai init [options]        # or: pnpm dlx sauron-ai init
 ```
 
-In a terminal, `init` asks a few questions, shows a plan, and writes nothing until you confirm:
+In a terminal, `init` shows an arrow-key setup (like `create-next-app` and shadcn), shows a plan, and writes nothing until you confirm. Use ↑/↓ to move, Space to toggle in lists, Enter to confirm, Ctrl+C to cancel:
 
 ```
-? Setup        1) Recommended  2) Custom
-? Runtimes     claude, cursor, ... or all          (Custom)
-? Subagents    fellowship | core | both | none     (Custom, Claude Code)
-? Skills       all | none | <departments>          (Custom)
-? Commands     y | n                               (Custom, Claude Code)
-? Caveman tier off | lite | full | ultra
-? Write these files (y/n)
+◆  How do you want to set up Sauron?
+│  ● Recommended (AGENTS.md + Claude Code + all skills + Fellowship agents)
+│  ○ Custom (pick runtimes, agents, and skills)
+◆  Which runtimes?                  (Custom: multi-select, Space to toggle)
+◆  Which subagents for Claude Code? (Custom: Fellowship / Core / Both / None)
+◆  Which skills?                    (Custom: All / Pick departments / None)
+◆  Install Sauron slash commands?   (Custom: Yes / No)
+◆  Caveman Mode                     (Full / Lite / Ultra / Off)
+◆  Write these files?               (Yes / No)
 ```
+
+With piped input, pass `--interactive` to answer the same questions line by line.
 
 **Recommended** installs the shared `AGENTS.md` core, Claude Code, every skill, and the 9 Fellowship subagents.
 

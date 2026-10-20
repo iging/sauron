@@ -612,7 +612,9 @@ async function createPrompter() {
   });
   return {
     question(text) {
-      process.stdout.write(text);
+      // setPrompt keeps the question on screen when readline redraws the line (backspace).
+      rl.setPrompt(text);
+      rl.prompt();
       const buffered = lines.shift();
       if (buffered !== undefined) {
         // Echo piped answers so the transcript reads like an interactive session.
@@ -801,6 +803,199 @@ async function confirmPlan(prompter) {
   return answer === "" || answer === "y" || answer === "yes";
 }
 
+/** Short descriptions shown next to each runtime in the arrow-key picker. */
+const RUNTIME_HINTS = Object.freeze({
+  claude: "CLAUDE.md + .claude/",
+  cursor: ".cursor/rules/",
+  windsurf: ".windsurf/rules/",
+  copilot: ".github/copilot-instructions.md",
+  vscode: ".vscode/settings.json",
+  cline: ".cline/rules/",
+  trae: ".trae/rules/",
+  zed: ".rules",
+  codex: "AGENTS.md + .codex/",
+  gemini: "GEMINI.md + .gemini/",
+  qwen: "QWEN.md + .qwen/",
+  kimi: ".kimi/",
+  kiro: ".kiro/steering/",
+  hermes: ".hermesrules",
+  openclaw: ".openclaw/",
+  opencode: "AGENTS.md + .opencode/",
+  pi: "AGENTS.md + .pi/",
+  adal: ".adalrules",
+  codebuddy: ".codebuddy/rules/",
+});
+
+/**
+ * Stops the setup when the user presses Ctrl+C or Esc in the arrow-key UI.
+ *
+ * @template T
+ * @param {T | symbol} value - Value returned by a clack prompt.
+ * @param {(value: unknown) => boolean} isCancel - clack's cancel detector.
+ * @param {(message: string) => void} cancel - clack's cancel printer.
+ * @returns {T} The value when not cancelled.
+ */
+function unlessCancelled(value, isCancel, cancel) {
+  if (isCancel(value)) {
+    cancel("Setup cancelled. Nothing was written.");
+    process.exit(130);
+  }
+  return /** @type {T} */ (value);
+}
+
+/**
+ * Arrow-key setup (like create-next-app and shadcn). Flags already given are not asked.
+ *
+ * @param {import("../dist/adapters/init-plan.js").InitFlags} flags - Parsed flags.
+ * @param {string[]} departments - Available skill departments.
+ * @param {string} defaultCaveman - Caveman tier to preselect.
+ * @returns {Promise<import("../dist/adapters/init-plan.js").InitPlan>} Final plan.
+ */
+async function promptInitPlanArrows(flags, departments, defaultCaveman) {
+  const clack = await import("@clack/prompts");
+  const { intro, select, multiselect, confirm, isCancel, cancel } = clack;
+  /** @template T @param {T | symbol} value @returns {T} */
+  const ok = (value) => unlessCancelled(value, isCancel, cancel);
+
+  intro("Sauron setup");
+
+  const preset = ok(
+    await select({
+      message: "How do you want to set up Sauron?",
+      options: [
+        {
+          value: "recommended",
+          label: "Recommended",
+          hint: "AGENTS.md + Claude Code + all skills + Fellowship agents",
+        },
+        {
+          value: "custom",
+          label: "Custom",
+          hint: "pick runtimes, agents, and skills",
+        },
+      ],
+      initialValue: "recommended",
+    }),
+  );
+
+  /** @type {import("../dist/adapters/init-plan.js").InitFlags} */
+  const answers = { ...flags };
+  if (preset === "custom") {
+    if (!answers.runtimes) {
+      answers.runtimes = ok(
+        await multiselect({
+          message:
+            "Which runtimes? (space to toggle, enter to confirm; AGENTS.md is always included)",
+          options: RUNTIME_IDS.map((id) => ({
+            value: id,
+            label: id,
+            hint:
+              /** @type {Record<string, string>} */ (RUNTIME_HINTS)[id] ?? "",
+          })),
+          initialValues: ["claude"],
+          required: true,
+        }),
+      );
+    }
+    if (!answers.agents && answers.runtimes.includes("claude")) {
+      answers.agents = ok(
+        await select({
+          message: "Which subagents for Claude Code?",
+          options: [
+            {
+              value: "fellowship",
+              label: "Fellowship",
+              hint: "9 agents: /gandalf, /frodo, ...",
+            },
+            { value: "core", label: "Core", hint: "69 specialist agents" },
+            { value: "both", label: "Both" },
+            { value: "none", label: "None" },
+          ],
+          initialValue: "fellowship",
+        }),
+      );
+    }
+    if (!answers.skills) {
+      const mode = ok(
+        await select({
+          message: "Which skills?",
+          options: [
+            {
+              value: "all",
+              label: "All skills",
+              hint: `${departments.length} departments`,
+            },
+            { value: "pick", label: "Pick departments" },
+            { value: "none", label: "None" },
+          ],
+          initialValue: "all",
+        }),
+      );
+      answers.skills =
+        mode === "pick"
+          ? ok(
+              await multiselect({
+                message: "Which departments? (space to toggle)",
+                options: departments.map((dept) => ({
+                  value: dept,
+                  label: dept,
+                })),
+                required: true,
+              }),
+            )
+          : /** @type {"all" | "none"} */ (mode);
+    }
+    if (answers.commands === undefined && answers.runtimes.includes("claude")) {
+      answers.commands = ok(
+        await confirm({
+          message: "Install Sauron slash commands into .claude/commands/?",
+          initialValue: true,
+        }),
+      );
+    }
+  }
+
+  if (!answers.caveman) {
+    answers.caveman = parseCaveman(
+      ok(
+        await select({
+          message:
+            "Caveman Mode (trims filler from replies; code and paths stay verbatim)",
+          options: [
+            {
+              value: "full",
+              label: "Full",
+              hint: "terse fragments (recommended)",
+            },
+            { value: "lite", label: "Lite", hint: "no filler, full sentences" },
+            { value: "ultra", label: "Ultra", hint: "maximum compression" },
+            { value: "off", label: "Off", hint: "normal replies" },
+          ],
+          initialValue: CAVEMAN_TIERS.includes(defaultCaveman)
+            ? defaultCaveman
+            : "full",
+        }),
+      ),
+    );
+  }
+  return resolvePlan(answers);
+}
+
+/**
+ * Final yes/no in the arrow-key UI. Cancelling exits without writing.
+ *
+ * @returns {Promise<boolean>} True when the user confirms.
+ */
+async function confirmPlanArrows() {
+  const { confirm, isCancel, cancel } = await import("@clack/prompts");
+  const answer = unlessCancelled(
+    await confirm({ message: "Write these files?", initialValue: true }),
+    isCancel,
+    cancel,
+  );
+  return answer === true;
+}
+
 /**
  * Rewrites `caveman.default_mode` in sauron.config.yaml, keeping comments intact.
  *
@@ -918,7 +1113,14 @@ async function executeInitCommand(options) {
   let plan;
   /** @type {{ question: (text: string) => Promise<string>, close: () => void } | undefined} */
   let prompter;
-  if (interactive) {
+  // A real terminal gets the arrow-key UI; piped answers (`--interactive`) use the line reader.
+  const useArrows =
+    interactive &&
+    process.stdin.isTTY === true &&
+    !argv.includes("--interactive");
+  if (useArrows) {
+    plan = await promptInitPlanArrows(flags, departments, defaultCaveman);
+  } else if (interactive) {
     prompter = await createPrompter();
     plan = await promptInitPlan(prompter, flags, departments, defaultCaveman);
   } else {
@@ -968,8 +1170,17 @@ async function executeInitCommand(options) {
     "  Safety    : existing files are merged, never replaced; backups in .sauron/backups/\n",
   );
 
-  const confirmed = prompter ? await confirmPlan(prompter) : true;
+  const confirmed = useArrows
+    ? await confirmPlanArrows()
+    : prompter
+      ? await confirmPlan(prompter)
+      : true;
   prompter?.close();
+  if (useArrows) {
+    // clack leaves stdin listening; release it so the process exits after writing.
+    process.stdin.pause();
+    process.stdin.unref();
+  }
   if (!confirmed) {
     console.log("[ABORTED] Nothing was written.");
     return;
