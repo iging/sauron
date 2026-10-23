@@ -91,3 +91,11 @@ All generated artifacts adhere to:
 | `graph.json`      | Node/edge graph data with symbol counts and import links  | `.sauron/graph/graph.json`      |
 | `graph-report.md` | Quantitative architecture analysis and circularity checks | `.sauron/graph/graph-report.md` |
 | `graph.html`      | Interactive in-browser visual dependency exploration      | `.sauron/graph/graph.html`      |
+
+**`graph.html` layout (galaxy view):**
+
+- Each top-level department (`backend`, `frontend`, `packages`, and so on) is its own spiral galaxy, with hub modules in the bright core. The galaxies are spread across a wide "multiverse", so a large codebase never collapses into one round blob. The layout is deterministic and needs no physics. The Physics toggle starts paused.
+- Imports inside a department are faint lanes. Imports between departments are dashed amber "timeline branches".
+- Department chips have an active state. Click a chip to highlight that galaxy, zoom to it, and dim the rest. Click it again, press Esc, or use Reset to clear.
+- Deep link: `graph.html#galaxy=backend` opens with that galaxy active.
+- Agent worktree copies under `.claude/worktrees/` are skipped when scanning.

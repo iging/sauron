@@ -83,7 +83,10 @@ export function scanSourceFiles(directory, rootDir = directory) {
 
   for (const entry of entries) {
     if (entry.isDirectory()) {
-      if (!IGNORED_DIRECTORIES.has(entry.name)) {
+      // Agent worktrees (.claude/worktrees) are full repository copies and would duplicate every module.
+      const isAgentWorktrees =
+        entry.name === "worktrees" && path.basename(directory) === ".claude";
+      if (!IGNORED_DIRECTORIES.has(entry.name) && !isAgentWorktrees) {
         results.push(
           ...scanSourceFiles(path.join(directory, entry.name), rootDir),
         );
@@ -427,14 +430,104 @@ function detectCycles(nodeMap, edges) {
   return cycles;
 }
 
+/** Extra galaxy colors for departments without a fixed color (backend, frontend, packages, and so on). */
+const GALAXY_PALETTE = [
+  { bg: "#22d3ee", border: "#67e8f9", highlight: "#cffafe" },
+  { bg: "#f472b6", border: "#f9a8d4", highlight: "#fce7f3" },
+  { bg: "#34d399", border: "#6ee7b7", highlight: "#d1fae5" },
+  { bg: "#fb923c", border: "#fdba74", highlight: "#ffedd5" },
+  { bg: "#818cf8", border: "#a5b4fc", highlight: "#e0e7ff" },
+  { bg: "#facc15", border: "#fde047", highlight: "#fef9c3" },
+  { bg: "#c084fc", border: "#d8b4fe", highlight: "#f3e8ff" },
+  { bg: "#2dd4bf", border: "#5eead4", highlight: "#ccfbf1" },
+];
+
 /**
- * Generate interactive HTML visualization using vis-network (Graphify-style).
- * @param {GraphNode[]} nodes
- * @param {GraphEdge[]} edges
- * @returns {string}
+ * Small deterministic string hash (FNV-1a), so layouts and colors are stable between runs.
+ * @param {string} text
+ * @returns {number} Unsigned 32-bit hash.
  */
+function hashString(text) {
+  let hash = 0x811c9dc5;
+  for (let i = 0; i < text.length; i++) {
+    hash ^= text.charCodeAt(i);
+    hash = Math.imul(hash, 0x01000193);
+  }
+  return hash >>> 0;
+}
+
 /**
- * Generate interactive HTML visualization using vis-network adhering to Linear brand preset & High-Craft principles.
+ * Places every department in its own spiral galaxy, and spreads the galaxies across a
+ * wide "multiverse" so a large codebase never collapses into one round blob.
+ * Hubs (high fan-in plus fan-out) sit in the bright core and the rest trail out on spiral arms.
+ * Deterministic: the same graph always gets the same layout.
+ *
+ * @param {Array<{ id: string, category: string, inDegree: number, outDegree: number }>} nodes
+ * @returns {{ positions: Map<string, { x: number, y: number }>, galaxies: Array<{ category: string, x: number, y: number, radius: number, count: number }> }}
+ */
+export function computeGalaxyLayout(nodes) {
+  /** @type {Map<string, typeof nodes>} */
+  const byCategory = new Map();
+  for (const node of nodes) {
+    const list = byCategory.get(node.category) ?? [];
+    list.push(node);
+    byCategory.set(node.category, list);
+  }
+  const groups = [...byCategory.entries()].sort(
+    (a, b) => b[1].length - a[1].length || a[0].localeCompare(b[0]),
+  );
+
+  const radiusOf = (/** @type {number} */ count) => 70 + Math.sqrt(count) * 34;
+  const largest = groups.length > 0 ? radiusOf(groups[0][1].length) : 0;
+  /** @type {Map<string, { x: number, y: number }>} */
+  const positions = new Map();
+  /** @type {Array<{ category: string, x: number, y: number, radius: number, count: number }>} */
+  const galaxies = [];
+  const goldenAngle = Math.PI * (3 - Math.sqrt(5));
+
+  groups.forEach(([category, members], index) => {
+    const radius = radiusOf(members.length);
+    // Galaxy centers follow a golden-angle spiral. Spacing grows with the largest galaxy so none overlap.
+    const distance =
+      index === 0 ? 0 : (largest + radius) * 1.35 * Math.sqrt(index);
+    const theta =
+      index * goldenAngle +
+      (hashString(category) % 360) * (Math.PI / 180) * 0.15;
+    const cx = Math.cos(theta) * distance;
+    const cy = Math.sin(theta) * distance;
+    galaxies.push({ category, x: cx, y: cy, radius, count: members.length });
+
+    const ordered = [...members].sort(
+      (a, b) =>
+        b.inDegree + b.outDegree - (a.inDegree + a.outDegree) ||
+        a.id.localeCompare(b.id),
+    );
+    const arms = members.length < 12 ? 2 : 3;
+    const tilt = ((hashString(category) % 628) / 100) % (Math.PI * 2);
+    ordered.forEach((node, k) => {
+      const t = ordered.length === 1 ? 0 : k / (ordered.length - 1);
+      const arm = k % arms;
+      const h = hashString(node.id);
+      // Spread each arm sideways (wider toward the rim) so arms look like dust lanes, not rings.
+      const spread = (((h >>> 8) & 0xff) / 0xff - 0.5) * (0.35 + 0.9 * t);
+      const angle = tilt + (arm * Math.PI * 2) / arms + t * Math.PI * 2.6 + spread;
+      const r = radius * (0.08 + 0.92 * Math.sqrt(t)) * (0.9 + (((h >>> 24) & 0xff) / 0xff) * 0.2);
+      const jitter = 8 + 30 * t;
+      const jx = (((h & 0xffff) / 0xffff) * 2 - 1) * jitter;
+      const jy = ((((h >>> 16) & 0xffff) / 0xffff) * 2 - 1) * jitter;
+      positions.set(node.id, {
+        x: Math.round(cx + Math.cos(angle) * r + jx),
+        y: Math.round(cy + Math.sin(angle) * r * 0.78 + jy),
+      });
+    });
+  });
+
+  return { positions, galaxies };
+}
+
+/**
+ * Generate the interactive HTML visualization (vis-network): one galaxy per department,
+ * spread across a multiverse layout, in the Linear brand preset.
  * @param {GraphNode[]} nodes
  * @param {GraphEdge[]} edges
  * @returns {string}
@@ -453,17 +546,36 @@ function generateHtmlVisualizer(nodes, edges) {
     root: { bg: "#62666d", border: "#8a8f98", highlight: "#d0d6e0" }, // Linear Muted Slate
   };
 
+  const { positions, galaxies } = computeGalaxyLayout(nodes);
+
+  // Departments without a fixed color get the next unused palette color (largest galaxy first),
+  // so neighbors never share a look-alike color and nothing falls back to gray.
+  const usedColors = new Set(
+    galaxies.map((g) => categoryColors[g.category]?.bg).filter(Boolean),
+  );
+  const freePalette = GALAXY_PALETTE.filter((c) => !usedColors.has(c.bg));
+  /** @type {Map<string, { bg: string, border: string, highlight: string }>} */
+  const assigned = new Map();
+  galaxies
+    .filter((g) => !categoryColors[g.category])
+    .forEach((g, i) => {
+      const pool = freePalette.length > 0 ? freePalette : GALAXY_PALETTE;
+      assigned.set(g.category, pool[i % pool.length] ?? GALAXY_PALETTE[0]);
+    });
+  /** @param {string} category */
+  const colorOf = (category) =>
+    categoryColors[category] ?? assigned.get(category) ?? GALAXY_PALETTE[0];
+  const categoryOf = new Map(nodes.map((n) => [n.id, n.category]));
+
   const visNodes = nodes.map((n) => {
-    const col = categoryColors[n.category] ??
-      categoryColors["root"] ?? {
-        bg: "#62666d",
-        border: "#8a8f98",
-        highlight: "#d0d6e0",
-      };
+    const col = colorOf(n.category);
     const degree = n.inDegree + n.outDegree;
-    const size = Math.max(14, Math.min(36, 12 + degree * 1.8));
+    const size = Math.max(6, Math.min(30, 6 + degree * 1.6));
+    const pos = positions.get(n.id) ?? { x: 0, y: 0 };
     return {
       id: n.id,
+      x: pos.x,
+      y: pos.y,
       label: n.label,
       title: `${n.id}\nLines: ${n.lineCount} | In: ${n.inDegree} | Out: ${n.outDegree}`,
       category: n.category,
@@ -482,21 +594,35 @@ function generateHtmlVisualizer(nodes, edges) {
         size: 11,
         face: "Inter, -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif",
       },
+      // Each star glows in its galaxy color.
+      shadow: { enabled: true, color: `${col.bg}99`, size: 10 + Math.min(degree, 20), x: 0, y: 0 },
       raw: n,
     };
   });
 
-  const visEdges = edges.map((e, idx) => ({
-    id: `e-${idx}`,
-    from: e.source,
-    to: e.target,
-    arrows: { to: { enabled: true, scaleFactor: 0.5 } },
-    color: { color: "#23252a", highlight: "#828fff", opacity: 0.8 },
-    smooth: { type: "continuous", roundness: 0.15 },
-    width: 1.2,
-  }));
+  // Edges inside a galaxy are faint star lanes. Edges between galaxies are amber
+  // "timeline branches" (TVA style) that arc across the multiverse.
+  const visEdges = edges.map((e, idx) => {
+    const crossGalaxy = categoryOf.get(e.source) !== categoryOf.get(e.target);
+    return {
+      id: `e-${idx}`,
+      from: e.source,
+      to: e.target,
+      crossGalaxy,
+      arrows: { to: { enabled: true, scaleFactor: crossGalaxy ? 0.45 : 0.35 } },
+      color: crossGalaxy
+        ? { color: "#f59e0b", highlight: "#fbbf24", opacity: 0.55 }
+        : { color: "#3a3d4a", highlight: "#a5b4fc", opacity: 0.55 },
+      dashes: crossGalaxy ? [6, 6] : false,
+      smooth: crossGalaxy
+        ? { enabled: true, type: "curvedCW", roundness: 0.25 }
+        : { enabled: true, type: "continuous", roundness: 0.1 },
+      width: crossGalaxy ? 1.1 : 0.8,
+    };
+  });
 
-  const dataPayload = JSON.stringify({ nodes: visNodes, edges: visEdges });
+  const galaxyPayload = galaxies.map((g) => ({ ...g, color: colorOf(g.category).bg }));
+  const dataPayload = JSON.stringify({ nodes: visNodes, edges: visEdges, galaxies: galaxyPayload });
 
   return `<!DOCTYPE html>
 <html lang="en">
@@ -541,13 +667,10 @@ function generateHtmlVisualizer(nodes, edges) {
       -webkit-font-smoothing: antialiased;
     }
 
-    /* Subdued grid background canvas */
     #network-canvas {
       flex: 1;
       height: 100vh;
       outline: none;
-      background-image: radial-gradient(var(--hairline) 1px, transparent 1px);
-      background-size: 32px 32px;
     }
 
     /* Linear Engineering Sidebar */
@@ -731,6 +854,33 @@ function generateHtmlVisualizer(nodes, edges) {
       width: 8px;
       height: 8px;
       border-radius: 50%;
+      transition: box-shadow 160ms var(--ease-out);
+    }
+
+    .chip-count {
+      font-family: var(--mono);
+      font-size: 0.68rem;
+      color: var(--ink-tertiary);
+    }
+
+    /* Active department: tinted fill, galaxy-colored border, glowing dot */
+    .cluster-chip[aria-pressed="true"] {
+      background: color-mix(in srgb, var(--chip-color) 16%, var(--surface-2));
+      border-color: var(--chip-color);
+      color: var(--ink);
+    }
+
+    .cluster-chip[aria-pressed="true"] .chip-dot {
+      box-shadow: 0 0 0 3px color-mix(in srgb, var(--chip-color) 30%, transparent), 0 0 10px var(--chip-color);
+    }
+
+    .cluster-chip[aria-pressed="true"] .chip-count {
+      color: var(--ink-muted);
+    }
+
+    .cluster-chip:focus-visible {
+      outline: 2px solid var(--primary-hover);
+      outline-offset: 2px;
     }
 
     /* AST Node Inspector Panel */
@@ -811,12 +961,20 @@ function generateHtmlVisualizer(nodes, edges) {
       overflow: hidden;
     }
 
+    /* Deep-space starfield: three layers of stars at different sizes and densities */
     #network-canvas {
       width: 100%;
       height: 100%;
       outline: none;
-      background-image: radial-gradient(var(--hairline) 1px, transparent 1px);
-      background-size: 32px 32px;
+      background-color: #020208;
+      background-image:
+        radial-gradient(1px 1px at 12% 18%, rgba(255, 255, 255, 0.55), transparent 60%),
+        radial-gradient(1px 1px at 68% 42%, rgba(255, 255, 255, 0.4), transparent 60%),
+        radial-gradient(1.5px 1.5px at 37% 77%, rgba(196, 210, 255, 0.5), transparent 60%),
+        radial-gradient(1px 1px at 88% 12%, rgba(255, 236, 200, 0.45), transparent 60%),
+        radial-gradient(1px 1px at 54% 91%, rgba(255, 255, 255, 0.35), transparent 60%),
+        radial-gradient(ellipse 60% 45% at 50% 50%, rgba(94, 106, 210, 0.08), transparent 70%);
+      background-size: 240px 240px, 310px 310px, 420px 420px, 530px 530px, 190px 190px, 100% 100%;
     }
 
     .floating-toolbar {
@@ -982,9 +1140,9 @@ function generateHtmlVisualizer(nodes, edges) {
         <span>Fit View</span>
       </button>
 
-      <button type="button" class="btn-tool" id="btn-physics" aria-pressed="true" aria-label="Toggle Physics Simulation">
+      <button type="button" class="btn-tool" id="btn-physics" aria-pressed="false" aria-label="Toggle Physics Simulation">
         <span class="status-dot" aria-hidden="true"></span>
-        <span id="physics-label">Physics Active</span>
+        <span id="physics-label">Physics Paused</span>
       </button>
 
       <div class="toolbar-divider" aria-hidden="true"></div>
@@ -1003,63 +1161,130 @@ function generateHtmlVisualizer(nodes, edges) {
     const edges = new vis.DataSet(payload.edges);
     const container = document.getElementById("network-canvas");
 
+    // Positions come precomputed from the galaxy layout, so physics starts paused.
+    // Turning physics on uses Barnes-Hut with zero central gravity, so galaxies never merge into one blob.
     const options = {
+      layout: { improvedLayout: false },
       nodes: {
         shape: "dot",
-        borderWidth: 1.5,
-        shadow: {
-          enabled: true,
-          color: "rgba(0, 0, 0, 0.7)",
-          size: 8,
-          x: 2,
-          y: 3
-        }
+        borderWidth: 1,
+        scaling: { label: { enabled: true, min: 9, max: 14, drawThreshold: 7 } }
       },
       edges: {
-        arrows: { to: { enabled: true, scaleFactor: 0.5 } },
-        color: { color: "#23252a", highlight: "#828fff" },
-        smooth: { type: "continuous", roundness: 0.15 }
+        arrows: { to: { enabled: true, scaleFactor: 0.4 } },
+        selectionWidth: 1.5
       },
       physics: {
-        enabled: true,
-        solver: "forceAtlas2Based",
-        forceAtlas2Based: {
-          gravitationalConstant: -75,
-          centralGravity: 0.015,
-          springLength: 90,
-          springConstant: 0.08,
-          damping: 0.85,
-          avoidOverlap: 0.85
+        enabled: false,
+        solver: "barnesHut",
+        barnesHut: {
+          gravitationalConstant: -1800,
+          centralGravity: 0,
+          springLength: 70,
+          springConstant: 0.02,
+          damping: 0.6,
+          avoidOverlap: 0.4
         },
-        stabilization: { iterations: 150 }
+        stabilization: false
       },
       interaction: {
         hover: true,
         tooltipDelay: 100,
-        hideEdgesOnDrag: false,
+        hideEdgesOnDrag: true,
         navigationButtons: false,
         zoomView: true
       }
     };
 
     const network = new vis.Network(container, { nodes, edges }, options);
+    network.once("afterDrawing", () => network.fit({ animation: false }));
 
-    // Render Clean Cluster Chips with Keyboard Operability
-    const categories = [...new Set(payload.nodes.map(n => n.category))];
+    // Live galaxy centers: the mean position of each department's nodes, so halos follow dragging.
+    function galaxyCenters() {
+      const positions = network.getPositions();
+      return payload.galaxies.map(g => {
+        const ids = payload.nodes.filter(n => n.category === g.category).map(n => n.id);
+        let x = 0, y = 0;
+        ids.forEach(id => { x += positions[id].x; y += positions[id].y; });
+        return { ...g, x: ids.length ? x / ids.length : g.x, y: ids.length ? y / ids.length : g.y };
+      });
+    }
+
+    // Nebula halo and name label behind each galaxy. The active galaxy glows brighter.
+    network.on("beforeDrawing", (ctx) => {
+      galaxyCenters().forEach(g => {
+        const isActive = activeCategory === g.category;
+        const isDimmed = activeCategory !== null && !isActive;
+        const glow = ctx.createRadialGradient(g.x, g.y, 0, g.x, g.y, g.radius * 1.35);
+        glow.addColorStop(0, g.color + (isActive ? "40" : isDimmed ? "08" : "22"));
+        glow.addColorStop(0.55, g.color + (isActive ? "18" : isDimmed ? "03" : "0c"));
+        glow.addColorStop(1, g.color + "00");
+        ctx.fillStyle = glow;
+        ctx.beginPath();
+        ctx.ellipse(g.x, g.y, g.radius * 1.35, g.radius * 1.1, 0, 0, Math.PI * 2);
+        ctx.fill();
+
+        ctx.font = "600 " + Math.max(14, g.radius * 0.16) + "px Inter, sans-serif";
+        ctx.textAlign = "center";
+        ctx.fillStyle = isDimmed ? "rgba(138, 143, 152, 0.35)" : "rgba(247, 248, 248, 0.85)";
+        ctx.fillText(g.category.toUpperCase(), g.x, g.y - g.radius * 1.15);
+        ctx.font = "500 " + Math.max(11, g.radius * 0.1) + "px 'JetBrains Mono', monospace";
+        ctx.fillStyle = isDimmed ? "rgba(98, 102, 109, 0.35)" : "rgba(138, 143, 152, 0.9)";
+        ctx.fillText(g.count + " modules", g.x, g.y - g.radius * 1.15 + Math.max(16, g.radius * 0.13));
+      });
+    });
+
+    // Department chips: one active galaxy at a time. Click again, Reset, or Esc to clear.
+    let activeCategory = null;
     const legendContainer = document.getElementById("legend-container");
-    categories.forEach(cat => {
-      const sample = payload.nodes.find(n => n.category === cat);
+    const chipByCategory = new Map();
+
+    function applyActiveCategory() {
+      chipByCategory.forEach((chip, cat) => {
+        chip.setAttribute("aria-pressed", cat === activeCategory ? "true" : "false");
+      });
+      nodes.update(payload.nodes.map(n => ({
+        id: n.id,
+        opacity: activeCategory === null || n.category === activeCategory ? 1 : 0.12
+      })));
+      const categoryById = new Map(payload.nodes.map(n => [n.id, n.category]));
+      edges.update(payload.edges.map(e => {
+        const touches = categoryById.get(e.from) === activeCategory || categoryById.get(e.to) === activeCategory;
+        return { id: e.id, hidden: activeCategory !== null && !touches };
+      }));
+      if (activeCategory === null) {
+        network.unselectAll();
+        network.fit({ animation: { duration: 500, easingFunction: "easeOutQuad" } });
+      } else {
+        const ids = payload.nodes.filter(n => n.category === activeCategory).map(n => n.id);
+        network.fit({ nodes: ids, animation: { duration: 600, easingFunction: "easeInOutQuad" } });
+      }
+    }
+
+    payload.galaxies.forEach(g => {
       const chip = document.createElement("button");
       chip.type = "button";
       chip.className = "cluster-chip";
-      chip.setAttribute("aria-label", "Filter by " + cat);
-      chip.innerHTML = \`<span class="chip-dot" style="background:\${sample.color.background}" aria-hidden="true"></span>\${cat}\`;
+      chip.style.setProperty("--chip-color", g.color);
+      chip.setAttribute("aria-pressed", "false");
+      chip.setAttribute("aria-label", "Show the " + g.category + " galaxy (" + g.count + " modules)");
+      chip.innerHTML = \`<span class="chip-dot" style="background:\${g.color}" aria-hidden="true"></span>\${g.category}<span class="chip-count">\${g.count}</span>\`;
       chip.onclick = () => {
-        const matchingIds = payload.nodes.filter(n => n.category === cat).map(n => n.id);
-        network.selectNodes(matchingIds);
+        activeCategory = activeCategory === g.category ? null : g.category;
+        applyActiveCategory();
       };
+      chipByCategory.set(g.category, chip);
       legendContainer.appendChild(chip);
     });
+
+    // Shareable deep link: graph.html#galaxy=backend opens with that galaxy active.
+    const linked = decodeURIComponent((location.hash.match(/^#galaxy=(.+)$/) || [])[1] || "");
+    if (chipByCategory.has(linked)) {
+      network.once("afterDrawing", () => {
+        activeCategory = linked;
+        applyActiveCategory();
+      });
+    }
 
     // Inspector Click Handler
     network.on("click", (params) => {
@@ -1131,7 +1356,7 @@ function generateHtmlVisualizer(nodes, edges) {
     };
 
     // Toggle Physics with Explicit Accessible Active State
-    let isPhysicsActive = true;
+    let isPhysicsActive = false;
     const physicsBtn = document.getElementById("btn-physics");
     const physicsLabel = document.getElementById("physics-label");
 
@@ -1144,8 +1369,8 @@ function generateHtmlVisualizer(nodes, edges) {
 
     // Reset View & Form
     document.getElementById("btn-reset").onclick = () => {
-      network.unselectAll();
-      network.fit({ animation: { duration: 400, easingFunction: "easeOutQuad" } });
+      activeCategory = null;
+      applyActiveCategory();
       searchInput.value = "";
       document.getElementById("inspector-body").innerHTML = "Click any module node or directional edge in the canvas to inspect its AST declarations, fan-in, and fan-out.";
     };
@@ -1153,6 +1378,10 @@ function generateHtmlVisualizer(nodes, edges) {
     // Keyboard Accessibility: Escape key clears selection
     window.addEventListener("keydown", (e) => {
       if (e.key === "Escape") {
+        if (activeCategory !== null) {
+          activeCategory = null;
+          applyActiveCategory();
+        }
         network.unselectAll();
         searchInput.value = "";
         searchInput.blur();
