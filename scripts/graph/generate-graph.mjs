@@ -338,13 +338,152 @@ function parseFileSymbols(filePath, rootDir) {
  * @returns {string | null}
  */
 function resolveImport(sourceId, importLiteral, nodeMap, rootDir) {
+  const sourceAbsDir = path.dirname(path.join(rootDir, sourceId));
+
   if (!importLiteral.startsWith(".")) {
-    return null; // External npm package or core node module
+    // Path aliases from tsconfig/jsconfig (for example "@/components/x"), then
+    // workspace packages by name (for example "@acme/ui"). Anything else is external.
+    for (const candidateBase of aliasCandidates(sourceAbsDir, importLiteral, rootDir)) {
+      const hit = matchCandidate(candidateBase, nodeMap, rootDir);
+      if (hit) return hit;
+    }
+    if (importLiteral.includes(".") && !importLiteral.includes("/")) {
+      const pyPathCandidate = importLiteral.replace(/\./g, "/") + ".py";
+      if (nodeMap.has(pyPathCandidate)) return pyPathCandidate;
+    }
+    return null;
   }
 
-  const sourceAbsDir = path.dirname(path.join(rootDir, sourceId));
-  const candidateBase = path.resolve(sourceAbsDir, importLiteral);
+  return matchCandidate(path.resolve(sourceAbsDir, importLiteral), nodeMap, rootDir);
+}
 
+/** Cache of path aliases per directory, so each tsconfig is read once. */
+const aliasCache = new Map();
+/** Cache of workspace packages (name to folder) per repository root. */
+const workspaceCache = new Map();
+
+/**
+ * Reads JSON that may contain comments and trailing commas (tsconfig style).
+ * @param {string} file
+ * @returns {any}
+ */
+function readLooseJson(file) {
+  try {
+    const raw = fs.readFileSync(file, "utf8");
+    const noComments = raw.replace(/("(?:\\.|[^"\\])*")|\/\/[^\n]*|\/\*[\s\S]*?\*\//g, (_match, str) => str ?? "");
+    return JSON.parse(noComments.replace(/,(\s*[}\]])/g, "$1"));
+  } catch {
+    return null;
+  }
+}
+
+/**
+ * Finds the nearest tsconfig.json or jsconfig.json at or above `dir` (inside the root)
+ * and returns its `paths` aliases as absolute target patterns.
+ * @param {string} dir
+ * @param {string} rootDir
+ * @returns {Array<{ pattern: string, targets: string[] }>}
+ */
+function aliasesFor(dir, rootDir) {
+  if (aliasCache.has(dir)) return aliasCache.get(dir);
+  /** @type {Array<{ pattern: string, targets: string[] }>} */
+  let result = [];
+  for (const name of ["tsconfig.json", "jsconfig.json"]) {
+    const config = readLooseJson(path.join(dir, name));
+    const options = config?.compilerOptions;
+    if (options?.paths && typeof options.paths === "object") {
+      const base = path.resolve(dir, options.baseUrl ?? ".");
+      result = Object.entries(options.paths).map(([pattern, targets]) => ({
+        pattern,
+        targets: (Array.isArray(targets) ? targets : []).map((t) => path.resolve(base, String(t))),
+      }));
+      break;
+    }
+  }
+  if (result.length === 0) {
+    const parent = path.dirname(dir);
+    const insideRoot = path.relative(rootDir, parent) === "" || !path.relative(rootDir, parent).startsWith("..");
+    if (parent !== dir && insideRoot && path.resolve(dir) !== path.resolve(rootDir)) {
+      result = aliasesFor(parent, rootDir);
+    }
+  }
+  aliasCache.set(dir, result);
+  return result;
+}
+
+/**
+ * Maps workspace package names to their folders by reading package.json files
+ * one and two levels below the root (apps/*, packages/*, backend, frontend, and so on).
+ * @param {string} rootDir
+ * @returns {Map<string, string>}
+ */
+function workspacePackages(rootDir) {
+  if (workspaceCache.has(rootDir)) return workspaceCache.get(rootDir);
+  /** @type {Map<string, string>} */
+  const packages = new Map();
+  /** @param {string} dir @param {number} depth */
+  const visit = (dir, depth) => {
+    let entries = [];
+    try {
+      entries = fs.readdirSync(dir, { withFileTypes: true });
+    } catch {
+      return;
+    }
+    for (const entry of entries) {
+      if (!entry.isDirectory() || IGNORED_DIRECTORIES.has(entry.name) || entry.name.startsWith(".")) continue;
+      const child = path.join(dir, entry.name);
+      const pkg = readLooseJson(path.join(child, "package.json"));
+      if (pkg && typeof pkg.name === "string") packages.set(pkg.name, child);
+      if (depth < 2) visit(child, depth + 1);
+    }
+  };
+  visit(rootDir, 1);
+  workspaceCache.set(rootDir, packages);
+  return packages;
+}
+
+/**
+ * Candidate absolute base paths for a bare import (alias or workspace package).
+ * @param {string} sourceAbsDir
+ * @param {string} importLiteral
+ * @param {string} rootDir
+ * @returns {string[]}
+ */
+function aliasCandidates(sourceAbsDir, importLiteral, rootDir) {
+  /** @type {string[]} */
+  const candidates = [];
+  for (const { pattern, targets } of aliasesFor(sourceAbsDir, rootDir)) {
+    const star = pattern.indexOf("*");
+    if (star === -1) {
+      if (importLiteral === pattern) candidates.push(...targets);
+      continue;
+    }
+    const prefix = pattern.slice(0, star);
+    const suffix = pattern.slice(star + 1);
+    if (importLiteral.startsWith(prefix) && importLiteral.endsWith(suffix)) {
+      const rest = importLiteral.slice(prefix.length, importLiteral.length - suffix.length);
+      candidates.push(...targets.map((t) => t.replace("*", rest)));
+    }
+  }
+  for (const [name, folder] of workspacePackages(rootDir)) {
+    if (importLiteral === name) {
+      candidates.push(path.join(folder, "src", "index"), path.join(folder, "index"));
+    } else if (importLiteral.startsWith(`${name}/`)) {
+      const sub = importLiteral.slice(name.length + 1);
+      candidates.push(path.join(folder, "src", sub), path.join(folder, sub));
+    }
+  }
+  return candidates;
+}
+
+/**
+ * Matches an absolute base path against known nodes, trying the usual extensions.
+ * @param {string} candidateBase
+ * @param {Map<string, GraphNode>} nodeMap
+ * @param {string} rootDir
+ * @returns {string | null}
+ */
+function matchCandidate(candidateBase, nodeMap, rootDir) {
   const candidateExtensions = [
     "",
     ".ts",
@@ -366,30 +505,27 @@ function resolveImport(sourceId, importLiteral, nodeMap, rootDir) {
     ".hpp",
     ".cs",
     "/index.ts",
+    "/index.tsx",
     "/index.js",
+    "/index.jsx",
+    "/index.mjs",
     "/__init__.py",
     "/mod.rs",
   ];
 
   for (const ext of candidateExtensions) {
-    let checkPath = candidateBase + ext;
-    // Replace .js with .ts if source is TypeScript
+    const checkPath = candidateBase + ext;
+    // Replace .js with .ts or .tsx if the source is TypeScript
     if (ext === "" && candidateBase.endsWith(".js")) {
-      const tsAlt = candidateBase.slice(0, -3) + ".ts";
-      const relTsAlt = path.relative(rootDir, tsAlt).replace(/\\/g, "/");
-      if (nodeMap.has(relTsAlt)) return relTsAlt;
+      for (const tsExt of [".ts", ".tsx"]) {
+        const tsAlt = candidateBase.slice(0, -3) + tsExt;
+        const relTsAlt = path.relative(rootDir, tsAlt).replace(/\\/g, "/");
+        if (nodeMap.has(relTsAlt)) return relTsAlt;
+      }
     }
     const relPath = path.relative(rootDir, checkPath).replace(/\\/g, "/");
     if (nodeMap.has(relPath)) {
       return relPath;
-    }
-  }
-
-  // Also resolve internal Python dot modules (e.g. app.services.auth)
-  if (!importLiteral.startsWith(".") && importLiteral.includes(".")) {
-    const pyPathCandidate = importLiteral.replace(/\./g, "/") + ".py";
-    if (nodeMap.has(pyPathCandidate)) {
-      return pyPathCandidate;
     }
   }
 
@@ -530,8 +666,12 @@ export function computeGalaxyLayout(nodes) {
       const h = hashString(node.id);
       // Spread each arm sideways (wider toward the rim) so arms look like dust lanes, not rings.
       const spread = (((h >>> 8) & 0xff) / 0xff - 0.5) * (0.35 + 0.9 * t);
-      const angle = tilt + (arm * Math.PI * 2) / arms + t * Math.PI * 2.6 + spread;
-      const r = radius * (0.08 + 0.92 * Math.sqrt(t)) * (0.9 + (((h >>> 24) & 0xff) / 0xff) * 0.2);
+      const angle =
+        tilt + (arm * Math.PI * 2) / arms + t * Math.PI * 2.6 + spread;
+      const r =
+        radius *
+        (0.08 + 0.92 * Math.sqrt(t)) *
+        (0.9 + (((h >>> 24) & 0xff) / 0xff) * 0.2);
       const jitter = 8 + 30 * t;
       const jx = (((h & 0xffff) / 0xffff) * 2 - 1) * jitter;
       const jy = ((((h >>> 16) & 0xffff) / 0xffff) * 2 - 1) * jitter;
@@ -615,7 +755,13 @@ function generateHtmlVisualizer(nodes, edges) {
         face: "Inter, -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif",
       },
       // Each star glows in its galaxy color.
-      shadow: { enabled: true, color: `${col.bg}99`, size: 10 + Math.min(degree, 20), x: 0, y: 0 },
+      shadow: {
+        enabled: true,
+        color: `${col.bg}99`,
+        size: 10 + Math.min(degree, 20),
+        x: 0,
+        y: 0,
+      },
       raw: n,
     };
   });
@@ -629,20 +775,40 @@ function generateHtmlVisualizer(nodes, edges) {
       from: e.source,
       to: e.target,
       crossGalaxy,
-      arrows: { to: { enabled: true, scaleFactor: crossGalaxy ? 0.45 : 0.35 } },
+      arrows: { to: { enabled: true, scaleFactor: crossGalaxy ? 0.5 : 0.45 } },
+      // Import lines inside a galaxy take the galaxy color so connections stay easy to follow.
       color: crossGalaxy
-        ? { color: "#f59e0b", highlight: "#fbbf24", opacity: 0.55 }
-        : { color: "#3a3d4a", highlight: "#a5b4fc", opacity: 0.55 },
+        ? {
+            color: "#f59e0b",
+            highlight: "#fde68a",
+            hover: "#fbbf24",
+            opacity: 0.7,
+          }
+        : {
+            color: colorOf(categoryOf.get(e.source) ?? "root").bg,
+            highlight: "#ffffff",
+            hover: colorOf(categoryOf.get(e.source) ?? "root").highlight,
+            opacity: 0.45,
+          },
       dashes: crossGalaxy ? [6, 6] : false,
       smooth: crossGalaxy
         ? { enabled: true, type: "curvedCW", roundness: 0.25 }
-        : { enabled: true, type: "continuous", roundness: 0.1 },
-      width: crossGalaxy ? 1.1 : 0.8,
+        : { enabled: true, type: "continuous", roundness: 0.15 },
+      width: crossGalaxy ? 1.4 : 1.2,
+      hoverWidth: 0.8,
+      selectionWidth: 1.2,
     };
   });
 
-  const galaxyPayload = galaxies.map((g) => ({ ...g, color: colorOf(g.category).bg }));
-  const dataPayload = JSON.stringify({ nodes: visNodes, edges: visEdges, galaxies: galaxyPayload });
+  const galaxyPayload = galaxies.map((g) => ({
+    ...g,
+    color: colorOf(g.category).bg,
+  }));
+  const dataPayload = JSON.stringify({
+    nodes: visNodes,
+    edges: visEdges,
+    galaxies: galaxyPayload,
+  });
 
   return `<!DOCTYPE html>
 <html lang="en">
@@ -1210,7 +1376,7 @@ function generateHtmlVisualizer(nodes, edges) {
       interaction: {
         hover: true,
         tooltipDelay: 100,
-        hideEdgesOnDrag: true,
+        hideEdgesOnDrag: false,
         navigationButtons: false,
         zoomView: true
       }

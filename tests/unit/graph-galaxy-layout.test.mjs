@@ -4,7 +4,11 @@ import assert from "node:assert/strict";
 import fs from "node:fs";
 import path from "node:path";
 import os from "node:os";
-import { computeGalaxyLayout, scanSourceFiles } from "../../scripts/graph/generate-graph.mjs";
+import {
+  buildCodebaseGraph,
+  computeGalaxyLayout,
+  scanSourceFiles,
+} from "../../scripts/graph/generate-graph.mjs";
 
 /** @param {string} category @param {number} count */
 const make = (category, count) =>
@@ -62,6 +66,30 @@ describe("Graph galaxy layout", () => {
       fs.writeFileSync(path.join(dir, "frontend", ".next", "server", "page.js"), "module.exports = 1;\n");
       const files = scanSourceFiles(dir).map((f) => path.relative(dir, f).split(path.sep).join("/"));
       assert.deepEqual(files, ["frontend/src/page.tsx"]);
+    } finally {
+      fs.rmSync(dir, { recursive: true, force: true });
+    }
+  });
+
+  it("resolves tsconfig path aliases and workspace package imports", () => {
+    const dir = fs.mkdtempSync(path.join(os.tmpdir(), "sauron-graph-alias-"));
+    try {
+      const write = (/** @type {string} */ rel, /** @type {string} */ text) => {
+        fs.mkdirSync(path.dirname(path.join(dir, rel)), { recursive: true });
+        fs.writeFileSync(path.join(dir, rel), text);
+      };
+      write("frontend/tsconfig.json", '{\n  // comment\n  "compilerOptions": { "paths": { "@/*": ["./src/*"] }, },\n}\n');
+      write("frontend/src/app/page.tsx", 'import { Button } from "@/components/button";\nexport default 1;\n');
+      write("frontend/src/components/button.tsx", "export const Button = 1;\n");
+      write("packages/shared/package.json", '{ "name": "@acme/shared" }\n');
+      write("packages/shared/src/index.ts", "export const shared = 1;\n");
+      write("backend/src/main.ts", 'import { shared } from "@acme/shared";\nexport const main = shared;\n');
+      const { edges } = buildCodebaseGraph(dir, { outputDir: path.join(dir, ".sauron", "graph") });
+      const pairs = edges.map((e) => `${e.source} -> ${e.target}`).sort();
+      assert.deepEqual(pairs, [
+        "backend/src/main.ts -> packages/shared/src/index.ts",
+        "frontend/src/app/page.tsx -> frontend/src/components/button.tsx",
+      ]);
     } finally {
       fs.rmSync(dir, { recursive: true, force: true });
     }

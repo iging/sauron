@@ -95,7 +95,8 @@ All generated artifacts adhere to:
 **`graph.html` layout (galaxy view):**
 
 - Each top-level department (`backend`, `frontend`, `packages`, and so on) is its own spiral galaxy, with hub modules in the bright core. The galaxies are spread across a wide "multiverse", so a large codebase never collapses into one round blob. The layout is deterministic and needs no physics. The Physics toggle starts paused.
-- Imports inside a department are faint lanes. Imports between departments are dashed amber "timeline branches".
+- Imports inside a department are lines in that galaxy's color. Imports between departments are dashed amber "timeline branches".
+- Imports are resolved from relative paths, from `tsconfig.json` or `jsconfig.json` `paths` aliases (for example `@/components/x`, the nearest config above the file), and from workspace package names (for example `@acme/shared`, found in `package.json` files one or two levels below the root).
 - Department chips have an active state. Click a chip to highlight that galaxy, zoom to it, and dim the rest. Click it again, press Esc, or use Reset to clear.
 - Deep link: `graph.html#galaxy=backend` opens with that galaxy active.
 - Agent worktree copies under `.claude/worktrees/` are skipped when scanning. So are framework build outputs and caches (`.next`, `.nuxt`, `.svelte-kit`, `.astro`, `.output`, `.vercel`, `.turbo`, `.expo`, `.angular`, `.cache`, `__pycache__`, `.venv`, `venv`, `target`, and others), because they hold generated code, not source.
