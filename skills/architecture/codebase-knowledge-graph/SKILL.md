@@ -98,4 +98,4 @@ All generated artifacts adhere to:
 - Imports inside a department are faint lanes. Imports between departments are dashed amber "timeline branches".
 - Department chips have an active state. Click a chip to highlight that galaxy, zoom to it, and dim the rest. Click it again, press Esc, or use Reset to clear.
 - Deep link: `graph.html#galaxy=backend` opens with that galaxy active.
-- Agent worktree copies under `.claude/worktrees/` are skipped when scanning.
+- Agent worktree copies under `.claude/worktrees/` are skipped when scanning. So are framework build outputs and caches (`.next`, `.nuxt`, `.svelte-kit`, `.astro`, `.output`, `.vercel`, `.turbo`, `.expo`, `.angular`, `.cache`, `__pycache__`, `.venv`, `venv`, `target`, and others), because they hold generated code, not source.

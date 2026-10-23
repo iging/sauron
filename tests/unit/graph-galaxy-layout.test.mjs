@@ -53,6 +53,20 @@ describe("Graph galaxy layout", () => {
     }
   });
 
+  it("skips framework build output such as .next when scanning", () => {
+    const dir = fs.mkdtempSync(path.join(os.tmpdir(), "sauron-graph-next-"));
+    try {
+      fs.mkdirSync(path.join(dir, "frontend", "src"), { recursive: true });
+      fs.mkdirSync(path.join(dir, "frontend", ".next", "server"), { recursive: true });
+      fs.writeFileSync(path.join(dir, "frontend", "src", "page.tsx"), "export default 1;\n");
+      fs.writeFileSync(path.join(dir, "frontend", ".next", "server", "page.js"), "module.exports = 1;\n");
+      const files = scanSourceFiles(dir).map((f) => path.relative(dir, f).split(path.sep).join("/"));
+      assert.deepEqual(files, ["frontend/src/page.tsx"]);
+    } finally {
+      fs.rmSync(dir, { recursive: true, force: true });
+    }
+  });
+
   it("skips .claude/worktrees copies when scanning", () => {
     const dir = fs.mkdtempSync(path.join(os.tmpdir(), "sauron-graph-wt-"));
     try {

@@ -38,6 +38,26 @@ const IGNORED_DIRECTORIES = new Set([
   ".sauron",
   "coverage",
   ".nyc_output",
+  // Framework build output and caches (generated code, not source).
+  ".next",
+  ".nuxt",
+  ".svelte-kit",
+  ".astro",
+  ".output",
+  ".vercel",
+  ".netlify",
+  ".turbo",
+  ".expo",
+  ".angular",
+  ".parcel-cache",
+  ".cache",
+  "__pycache__",
+  ".venv",
+  "venv",
+  ".pytest_cache",
+  ".mypy_cache",
+  ".gradle",
+  "target",
 ]);
 
 const SUPPORTED_EXTENSIONS = new Set([
