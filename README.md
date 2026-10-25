@@ -28,7 +28,7 @@ and in your codebase bind them.
 1. **The Tool Fragmentation & Manual Setup Nightmare**:
    Today, engineering teams and individual developers use multiple AI tools simultaneously—Claude Code, Cursor, Copilot, Windsurf, Cline, Gemini, Zed, and others. Configuring each tool requires manually writing, syncing, and constantly updating fragmented prompt files (`CLAUDE.md`, `.cursorrules`, `.windsurfrules`, `.github/copilot-instructions.md`, etc.). When rules or architectural constraints change, synchronizing them by hand across every developer's IDE is tedious, error-prone, and unsustainable.
 
-   **Sauron solves this with One Universal Harness**: You define your architectural rules, safety boundaries, and skill contracts once in a master specification, and Sauron automatically transpiles and synchronizes them deterministically across **17 AI coding runtimes**.
+   **Sauron solves this with One Universal Harness**: You define your architectural rules, safety boundaries, and skill contracts once in a master specification, and Sauron automatically transpiles and synchronizes them deterministically across **20 AI coding runtimes**.
 
 2. **The "Vibe Coding" Crisis**:
    **Vibe coding is a recipe for disaster.** Prompting AI assistants to generate features without architectural blueprints, data invariants, or test criteria produces immediate gratification followed by rapid failure—hallucinated libraries, silent security holes, state corruptions, and unmaintainable spaghetti code.
@@ -40,7 +40,7 @@ and in your codebase bind them.
    Long-running agent sessions burn up to 75% of context window limits on conversational filler, pleasantries, and redundant narration. As token budgets deplete, model attention degrades, leading to forgotten requirements, catastrophic forgetfulness, and expensive API bills.
 
    **Sauron solves this with Built-in Token Conservation & Caveman Transpilation**:
-   Sauron embeds **Caveman Mode**—a native compression engine with multiple intensity tiers (`lite`, `full`, `ultra`) that cuts conversational filler while strictly preserving technical precision, code blocks, diffs, and negations. `sauron init` asks which tier to turn on (or pass `--caveman=off|lite|full|ultra`) and writes it into the instruction files of all **19 runtimes** (`AGENTS.md`, `CLAUDE.md`, `.cursor/rules/`, `.windsurf/rules/`, `.cline/rules/`, and more), so the agent applies it from its first reply with no trigger command. Coupled with zero-install modular skill injection via `npx`, developers load only what the agent needs, eliminating memory bloat.
+   Sauron embeds **Caveman Mode**—a native compression engine with multiple intensity tiers (`lite`, `full`, `ultra`) that cuts conversational filler while strictly preserving technical precision, code blocks, diffs, and negations. `sauron init` asks which tier to turn on (or pass `--caveman=off|lite|full|ultra`) and writes it into the instruction files of all **20 runtimes** (`AGENTS.md`, `CLAUDE.md`, `.cursor/rules/`, `.windsurf/rules/`, `.cline/rules/`, and more), so the agent applies it from its first reply with no trigger command. Coupled with zero-install modular skill injection via `npx`, developers load only what the agent needs, eliminating memory bloat.
 
 4. **Blind Multi-File Hallucination & Hidden Architectural Drift**:
    Large-language models lack holistic codebase perception. When instructed to modify a component, agents frequently introduce silent circular imports, break cross-module boundaries, and create cascading dependency failures because they cannot visualize the full system topology.
@@ -64,7 +64,7 @@ and in your codebase bind them.
 
 ## Quickstart
 
-You can use Sauron in two ways: **Modular Mode** (zero-install: add individual skills to any codebase without token bloat) or **Full Harness Mode** (transpile and synchronize rules across all 17 AI runtimes).
+You can use Sauron in two ways: **Modular Mode** (zero-install: add individual skills to any codebase without token bloat) or **Full Harness Mode** (transpile and synchronize rules across all 20 AI runtimes).
 
 ### 1. Modular Skills (Zero-Install via NPX)
 
@@ -85,7 +85,7 @@ npx sauron-ai list-skills
 
 > **Prefer Global CLI?** Install once with `npm install -g sauron-ai` and run `sauron add <skill>` anywhere.
 
-### 2. Full Harness Synchronization (19 Runtimes & Fellowship)
+### 2. Full Harness Synchronization (20 Runtimes & Fellowship)
 
 `init` asks a few questions (Recommended or Custom: runtimes, subagents, skills, Caveman tier), shows a plan, and writes nothing until you confirm. It generates the shared `AGENTS.md` core plus native files for the runtimes you pick (`CLAUDE.md` + `.claude/`, `.cursor/rules/`, `.windsurf/rules/`, `.cline/rules/`, and more), and merges into files you already have instead of replacing them:
 
@@ -157,27 +157,32 @@ Sauron executes locally and provides full source transparency:
 
 ---
 
-## The 17 Runtimes Configured by Sauron
+## The 20 Runtimes Configured by Sauron
 
 Sauron generates native configuration files for:
 
-1. Claude Code (`CLAUDE.md`, `.claude/commands/`)
-2. Cursor (`.cursorrules`, `.cursor/rules/*.mdc`)
-3. Windsurf (`.windsurfrules`)
-4. GitHub Copilot and VSCode (`.github/copilot-instructions.md`)
-5. Cline (`.cline/rules/`)
-6. Trae (`.traerules`, `.trae/`)
-7. Zed (`.zed/prompts/`, `.zed/settings.json`)
-8. Codex (`.codex/instructions.md`)
-9. Gemini (`GEMINI.md`)
-10. Hermes (`.hermesrules`)
-11. Kimi (`.kimi/prompt.md`)
-12. Kiro (`.kirorules`)
-13. OpenClaw (`.openclaw/config.json`)
-14. OpenCode (`.opencode/instructions.md`)
-15. Pi (`.pirules`)
-16. Qwen (`.qwen/system.md`)
-17. Adal and CodeBuddy (`.adalrules`, `.codebuddy.md`)
+1. Claude Code (`CLAUDE.md`, `.claude/`)
+2. Cursor (`.cursor/rules/sauron.mdc`)
+3. Windsurf (`.windsurf/rules/sauron.md`)
+4. GitHub Copilot (`.github/copilot-instructions.md`)
+5. VS Code (`.vscode/settings.json`)
+6. Cline (`.cline/rules/sauron.md`)
+7. Trae (`.trae/rules/project_rules.md`)
+8. Zed (`.rules`)
+9. Codex (`AGENTS.md`, `.codex/config.toml`)
+10. Gemini CLI (`GEMINI.md`, `.gemini/`)
+11. Qwen (`QWEN.md`, `.qwen/`)
+12. Kimi (`.kimi/prompt.md`)
+13. Kiro (`.kiro/steering/sauron.md`)
+14. Hermes (`.hermesrules`)
+15. OpenClaw (`.openclaw/config.json`)
+16. OpenCode (`AGENTS.md`, `opencode.json`, `.opencode/`)
+17. Pi (`AGENTS.md`, `.pi/`)
+18. omp / oh-my-pi (`AGENTS.md`, `.omp/mcp.json`, `.omp/`)
+19. AdaL (`.adalrules`)
+20. CodeBuddy (`.codebuddy/rules/sauron.md`)
+
+Every runtime also shares the `AGENTS.md` core and `.agents/skills/`.
 
 ---
 
@@ -330,7 +335,7 @@ We welcome contributions from the community to expand the Sauron harness, runtim
 
 - [CONTRIBUTING.md](./CONTRIBUTING.md): Comprehensive guide on local development, adding skills, and PR guidelines.
 - [CONTRIBUTORS.md](./CONTRIBUTORS.md): The official Sauron Fellowship & Contributors Roll.
-- [runtime-matrix.md](./references/runtime-matrix.md): Complete technical comparison table across all 17 supported runtimes.
+- [runtime-matrix.md](./references/runtime-matrix.md): Complete technical comparison table across all 20 supported runtimes.
 - [fellowship-contracts.md](./references/fellowship-contracts.md): Explicit authority boundaries and handoff protocols for the 9 sub-agents.
 - [anti-patterns.md](./references/anti-patterns.md): The 60 credit-killing patterns reference used to audit all skills.
 - [faq.md](./docs/01-getting-started/faq.md): Frequently asked questions, safety guarantees, and migration guide.

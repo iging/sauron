@@ -6,39 +6,33 @@ Sauron operates as a single source of truth for AI instructions. Instead of manu
 
 ## Supported Runtimes
 
-Sauron supports 17 runtimes grouped into three operational categories:
+Sauron supports 20 runtimes grouped into three operational categories:
 
 1. **Desktop & IDE Environments**:
    - Cursor (`.cursor/rules/sauron.mdc`, `.cursor/rules/README.md`, `.cursor/skills/README.md`)
-   - Windsurf (`.windsurfrules`)
-   - Trae (`.traerules`)
-   - Zed (`.zed/settings.json`, `.zed/prompts/sauron.md`)
-   - VS Code (`.vscode/settings.json`)
+   - Windsurf (`.windsurf/rules/sauron.md`, `.windsurf/workflows/`, `.windsurf/skills/`)
+   - Trae (`.trae/rules/project_rules.md`)
    - Zed (`.rules`, `.zed/settings.json`)
-   - VS Code (`.vscode/settings.json`, `.vscode/sauron.instructions.md`)
-   - Kiro (`.kirorules`)
+   - VS Code (`.vscode/settings.json`)
+   - Kiro (`.kiro/steering/sauron.md`, `.kiro/skills/README.md`)
+   - CodeBuddy (`.codebuddy/rules/sauron.md`, `.codebuddy/skills/README.md`)
 
 2. **CLI Coding Agents**:
-   - Claude Code (`CLAUDE.md`)
-   - Cline (`.clinerules`)
-   - OpenAI Codex (`.codex/config.toml`, `.codex/README.md`)
+   - Claude Code (`CLAUDE.md`, `.claude/`)
    - Cline (`.cline/rules/sauron.md` + `.cline/` scaffold)
-   - OpenAI Codex (`.codex/instructions.md`)
-   - OpenCode (`.opencode/instructions.md`)
+   - OpenAI Codex (`AGENTS.md`, `.codex/config.toml`, `.codex/README.md`)
+   - OpenCode (`AGENTS.md`, `opencode.json`, `.opencode/{agents,commands,skills}/`)
    - OpenClaw (`.openclaw/config.json`)
-   - Pi (`.pirules`)
+   - Pi (`AGENTS.md`, `.pi/prompts/`, `.pi/skills/`)
+   - omp / oh-my-pi (`AGENTS.md`, `.omp/mcp.json`, `.omp/{skills,prompts,agents}/`)
 
 3. **Web & Model Interfaces**:
-   - Google Gemini (`GEMINI.md`)
    - GitHub Copilot (`.github/copilot-instructions.md`, hooks, `.github/{instructions,prompts,agents,skills}/` with READMEs and a sample `sauron.instructions.md`)
    - Google Gemini (`GEMINI.md`, `.gemini/settings.json`, `.gemini/README.md`)
-   - GitHub Copilot (`.github/copilot-instructions.md`, hooks)
    - Hermes (`.hermesrules`)
    - Moonshot Kimi (`.kimi/prompt.md`)
    - Qwen (`QWEN.md`, `.qwen/skills/README.md`)
-   - Adal / CodeBuddy (`.adalrules`, `.codebuddy/rules.md`)
-   - Qwen (`.qwen/system.md`)
-   - Adal / CodeBuddy (`.adalrules`, `.codebuddy/rules/sauron.md`, `.codebuddy/skills/README.md`)
+   - AdaL (`.adalrules`)
 
 ### Shared AGENTS.md Core
 

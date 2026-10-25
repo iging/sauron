@@ -18,7 +18,7 @@ This directory contains production-grade, hardened Docker configurations for **S
 
 | File                     | Purpose                             | Base Image       | Non-Root User    |
 | :----------------------- | :---------------------------------- | :--------------- | :--------------- |
-| **`Dockerfile.cli`**     | Sauron 17-Runtime Transpiler & CLI  | `node:22-alpine` | `sauron` (10001) |
+| **`Dockerfile.cli`**     | Sauron 20-Runtime Transpiler & CLI  | `node:22-alpine` | `sauron` (10001) |
 | **`Dockerfile.landing`** | Sauron Landing Page Next.js Web App | `node:22-alpine` | `nextjs` (10001) |
 | **`docker-compose.yml`** | Compose configuration for local dev | -                | -                |
 

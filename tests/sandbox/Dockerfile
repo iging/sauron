@@ -34,7 +34,7 @@ RUN node --test tests/**/*.test.mjs
 FROM node:22.14.0-alpine3.21 AS runner
 
 LABEL maintainer="sauron contributors"
-LABEL description="Hardened minimal runtime container for Sauron 17-runtime transpiler"
+LABEL description="Hardened minimal runtime container for Sauron 20-runtime transpiler"
 
 # Install only minimal runtime dependencies with cache purged
 RUN apk add --no-cache bash git python3 \

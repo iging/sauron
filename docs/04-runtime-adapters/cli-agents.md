@@ -45,3 +45,15 @@ This guide covers Sauron's integration with terminal-based autonomous coding age
 - **Generated File**: `.pirules`.
 - **Behavior**:
   - Configures terminal agents running the Pi agent framework with strict verification gates.
+
+---
+
+## 6. omp (oh-my-pi)
+
+- **Generated Files**: `.omp/mcp.json`, `.omp/skills/README.md`, `.omp/prompts/README.md`, `.omp/agents/README.md`.
+- **Behavior**:
+  - omp is a Rust-core terminal coding agent forked from Pi. It reads project instructions from the shared `AGENTS.md` core, so Sauron does not emit `.omp/AGENTS.md` (that file would shadow the root one).
+  - `.omp/mcp.json` starts as `{ "mcpServers": {} }` and is deep-merged on re-runs, so servers you add are kept.
+  - omp also discovers `.agents/skills/` and `.claude/skills/`, so Sauron skills reach it without a second copy.
+  - Reactive TTSR rules (`.omp/rules/`), hooks (`.omp/hooks/`), and `.omp/config.yml` are left for you to author.
+- **Docs**: https://omp.sh/docs/context-files, https://omp.sh/docs/skills, https://omp.sh/docs/prompt-templates, https://omp.sh/docs/subagent-authoring, https://omp.sh/docs/mcp

@@ -36,12 +36,13 @@
     },
     "runtimes": {
       "type": "object",
-      "description": "Toggle active status for the 17 AI coding runtimes",
+      "description": "Toggle active status for the 20 AI coding runtimes",
       "properties": {
         "claude": { "type": "boolean" },
         "cursor": { "type": "boolean" },
         "windsurf": { "type": "boolean" },
         "copilot": { "type": "boolean" },
+        "vscode": { "type": "boolean" },
         "cline": { "type": "boolean" },
         "trae": { "type": "boolean" },
         "zed": { "type": "boolean" },
@@ -53,6 +54,7 @@
         "openclaw": { "type": "boolean" },
         "opencode": { "type": "boolean" },
         "pi": { "type": "boolean" },
+        "omp": { "type": "boolean" },
         "qwen": { "type": "boolean" },
         "adal": { "type": "boolean" },
         "codebuddy": { "type": "boolean" }

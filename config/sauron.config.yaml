@@ -7,12 +7,13 @@ project:
   language: "typescript" # typescript | python | rust | go | multi
   framework: "nextjs" # optional framework hint
 
-# The 17 Runtimes Bound by sauron (set true/false per workspace)
+# The 20 Runtimes Bound by sauron (set true/false per workspace)
 runtimes:
   claude: true
   cursor: true
   windsurf: true
   copilot: true
+  vscode: true
   cline: true
   trae: true
   zed: true
@@ -24,6 +25,7 @@ runtimes:
   openclaw: true
   opencode: true
   pi: true
+  omp: true
   qwen: true
   adal: true
   codebuddy: true

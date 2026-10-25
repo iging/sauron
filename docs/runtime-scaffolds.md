@@ -6,7 +6,7 @@ Research date: 2026-10-19. Each Sauron adapter emits the project scaffold that i
 
 ## Shared Core
 
-`AGENTS.md` and `.agents/skills/` form the shared core. Codex, Cursor, OpenCode, Kiro, Zed, CodeBuddy, Pi, and Gemini (via its alias) read these paths. Sauron emits them once from the `agents` adapter.
+`AGENTS.md` and `.agents/skills/` form the shared core. Codex, Cursor, OpenCode, Kiro, Zed, CodeBuddy, Pi, omp, and Gemini (via its alias) read these paths. Sauron emits them once from the `agents` adapter.
 
 ## Findings
 
@@ -28,6 +28,7 @@ Research date: 2026-10-19. Each Sauron adapter emits the project scaffold that i
 | Zed | `.rules` | Reads the first match of `.rules`, …, `AGENTS.md` (V). `.zed/settings.json` (U). | V/U | https://zed.dev/docs/ai/rules |
 | Trae | `.trae/rules/project_rules.md` | `.trae/rules/project_rules.md` (multiple unofficial sources) | U | none (needs an official source) |
 | Pi | `.pi/prompts/README.md` | `AGENTS.md`, `.pi/skills`, `.agents/skills`, `.pi/prompts/` | U | none (needs an official source) |
+| omp (oh-my-pi) | `.omp/mcp.json` | `AGENTS.md`, `.omp/skills/<n>/SKILL.md`, `.omp/prompts/*.md`, `.omp/agents/*.md`, `.omp/mcp.json`. Also discovers `.agents/skills/` and `.claude/skills/`. `.omp/rules/` (TTSR) and `.omp/hooks/` are not scaffolded. | V | https://omp.sh/docs/context-files |
 | Kimi | `.kimi/prompt.md` | Legacy path kept | U | none |
 | Hermes | `.hermesrules` | Legacy path kept | U | none |
 | OpenClaw | `.openclaw/config.json` | Legacy path kept | U | none |

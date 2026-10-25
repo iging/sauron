@@ -8,7 +8,7 @@ _Last updated: 2026-09-20_
 
 ## 1. System Overview and Foundational Architecture
 
-Sauron AI operates as a local-first, deterministic transpile-and-orchestration engine for AI coding agents. It compiles a declarative Master Specification (`sauron.config.yaml`) into runtime-native instructions across 17 AI coding agent environments in under 50 milliseconds.
+Sauron AI operates as a local-first, deterministic transpile-and-orchestration engine for AI coding agents. It compiles a declarative Master Specification (`sauron.config.yaml`) into runtime-native instructions across 20 AI coding agent environments in under 50 milliseconds.
 
 ```mermaid
 graph TD
@@ -77,7 +77,7 @@ sauron/
 ├── .sauron/                 # Workspace metadata and safe backup store
 │   ├── backups/             # Timestamped rollback copies (*.bak)
 │   └── manifest.json        # State manifest tracking generated file hashes
-├── adapters/                # 17 runtime transpilation adapters
+├── adapters/                # 20 runtime transpilation adapters
 │   ├── types.ts             # Transpiler contracts and runtime options interface
 │   ├── conflict-manager.ts  # Non-destructive file writer with automated backups
 │   ├── claude.ts            # Claude Code adapter (CLAUDE.md & slash commands)
@@ -98,7 +98,7 @@ sauron/
 │   ├── tdd.md               # Test-driven development command (/tdd)
 │   └── commit.md            # Git conventional commit command (/commit)
 ├── config/                  # Master workspace configuration schemas and defaults
-│   └── sauron.config.yaml   # Canonical user configuration for 17 runtimes & Fellowship
+│   └── sauron.config.yaml   # Canonical user configuration for 20 runtimes & Fellowship
 ├── context/                 # Sauron project foundation specifications
 │   ├── ARCHITECTURE.md      # Technical architecture and topology specification
 │   ├── PRD.md               # Product Requirements Document and vision

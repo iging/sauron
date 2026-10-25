@@ -1,6 +1,6 @@
 # PRD: Product Requirements Document: Sauron AI
 
-> **Purpose:** Defines the overarching vision, root problem, architecture philosophy, target personas, scope boundaries, and verification criteria for `Sauron AI`, the open-source universal AI agent harness for 17 coding runtimes.
+> **Purpose:** Defines the overarching vision, root problem, architecture philosophy, target personas, scope boundaries, and verification criteria for `Sauron AI`, the open-source universal AI agent harness for 20 coding runtimes.
 
 _Last updated: 2026-09-20_
 
@@ -46,7 +46,7 @@ Existing AI scaffolding tools blindly overwrite existing project configurations 
 
 ## 3. Core Goals and Objectives
 
-- **Goal 1 (Universal Portability Across 17 Runtimes):** Transpile the single master configuration (`sauron.config.yaml`) into production-grade native rule and command files for 17 runtimes in under 50 milliseconds locally.
+- **Goal 1 (Universal Portability Across 20 Runtimes):** Transpile the single master configuration (`sauron.config.yaml`) into production-grade native rule and command files for 20 runtimes in under 50 milliseconds locally.
 - **Goal 2 (Nine-Agent Fellowship Governance):** Orchestrate all engineering workflows through nine specialized personas with strict ownership boundaries:
   - Planning (`gandalf`) -> System Architecture (`aragorn`) -> Syntax Linting (`legolas`) -> Refactoring (`gimli`) -> Security Auditing (`boromir`) -> Task Execution (`frodo`) -> Conventional Commits (`samwise`) -> Test-Driven Verification (`merry`) -> Fuzzing and Chaos (`pippin`).
 - **Goal 3 (Enterprise Skill Standardization):** Provide over 500 production-ready skills organized across 8 departments (Architecture, Backend, Database, DevOps, Frontend, Quality, Security, Workflow).
@@ -69,7 +69,7 @@ Existing AI scaffolding tools blindly overwrite existing project configurations 
 
 ### 1. Universal Transpiler Engine (P0)
 
-Translates `sauron.config.yaml` into native rule and command configurations across 17 runtimes:
+Translates `sauron.config.yaml` into native rule and command configurations across 20 runtimes:
 
 1. Claude Code (`CLAUDE.md`, `.claude/commands/`)
 2. Cursor (`.cursorrules`, `.cursor/rules/*.mdc`)
@@ -120,7 +120,7 @@ Direct invocation mapping across terminal and IDE platforms:
 
 ## 6. Success Metrics and Verification Standards
 
-- **Transpiler Latency:** Evaluates and generates configurations for all 17 runtimes in under 50 milliseconds.
+- **Transpiler Latency:** Evaluates and generates configurations for all 20 runtimes in under 50 milliseconds.
 - **Safety Guarantee:** Exactly zero unbacked destructive file overwrites.
 - **Test Integrity:** 100 percent pass rate across automated regression test suites (`npm test`).
 - **Code Standard:** Zero barrel files (`index.ts` is strictly prohibited), strict ESM relative imports with explicit extensions, cognitive complexity capped under 15.

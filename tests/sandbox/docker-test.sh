@@ -1,7 +1,7 @@
 #!/usr/bin/env bash
 # ===================================================================
 # Docker Sandbox Verification Test Runner
-# Verifies zero-side-effect isolation and complete 17-runtime file creation
+# Verifies zero-side-effect isolation and complete 20-runtime file creation
 # ===================================================================
 
 set -euo pipefail

@@ -11,7 +11,7 @@ const __filename = fileURLToPath(import.meta.url);
 const __dirname = path.dirname(__filename);
 const SAURON_ROOT = path.resolve(__dirname, "../..");
 
-describe("Transpiler 19-Runtime Generation (Milestone 6.2)", () => {
+describe("Transpiler 20-Runtime Generation (Milestone 6.2)", () => {
   /** @type {string} */
   let tempWorkspace;
 
@@ -25,7 +25,7 @@ describe("Transpiler 19-Runtime Generation (Milestone 6.2)", () => {
     }
   });
 
-  it("successfully transpiles and generates files for all 19 runtimes in isolation", () => {
+  it("successfully transpiles and generates files for all 20 runtimes in isolation", () => {
     const transpiler = new Transpiler({
       workspaceRoot: tempWorkspace,
       sauronRoot: SAURON_ROOT,
@@ -82,6 +82,9 @@ describe("Transpiler 19-Runtime Generation (Milestone 6.2)", () => {
       ".opencode/skills/README.md",
       ".pi/prompts/README.md",
       ".pi/skills/README.md",
+      ".omp/skills/README.md",
+      ".omp/prompts/README.md",
+      ".omp/agents/README.md",
       ".adalrules",
       ".codebuddy/rules/sauron.md",
       ".codebuddy/skills/README.md",

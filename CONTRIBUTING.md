@@ -1,6 +1,6 @@
 # Contributing to Sauron AI
 
-Thank you for your interest in contributing to **Sauron AI** — the universal AI coding agent harness and skills ecosystem for 17 AI coding runtimes!
+Thank you for your interest in contributing to **Sauron AI** — the universal AI coding agent harness and skills ecosystem for 20 AI coding runtimes!
 
 Sauron is a free, local-first, open-source project licensed under MIT and Apache 2.0. We welcome contributions from developers, AI engineers, and open-source practitioners worldwide.
 
@@ -78,12 +78,12 @@ To add a new skill:
    npm run check-docs
    ```
 
-### 3.2 Enhancing 17-Runtime Transpilers
+### 3.2 Enhancing 20-Runtime Transpilers
 
 Transpilers and adapters live under `core/` and `src/adapters/`.
 
 - Every adapter must generate valid, native rule syntax for its specific runtime (e.g. `.cursorrules`, `CLAUDE.md`, `.windsurfrules`).
-- Always run `npm test` to verify that all 17 runtimes generate without regression.
+- Always run `npm test` to verify that all 20 runtimes generate without regression.
 
 ### 3.3 Adding or Updating Commands
 

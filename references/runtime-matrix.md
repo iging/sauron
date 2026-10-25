@@ -1,6 +1,6 @@
-# The 17 AI Coding Runtime Adapter Matrix
+# The 20 AI Coding Runtime Adapter Matrix
 
-> Authoritative specification and feature parity matrix for the 17 AI coding runtimes supported by **Sauron AI**.
+> Authoritative specification and feature parity matrix for the 20 AI coding runtimes supported by **Sauron AI**.
 
 ---
 
@@ -12,7 +12,7 @@ Sauron solves this by compiling a single declarative configuration (`sauron.conf
 
 ---
 
-## 2. Comprehensive 17-Runtime Comparison Table
+## 2. Comprehensive 20-Runtime Comparison Table
 
 | #   | Runtime / Tool       | Primary Configuration File        | Additional Paths / Commands | Format          | Frontmatter MDC | Slash Commands | Output Strategy                                           |
 | :-- | :------------------- | :-------------------------------- | :-------------------------- | :-------------- | :-------------: | :------------: | :-------------------------------------------------------- |
@@ -33,6 +33,7 @@ Sauron solves this by compiling a single declarative configuration (`sauron.conf
 | 15  | **Pi**               | `.pirules`                        | `.pi/`                      | Plaintext       |       ❌        |   🟡 Limited   | Spartan plain-text instruction constraints                |
 | 16  | **Qwen**             | `.qwen/system.md`                 | `.qwen/`                    | Markdown        |       ❌        |   🟡 Limited   | System instructions optimized for Alibaba Qwen-Coder      |
 | 17  | **Adal & CodeBuddy** | `.adalrules`                      | `.codebuddy_rules.md`       | Markdown        |       ❌        |   🟡 Limited   | Dual-engine rules for enterprise CodeBuddy environments   |
+| 18  | **omp (oh-my-pi)**   | `AGENTS.md`                       | `.omp/{skills,prompts,agents}/`, `.omp/mcp.json` | Markdown / JSON |       ❌        |  ✅ Prompts    | Shared AGENTS.md core plus native `.omp/` scaffold READMEs |
 
 ---
 

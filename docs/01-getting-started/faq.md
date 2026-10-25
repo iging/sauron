@@ -45,9 +45,9 @@
 
 ---
 
-### 5. Why are there 17 runtimes? Do I need to enable all of them?
+### 5. Why are there 20 runtimes? Do I need to enable all of them?
 
-No. While Sauron provides out-of-the-box adapters for 17 runtimes, you have complete control over which runtimes are active.
+No. While Sauron provides out-of-the-box adapters for 20 runtimes, you have complete control over which runtimes are active.
 In your `sauron.config.yaml`, simply toggle whichever editors your team uses:
 
 ```yaml

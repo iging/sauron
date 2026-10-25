@@ -1,6 +1,6 @@
 #!/usr/bin/env python3
 """
-Sauron CLI (Python entry point): Universal AI Agent Harness for 19 AI coding runtimes.
+Sauron CLI (Python entry point): Universal AI Agent Harness for 20 AI coding runtimes.
 One Harness to rule them all.
 
 The engine is the Node.js CLI. This wrapper forwards every command and flag to it:

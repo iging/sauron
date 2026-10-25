@@ -1,6 +1,6 @@
 # AGENTS.md
 
-> Universal AI Agent Harness for 17 runtimes. Governed by Sauron AI.
+> Universal AI Agent Harness for 20 runtimes. Governed by Sauron AI.
 
 ## Setup commands
 
@@ -21,7 +21,7 @@
 
 ## Project structure
 
-- `adapters/` : 17 runtime transpilation adapters, types, and safe conflict manager.
+- `adapters/` : 20 runtime transpilation adapters, types, and safe conflict manager.
 - `bin/` : CLI orchestrator (`sauron.mjs`).
 - `config/` : Master workspace configuration (`sauron.config.yaml`) and JSON schemas.
 - `core/` : Fellowship agent specifications and department skill metadata.
