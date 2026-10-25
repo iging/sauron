@@ -2,7 +2,7 @@
  * @fileoverview Shared AGENTS.md core adapter.
  *
  * Root `AGENTS.md` is the cross-tool instruction standard read by Codex, Cursor,
- * GitHub Copilot, Windsurf, Cline, OpenCode, Kiro, Zed, CodeBuddy, and Pi.
+ * GitHub Copilot, Windsurf, Cline, OpenCode, Kiro, Zed, CodeBuddy, Pi, and omp.
  * Also emits the shared `.agents/skills/` scaffold README and the
  * `.agents/anti-patterns.md` reference when the source document is available.
  */
@@ -73,7 +73,7 @@ export class AgentsMdAdapter implements RuntimeAdapter {
       "  AGENTS.md: shared agent instructions standard (https://agents.md).",
     );
     lines.push(
-      "  Read by Codex, Cursor, GitHub Copilot, Windsurf, Cline, OpenCode, Kiro, Zed, CodeBuddy, and Pi.",
+      "  Read by Codex, Cursor, GitHub Copilot, Windsurf, Cline, OpenCode, Kiro, Zed, CodeBuddy, Pi, and omp.",
     );
     lines.push("-->");
     lines.push("");
@@ -158,7 +158,7 @@ export class AgentsMdAdapter implements RuntimeAdapter {
       "",
       "## Runtimes Reading This Folder",
       "",
-      "- Verified: Cursor, GitHub Copilot, Windsurf, Gemini CLI.",
+      "- Verified: Cursor, GitHub Copilot, Windsurf, Gemini CLI, omp.",
       "<!-- unverified: Codex and Pi docs reference .agents/skills but discovery is not confirmed -->",
       "- Unverified: Codex, Pi.",
       "",

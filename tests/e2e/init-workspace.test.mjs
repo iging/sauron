@@ -47,7 +47,7 @@ describe("E2E: Workspace Bootstrap & Transpilation (init-workspace)", () => {
     }
   });
 
-  it("bootstraps sauron in a new workspace, creating config and all 19 runtimes", async () => {
+  it("bootstraps sauron in a new workspace, creating config and all 20 runtimes", async () => {
     // Act: Execute sauron init with every runtime and no skill copies
     const { stdout } = await execFileAsync("node", [CLI_PATH, "init", "--yes", "--runtimes=all", "--skills=none"], {
       cwd: tempWorkspace,
@@ -77,6 +77,7 @@ describe("E2E: Workspace Bootstrap & Transpilation (init-workspace)", () => {
       "GEMINI.md",
       path.join(".github", "copilot-instructions.md"),
       path.join(".cursor", "rules", "sauron.mdc"),
+      path.join(".omp", "skills", "README.md"),
     ];
 
     for (const relFile of expectedFiles) {
@@ -92,6 +93,9 @@ describe("E2E: Workspace Bootstrap & Transpilation (init-workspace)", () => {
         `File '${relFile}' must contain Sauron governance rules`,
       );
     }
+
+    const ompMcp = JSON.parse(fs.readFileSync(path.join(tempWorkspace, ".omp", "mcp.json"), "utf8"));
+    assert.deepEqual(ompMcp, { mcpServers: {} }, ".omp/mcp.json must hold an mcpServers object");
   });
 
   it("verifies idempotency: re-running init preserves existing user config without crashing", async () => {

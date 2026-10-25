@@ -11,7 +11,12 @@ import type { CavemanMode } from "./types.js";
 export type AgentSet = "fellowship" | "core" | "both" | "none";
 
 /** All valid agent sets. */
-export const AGENT_SETS: readonly AgentSet[] = ["fellowship", "core", "both", "none"];
+export const AGENT_SETS: readonly AgentSet[] = [
+  "fellowship",
+  "core",
+  "both",
+  "none",
+];
 
 /** Runtime ids accepted by `--runtimes`, matching the transpiler adapter ids. */
 export const RUNTIME_IDS: readonly string[] = [
@@ -32,6 +37,7 @@ export const RUNTIME_IDS: readonly string[] = [
   "openclaw",
   "opencode",
   "pi",
+  "omp",
   "adal",
   "codebuddy",
 ];
@@ -127,7 +133,9 @@ export function parseSkills(
 export function parseAgents(value: string): AgentSet {
   const agents = value.trim().toLowerCase();
   if (!AGENT_SETS.includes(agents as AgentSet)) {
-    throw new InitPlanError(`Unknown agent set '${value}'. Valid: ${AGENT_SETS.join(", ")}.`);
+    throw new InitPlanError(
+      `Unknown agent set '${value}'. Valid: ${AGENT_SETS.join(", ")}.`,
+    );
   }
   return agents as AgentSet;
 }
@@ -136,7 +144,9 @@ export function parseAgents(value: string): AgentSet {
 export function parseCaveman(value: string): CavemanMode {
   const mode = value.trim().toLowerCase();
   if (!CAVEMAN_MODES.includes(mode as CavemanMode)) {
-    throw new InitPlanError(`Invalid caveman tier '${value}'. Valid: ${CAVEMAN_MODES.join(", ")}.`);
+    throw new InitPlanError(
+      `Invalid caveman tier '${value}'. Valid: ${CAVEMAN_MODES.join(", ")}.`,
+    );
   }
   return mode as CavemanMode;
 }
@@ -174,7 +184,9 @@ export function resolvePlan(
   return {
     runtimes: flags.runtimes ?? [...base.runtimes],
     agents: flags.agents ?? base.agents,
-    skills: flags.skills ?? (Array.isArray(base.skills) ? [...base.skills] : base.skills),
+    skills:
+      flags.skills ??
+      (Array.isArray(base.skills) ? [...base.skills] : base.skills),
     caveman: flags.caveman ?? base.caveman,
     commands: flags.commands ?? base.commands,
   };
@@ -205,9 +217,13 @@ export function planFromConfig(
           : undefined;
     return resolvePlan({
       ...(runtimes ? { runtimes } : {}),
-      ...(typeof record["agents"] === "string" ? { agents: parseAgents(record["agents"]) } : {}),
+      ...(typeof record["agents"] === "string"
+        ? { agents: parseAgents(record["agents"]) }
+        : {}),
       ...(skills ? { skills } : {}),
-      ...(typeof record["commands"] === "boolean" ? { commands: record["commands"] } : {}),
+      ...(typeof record["commands"] === "boolean"
+        ? { commands: record["commands"] }
+        : {}),
     });
   } catch {
     return undefined;

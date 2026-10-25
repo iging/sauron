@@ -1,7 +1,7 @@
 /// <reference types="node" />
 /**
  * @fileoverview Universal Transpiler Core Engine.
- * Converts Sauron master configuration and Fellowship specs into 17 target runtime adapters.
+ * Converts Sauron master configuration and Fellowship specs into 20 target runtime adapters.
  * Strictly adheres to sauron typescript-standards. No barrel files.
  *
  * The Transpiler acts as the central orchestrator for multi-agent synchronization.
@@ -30,6 +30,7 @@ import { HermesAdapter } from "./hermes.js";
 import { OpenClawAdapter } from "./openclaw.js";
 import { OpenCodeAdapter } from "./opencode.js";
 import { PiAdapter } from "./pi.js";
+import { OmpAdapter } from "./omp.js";
 import { AdalAdapter } from "./adal.js";
 import { CodeBuddyAdapter } from "./codebuddy.js";
 import { AgentsMdAdapter } from "./agents-md.js";
@@ -122,7 +123,7 @@ export class Transpiler {
     this.conflictManager = new ConflictManager(this.workspaceRoot);
     this.adapters = new Map();
 
-    // Registry of all 17+ supported AI coding runtimes.
+    // Registry of all 20 supported AI coding runtimes.
     // Each adapter owns its tool-specific formatting while remaining decoupled from disk I/O.
     const adapterList: RuntimeAdapter[] = [
       new ClaudeAdapter(),
@@ -142,6 +143,7 @@ export class Transpiler {
       new OpenClawAdapter(),
       new OpenCodeAdapter(),
       new PiAdapter(),
+      new OmpAdapter(),
       new AdalAdapter(),
       new CodeBuddyAdapter(),
       new AgentsMdAdapter(),
@@ -262,7 +264,11 @@ export class Transpiler {
    * Fail-closed: returns undefined when the file is missing or unreadable.
    */
   private loadAntiPatternsDoc(): string | undefined {
-    const docPath = path.join(this.sauronRoot, "references", "anti-patterns.md");
+    const docPath = path.join(
+      this.sauronRoot,
+      "references",
+      "anti-patterns.md",
+    );
     try {
       return fs.readFileSync(docPath, "utf8");
     } catch {
@@ -366,16 +372,27 @@ export class Transpiler {
         for (const out of outputs) {
           // Enforce zero-destructive overwrites across every generated file.
           results.push(
-            this.conflictManager.safeWrite(out.relativePath, out.content, adapter.id, dryRun),
+            this.conflictManager.safeWrite(
+              out.relativePath,
+              out.content,
+              adapter.id,
+              dryRun,
+            ),
           );
         }
       }
 
       for (const extra of options.extras ?? []) {
         results.push(
-          this.conflictManager.safeWrite(extra.relativePath, extra.content, "install", dryRun, {
-            raw: extra.raw,
-          }),
+          this.conflictManager.safeWrite(
+            extra.relativePath,
+            extra.content,
+            "install",
+            dryRun,
+            {
+              raw: extra.raw,
+            },
+          ),
         );
       }
     } finally {

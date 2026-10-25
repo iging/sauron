@@ -3,7 +3,7 @@
  * @fileoverview Type definitions for Sauron transpiler, adapters, and intermediate representations.
  * Strictly adheres to sauron typescript-standards. No barrel files.
  *
- * This module defines the architectural contracts used across all 17 runtime adapters,
+ * This module defines the architectural contracts used across all 20 runtime adapters,
  * the conflict manager, and the CLI transpiler pipeline.
  */
 

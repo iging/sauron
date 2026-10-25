@@ -30,7 +30,7 @@ describe("AgentsMdAdapter", () => {
     const agents = out[0].content;
     assert.match(
       agents,
-      /Codex, Cursor, GitHub Copilot, Windsurf, Cline, OpenCode, Kiro, Zed, CodeBuddy, and Pi/,
+      /Codex, Cursor, GitHub Copilot, Windsurf, Cline, OpenCode, Kiro, Zed, CodeBuddy, Pi, and omp/,
     );
     assert.match(agents, /Caveman Mode/);
     assert.match(agents, /\/gandalf/);

@@ -86,7 +86,7 @@ const LOTR_BANNER = Object.freeze(`
  */
 
 /**
- * Catalog of the shared AGENTS.md core plus all 19 supported AI coding runtimes and their primary scaffold paths.
+ * Catalog of the shared AGENTS.md core plus all 20 supported AI coding runtimes and their primary scaffold paths.
  * See docs/runtime-scaffolds.md for sources and verification status.
  * Sealed with Object.freeze to prevent runtime prototype pollution or accidental mutations.
  * @type {readonly RuntimeTarget[]}
@@ -138,6 +138,7 @@ const RUNTIMES = Object.freeze([
   }),
   Object.freeze({ id: "opencode", name: "OpenCode", file: "opencode.json" }),
   Object.freeze({ id: "pi", name: "Pi", file: ".pi/prompts/README.md" }),
+  Object.freeze({ id: "omp", name: "omp (oh-my-pi)", file: ".omp/mcp.json" }),
   Object.freeze({ id: "adal", name: "AdaL", file: ".adalrules" }),
   Object.freeze({
     id: "codebuddy",
@@ -255,7 +256,7 @@ function printHelpMenu() {
   console.log("Usage: sauron <command> [options]\n");
   console.log("Commands:");
   console.log(
-    "  init         Initialize sauron configuration and transpile to 19 runtimes",
+    "  init         Initialize sauron configuration and transpile to 20 runtimes",
   );
   console.log(
     "               Interactive setup (Recommended or Custom). Flags skip questions:",
@@ -326,7 +327,7 @@ function executeStatusCommand() {
   console.log(`[STATUS] sauron v${VERSION}\n`);
 
   console.log(
-    "--- The 19 Runtimes Bound by sauron (+ shared AGENTS.md core) ---",
+    "--- The 20 Runtimes Bound by sauron (+ shared AGENTS.md core) ---",
   );
   for (const runtime of RUNTIMES) {
     console.log(`  [OK] ${runtime.name.padEnd(20)} -> ${runtime.file}`);
@@ -822,6 +823,7 @@ const RUNTIME_HINTS = Object.freeze({
   openclaw: ".openclaw/",
   opencode: "AGENTS.md + .opencode/",
   pi: "AGENTS.md + .pi/",
+  omp: "AGENTS.md + .omp/",
   adal: ".adalrules",
   codebuddy: ".codebuddy/rules/",
 });
