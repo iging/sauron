@@ -1,6 +1,6 @@
 # Sauron Documentation Portal
 
-> Universal AI Agent Harness for 17 runtimes. Governed by Sauron v1.0.0.
+> Universal AI Agent Harness for 20 runtimes. Governed by Sauron v1.0.0.
 
 Welcome to the Sauron documentation portal. This directory provides complete, structured guides covering the Sauron architecture, Fellowship sub-agents, skill ecosystem, runtime adapters, token conservation engine, and safety mechanisms.
 
@@ -61,7 +61,7 @@ Browse the documentation by topic:
 
 ### [07. References & Authoritative Matrices](../references/)
 
-- [The 17-Runtime Matrix](../references/runtime-matrix.md) : Complete comparison table of file paths, formats, frontmatter support, and slash command mappings.
+- [The 20-Runtime Matrix](../references/runtime-matrix.md) : Complete comparison table of file paths, formats, frontmatter support, and slash command mappings.
 - [Fellowship Authority Contracts](../references/fellowship-contracts.md) : Formal authority boundaries, file modification rules, and 5-phase handoff lifecycle.
 - [Anti-Patterns Reference](../references/anti-patterns.md) : Comprehensive guide to the 60 credit-killing patterns across AI engineering workflows.
 - [Docker Architecture & Sandboxing](../docker/README.md) : Production-grade, non-root isolated container instructions.

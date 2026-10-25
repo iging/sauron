@@ -12,7 +12,7 @@
 
 ## Architecture & Code Organization
 
-- `adapters/` : 17 runtime transpilation adapters, types, and safe conflict manager.
+- `adapters/` : 20 runtime transpilation adapters, types, and safe conflict manager.
 - `bin/` : CLI orchestrator and runtime entry points.
 - `core/` : Fellowship sub-agent specifications and department skill metadata.
 - `skills/` : 44 ECC-standard modular skills across 7 functional departments.

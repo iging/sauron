@@ -41,7 +41,7 @@ node ./bin/sauron.mjs init
 This command performs three automated actions:
 
 1. Generates `sauron.config.yaml` in your root directory if not present.
-2. Transpiles universal instructions to all 17 supported runtime configuration files.
+2. Transpiles universal instructions to all 20 supported runtime configuration files.
 3. Initializes `.sauron/manifest.json` to track file checksums and prevent destructive overwrites.
 
 To preview actions without modifying files, pass the `--dry-run` flag:
@@ -71,7 +71,7 @@ Expected output:
 
 [STATUS] sauron v1.0.0
 
---- The 17 Runtimes Bound by sauron ---
+--- The 20 Runtimes Bound by sauron ---
   [OK] Claude Code          -> CLAUDE.md
   [OK] Cursor               -> .cursorrules
   [OK] Windsurf             -> .windsurfrules

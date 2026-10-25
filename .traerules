@@ -4,7 +4,7 @@
 
 ## Project Overview
 
-Sauron is a universal AI agent harness managing 17 AI coding runtimes.
+Sauron is a universal AI agent harness managing 20 AI coding runtimes.
 
 - Tech Stack: Node.js 20+, TypeScript 5.5+, ESM.
 - Test Runner: Native Node.js test runner.

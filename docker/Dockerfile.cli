@@ -18,7 +18,7 @@ RUN npx tsc --project tsconfig.json
 FROM node:22-alpine AS runner
 
 LABEL maintainer="sauron contributors"
-LABEL description="Sauron 17-Runtime AI Agent Harness & Transpiler"
+LABEL description="Sauron 20-Runtime AI Agent Harness & Transpiler"
 
 # Install minimal runtime dependencies with cache purged
 RUN apk add --no-cache bash git python3 && \

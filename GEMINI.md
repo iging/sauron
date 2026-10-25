@@ -4,7 +4,7 @@
 
 ## Project Overview & Tech Stack
 
-Sauron AI is a universal AI agent harness that synchronizes instructions across 17 AI coding runtimes.
+Sauron AI is a universal AI agent harness that synchronizes instructions across 20 AI coding runtimes.
 
 - **Runtime Environment**: Node.js 20+, TypeScript 7+, ESM.
 - **Dependencies**: Commander.js, Chalk, YAML.

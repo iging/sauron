@@ -104,7 +104,7 @@ node ./bin/sauron.mjs status
 **Information Displayed:**
 
 - Harness version and header banner.
-- All 17 runtimes with target configuration paths and sync states.
+- All 20 runtimes with target configuration paths and sync states.
 - Fellowship agents with assigned titles and roles.
 - Skill ecosystem count across all 8 functional domains.
 

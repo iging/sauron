@@ -1,6 +1,6 @@
 # Sauron AI Contributors & The Fellowship Roll
 
-Thank you to all the engineers, architects, and open-source contributors who build, maintain, and expand **Sauron AI** — the universal AI coding agent harness and skills ecosystem for 17 AI coding runtimes.
+Thank you to all the engineers, architects, and open-source contributors who build, maintain, and expand **Sauron AI** — the universal AI coding agent harness and skills ecosystem for 20 AI coding runtimes.
 
 ---
 
@@ -8,7 +8,7 @@ Thank you to all the engineers, architects, and open-source contributors who bui
 
 | Contributor | Role                     | GitHub                             | Primary Focus                                           |
 | :---------- | :----------------------- | :--------------------------------- | :------------------------------------------------------ |
-| **iging**   | Creator & Lead Architect | [@iging](https://github.com/iging) | Sauron Core, 17-Runtime Transpiler, Skills Architecture |
+| **iging**   | Creator & Lead Architect | [@iging](https://github.com/iging) | Sauron Core, 20-Runtime Transpiler, Skills Architecture |
 
 ---
 
