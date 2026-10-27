@@ -2,6 +2,14 @@
 
 > Governed by Sauron AI. Persistent context and instructions for Gemini CLI.
 
+## Second Brain
+
+Read [claude.md](docs/sauron-second-brain/claude.md), then its small startup read set.
+Use [task-file-map.md](docs/sauron-second-brain/project/task-file-map.md) for task sources.
+Do not scan the whole codebase, skill catalog, Git history, or other worktrees at startup.
+Read implementation and tests only for the named task. Before stopping, update the vault's
+status, open items, and lessons. Handoffs stay in `docs/handoffs/`.
+
 ## Project Overview & Tech Stack
 
 Sauron AI is a universal AI agent harness that synchronizes instructions across 20 AI coding runtimes.
