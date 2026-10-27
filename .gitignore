@@ -34,7 +34,18 @@ Thumbs.db
 progress-report-result.md
 .sauron/graph/
 
-
 # Claude Code agent worktrees
 .claude/worktrees/
 
+# Obsidian per-user layout for the second brain vault
+docs/sauron-second-brain/.obsidian/
+
+# Recoverable local cleanup archives
+.sauron/cleanup-archives/
+sauron-ai-*.tgz
+RELEASE-V3-COMMANDS.md
+RELEASE-V3.1-ARROW-INIT.md
+RUNTIME-SCAFFOLDS-CHANGES.md
+TESTING-RUNTIME-SCAFFOLDS.md
+context/PRD.md
+context/TASKS.md

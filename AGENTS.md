@@ -2,6 +2,14 @@
 
 > Universal AI Agent Harness for 20 runtimes. Governed by Sauron AI.
 
+## Second Brain
+
+Read [claude.md](docs/sauron-second-brain/claude.md), then its small startup read set.
+Use [task-file-map.md](docs/sauron-second-brain/project/task-file-map.md) for task sources.
+Do not scan the whole codebase, skill catalog, Git history, or other worktrees at startup.
+Read implementation and tests only for the named task. Before stopping, update the vault's
+status, open items, and lessons. Handoffs stay in `docs/handoffs/`.
+
 ## Setup commands
 
 - Install dependencies: `npm install`
