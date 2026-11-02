@@ -5,7 +5,7 @@
   "author": "sauron contributors",
   "homepage": "https://github.com/iging/sauron",
   "repository": "https://github.com/iging/sauron",
-  "license": ["MIT", "Apache-2.0", "unlicense"],
+  "license": "MIT OR Apache-2.0 OR Unlicense",
   "skills": ["./skills"],
   "hooks": {
     "preCommand": "./.claude/hooks/guard.sh"

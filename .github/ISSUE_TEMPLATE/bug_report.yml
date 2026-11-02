@@ -1,0 +1,45 @@
+name: Bug report
+description: Report something in Sauron that does not work.
+labels: [bug]
+body:
+  - type: textarea
+    id: problem
+    attributes:
+      label: What happened?
+      description: Include the exact command and any error output.
+    validations:
+      required: true
+  - type: textarea
+    id: expected
+    attributes:
+      label: What did you expect?
+    validations:
+      required: true
+  - type: textarea
+    id: steps
+    attributes:
+      label: Steps to reproduce
+      placeholder: |
+        1. Run `npx sauron-ai init --yes`
+        2. ...
+    validations:
+      required: true
+  - type: input
+    id: version
+    attributes:
+      label: Sauron version
+      description: Run `npx sauron-ai --version`.
+    validations:
+      required: true
+  - type: input
+    id: environment
+    attributes:
+      label: Environment
+      placeholder: Windows 11, Node 24, Git Bash
+    validations:
+      required: true
+  - type: input
+    id: runtime
+    attributes:
+      label: AI coding runtime
+      placeholder: Claude Code, Cursor, OpenCode

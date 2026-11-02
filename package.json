@@ -9,6 +9,7 @@
     "sauron-ai": "./bin/sauron.mjs"
   },
   "files": [
+    "licenses",
     "bin",
     "dist",
     "config",
@@ -17,6 +18,8 @@
     "skills",
     "references",
     "docs",
+    "!docs/handoffs",
+    "!docs/sauron-second-brain",
     "commands",
     "scripts"
   ],
@@ -46,7 +49,15 @@
     "sauron"
   ],
   "author": "sauron contributors",
-  "license": "MIT",
+  "license": "(MIT OR Apache-2.0 OR Unlicense)",
+  "homepage": "https://sauron-cli.vercel.app",
+  "bugs": {
+    "url": "https://github.com/iging/sauron/issues"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/iging/sauron.git"
+  },
   "engines": {
     "node": ">=18.0.0"
   },
