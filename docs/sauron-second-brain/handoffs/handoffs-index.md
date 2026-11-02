@@ -17,6 +17,8 @@ path is part of the product. See [[decisions]].
 
 ## Index (newest first)
 
+- 2026-11-01: `docs/handoffs/2026-11-01-launch-readiness-and-plan-order.md`
+  Landing live, 3.2.0 uncommitted, plan-only decision, and the ordered plan.
 - 2026-10-20: `docs/handoffs/2026-10-20-sauron-v3-release-and-roadmap.md`
   3.0.0 shipped, 3.1.0 plan, research briefs, `/plan-feature` Parts 1 and 2.
 - 2026-10-05: `docs/handoffs/2026-10-05-design-patterns-skill-finder-and-discipline-layer.md`

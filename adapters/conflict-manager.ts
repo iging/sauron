@@ -273,7 +273,8 @@ export class ConflictManager {
     const targetPath = path.join(this.workspaceRoot, relativePath);
     const raw = options.raw === true;
     const isJson = !raw && relativePath.toLowerCase().endsWith(".json");
-    const rendered = raw || isJson ? content : wrapManagedBlock(relativePath, content);
+    const rendered =
+      raw || isJson ? content : wrapManagedBlock(relativePath, content);
     const result = (
       action: WriteFileResult["action"],
       backupPath: string | null = null,
@@ -341,13 +342,7 @@ export class ConflictManager {
       return result("simulated");
     }
 
-    // Sanitize delimiters (slashes, colons, dots) so backup filename is valid across Windows, Linux, and macOS.
-    const timestamp = new Date().toISOString().replace(/[:.]/g, "-");
-    const safeRelativeBackup = `${relativePath.replace(/[\/\\]/g, "_")}.${timestamp}.bak`;
-    const fullBackupPath = path.join(this.backupDir, safeRelativeBackup);
-    fs.mkdirSync(this.backupDir, { recursive: true });
-    fs.copyFileSync(targetPath, fullBackupPath);
-
+    const fullBackupPath = this.backupFile(relativePath, targetPath);
     fs.writeFileSync(targetPath, next, "utf8");
     this.recordInManifest(
       relativePath,
@@ -357,6 +352,73 @@ export class ConflictManager {
       action === "merged",
     );
     return result(action, path.relative(this.workspaceRoot, fullBackupPath));
+  }
+
+  /**
+   * Removes a file an older Sauron version emitted, only while Sauron still owns it.
+   * A file the user edited, a user file Sauron merged into, and an untracked file all
+   * stay on disk and report `skipped`. A removal keeps a copy in `.sauron/backups/`.
+   *
+   * @param relativePath - Target file path relative to workspace root.
+   * @param runtime - Identifier of the AI runtime that retired the file.
+   * @param dryRun - When true, evaluates the removal without modifying disk.
+   * @returns The result, or null when the file does not exist.
+   */
+  public retireFile(
+    relativePath: string,
+    runtime: string,
+    dryRun: boolean = false,
+  ): WriteFileResult | null {
+    const targetPath = path.join(this.workspaceRoot, relativePath);
+    if (!fs.existsSync(targetPath)) {
+      return null;
+    }
+    const result = (
+      action: WriteFileResult["action"],
+      backupPath: string | null = null,
+    ): WriteFileResult => ({
+      filePath: relativePath,
+      runtime,
+      action,
+      backupPath,
+    });
+
+    const manifest = this.loadManifest();
+    const record = manifest.managedFiles.find((f) => f.path === relativePath);
+    const ownedByUs =
+      record !== undefined &&
+      record.merged !== true &&
+      record.checksum ===
+        this.computeChecksum(fs.readFileSync(targetPath, "utf8"));
+    if (!ownedByUs) {
+      return result("skipped");
+    }
+    if (dryRun) {
+      return result("simulated");
+    }
+
+    const fullBackupPath = this.backupFile(relativePath, targetPath);
+    fs.rmSync(targetPath);
+    manifest.managedFiles = manifest.managedFiles.filter(
+      (f) => f.path !== relativePath,
+    );
+    if (this.batchManifest) {
+      this.batchDirty = true;
+    } else {
+      this.saveManifest(manifest);
+    }
+    return result("removed", path.relative(this.workspaceRoot, fullBackupPath));
+  }
+
+  /** Copies a file to `.sauron/backups/` and returns the absolute backup path. */
+  private backupFile(relativePath: string, targetPath: string): string {
+    // Sanitize delimiters (slashes, colons, dots) so backup filename is valid across Windows, Linux, and macOS.
+    const timestamp = new Date().toISOString().replace(/[:.]/g, "-");
+    const safeRelativeBackup = `${relativePath.replace(/[\/\\]/g, "_")}.${timestamp}.bak`;
+    const fullBackupPath = path.join(this.backupDir, safeRelativeBackup);
+    fs.mkdirSync(this.backupDir, { recursive: true });
+    fs.copyFileSync(targetPath, fullBackupPath);
+    return fullBackupPath;
   }
 
   /**

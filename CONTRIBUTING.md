@@ -2,7 +2,7 @@
 
 Thank you for your interest in contributing to **Sauron AI** — the universal AI coding agent harness and skills ecosystem for 20 AI coding runtimes!
 
-Sauron is a free, local-first, open-source project licensed under MIT and Apache 2.0. We welcome contributions from developers, AI engineers, and open-source practitioners worldwide.
+Sauron is a free, local-first, open-source project. You may use it under your choice of MIT, Apache 2.0, or the Unlicense, and contributions are accepted under all three. We welcome contributions from developers, AI engineers, and open-source practitioners worldwide.
 
 ---
 

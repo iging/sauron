@@ -37,7 +37,7 @@ and in your codebase bind them.
    Instead of blind prompting, Sauron orchestrates a **Fellowship of 9 Specialized Sub-Agents** (Gandalf for planning, Aragorn for system architecture, Legolas for linting, Boromir for security, Frodo for atomic execution, Merry for TDD QA, and more). Every task routes through structured domain blueprints, token-efficient communication (`/caveman`), and rigorous test verification before a single line of code reaches your git history.
 
 3. **Context Window Bloat & LLM Token Burn**:
-   Long-running agent sessions burn up to 75% of context window limits on conversational filler, pleasantries, and redundant narration. As token budgets deplete, model attention degrades, leading to forgotten requirements, catastrophic forgetfulness, and expensive API bills.
+   Long-running agent sessions spend context window limits on conversational filler, pleasantries, and redundant narration. As token budgets deplete, model attention degrades, leading to forgotten requirements, catastrophic forgetfulness, and expensive API bills.
 
    **Sauron solves this with Built-in Token Conservation & Caveman Transpilation**:
    Sauron embeds **Caveman Mode**—a native compression engine with multiple intensity tiers (`lite`, `full`, `ultra`) that cuts conversational filler while strictly preserving technical precision, code blocks, diffs, and negations. `sauron init` asks which tier to turn on (or pass `--caveman=off|lite|full|ultra`) and writes it into the instruction files of all **20 runtimes** (`AGENTS.md`, `CLAUDE.md`, `.cursor/rules/`, `.windsurf/rules/`, `.cline/rules/`, and more), so the agent applies it from its first reply with no trigger command. Coupled with zero-install modular skill injection via `npx`, developers load only what the agent needs, eliminating memory bloat.
@@ -102,9 +102,6 @@ npx sauron-ai init --yes --runtimes=claude --agents=fellowship
 # Or install globally
 npm install -g sauron-ai        # or: pnpm add -g sauron-ai
 sauron init
-
-# Using Python PIP (forwards to the Node.js CLI; Node.js 18+ required)
-pip install sauron-ai && sauron init
 
 # Direct Git Clone
 git clone https://github.com/iging/sauron.git
@@ -345,7 +342,7 @@ We welcome contributions from the community to expand the Sauron harness, runtim
 
 ## Licenses
 
-Sauron is released under multiple open-source licenses:
+Sauron is available under your choice of one of these licenses:
 
 - [MIT License](./licenses/LICENSE-MIT)
 - [Apache License 2.0](./licenses/LICENSE-APACHE-2.0)

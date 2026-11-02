@@ -77,7 +77,7 @@ describe("E2E: Workspace Bootstrap & Transpilation (init-workspace)", () => {
       "GEMINI.md",
       path.join(".github", "copilot-instructions.md"),
       path.join(".cursor", "rules", "sauron.mdc"),
-      path.join(".omp", "skills", "README.md"),
+      path.join(".omp", "README.md"),
     ];
 
     for (const relFile of expectedFiles) {

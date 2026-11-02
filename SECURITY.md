@@ -22,7 +22,7 @@ In the broader AI tooling ecosystem, unverified agent harnesses are vulnerable t
 
 4. **Supply-Chain Dependency Vulnerabilities:**
    - _Attack:_ Malicious npm/pip packages containing backdoor postinstall scripts.
-   - _Sauron Defense:_ Sauron maintains zero runtime cloud dependencies and pins all package versions. Automated SAST scans audit the repository for unsafe sinks (`eval`, dynamic `child_process`).
+   - _Sauron Defense:_ Sauron has zero runtime cloud dependencies, and `package-lock.json` records exact dependency versions. Automated SAST scans audit the repository for unsafe sinks (`eval`, dynamic `child_process`).
 
 ---
 

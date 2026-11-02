@@ -1,6 +1,6 @@
 # Roadmap Brief
 
-Planning context only. Reading this does not authorize new research or implementation.
+Newest proposal: [[roadmap-ecc]]. Planning context only. Reading this does not authorize new research or implementation.
 Source: October 20 handoff, sections 9 through 11. See [[handoffs-index]].
 
 ## Retired local drafts

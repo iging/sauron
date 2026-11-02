@@ -8,7 +8,7 @@ version = "1.0.0"
 description = "Universal AI agent harness for 20 AI coding runtimes (Python entry point for the Node.js CLI; requires Node.js 18+)."
 readme = "README.md"
 requires-python = ">=3.10"
-license = { text = "MIT" }
+license = { text = "MIT OR Apache-2.0 OR Unlicense" }
 authors = [
   { name = "sauron contributors" }
 ]

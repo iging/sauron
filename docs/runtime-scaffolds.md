@@ -1,6 +1,6 @@
 # Runtime Scaffolds
 
-Research date: 2026-10-19. Each Sauron adapter emits the project scaffold that its runtime officially documents. Every emitted folder contains a `README.md` that explains how to extend it.
+Research date: 2026-10-19. Each Sauron adapter emits the project scaffold that its runtime officially documents. Every emitted folder contains a `README.md` that explains how to extend it. OpenCode and omp keep one note at `.opencode/README.md` and `.omp/README.md` instead, because they load every Markdown file in their agent and command folders. `sauron sync` removes the older folder notes unless you edited them.
 
 **V** means the path is verified in official documentation. **U** means the path is unverified (for example, it comes only from blogs or community sources). Sauron emits U paths only with a `<!-- unverified: <source> -->` note.
 
@@ -22,13 +22,13 @@ Research date: 2026-10-19. Each Sauron adapter emits the project scaffold that i
 | Cline | `.cline/rules/sauron.md` | `.clinerules/` directory **or** `.cline/rules/`, plus `.cline/{workflows,skills,hooks}/` | V | https://docs.cline.bot/features/cline-rules |
 | Gemini CLI | `GEMINI.md` | `GEMINI.md`, `.gemini/skills/` (alias `.agents/skills/`) (V). `.gemini/settings.json` and `.gemini/commands/*.toml` (U). The free tier moved to Antigravity CLI on 2026-06-18. | V/U | https://geminicli.com/docs/cli/gemini-md |
 | Qwen Code | `QWEN.md` | `.qwen/skills/` (V). `QWEN.md` and `.qwen/{settings.json,agents,commands}` (U). | V/U | https://qwenlm.github.io/qwen-code-docs |
-| OpenCode | `opencode.json` | `AGENTS.md`, `opencode.json`, `.opencode/{agents,commands,skills,modes,plugins,tools}/` | V | https://opencode.ai/docs/rules |
+| OpenCode | `opencode.json` | `AGENTS.md`, `opencode.json`, `.opencode/{agents,commands,skills,modes,plugins,tools}/`. Sauron installs native subagents and commands here. | V | https://opencode.ai/docs/rules |
 | Kiro | `.kiro/steering/sauron.md` | `.kiro/steering/*.md` (`inclusion:`), `.kiro/skills/`. Also reads `AGENTS.md`. | V | https://kiro.dev/docs/steering |
 | CodeBuddy | `.codebuddy/rules/sauron.md` | `CODEBUDDY.md` (falls back to `AGENTS.md`), `.codebuddy/rules/`, `.codebuddy/skills/<n>/SKILL.md` | V | https://www.tencentcloud.com/document/product/1256/77282 |
 | Zed | `.rules` | Reads the first match of `.rules`, …, `AGENTS.md` (V). `.zed/settings.json` (U). | V/U | https://zed.dev/docs/ai/rules |
 | Trae | `.trae/rules/project_rules.md` | `.trae/rules/project_rules.md` (multiple unofficial sources) | U | none (needs an official source) |
 | Pi | `.pi/prompts/README.md` | `AGENTS.md`, `.pi/skills`, `.agents/skills`, `.pi/prompts/` | U | none (needs an official source) |
-| omp (oh-my-pi) | `.omp/mcp.json` | `AGENTS.md`, `.omp/skills/<n>/SKILL.md`, `.omp/prompts/*.md`, `.omp/agents/*.md`, `.omp/mcp.json`. Also discovers `.agents/skills/` and `.claude/skills/`. `.omp/rules/` (TTSR) and `.omp/hooks/` are not scaffolded. | V | https://omp.sh/docs/context-files |
+| omp (oh-my-pi) | `.omp/mcp.json` | `AGENTS.md`, `.omp/skills/<n>/SKILL.md`, `.omp/prompts/*.md`, `.omp/agents/*.md`, `.omp/mcp.json`. Sauron installs native subagents and commands here. Also discovers `.agents/skills/` and `.claude/skills/`. `.omp/rules/` (TTSR) and `.omp/hooks/` are not scaffolded. | V | https://omp.sh/docs/context-files |
 | Kimi | `.kimi/prompt.md` | Legacy path kept | U | none |
 | Hermes | `.hermesrules` | Legacy path kept | U | none |
 | OpenClaw | `.openclaw/config.json` | Legacy path kept | U | none |

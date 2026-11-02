@@ -37,6 +37,32 @@ Short record of decisions and why. See [[claude]] and [[project-overview]].
 - This vault lives in `docs/sauron-second-brain/` with `claude.md` as the entry note, the same
   layout as the vault in `vetted-studio`.
 
+## Native subagents, 2026-11-01
+
+- OpenCode and omp come first. Their formats are documented and close to Claude Code files.
+- 3.2.0 is MINOR. Reasoning: [[plan-native-subagents]].
+- `nativeRuntimes` is saved so `sync` never adds native files that a user did not choose.
+- Commands shadowed by omp built-ins are left out, not renamed.
+
+## Scaffold notes and outside tools, 2026-11-01
+
+- OpenCode and omp keep one note at their root. Their loaders read every Markdown file in the
+  agent and command folders.
+- Removing a retired file needs Sauron ownership, a matching checksum, and a backup.
+- Static inspection lives inside Sauron, with no external tool. See [[plan-sauron-eye]].
+- Any reverse-engineering skill puts authorization first and refuses DRM, license, and
+  anti-cheat bypass.
+
+## Licensing and launch, 2026-11-01
+
+- Sauron offers a choice of MIT, Apache-2.0, or the Unlicense. Users pick one.
+- Public contact is GitHub only. No personal email appears in the repo or on the site.
+- The landing page uses Vercel Web Analytics, with no cookies and no banner. Recheck after deploy.
+- Checklist items that need a sale, form, or email list are skipped, not faked.
+- Miguel chose on 2026-11-02: Eye and roadmap stay plan-only, and all other work ships in 3.2.0.
+- `docs/handoffs/` and this vault leave the npm package, because `npm publish` packs what is on
+  disk and these notes are for the project, not for users.
+
 ## Portable memory, 2026-10-25
 
 - Startup reads the resume brief and task map. History and full handoffs load on demand.

@@ -9,7 +9,9 @@ Snapshot: 2026-10-25, release commit `1a185e9`. Start after [[claude]].
 - Branch: `main`. omp merges in PR #9 at `26669a8`. Release tag: `v3.1.0`.
 - Release build, typecheck, doc gate, and 116 tests pass on 2026-10-25.
 - Packed setup and graph checks pass. Fresh registry installation reports 20 runtimes.
-- Vault and cleanup changes stay uncommitted. Check `git status --short`.
+- 3.2.0 work is uncommitted on `main`: [[plan-native-subagents]] and the README fix.
+  Follow [[implementation-order]] for what comes next.
+  Check `git status --short`.
 - Local VS Code edits, stashes, and the extra worktree are user state. Preserve them.
 
 ## Small startup read set

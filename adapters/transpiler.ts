@@ -380,6 +380,16 @@ export class Transpiler {
             ),
           );
         }
+        for (const retired of adapter.retiredFiles ?? []) {
+          const removal = this.conflictManager.retireFile(
+            retired,
+            adapter.id,
+            dryRun,
+          );
+          if (removal) {
+            results.push(removal);
+          }
+        }
       }
 
       for (const extra of options.extras ?? []) {

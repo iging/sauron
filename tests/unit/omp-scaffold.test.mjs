@@ -13,16 +13,11 @@ const ctx = {
 };
 
 describe("omp scaffold", () => {
-  it("emits .omp/mcp.json and folder READMEs only", () => {
+  it("emits .omp/mcp.json and one README outside the scanned folders", () => {
     const adapter = new OmpAdapter();
     const out = adapter.transpile(ctx);
     const paths = out.map((o) => o.relativePath).sort();
-    assert.deepEqual(paths, [
-      ".omp/agents/README.md",
-      ".omp/mcp.json",
-      ".omp/prompts/README.md",
-      ".omp/skills/README.md",
-    ]);
+    assert.deepEqual(paths, [".omp/README.md", ".omp/mcp.json"]);
     assert.deepEqual([...adapter.targetFiles].sort(), paths);
     assert.ok(!paths.includes("AGENTS.md"));
   });
@@ -34,16 +29,14 @@ describe("omp scaffold", () => {
     assert.deepEqual(JSON.parse(mcp?.content ?? ""), { mcpServers: {} });
   });
 
-  it("documents native omp frontmatter in each README", () => {
+  it("documents native omp frontmatter in the README", () => {
     const out = new OmpAdapter().transpile(ctx);
-    const read = (/** @type {string} */ p) => out.find((o) => o.relativePath === p)?.content ?? "";
-    assert.match(read(".omp/skills/README.md"), /SKILL\.md/);
-    assert.match(read(".omp/skills/README.md"), /\.agents\/skills\//);
-    assert.match(read(".omp/prompts/README.md"), /\$ARGUMENTS/);
-    assert.match(read(".omp/agents/README.md"), /`name` and `description`/);
-    for (const o of out.filter((x) => x.format === "markdown")) {
-      assert.match(o.content, /AGENTS\.md/);
-      assert.match(o.content, /https:\/\/omp\.sh\/docs\//);
-    }
+    const readme = out.find((o) => o.relativePath === ".omp/README.md")?.content ?? "";
+    assert.match(readme, /SKILL\.md/);
+    assert.match(readme, /\.agents\/skills\//);
+    assert.match(readme, /\$ARGUMENTS/);
+    assert.match(readme, /`name` and `description`/);
+    assert.match(readme, /AGENTS\.md/);
+    assert.match(readme, /https:\/\/omp\.sh\/docs\//);
   });
 });

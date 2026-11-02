@@ -20,13 +20,20 @@ describe("init plan resolution", () => {
       skills: "all",
       caveman: "full",
       commands: true,
+      nativeRuntimes: ["claude"],
     });
     assert.ok(Object.isFrozen(PRESET_RECOMMENDED));
   });
 
   it("parses every flag and fills the rest from the preset", () => {
     const flags = parseInitFlags(
-      ["--runtimes=claude,cursor", "--agents=both", "--skills=workflow", "--caveman=ultra", "--no-commands"],
+      [
+        "--runtimes=claude,cursor",
+        "--agents=both",
+        "--skills=workflow",
+        "--caveman=ultra",
+        "--no-commands",
+      ],
       DEPTS,
     );
     assert.deepEqual(resolvePlan(flags), {
@@ -35,23 +42,40 @@ describe("init plan resolution", () => {
       skills: ["workflow"],
       caveman: "ultra",
       commands: false,
+      nativeRuntimes: ["claude"],
     });
   });
 
   it("expands --runtimes=all to every runtime", () => {
-    assert.deepEqual(parseInitFlags(["--runtimes=all"], DEPTS).runtimes, [...RUNTIME_IDS]);
+    assert.deepEqual(parseInitFlags(["--runtimes=all"], DEPTS).runtimes, [
+      ...RUNTIME_IDS,
+    ]);
   });
 
   it("rejects unknown values with InitPlanError", () => {
-    assert.throws(() => parseInitFlags(["--runtimes=nope"], DEPTS), InitPlanError);
+    assert.throws(
+      () => parseInitFlags(["--runtimes=nope"], DEPTS),
+      InitPlanError,
+    );
     assert.throws(() => parseInitFlags(["--agents=all"], DEPTS), InitPlanError);
-    assert.throws(() => parseInitFlags(["--skills=backend"], DEPTS), InitPlanError);
-    assert.throws(() => parseInitFlags(["--caveman=mega"], DEPTS), InitPlanError);
+    assert.throws(
+      () => parseInitFlags(["--skills=backend"], DEPTS),
+      InitPlanError,
+    );
+    assert.throws(
+      () => parseInitFlags(["--caveman=mega"], DEPTS),
+      InitPlanError,
+    );
   });
 
   it("restores a saved plan and ignores an invalid one", () => {
     const saved = planFromConfig(
-      { runtimes: ["cursor"], agents: "none", skills: ["frontend"], commands: false },
+      {
+        runtimes: ["cursor"],
+        agents: "none",
+        skills: ["frontend"],
+        commands: false,
+      },
       DEPTS,
     );
     assert.deepEqual(saved?.runtimes, ["cursor"]);

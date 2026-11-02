@@ -9,6 +9,7 @@ Read one row after [[resume-brief]]. Paths are repository-relative.
 | Runtime registry | `adapters/transpiler.ts`, `adapters/init-plan.ts` | [[agent-runtimes]] |
 | Safe writes | `adapters/conflict-manager.ts` | [[architecture-map]] |
 | Skill installation | `adapters/installer.ts`, `bin/sauron.mjs` | [[architecture-map]] |
+| Native subagents, commands | `adapters/installer.ts`, `adapters/init-plan.ts` | [[agent-runtimes]] |
 | Skill lookup | `adapters/skill-finder.ts` | [[history-skills-and-discipline]] |
 | Graph | `scripts/graph/generate-graph.mjs` | [[history-releases-and-init]] |
 | Config | `config/`, `schema/`, `sauron.config.yaml` | [[decisions]] |

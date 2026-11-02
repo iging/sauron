@@ -24,7 +24,7 @@ Activates conversational compression to save context tokens.
 
 1. **Step 1:** Strip greetings, pleasantries, and tool narration.
 2. **Step 2:** Format output as [subject] [action] [rationale]. [next step].
-3. **Step 3:** Conserve up to 75% of context window tokens.
+3. **Step 3:** Conserve context window tokens.
 
 ---
 
