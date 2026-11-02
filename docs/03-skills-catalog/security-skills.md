@@ -12,6 +12,7 @@ The Security domain houses skills that govern vulnerability scanning, OWASP Top 
 | **agent-guard**             | Boromir | `/agent-guard`             | Enforces runtime pre-execution validation to block destructive terminal commands.          |
 | **incident-response**       | Boromir | `/incident-response`       | Triage protocols, token revocation checklists, and post-mortem incident reporting.         |
 | **security-best-practices** | Boromir | `/security-best-practices` | Establishes defense-in-depth conventions, authentication standards, and secret management. |
+| **launch-compliance-audit** | Boromir | `/launch-compliance-audit` | Audits pre-launch legal and trust gaps with evidence per item. Not legal advice.           |
 
 ---
 

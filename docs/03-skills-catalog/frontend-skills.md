@@ -46,3 +46,4 @@ The Frontend domain houses skills governing user interface architecture, aesthet
 | **bootstrap-principles**    | Aragorn | `/bootstrap-principles`    | Responsive grid layouts and accessible Bootstrap component usage.                     |
 | **html-css-principles**     | Aragorn | `/html-css-principles`     | Semantic HTML tags, modern CSS flexbox and grid, and CSS variables.                   |
 | **javascript-principles**   | Aragorn | `/javascript-principles`   | Modern ECMAScript patterns, async/await discipline, and event loops.                  |
+| **website-launch-audit**    | Legolas | `/website-launch-audit`    | Audits pre-launch conversion, trust, and search basics by site type with evidence.    |
