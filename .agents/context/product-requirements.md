@@ -17,7 +17,7 @@ Modern AI-assisted software engineering suffers from fragmentation, instability,
 1. **Eliminate Runtime Configuration Fragmentation:** Every editor and terminal assistant requires isolated configuration formats (`CLAUDE.md`, `.cursorrules`, `.windsurfrules`, `.github/copilot-instructions.md`, `.clinerules`, `.traerules`, and others). When rules change in one environment, engineers must manually synchronize instructions across all tools. Sauron provides a single authoritative specification (`sauron.config.yaml`) that compiles and synchronizes to 17 native runtimes in milliseconds.
 2. **Eliminate Undisciplined, Unverified Code Generation:** Generic AI agents acting without explicit boundaries or verification gates produce chaotic codebases, violate layered architecture, generate security vulnerabilities, and introduce regressions. Sauron introduces **The Fellowship** (9 specialized sub-agents with strict authority boundaries) backed by an enterprise-grade catalog of over 500 modular skills. Every code modification requires explicit architectural alignment, linting, security scans, and test-driven assertions before completion.
 
-Distributed via instant CLI commands (`npx sauron init`, `pip install sauron-ai`, and zero-dependency shell scripts), Sauron is 100 percent free, local-first, telemetry-free, and open source under MIT and Apache 2.0 licenses.
+Distributed via instant CLI commands (`npx sauron-ai init`, `pnpm dlx sauron-ai init`, and shell scripts), Sauron is 100 percent free, local-first, telemetry-free, and open source under a choice of MIT, Apache 2.0, or the Unlicense licenses.
 
 ---
 
@@ -51,7 +51,7 @@ Existing AI scaffolding tools blindly overwrite existing project configurations 
   - Planning (`gandalf`) -> System Architecture (`aragorn`) -> Syntax Linting (`legolas`) -> Refactoring (`gimli`) -> Security Auditing (`boromir`) -> Task Execution (`frodo`) -> Conventional Commits (`samwise`) -> Test-Driven Verification (`merry`) -> Fuzzing and Chaos (`pippin`).
 - **Goal 3 (Enterprise Skill Standardization):** Provide over 500 production-ready skills organized across 8 departments (Architecture, Backend, Database, DevOps, Frontend, Quality, Security, Workflow).
 - **Goal 4 (Zero-Destructive Operations):** Ensure that no configuration file is modified or overwritten without generating an automated, timestamped `.bak` file in `.sauron/backups/`.
-- **Goal 5 (Zero-Friction Multi-Ecosystem Distribution):** Enable single-command installation across Node.js (`npx sauron`), Python (`pip install sauron-ai`), and shell scripts (`curl` and `irm`).
+- **Goal 5 (Zero-Friction Multi-Ecosystem Distribution):** Enable single-command installation across Node.js (`npx sauron-ai`), a Python wrapper (`sauron.py`), and shell scripts (`curl` and `irm`).
 - **Goal 6 (Local-First Privacy & Zero Telemetry):** All transpilation, parsing, and rule generation occurs entirely on the developer's local machine with zero external network dependencies.
 
 ---
@@ -132,4 +132,4 @@ Direct invocation mapping across terminal and IDE platforms:
 - **Engine:** Node.js 18+ ESM native, TypeScript 7+ in strict mode.
 - **Configuration Master:** YAML (`sauron.config.yaml`) validated by JSON Schema (`schema/sauron.schema.json`).
 - **Automated Verification:** Native Node.js test runner (`node --test`).
-- **Package Distribution:** npm (`npx sauron`), PyPI (`sauron-ai`), standalone shell installers (`install.sh`, `install.ps1`).
+- **Package Distribution:** npm (`npx sauron-ai`), standalone shell installers (`install.sh`, `install.ps1`).

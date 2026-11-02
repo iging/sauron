@@ -2,6 +2,37 @@
 
 What went wrong and what we do now. Add new lessons at the top. See [[claude]].
 
+## 2026-11-02
+
+- `npm publish` packs what is on disk, including untracked files. Leaving a note uncommitted does
+  not keep it out of the package. Exclude it in `files`, then confirm with `npm pack --dry-run`.
+- An audit checklist must handle a product with no forms, signup, or image hero. Run it on a real
+  site before trusting the wording.
+
+## 2026-11-01
+
+- Saved defaults can be armed but unused. Check what `sync` does before widening an install.
+- Compare new output with the published package, not only with tests. See [[release-and-publish]].
+- OpenCode loads project agents only inside a git repository. An empty list may mean no repo.
+- Use a negative control. `opencode run` answered a made-up slash command the same way.
+- Folder scanners may load `README.md` as content. Check scaffolds in the real tool.
+- Git Bash rewrites `/path` arguments. Set `MSYS_NO_PATHCONV=1` for API-style paths.
+- Many repo files are CRLF. Normalize before matching multi-line text in a script.
+- OpenCode returns empty on the first call for a new directory, and caches the directory.
+  Use a fresh folder per test and read the second result.
+- An empty result is not proof of a fix. Keep a control that shows the bug can still appear.
+- `MSYS_NO_PATHCONV=1` also stops `/c/...` conversion. Use `C:/...` paths with it.
+- The safety check blocks `rm -rf` on a variable path. Use fresh folders in the scratchpad.
+- Check a public name for trademarks before proposing it. `palantir` failed that check.
+- Test install commands against the registry. `npx sauron` runs an unrelated npm package.
+- Bash guard blocks `Object.keys` as `.key`. Put such checks in a script file.
+- Hard-coded counts drift. Landing counts now come from `src/constants/stats.ts`.
+- HTTP 200 does not prove a site is yours. Check the title and content.
+- Read every claim in docs against the code. A results table can exist with no data behind it.
+- Check a shipped package for license text. `npm pack --dry-run` shows what users receive.
+- Run `npm audit --omit=dev` when touching dependencies. It found a critical Next.js advisory.
+- A focus test needs a real Tab key. Scripted focus does not open keyboard tooltips.
+
 ## 2026-10-27
 
 - A progress-report commit must exclude protected manifest state and local editor settings.

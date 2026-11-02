@@ -1,11 +1,11 @@
 # Second Brain: Start Here
 
 Memory of the Sauron project for any AI agent or teammate. Read this note first.
-Last updated: 2026-10-25.
+Last updated: 2026-11-01.
 
 ## How to use this vault
 
-1. Read [[resume-brief]], then [[status]] and [[open-items]].
+1. Read [[resume-brief]], then [[implementation-order]], [[status]], and [[open-items]].
 2. Read [[working-rules]] and [[communication]] before you change anything.
 3. Read [[task-file-map]] and only sources for the named task.
    Open a handoff only when the brief lacks a needed decision.
@@ -32,11 +32,14 @@ Current notes provide context. Check relevant code before changing behavior.
 - Runbooks: [[commands-and-stack]], [[git-and-pr-flow]], [[release-and-publish]],
   [[agent-runtimes]], [[switching-agents]].
 - Learning: [[lessons]] and the dated notes in `sessions/`, starting with
-  [[session-2026-10-25-omp-and-second-brain]].
+  [[session-2026-10-25-omp-and-second-brain]], [[session-2026-11-01-native-subagents]], and
+  [[session-2026-11-01-launch-readiness]].
 - Handoffs: [[handoffs-index]].
 - Team: [[team-onboarding]].
 - Routing: [[task-file-map]], [[architecture-map]].
-- History: [[history-index]]. Planning: [[roadmap-brief]].
+- History: [[history-index]]. Planning: [[implementation-order]], [[roadmap-brief]],
+  [[roadmap-ecc]],
+  [[plan-native-subagents]], [[plan-sauron-eye]].
 - Checks: [[verification-checklist]]. Obsidian: [[obsidian-use]].
 - Cleanup: [[cleanup-record]].
 

@@ -19,19 +19,19 @@
 
 - The **ConflictManager** engine compares file contents and cryptographic checksums (SHA-256) before touching your disk.
 - If an existing configuration file differs from the new output, Sauron automatically creates an immutable, timestamped backup in `.sauron/backups/` (e.g., `.cursorrules.20260921.bak`) before writing.
-- You can always run `npx sauron init --dry-run` first to preview changes without modifying anything on disk.
+- You can always run `npx sauron-ai init --dry-run` first to preview changes without modifying anything on disk.
 
 ---
 
 ### 3. Do I need Node.js installed to use Sauron?
 
-**No.** While Sauron has a fast npm package (`npx sauron`), it supports three zero-Node distribution channels:
+**Yes, unless you use Docker.** Sauron runs on Node.js 18 or newer. These install paths are available:
 
-1. **Standalone Shell Installers:**
+1. **npm or pnpm:** `npx sauron-ai init` or `pnpm dlx sauron-ai init`
+2. **Shell Installers (Node.js required):**
    - Linux/macOS: `curl -fsSL https://raw.githubusercontent.com/iging/sauron/main/bin/install.sh | bash`
    - Windows PowerShell: `irm https://raw.githubusercontent.com/iging/sauron/main/bin/install.ps1 | iex`
-2. **Python PyPI:** `pip install sauron-ai && sauron init`
-3. **Hardened Docker Container:** Run directly with `docker compose run --rm sauron init` without installing anything on your host machine.
+3. **Docker Container (no Node.js needed on your host):** Run directly with `docker compose run --rm sauron init` without installing anything on your host machine.
 
 ---
 
@@ -40,7 +40,7 @@
 **No. Exactly zero telemetry.**
 
 - All transpilation, schema parsing, and rule generation happens 100% locally on your machine.
-- Sauron makes zero outbound network requests during operation.
+- The CLI makes no outbound network requests of its own. Installing it uses your package registry, and an opened `graph.html` loads fonts and its graph library. See [PRIVACY.md](../../PRIVACY.md).
 - Your intellectual property, source files, and developer instructions never leave your local workspace.
 
 ---
@@ -64,15 +64,15 @@ Sauron will only transpile and maintain files for the runtimes you enable.
 
 ---
 
-### 6. What is Caveman Mode and how does it save up to 75% tokens?
+### 6. What is Caveman Mode and how does it save tokens?
 
-Conversational AI models spend up to 70% of their output tokens on pleasantries, filler phrases ("Sure, I can help with that!"), and repetitive summaries. Over long engineering sessions, this blows through context windows and burns expensive API credits.
+Conversational AI models spend output tokens on pleasantries, filler phrases ("Sure, I can help with that!"), and repetitive summaries. Over long engineering sessions, this blows through context windows and burns expensive API credits.
 
 **Caveman Mode** compresses agent communication into dense, telegraphic technical fragments:
 
-- `/caveman full`: Spartan fragments, zero filler (~60% token reduction).
-- `/caveman lite`: Grammatically complete sentences without conversational filler (~40% reduction).
-- `/caveman ultra`: Extreme token compression for critical context conservation (~75% reduction).
+- `/caveman full`: Spartan fragments, zero filler.
+- `/caveman lite`: Grammatically complete sentences without conversational filler.
+- `/caveman ultra`: Extreme token compression for critical context conservation.
 - `/caveman off`: Restores default conversational mode.
 
 ---

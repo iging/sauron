@@ -1,32 +1,23 @@
 # Token Optimization Benchmarks
 
-This document records empirical token consumption benchmarks comparing standard conversational agent responses against Sauron's Caveman Mode.
+Sauron has no published benchmark for Caveman Mode yet, so it makes no claim about how many tokens the mode saves. Results vary by model, task, and tier.
 
 ---
 
-## Benchmark Methodology
+## Measure It Yourself
 
-- **Test Suite**: 25 realistic developer scenarios across code review, multi-file refactoring, debugging, and test scaffolding.
-- **Model**: Claude 3.5 Sonnet / Claude 3.7 Sonnet.
-- **Metric**: Output tokens consumed per interaction turn and total context window retention over 30 conversation turns.
+1. Pick a small set of real tasks, such as a bug diagnosis, a pull request review, and a refactor explanation.
+2. Run each task with Caveman Mode off, using the same model and starting context.
+3. Run each task again with the tier you want to test.
+4. Compare the output tokens that your tool reports.
+5. Check that code, paths, commands, and error text stayed exact in both runs.
 
----
-
-## Results Summary
-
-| Scenario                      | Standard Mode (Tokens) | Caveman Full (Tokens) | Reduction (%) | Context Retention Impact              |
-| ----------------------------- | ---------------------- | --------------------- | ------------- | ------------------------------------- |
-| **Simple Bug Diagnosis**      | 412                    | 118                   | -71.4%        | Context preserved for 3.5x more turns |
-| **Pull Request Review**       | 890                    | 225                   | -74.7%        | Blocker-focused; zero filler praise   |
-| **Refactor Explanation**      | 650                    | 185                   | -71.5%        | Exact line numbers and diffs only     |
-| **Test Scaffolding**          | 520                    | 142                   | -72.7%        | Direct test code and runner commands  |
-| **Architecture Consultation** | 1,140                  | 380                   | -66.7%        | Structured decisions without preamble |
-| **Average Over 25 Tasks**     | **722**                | **210**               | **-70.9%**    | **Over 3x context window lifespan**   |
+Publish a result only with the raw data and the steps to reproduce it.
 
 ---
 
 ## Why Token Optimization Matters
 
-1. **Context Longevity**: AI coding models experience cognitive degradation as context windows fill. Reducing conversational overhead keeps the model focused on code and system architecture.
-2. **Cost Efficiency**: Cutting response tokens by 70% directly reduces API credit usage during long development sprints.
-3. **Faster Inference**: Shorter token outputs finish streaming significantly faster, speeding up the developer feedback loop.
+1. **Context Longevity**: Filler uses context space that code and requirements could use.
+2. **Cost Efficiency**: Fewer output tokens mean lower usage on metered APIs.
+3. **Faster Inference**: Shorter outputs finish streaming sooner.

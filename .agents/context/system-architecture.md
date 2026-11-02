@@ -37,7 +37,7 @@ graph TD
 ## 2. Layered Architecture and Conventions
 
 1. **Presentation & Invocation Layer:**
-   - Command-line interfaces: `npx sauron [init|sync|diff|test]`, `pip install sauron-ai`, and `install.sh` / `install.ps1`.
+   - Command-line interfaces: `npx sauron-ai [init|sync|diff|fitness]` and `install.sh` / `install.ps1`.
    - Omnichannel bindings: 94 universal slash commands (`commands/`), direct persona tagging (`@gandalf`, `@aragorn`), and intent-based routing.
 2. **Core Fellowship Layer:**
    - 9 specialized sub-agent definitions with strict role and authority boundaries:
@@ -154,7 +154,7 @@ sauron/
 | 10  | **Hermes**                    | `.hermesrules`                        | Markdown Rules               |
 | 11  | **Kimi**                      | `.kimi/prompt.md`                     | Markdown System Prompt       |
 | 12  | **Kiro**                      | `.kirorules`                          | Markdown Rules               |
-| 13  | **OpenClaw**                | `.openclaw/config.json`             | JSON and Markdown            |
+| 13  | **OpenClaw**                  | `.openclaw/config.json`               | JSON and Markdown            |
 | 14  | **OpenCode**                  | `.opencode/instructions.md`           | Markdown Instructions        |
 | 15  | **Pi**                        | `.pirules`                            | Plaintext and Markdown       |
 | 16  | **Qwen**                      | `.qwen/system.md`                     | Markdown System Prompt       |

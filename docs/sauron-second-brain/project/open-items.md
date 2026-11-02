@@ -1,7 +1,7 @@
 # Open Items
 
 Things not finished or not decided. Update before every stop. See [[claude]] and [[status]].
-Last updated: 2026-10-27.
+Last updated: 2026-11-02.
 
 ## Remaining release verification
 
@@ -16,7 +16,7 @@ Last updated: 2026-10-27.
 - Sauron output inside a real Claude Code session: `/agents`, `/gandalf`, `/output-style`,
   `/plan-feature`.
 - omp output inside a real omp session (`/extensions` should list `.agents/skills/`).
-- pnpm (`pnpm dlx sauron-ai init`) and both install scripts were only syntax-checked.
+- `pnpm dlx sauron-ai` works for `--version` and an `init` dry run. Install scripts are unrun.
 - Runtime paths still unverified: Trae, Pi, Kimi, Hermes, OpenClaw, AdaL. Antigravity has
   no adapter. See `docs/runtime-scaffolds.md`.
 
@@ -28,21 +28,37 @@ Last updated: 2026-10-27.
 - `.cursor/rules/README.md` may load as a Cursor rule. Move it to `.cursor/README.md`.
 - `references/runtime-matrix.md` table has 18 rows and some stale paths. Rebuild it from
   `docs/runtime-scaffolds.md`.
-- `token-benchmarks.md` and `faq.md` claim 60% to 85% savings with no benchmark. Remove the
-  figures or build a real benchmark.
+- Caveman savings have no benchmark. Publish a figure only with a script and raw data.
+- `graph.html` loads `vis-network` from unpkg with no version pin. Pin it or bundle it.
 
 ## Housekeeping
 
 - Retired follower update is archived and removed. See [[cleanup-record]].
-- Vault and cleanup changes await pull request review from `docs/portable-second-brain`.
+- Order of all planned work: [[implementation-order]].
+- `launch-compliance-audit` has 44 items, and `website-launch-audit` has 40. Both ran on the
+  landing page on 2026-11-02. The report is local: `../sauron-landing/launch-audit-2026-11-02.md`.
+- Landing gaps from that run: no trademark search record, no breach runbook, no error alerts,
+  no CSP or `X-Content-Type-Options`, and no event for the primary action.
+- `sauron status` prints 173 skills while the site says 370+. Pick one count for 3.2.1.
+- `plugin.json` and `pyproject.toml` still say version 1.0.0. `npm version` does not touch them.
 - Older gaps: [[historical-open-items]].
 - Sauron Obsidian UI check remains pending. Disk checks are separate.
 - Remove the locked worktree `fix-readline-types` after closing its session.
-- Landing site still shows `npx sauron init`, which installs a different package.
-  Signal to start: `go landing v3`.
+- Landing launch work is live through PR #2. Analytics reports, and no cookies are set.
+  `/privacy` links to `PRIVACY.md`, which returns 404 until the Sauron work merges.
+- Turn on private vulnerability reporting in the GitHub repository security settings.
+  `sauron-ai.vercel.app` is an unrelated placeholder. Ownership is unknown.
+  Update `SKILL_COUNT_LABEL` in `src/constants/stats.ts` after each skill sync.
 
 ## Roadmap (after 3.1.0)
 
+- Built for 3.2.0, uncommitted on `main`: [[plan-native-subagents]]. Run `/progress-report`.
+  Open checks: slash commands in the OpenCode TUI, all of omp, arrow prompts in a terminal.
+- README notes for OpenCode and omp now sit at `.opencode/README.md` and `.omp/README.md`.
+  Same check still open for Pi, Claude Code, Windsurf, Cline, and Cursor. See [[roadmap-ecc]].
+- [[plan-sauron-eye]] is approved for 3.3.0, not built. Future Eye work is listed in that note.
+- Proposed roadmap, awaiting approval one tier at a time: [[roadmap-ecc]].
+- Same native install for Codex (TOML) and Copilot, after OpenCode and omp are proven.
 - Batch research, then `/plan-feature` Part 1 (product roadmap) and Part 2 (Agent
   Engineering Track). Briefs: `docs/handoffs/2026-10-20-sauron-v3-release-and-roadmap.md`
   sections 9 to 11. See [[roadmap-brief]]. Old PRD and TASKS are archived and removed.

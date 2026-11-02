@@ -1,7 +1,7 @@
 # Status
 
 Where the project stands. Update this note before every stop. See [[claude]].
-Last updated: 2026-10-27.
+Last updated: 2026-11-02.
 
 ## npm
 
@@ -10,10 +10,9 @@ Last updated: 2026-10-27.
 
 ## Git
 
-- `main` on GitHub is at `1a185e9` (3.1.0 release).
+- `main` on GitHub is at `73350d9` (PR #10). Release tag `v3.1.0` is at `1a185e9`.
 - omp is merged through PR #9 at `26669a8`.
 - Local worktree `.claude/worktrees/fix-readline-types` still exists. Its commit is on `main`.
-- Branch `docs/portable-second-brain` contains the vault and cleanup documentation work.
 - Build, typecheck, 116 tests, and the pre-push documentation gate pass on 2026-10-27.
 
 ## What 3.1.0 contains
@@ -27,11 +26,23 @@ Last updated: 2026-10-27.
 | `scripts/` included in the published files | `15361d3` |
 | omp (oh-my-pi) runtime, 20 runtimes everywhere | `dd810b8`, `39b26fb` |
 
-## Numbers (checked 2026-10-25)
+## In progress: 3.2.0 (not released)
 
-- `npm test`: 116 pass, 0 fail. `npx tsc --noEmit`: 0 errors.
+- Native subagents and commands for OpenCode and omp are built.
+  See [[plan-native-subagents]] and [[session-2026-11-01-native-subagents]].
+- The scanned-folder README fix, the license and policy work, and two launch skills are built.
+- Miguel chose on 2026-11-02: Eye and roadmap stay plan-only, and the rest ships in 3.2.0.
+- Both launch skills ran on the landing page for the first time on 2026-11-02.
+- [[plan-sauron-eye]] is approved for 3.3.0, not built.
+- `package.json` stays at 3.1.0 until the release. Order: [[implementation-order]].
+- Waiting on Miguel: legal review, `init` and OpenCode tests, merge, and the npm OTP.
+
+## Numbers (checked 2026-11-02)
+
+- `npm test`: 138 pass, 0 fail. `npx tsc --noEmit`: 0 errors.
 - Runtimes registered: 20, plus the shared `AGENTS.md` core. See [[agent-runtimes]].
-- Packed tarball smoke test passed: `status`, `init --runtimes=omp,claude`, `graph .`.
+- Packed tarball smoke test passed: `status`, `init --runtimes=omp,opencode,claude`, `graph .`.
+- Packed `init` writes 9 agents each, 123 OpenCode commands, and 119 omp prompts.
 
 ## Portable memory and cleanup
 

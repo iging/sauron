@@ -20,12 +20,12 @@ When Caveman Mode activates, the agent follows five strict compression rules:
 
 ## Compression Levels
 
-| Level                | Trigger Phrase               | Behavior                                                              | Token Savings |
-| -------------------- | ---------------------------- | --------------------------------------------------------------------- | ------------- |
-| **Lite**             | `caveman lite`               | Complete sentences. Zero filler words. Dense, informative prose.      | 25% to 35%    |
-| **Full** _(Default)_ | `caveman full` or `/caveman` | Drops articles. Allows sentence fragments. Direct tool calls.         | 60% to 75%    |
-| **Ultra**            | `caveman ultra`              | Extreme compression. Minimal fragments. Maximum context conservation. | 75% to 85%    |
-| **Off**              | `caveman off`                | Deactivates compression and reverts to standard conversational style. | 0%            |
+| Level                | Trigger Phrase               | Behavior                                                              |
+| -------------------- | ---------------------------- | --------------------------------------------------------------------- |
+| **Lite**             | `caveman lite`               | Complete sentences. Zero filler words. Dense, informative prose.      |
+| **Full** _(Default)_ | `caveman full` or `/caveman` | Drops articles. Allows sentence fragments. Direct tool calls.         |
+| **Ultra**            | `caveman ultra`              | Extreme compression. Minimal fragments. Maximum context conservation. |
+| **Off**              | `caveman off`                | Deactivates compression and reverts to standard conversational style. |
 
 ---
 

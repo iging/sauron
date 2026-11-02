@@ -15,6 +15,17 @@ hermes, openclaw, opencode, pi, omp, adal, codebuddy. Plus the shared `agents` c
 - `.agents/skills/` verified: Cursor, GitHub Copilot, Windsurf, Gemini CLI, omp.
 - Claude Code reads `CLAUDE.md` and `.claude/`, not `AGENTS.md`. Gemini reads `GEMINI.md`.
 
+## Native subagents and commands
+
+Claude Code, OpenCode, and omp get real files. Others get instructions and READMEs only.
+
+- Add one entry to `NATIVE_TARGETS` in `adapters/installer.ts` and one id to
+  `NATIVE_RUNTIMES` in `adapters/init-plan.ts`.
+- List names shadowed by built-ins in `reservedCommands`.
+- Saved `nativeRuntimes` decides what `sync` writes. A missing key means Claude-only.
+- Keep notes out of folders a runtime scans. Add old paths to `retiredFiles`. `retireFile`
+  removes them only while Sauron owns them, and keeps a backup.
+
 ## Add a runtime (checklist from the omp work, 2026-10-25)
 
 1. Read the official docs. Note project paths, frontmatter, and what the tool already reads
