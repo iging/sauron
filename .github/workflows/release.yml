@@ -61,7 +61,7 @@ jobs:
           zip -r sauron-harness.zip bin/ dist/ config/ skills/ adapters/ references/ core/ package.json README.md LICENSE -x "node_modules/*"
 
       - name: Create GitHub Release and Attach Bundle
-        uses: softprops/action-gh-release@v2
+        uses: softprops/action-gh-release@v3
         with:
           tag_name: ${{ steps.version_meta.outputs.tag }}
           name: Sauron Release ${{ steps.version_meta.outputs.tag }}
