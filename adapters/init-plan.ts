@@ -42,18 +42,28 @@ export const RUNTIME_IDS: readonly string[] = [
   "codebuddy",
 ];
 
+/** Runtimes that receive Sauron subagents and slash commands as native files. */
+export const NATIVE_RUNTIMES: readonly string[] = ["claude", "opencode", "omp"];
+
+/** Keeps only the runtimes that receive native subagents and slash commands. */
+export function nativeRuntimesFor(runtimes: readonly string[]): string[] {
+  return runtimes.filter((id) => NATIVE_RUNTIMES.includes(id));
+}
+
 /** Fully resolved answers for one `init` run. */
 export interface InitPlan {
   /** Runtime adapter ids to generate. The shared AGENTS.md core is always included. */
   runtimes: string[];
-  /** Subagent set installed into `.claude/agents/` when Claude Code is selected. */
+  /** Subagent set installed into each runtime in `nativeRuntimes`. */
   agents: AgentSet;
   /** `all`, `none`, or a list of skill departments to install into `.agents/skills/`. */
   skills: "all" | "none" | string[];
   /** Default Caveman Mode tier. */
   caveman: CavemanMode;
-  /** Copy Sauron slash commands into `.claude/commands/` when Claude Code is selected. */
+  /** Copy Sauron slash commands into each runtime in `nativeRuntimes`. */
   commands: boolean;
+  /** Runtimes opted in to native subagents and commands. Saved so `sync` adds no others. */
+  nativeRuntimes: string[];
 }
 
 /** The one-keypress default: shared core, Claude Code, every skill, the Fellowship. */
@@ -63,6 +73,7 @@ export const PRESET_RECOMMENDED: Readonly<InitPlan> = Object.freeze({
   skills: "all",
   caveman: "full",
   commands: true,
+  nativeRuntimes: ["claude"],
 });
 
 /** Thrown when a flag value is invalid; the CLI prints it and exits 1. */
@@ -189,7 +200,26 @@ export function resolvePlan(
       (Array.isArray(base.skills) ? [...base.skills] : base.skills),
     caveman: flags.caveman ?? base.caveman,
     commands: flags.commands ?? base.commands,
+    nativeRuntimes:
+      flags.nativeRuntimes ??
+      (flags.runtimes
+        ? nativeRuntimesFor(flags.runtimes)
+        : [...base.nativeRuntimes]),
   };
+}
+
+/**
+ * Reads the saved native runtimes. Configs saved before 3.2.0 have no such key, and
+ * those users only ever chose native files for Claude Code, so `sync` keeps it that way.
+ */
+function savedNativeRuntimes(
+  value: unknown,
+  runtimes: readonly string[],
+): string[] {
+  const chosen = Array.isArray(value)
+    ? nativeRuntimesFor(value.map(String))
+    : ["claude"];
+  return chosen.filter((id) => runtimes.includes(id));
 }
 
 /**
@@ -224,6 +254,10 @@ export function planFromConfig(
       ...(typeof record["commands"] === "boolean"
         ? { commands: record["commands"] }
         : {}),
+      nativeRuntimes: savedNativeRuntimes(
+        record["nativeRuntimes"],
+        runtimes ?? PRESET_RECOMMENDED.runtimes,
+      ),
     });
   } catch {
     return undefined;

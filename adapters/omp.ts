@@ -19,6 +19,7 @@ interface FolderSpec {
 }
 
 const OMP_MCP = ".omp/mcp.json";
+const OMP_README = ".omp/README.md";
 
 const FOLDERS: readonly FolderSpec[] = [
   {
@@ -51,43 +52,46 @@ const FOLDERS: readonly FolderSpec[] = [
 export class OmpAdapter implements RuntimeAdapter {
   public readonly id = "omp";
   public readonly name = "omp (oh-my-pi)";
-  public readonly targetFiles = [
-    OMP_MCP,
-    ...FOLDERS.map((f) => `${f.dir}/README.md`),
-  ];
+  public readonly targetFiles = [OMP_MCP, OMP_README];
+  // omp reads every Markdown file in prompts/, so a README there became a command.
+  public readonly retiredFiles = FOLDERS.map((f) => `${f.dir}/README.md`);
 
   public transpile(context: TranspileContext): TranspileOutput[] {
-    const outputs: TranspileOutput[] = [
+    const lines = [
+      "# omp Scaffold",
+      "",
+      `Scaffolded by Sauron v${context.version} for ${context.projectName}.`,
+      "",
+      "omp reads project instructions from `AGENTS.md` at the repository root and MCP servers from `.omp/mcp.json` (docs: https://omp.sh/docs/mcp).",
+      "",
+      "Keep this note here. omp reads every Markdown file in `prompts/` as a command, so a note in that folder becomes a slash command.",
+      "",
+    ];
+    for (const folder of FOLDERS) {
+      lines.push(
+        `## ${folder.title}`,
+        "",
+        `Folder: \`${folder.dir}/\``,
+        "",
+        folder.purpose,
+        "",
+        folder.howTo,
+        "",
+        `Official docs: ${folder.docUrl}`,
+        "",
+      );
+    }
+    return [
       {
         relativePath: OMP_MCP,
         content: `${JSON.stringify({ mcpServers: {} }, null, 2)}\n`,
         format: "json",
       },
-    ];
-    for (const folder of FOLDERS) {
-      const lines = [
-        `# ${folder.title}`,
-        "",
-        `Scaffolded by Sauron v${context.version} for ${context.projectName}.`,
-        "",
-        "## Purpose",
-        folder.purpose,
-        "",
-        "## How to add a file",
-        folder.howTo,
-        "",
-        "## Notes",
-        "omp reads project instructions from `AGENTS.md` at the repository root and MCP servers from `.omp/mcp.json` (docs: https://omp.sh/docs/mcp).",
-        "",
-        `Official docs: ${folder.docUrl}`,
-        "",
-      ];
-      outputs.push({
-        relativePath: `${folder.dir}/README.md`,
+      {
+        relativePath: OMP_README,
         content: lines.join("\n"),
         format: "markdown",
-      });
-    }
-    return outputs;
+      },
+    ];
   }
 }

@@ -35,7 +35,7 @@ In a terminal, `init` shows an arrow-key setup (like `create-next-app` and shadc
 │  ● Recommended (AGENTS.md + Claude Code + all skills + Fellowship agents)
 │  ○ Custom (pick runtimes, agents, and skills)
 ◆  Which runtimes?                  (Custom: multi-select, Space to toggle)
-◆  Which subagents for Claude Code? (Custom: Fellowship / Core / Both / None)
+◆  Which subagents?                (Custom: Fellowship / Core / Both / None)
 ◆  Which skills?                    (Custom: All / Pick departments / None)
 ◆  Install Sauron slash commands?   (Custom: Yes / No)
 ◆  Caveman Mode                     (Full / Lite / Ultra / Off)
@@ -50,18 +50,18 @@ With piped input, pass `--interactive` to answer the same questions line by line
 
 1. Resolves the plan from prompts, flags, or the saved `init:` section of `sauron.config.yaml`.
 2. Writes `AGENTS.md`, `.agents/skills/`, `.agents/anti-patterns.md`, and the scaffold of each selected runtime.
-3. With Claude Code selected: installs skills into `.claude/skills/`, subagents into `.claude/agents/`, slash commands into `.claude/commands/`, and the Caveman output style.
+3. With Claude Code selected: installs skills into `.claude/skills/`, subagents into `.claude/agents/`, slash commands into `.claude/commands/`, and the Caveman output style. With OpenCode selected: subagents into `.opencode/agents/` and commands into `.opencode/commands/`. With omp selected: subagents into `.omp/agents/` and commands into `.omp/prompts/`.
 4. Merges into existing files instead of replacing them (managed `sauron:start/end` blocks; JSON keys you set always win). Copied skills you edited are skipped. Every change is backed up to `.sauron/backups/`.
-5. Saves the choices under `init:` in `sauron.config.yaml` and records files in `.sauron/manifest.json`.
+5. Saves the choices under `init:` in `sauron.config.yaml` and records files in `.sauron/manifest.json`. `nativeRuntimes` lists the runtimes that receive subagents and commands. A config saved before 3.2.0 has no such key and stays Claude-only on `sync`. To opt in, run `init` with an explicit `--runtimes=` list.
 
 **Options:**
 
 - `--yes`, `-y`: No prompts. Uses the saved choices, or the Recommended preset.
 - `--runtimes=claude,cursor` or `--runtimes=all`: Runtimes to generate. `AGENTS.md` is always included.
-- `--agents=fellowship|core|both|none`: Subagents for `.claude/agents/`.
+- `--agents=fellowship|core|both|none`: Subagents for Claude Code, OpenCode, and omp.
 - `--skills=all|none|<dept,...>`: Skills to install.
 - `--caveman=off|lite|full|ultra`: Default Caveman tier.
-- `--no-commands`: Skip `.claude/commands/`.
+- `--no-commands`: Skip slash commands for Claude Code, OpenCode, and omp.
 - `--interactive`: Ask the questions even without a terminal (piped answers).
 - `--dry-run`: Simulates the initialization without writing files.
 

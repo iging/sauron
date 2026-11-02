@@ -3,7 +3,11 @@
  * Project instructions live in AGENTS.md, emitted by the shared AGENTS.md adapter.
  */
 
-import type { RuntimeAdapter, TranspileContext, TranspileOutput } from "./types.js";
+import type {
+  RuntimeAdapter,
+  TranspileContext,
+  TranspileOutput,
+} from "./types.js";
 
 interface FolderSpec {
   readonly dir: string;
@@ -12,6 +16,8 @@ interface FolderSpec {
   readonly howTo: string;
   readonly docUrl: string;
 }
+
+const OPENCODE_README = ".opencode/README.md";
 
 const FOLDERS: readonly FolderSpec[] = [
   {
@@ -43,40 +49,46 @@ const FOLDERS: readonly FolderSpec[] = [
 export class OpenCodeAdapter implements RuntimeAdapter {
   public readonly id = "opencode";
   public readonly name = "OpenCode";
-  public readonly targetFiles = ["opencode.json", ...FOLDERS.map((f) => `${f.dir}/README.md`)];
+  public readonly targetFiles = ["opencode.json", OPENCODE_README];
+  // OpenCode loads every Markdown file in these folders, so a README became an agent.
+  public readonly retiredFiles = FOLDERS.map((f) => `${f.dir}/README.md`);
 
   public transpile(context: TranspileContext): TranspileOutput[] {
-    const outputs: TranspileOutput[] = [
+    const lines = [
+      "# OpenCode Scaffold",
+      "",
+      `Scaffolded by Sauron v${context.version} for ${context.projectName}.`,
+      "",
+      "OpenCode reads project instructions from `AGENTS.md` at the repository root and config from `opencode.json`.",
+      "",
+      "Keep this note here. OpenCode loads every Markdown file in `agents/` and `commands/`, so a note in those folders becomes an agent or a command.",
+      "",
+    ];
+    for (const folder of FOLDERS) {
+      lines.push(
+        `## ${folder.title}`,
+        "",
+        `Folder: \`${folder.dir}/\``,
+        "",
+        folder.purpose,
+        "",
+        folder.howTo,
+        "",
+        `Official docs: ${folder.docUrl}`,
+        "",
+      );
+    }
+    return [
       {
         relativePath: "opencode.json",
         content: `${JSON.stringify({ $schema: "https://opencode.ai/config.json" }, null, 2)}\n`,
         format: "json",
       },
-    ];
-    for (const folder of FOLDERS) {
-      const lines = [
-        `# ${folder.title}`,
-        "",
-        `Scaffolded by Sauron v${context.version} for ${context.projectName}.`,
-        "",
-        "## Purpose",
-        folder.purpose,
-        "",
-        "## How to add a file",
-        folder.howTo,
-        "",
-        "## Notes",
-        "OpenCode reads project instructions from `AGENTS.md` at the repository root and config from `opencode.json`.",
-        "",
-        `Official docs: ${folder.docUrl}`,
-        "",
-      ];
-      outputs.push({
-        relativePath: `${folder.dir}/README.md`,
+      {
+        relativePath: OPENCODE_README,
         content: lines.join("\n"),
         format: "markdown",
-      });
-    }
-    return outputs;
+      },
+    ];
   }
 }

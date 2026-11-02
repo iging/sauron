@@ -14,14 +14,12 @@ const ctx = {
 };
 
 describe("OpenCode + Kiro scaffold", () => {
-  it("OpenCode emits opencode.json schema and folder READMEs only", () => {
+  it("OpenCode emits opencode.json and one README outside the scanned folders", () => {
     const adapter = new OpenCodeAdapter();
     const out = adapter.transpile(ctx);
     const paths = out.map((o) => o.relativePath).sort();
     assert.deepEqual(paths, [
-      ".opencode/agents/README.md",
-      ".opencode/commands/README.md",
-      ".opencode/skills/README.md",
+      ".opencode/README.md",
       "opencode.json",
     ]);
     assert.deepEqual([...adapter.targetFiles].sort(), paths);

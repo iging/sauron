@@ -23,6 +23,7 @@ import {
   InitPlanError,
   PRESET_RECOMMENDED,
   RUNTIME_IDS,
+  nativeRuntimesFor,
   parseAgents,
   parseCaveman,
   parseInitFlags,
@@ -32,6 +33,7 @@ import {
   resolvePlan,
 } from "../dist/adapters/init-plan.js";
 import {
+  NATIVE_TARGETS,
   buildInstallOutputs,
   listDepartments,
   skillFileOutputs,
@@ -268,7 +270,7 @@ function printHelpMenu() {
     "               --runtimes=claude,cursor|all    Runtimes to generate (AGENTS.md always included)",
   );
   console.log(
-    "               --agents=fellowship|core|both|none  Subagents for .claude/agents/",
+    "               --agents=fellowship|core|both|none  Subagents for Claude Code, OpenCode, omp",
   );
   console.log(
     "               --skills=all|none|<dept,...>    Skills for .agents/skills/ (+ .claude/skills/)",
@@ -277,7 +279,7 @@ function printHelpMenu() {
     "               --caveman=off|lite|full|ultra   Default Caveman tier",
   );
   console.log(
-    "               --no-commands                   Skip .claude/commands/",
+    "               --no-commands                   Skip slash commands",
   );
   console.log("  sync         Re-apply saved init choices without prompts");
   console.log(
@@ -716,8 +718,9 @@ async function promptInitPlan(rl, flags, departments, defaultCaveman) {
           pick.replace(/\b(\d+)\b/g, (n) => RUNTIME_IDS[Number(n) - 1] ?? n),
         );
       }
-      if (!answers.agents && answers.runtimes.includes("claude")) {
-        console.log("\nSubagents for .claude/agents/:");
+      const native = nativeRuntimesFor(answers.runtimes).length > 0;
+      if (!answers.agents && native) {
+        console.log("\nSubagents for Claude Code, OpenCode, and omp:");
         console.log(
           "  fellowship : 9 Fellowship agents (/gandalf, /frodo, ...)",
         );
@@ -755,14 +758,11 @@ async function promptInitPlan(rl, flags, departments, defaultCaveman) {
           departments,
         );
       }
-      if (
-        answers.commands === undefined &&
-        answers.runtimes.includes("claude")
-      ) {
+      if (answers.commands === undefined && native) {
         answers.commands =
           (await ask(
             rl,
-            "Install Sauron slash commands into .claude/commands/ (y/n)",
+            "Install Sauron slash commands (y/n)",
             "y",
             (a) => a === "y" || a === "n",
             "Type y or n.",
@@ -899,10 +899,11 @@ async function promptInitPlanArrows(flags, departments, defaultCaveman) {
         }),
       );
     }
-    if (!answers.agents && answers.runtimes.includes("claude")) {
+    const native = nativeRuntimesFor(answers.runtimes).length > 0;
+    if (!answers.agents && native) {
       answers.agents = ok(
         await select({
-          message: "Which subagents for Claude Code?",
+          message: "Which subagents?",
           options: [
             {
               value: "fellowship",
@@ -947,10 +948,10 @@ async function promptInitPlanArrows(flags, departments, defaultCaveman) {
             )
           : /** @type {"all" | "none"} */ (mode);
     }
-    if (answers.commands === undefined && answers.runtimes.includes("claude")) {
+    if (answers.commands === undefined && native) {
       answers.commands = ok(
         await confirm({
-          message: "Install Sauron slash commands into .claude/commands/?",
+          message: "Install Sauron slash commands?",
           initialValue: true,
         }),
       );
@@ -1034,6 +1035,7 @@ function setInitPlanInConfig(configPath, plan) {
     `  agents: ${plan.agents}`,
     `  skills: ${skills}`,
     `  commands: ${plan.commands}`,
+    `  nativeRuntimes: [${plan.nativeRuntimes.join(", ")}]`,
     "",
   ].join("\n");
   const pattern = /^init:\r?\n(?:[ \t]+.*(?:\r?\n|$))*/m;
@@ -1151,12 +1153,17 @@ async function executeInitCommand(options) {
       .filter((e) => e.relativePath.startsWith(".agents/skills/"))
       .map((e) => e.relativePath.split("/")[2]),
   ).size;
-  const agentCount = extras.filter((e) =>
-    e.relativePath.startsWith(".claude/agents/"),
-  ).length;
-  const commandCount = extras.filter((e) =>
-    e.relativePath.startsWith(".claude/commands/"),
-  ).length;
+  const targets = plan.nativeRuntimes.flatMap((id) => NATIVE_TARGETS[id] ?? []);
+  /** @param {string[]} dirs */
+  const installedInto = (dirs) =>
+    dirs
+      .map((dir) => {
+        const count = extras.filter((e) =>
+          e.relativePath.startsWith(`${dir}/`),
+        ).length;
+        return `${count} into ${dir}/`;
+      })
+      .join(", ") || "none (no selected runtime installs them)";
 
   console.log("\nPlan:");
   console.log(`  Runtimes  : AGENTS.md + ${plan.runtimes.join(", ")}`);
@@ -1164,9 +1171,11 @@ async function executeInitCommand(options) {
     `  Skills    : ${skillCount} into .agents/skills/${plan.runtimes.includes("claude") && skillCount > 0 ? " and .claude/skills/" : ""}`,
   );
   console.log(
-    `  Subagents : ${agentCount} into .claude/agents/ (${plan.runtimes.includes("claude") ? plan.agents : "Claude Code not selected"})`,
+    `  Subagents : ${installedInto(targets.map((t) => t.agentsDir))} (${plan.agents})`,
   );
-  console.log(`  Commands  : ${commandCount} into .claude/commands/`);
+  console.log(
+    `  Commands  : ${installedInto(targets.map((t) => t.commandsDir))}`,
+  );
   console.log(`  Caveman   : ${plan.caveman}`);
   console.log(
     "  Safety    : existing files are merged, never replaced; backups in .sauron/backups/\n",
@@ -1262,6 +1271,14 @@ async function executeInitCommand(options) {
     if (plan.runtimes.includes("claude")) {
       console.log(
         "  - In Claude Code: try /gandalf <goal>, or @frodo, or /<skill-name>",
+      );
+    }
+    if (plan.nativeRuntimes.includes("opencode")) {
+      console.log("  - In OpenCode: try /gandalf <goal>, or @frodo");
+    }
+    if (plan.nativeRuntimes.includes("omp")) {
+      console.log(
+        "  - In omp: try /gandalf <goal>, or /skill:<name> for a skill",
       );
     }
   }
