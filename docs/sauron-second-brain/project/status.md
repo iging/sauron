@@ -3,10 +3,18 @@
 Where the project stands. Update this note before every stop. See [[claude]].
 Last updated: 2026-11-07.
 
+## Phase 4 of 4.0.0
+
+- Branch `codex/4.0.0-phase-4-install-lifecycle` adds `list-installed`, `doctor`, `repair`,
+  and `uninstall`. Built by Claude Code on 2026-11-07 while Codex usage was out. Not merged.
+- Node 24.15.0 passes build, typecheck, strict CLI check, doc gate, and 194 tests.
+- Node 20 and 22 were not run locally. Hosted CI covers them on the pull request.
+- See [[session-2026-11-07-phase-4-install-lifecycle]].
+
 ## Phase 3 of 4.0.0
 
-- Phase 2 is on main, pulled to `8e0a482` with fast-forward only.
-- Branch: `codex/4.0.0-phase-3-skill-picker`. Miguel authorizes report, commit, and push.
+- Phases 0 through 3 are merged. Main is pulled to `748ca5a` with fast-forward only.
+- Current branch: `main`, matching origin/main. Phase 3 includes CLI follow-up `410d780`.
 - Shared picker flow supports departments, individual skills, another department, Back, and Done.
 - Frontmatter names and hints load on demand. Saved subsets and empty choices survive revisits.
 - Picker saves explicit ids. Arrows use Backspace to return. Numbered input accepts back or 0.
@@ -14,14 +22,18 @@ Last updated: 2026-11-07.
 - Scripted arrows and packed picker/install/sync preview pass. Real-terminal checks stay open.
 - See [[session-2026-11-07-phase-3-skill-picker]]. Package version remains 3.2.0.
 
+- Post-push CLI type fixes pass strict JS checks and 180 tests. Empty test folder stays locked.
+- See [[session-2026-11-07-cli-lint-cleanup]]. Follow-up `410d780` is committed and pushed.
+
 ## npm
 
-- Published: `sauron-ai@3.1.0` on 2026-10-25. npm `latest` is `3.1.0`.
-- Local version is `3.1.0`. Release commit `1a185e9` and tag `v3.1.0` are pushed.
+- Published: `sauron-ai@3.2.0` on 2026-11-02. npm `latest` is `3.2.0`.
+- Local version is `3.2.0`. Release commit `de9de83` and tag `v3.2.0` are pushed.
+- Published shasum `9c77c9e` comes from a tree with `npm pkg fix` applied to `bin` paths.
 
 ## Git
 
-- Main is pulled to `8e0a482` after the Phase 2 merge. Release tag `v3.2.0` stays at `de9de83`.
+- Main is pulled to `748ca5a` after the Phase 3 merge. Release tag `v3.2.0` stays at `de9de83`.
 - omp is merged through PR #9 at `26669a8`.
 - Local worktree `.claude/worktrees/fix-readline-types` still exists. Its commit is on `main`.
 - Build, typecheck, 116 tests, and the pre-push documentation gate pass on 2026-10-27.
@@ -37,7 +49,7 @@ Last updated: 2026-11-07.
 | `scripts/` included in the published files | `15361d3` |
 | omp (oh-my-pi) runtime, 20 runtimes everywhere | `dd810b8`, `39b26fb` |
 
-## In progress: 3.2.0 (not released)
+## Released: 3.2.0
 
 - Native subagents and commands for OpenCode and omp are built.
   See [[plan-native-subagents]] and [[session-2026-11-01-native-subagents]].
@@ -45,8 +57,10 @@ Last updated: 2026-11-07.
 - Miguel chose on 2026-11-02: Eye and roadmap stay plan-only, and the rest ships in 3.2.0.
 - Both launch skills ran on the landing page for the first time on 2026-11-02.
 - [[plan-sauron-eye]] is approved for 3.3.0, not built.
-- `package.json` stays at 3.1.0 until the release. Order: [[implementation-order]].
-- Waiting on Miguel: legal review, `init` and OpenCode tests, merge, and the npm OTP.
+- Order of the next work: [[implementation-order]].
+- Registry install checked: `--version`, `status`, license file, and no internal notes.
+- Not confirmed by this session: legal review, `init` terminal tests, and the OpenCode test.
+- The GitHub release for `v3.2.0` is not created. This machine's shell has no `gh`.
 
 ## Numbers (checked 2026-11-02)
 
@@ -65,6 +79,6 @@ Last updated: 2026-11-07.
 
 ## Next
 
-1. Release 3.1.0 is live. Registry checksum matches the tested tarball.
+1. Release 3.2.0 is live. Create the GitHub release.
 2. Real-terminal test of the arrow-key `init` (Git Bash and PowerShell).
-3. Review Phase 3 through its compare link. The approved 4.0.0 handoff sets the order.
+3. Miguel opens and merges the Phase 4 pull request. Then Phase 5: profiles, plugin, and tiers.

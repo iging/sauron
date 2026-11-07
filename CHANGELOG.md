@@ -28,6 +28,12 @@ Notable changes to Sauron. Versions follow [Semantic Versioning](https://semver.
 
 ### Added
 
+- `sauron list-installed` and `sauron doctor`, read-only checks of Node, config, manifest, and
+  installed files. `doctor` exits with code 1 on an error.
+- `sauron repair`, which applies saved choices again so missing files and blocks come back.
+- `sauron uninstall`, a preview by default. With `--yes` it removes unchanged Sauron files and
+  managed blocks, keeps edited files, config, and `.sauron/`, and backs up every change.
+
 - Per-skill interactive init in both arrow-key and numbered flows, with frontmatter names
   and description hints. Revisit departments, keep checked subsets, select none, or cancel.
 - Backspace returns from an arrow skill list to departments. Numbered input accepts back or 0.

@@ -423,6 +423,106 @@ export class ConflictManager {
     return result("removed", path.relative(this.workspaceRoot, fullBackupPath));
   }
 
+  /**
+   * Takes the managed block out of a user file Sauron merged into, keeping every user line.
+   * A file with no complete block is left alone and reports `skipped`.
+   * The change keeps a copy in `.sauron/backups/`, and the manifest record is dropped.
+   *
+   * @param relativePath - Target file path relative to workspace root.
+   * @param runtime - Identifier of the runtime that owned the block.
+   * @param dryRun - When true, evaluates the removal without modifying disk.
+   * @returns The result, or null when the file does not exist.
+   */
+  public removeManagedBlock(
+    relativePath: string,
+    runtime: string,
+    dryRun: boolean = false,
+  ): WriteFileResult | null {
+    const targetPath = path.join(this.workspaceRoot, relativePath);
+    if (!fs.existsSync(targetPath)) {
+      return null;
+    }
+    const result = (
+      action: WriteFileResult["action"],
+      backupPath: string | null = null,
+    ): WriteFileResult => ({
+      filePath: relativePath,
+      runtime,
+      action,
+      backupPath,
+    });
+
+    const existing = fs.readFileSync(targetPath, "utf8");
+    const { start, end } = markersFor(relativePath);
+    const startIndex = existing.indexOf(start);
+    const endIndex = startIndex >= 0 ? existing.indexOf(end, startIndex) : -1;
+    if (startIndex < 0 || endIndex < 0) {
+      return result("skipped");
+    }
+    let after = endIndex + end.length;
+    if (existing[after] === "\r") after += 1;
+    if (existing[after] === "\n") after += 1;
+    const next = (
+      existing.slice(0, startIndex).replace(/\s+$/, "") +
+      "\n" +
+      existing.slice(after).replace(/^\s+/, "")
+    ).replace(/^\n$/, "");
+    if (dryRun) {
+      return result("simulated");
+    }
+
+    const fullBackupPath = this.backupFile(relativePath, targetPath);
+    fs.writeFileSync(targetPath, next, "utf8");
+    this.forgetFile(relativePath);
+    return result("removed", path.relative(this.workspaceRoot, fullBackupPath));
+  }
+
+  /**
+   * Drops a file from the manifest without touching disk.
+   *
+   * @param relativePath - Target file path relative to workspace root.
+   * @returns True when a record was removed.
+   */
+  public forgetFile(relativePath: string): boolean {
+    const manifest = this.loadManifest();
+    const before = manifest.managedFiles.length;
+    manifest.managedFiles = manifest.managedFiles.filter(
+      (f) => f.path !== relativePath,
+    );
+    if (manifest.managedFiles.length === before) {
+      return false;
+    }
+    if (this.batchManifest) {
+      this.batchDirty = true;
+    } else {
+      this.saveManifest(manifest);
+    }
+    return true;
+  }
+
+  /**
+   * Removes the empty folders left above a removed file, stopping at the workspace root
+   * or at the first folder that still holds anything.
+   *
+   * @param relativePath - Path of the removed file, relative to workspace root.
+   * @returns Workspace-relative folders that were removed.
+   */
+  public pruneEmptyParents(relativePath: string): string[] {
+    const removed: string[] = [];
+    let dir = path.dirname(path.join(this.workspaceRoot, relativePath));
+    while (
+      dir !== this.workspaceRoot &&
+      dir.startsWith(this.workspaceRoot + path.sep) &&
+      fs.existsSync(dir) &&
+      fs.readdirSync(dir).length === 0
+    ) {
+      fs.rmdirSync(dir);
+      removed.push(path.relative(this.workspaceRoot, dir));
+      dir = path.dirname(dir);
+    }
+    return removed;
+  }
+
   /** Copies a file to `.sauron/backups/` and returns the absolute backup path. */
   private backupFile(relativePath: string, targetPath: string): string {
     // Sanitize delimiters (slashes, colons, dots) so backup filename is valid across Windows, Linux, and macOS.
