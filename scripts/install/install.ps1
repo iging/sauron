@@ -10,7 +10,7 @@ param (
 )
 
 $ErrorActionPreference = "Stop"
-$Version = "1.0.0"
+$Version = "3.2.0"
 
 Write-Host "===================================================================" -ForegroundColor Cyan
 Write-Host "                       S A U R O N" -ForegroundColor Cyan
@@ -24,14 +24,13 @@ Write-Host "[INSTALLER] Installing sauron v$Version for Windows..." -ForegroundC
 $NodeCmd = Get-Command node -ErrorAction SilentlyContinue
 if (-not $NodeCmd) {
     Write-Host "[ERROR] Node.js was not found in PATH." -ForegroundColor Red
-    Write-Host "Please install Node.js (version 18 or newer) before installing sauron." -ForegroundColor Red
+    Write-Host "Please install Node.js (version 20.12.0 or newer) before installing sauron." -ForegroundColor Red
     exit 1
 }
 
 $NodeVersionRaw = (node -v) -replace '^v',''
-$NodeMajor = [int]($NodeVersionRaw.Split('.')[0])
-if ($NodeMajor -lt 18) {
-    Write-Host "[ERROR] Detected Node.js v$NodeVersionRaw. Sauron requires Node.js 18 or newer." -ForegroundColor Red
+if ([version]$NodeVersionRaw -lt [version]'20.12.0') {
+    Write-Host "[ERROR] Detected Node.js v$NodeVersionRaw. Sauron requires Node.js 20.12.0 or newer." -ForegroundColor Red
     exit 1
 }
 

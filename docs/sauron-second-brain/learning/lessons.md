@@ -2,6 +2,13 @@
 
 What went wrong and what we do now. Add new lessons at the top. See [[claude]].
 
+## 2026-11-07
+
+- Pin prompt upgrades exactly when requested and keep the root lockfile spec in sync.
+- Clack 1.8.1 needs Node 20.12.0. Check the exact floor, not only a supported major.
+- Scripted prompt input checks API compatibility. Real-terminal checks remain separate.
+- Use `npm pack --ignore-scripts` for isolated inspection when prepare would write Git config.
+
 ## 2026-11-02
 
 - `npm publish` packs what is on disk, including untracked files. Leaving a note uncommitted does

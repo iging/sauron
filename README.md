@@ -64,6 +64,8 @@ and in your codebase bind them.
 
 ## Quickstart
 
+Requires Node.js 20.12.0 or newer.
+
 You can use Sauron in two ways: **Modular Mode** (zero-install: add individual skills to any codebase without token bloat) or **Full Harness Mode** (transpile and synchronize rules across all 20 AI runtimes).
 
 ### 1. Modular Skills (Zero-Install via NPX)
