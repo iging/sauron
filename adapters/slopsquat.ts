@@ -188,7 +188,10 @@ export function fingerprintContent(content: string): string {
  * @param findings - Sink findings to convert.
  * @returns SARIF document as formatted JSON string.
  */
-export function toSarif(findings: SinkFinding[]): string {
+export function toSarif(
+  findings: SinkFinding[],
+  toolName: string = "sauron-slopsquat",
+): string {
   const results = findings.map((finding) => {
     return {
       ruleId: finding.rule,
@@ -209,7 +212,7 @@ export function toSarif(findings: SinkFinding[]): string {
     $schema: "https://json.schemastore.org/sarif-2.1.0.json",
     runs: [
       {
-        tool: { driver: { name: "sauron-slopsquat", version: "1.0.0" } },
+        tool: { driver: { name: toolName, version: "1.0.0" } },
         results,
       },
     ],
