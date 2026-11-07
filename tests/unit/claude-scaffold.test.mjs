@@ -16,16 +16,16 @@ describe("ClaudeAdapter scaffold", () => {
   const outputs = run();
   const paths = outputs.map((o) => o.relativePath);
 
-  it("emits CLAUDE.md, .claude/README.md, settings.json, output style and folder READMEs", () => {
+  it("keeps scaffold notes in .claude/README.md beside settings and the output style", () => {
     const expected = [
       "CLAUDE.md",
       ".claude/README.md",
       ".claude/settings.json",
       ".claude/output-styles/caveman.md",
-      ...FOLDERS.map((f) => `.claude/${f}/README.md`),
     ];
     assert.deepEqual([...paths].sort(), [...expected].sort());
     assert.deepEqual([...adapter.targetFiles].sort(), [...expected].sort());
+    assert.deepEqual(adapter.retiredFiles, FOLDERS.map((folder) => `.claude/${folder}/README.md`));
   });
 
   it("enables the Caveman output style in settings.json by default", () => {

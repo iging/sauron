@@ -24,7 +24,8 @@ const TRUNCATED_NOTE =
 export class WindsurfAdapter implements RuntimeAdapter {
   public readonly id = "windsurf";
   public readonly name = "Windsurf";
-  public readonly targetFiles = [RULE_PATH, WORKFLOWS_README, SKILLS_README];
+  public readonly targetFiles = [RULE_PATH, ".windsurf/README.md"];
+  public readonly retiredFiles = [WORKFLOWS_README, SKILLS_README];
 
   public transpile(context: TranspileContext): TranspileOutput[] {
     return [
@@ -34,31 +35,31 @@ export class WindsurfAdapter implements RuntimeAdapter {
         format: "markdown",
       },
       {
-        relativePath: WORKFLOWS_README,
-        content: folderReadme(
-          "Workflows",
-          "Workflows are reusable Markdown prompts that Cascade runs as `/<workflow-name>` slash commands.",
-          [
-            "1. Create `<workflow-name>.md` in this folder.",
-            "2. Write a title, a short description, and numbered steps for Cascade to follow.",
-            "3. Invoke it in Cascade with `/<workflow-name>`.",
-          ],
-          ".devin/workflows/",
-        ),
-        format: "markdown",
-      },
-      {
-        relativePath: SKILLS_README,
-        content: folderReadme(
-          "Skills",
-          "Skills are folders that bundle instructions and supporting files Cascade can load on demand.",
-          [
-            "1. Create `<skill-name>/SKILL.md` in this folder.",
-            "2. Start `SKILL.md` with frontmatter holding `name` and `description`, then the instructions.",
-            "3. Put any scripts or reference files next to `SKILL.md`.",
-          ],
-          ".devin/skills/",
-        ),
+        relativePath: ".windsurf/README.md",
+        content: [
+          "# Windsurf",
+          "",
+          folderReadme(
+            "Workflows",
+            "Workflows are reusable Markdown prompts that Cascade runs as `/<workflow-name>` slash commands.",
+            [
+              "1. Create `.windsurf/workflows/<workflow-name>.md`.",
+              "2. Write a title, a short description, and numbered steps for Cascade to follow.",
+              "3. Invoke it in Cascade with `/<workflow-name>`.",
+            ],
+            ".devin/workflows/",
+          ),
+          folderReadme(
+            "Skills",
+            "Skills are folders that bundle instructions and supporting files Cascade can load on demand.",
+            [
+              "1. Create `.windsurf/skills/<skill-name>/SKILL.md`.",
+              "2. Start `SKILL.md` with frontmatter holding `name` and `description`, then the instructions.",
+              "3. Put any scripts or reference files next to `SKILL.md`.",
+            ],
+            ".devin/skills/",
+          ),
+        ].join("\n"),
         format: "markdown",
       },
     ];
@@ -120,7 +121,7 @@ function folderReadme(
   devinPath: string,
 ): string {
   return [
-    `# Windsurf ${kind} (managed by Sauron)`,
+    `## Windsurf ${kind} (managed by Sauron)`,
     "",
     purpose,
     "",

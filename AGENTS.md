@@ -33,7 +33,7 @@ status, open items, and lessons. Handoffs stay in `docs/handoffs/`.
 - `bin/` : CLI orchestrator (`sauron.mjs`).
 - `config/` : Master workspace configuration (`sauron.config.yaml`) and JSON schemas.
 - `core/` : Fellowship agent specifications and department skill metadata.
-- `skills/` : 44 ECC-standard modular skills across 7 functional departments.
+- `skills/` : 245 installable modular skills across 9 functional departments.
 - `tests/` : Automated test suite executed with native Node.js test runner.
 
 ## Boundaries & Safety

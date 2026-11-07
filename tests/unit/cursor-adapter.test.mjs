@@ -19,8 +19,7 @@ describe("CursorAdapter scaffold", () => {
   it("emits the .cursor scaffold and no legacy .cursorrules", () => {
     assert.deepEqual(paths, [
       ".cursor/rules/sauron.mdc",
-      ".cursor/rules/README.md",
-      ".cursor/skills/README.md",
+      ".cursor/README.md",
     ]);
     assert.deepEqual(new CursorAdapter().targetFiles, paths);
   });
@@ -37,6 +36,6 @@ describe("CursorAdapter scaffold", () => {
 
   it("READMEs link official docs", () => {
     assert.ok(outputs[1].content.includes("https://cursor.com/docs/context/rules"));
-    assert.ok(outputs[2].content.includes("https://cursor.com/docs/skills"));
+    assert.ok(outputs[1].content.includes("https://cursor.com/docs/skills"));
   });
 });

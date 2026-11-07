@@ -14,6 +14,9 @@ export class CursorAdapter implements RuntimeAdapter {
   public readonly name = "Cursor";
   public readonly targetFiles = [
     ".cursor/rules/sauron.mdc",
+    ".cursor/README.md",
+  ];
+  public readonly retiredFiles = [
     ".cursor/rules/README.md",
     ".cursor/skills/README.md",
   ];
@@ -60,22 +63,15 @@ export class CursorAdapter implements RuntimeAdapter {
     }
     mdcLines.push("");
 
-    // Frontmatter keeps this README a manual-only rule if Cursor indexes
-    // plain .md files here, so it never enters agent context on its own.
+    // Keep setup notes outside the rule and skill discovery folders.
     const rulesReadme = [
-      "---",
-      "description:",
-      "globs:",
-      "alwaysApply: false",
-      "---",
-      "",
-      "# .cursor/rules",
+      "## .cursor/rules",
       "",
       "Project rules for Cursor, managed by Sauron.",
       "",
       "## Adding a rule",
       "",
-      "Create a `<name>.mdc` file in this folder. Each file starts with YAML frontmatter:",
+      "Create a `.cursor/rules/<name>.mdc` file. Each file starts with YAML frontmatter:",
       "",
       "```mdc",
       "---",
@@ -100,13 +96,13 @@ export class CursorAdapter implements RuntimeAdapter {
     ].join("\n");
 
     const skillsReadme = [
-      "# .cursor/skills",
+      "## .cursor/skills",
       "",
       "Agent Skills for Cursor.",
       "",
       "## Adding a skill",
       "",
-      "Create a folder `<skill-name>/` containing a `SKILL.md` file:",
+      "Create `.cursor/skills/<skill-name>/` containing a `SKILL.md` file:",
       "",
       "```md",
       "---",
@@ -130,13 +126,8 @@ export class CursorAdapter implements RuntimeAdapter {
         format: "markdown",
       },
       {
-        relativePath: ".cursor/rules/README.md",
-        content: rulesReadme,
-        format: "markdown",
-      },
-      {
-        relativePath: ".cursor/skills/README.md",
-        content: skillsReadme,
+        relativePath: ".cursor/README.md",
+        content: ["# Cursor", "", rulesReadme, skillsReadme].join("\n"),
         format: "markdown",
       },
     ];

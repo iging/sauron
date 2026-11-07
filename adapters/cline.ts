@@ -45,7 +45,7 @@ Invoke one in Cline chat by typing \`/\` followed by its filename.
 
 ## Add a workflow
 
-1. Create \`<name>.md\` in this folder (for example \`release.md\`).
+1. Create \`.cline/workflows/<name>.md\` (for example \`release.md\`).
 2. Write a title, then numbered steps Cline should follow, including any
    commands to run or tools to use.
 3. Run it with \`/release.md\`.
@@ -62,7 +62,7 @@ description and loads the full instructions only when relevant.
 
 ## Add a skill
 
-1. Create a folder \`<skill-name>/\` here.
+1. Create a folder \`.cline/skills/<skill-name>/\`.
 2. Add \`<skill-name>/SKILL.md\` with YAML frontmatter:
 
 \`\`\`markdown
@@ -91,7 +91,7 @@ action.
 
 ## Add a hook
 
-1. Create an executable script named after the event it handles
+1. Create an executable script in \`.cline/hooks/\` named after the event it handles
    (for example \`PreToolUse\`).
 2. Read the JSON event from stdin and write a JSON response to stdout.
 3. Make it executable (\`chmod +x\`) on macOS/Linux.
@@ -105,6 +105,8 @@ export class ClineAdapter implements RuntimeAdapter {
   public readonly targetFiles = [
     RULES_PATH,
     ".cline/README.md",
+  ];
+  public readonly retiredFiles = [
     ".cline/workflows/README.md",
     ".cline/skills/README.md",
     ".cline/hooks/README.md",
@@ -145,20 +147,9 @@ export class ClineAdapter implements RuntimeAdapter {
 
     return [
       { relativePath: RULES_PATH, content: lines.join("\n"), format: "markdown" },
-      { relativePath: ".cline/README.md", content: ROOT_README, format: "markdown" },
       {
-        relativePath: ".cline/workflows/README.md",
-        content: WORKFLOWS_README,
-        format: "markdown",
-      },
-      {
-        relativePath: ".cline/skills/README.md",
-        content: SKILLS_README,
-        format: "markdown",
-      },
-      {
-        relativePath: ".cline/hooks/README.md",
-        content: HOOKS_README,
+        relativePath: ".cline/README.md",
+        content: [ROOT_README, WORKFLOWS_README, SKILLS_README, HOOKS_README].join("\n"),
         format: "markdown",
       },
     ];

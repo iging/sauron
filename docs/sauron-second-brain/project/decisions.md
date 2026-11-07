@@ -8,8 +8,15 @@ Short record of decisions and why. See [[claude]] and [[project-overview]].
   `.clinerules`, and others).
 - 3.1.0 is MINOR: arrow-key UI, omp runtime, and fixes. Flags, `sync`, and saved choices
   behave the same.
-- `@clack/prompts` stays at 0.11.0. Version 1.x needs Node 20.12 or newer, and Sauron
-  supports Node 18.
+- Phase 0 of 4.0.0 ends Node 18 support, requires Node 20.12.0, and pins Clack to 1.8.1.
+
+## Phase 1, 2026-11-07
+
+- Preserve skill names. Prefix colliding bundled command wrappers with `sauron-` for stable
+  invocation across native targets, including plans with no skills selected.
+- Retire an old wrapper only after its replacement installs. User edits stay on disk.
+- Count `listSkills` entries, not folders or nested supporting files. The current count is 245.
+- Keep setup notes at runtime roots, including Cursor where plain Markdown rules are ignored.
 
 ## Init
 

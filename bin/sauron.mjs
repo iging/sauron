@@ -36,6 +36,8 @@ import {
   NATIVE_TARGETS,
   buildInstallOutputs,
   listDepartments,
+  listSkills,
+  commandRetirements,
   skillFileOutputs,
 } from "../dist/adapters/installer.js";
 import { ConflictManager } from "../dist/adapters/conflict-manager.js";
@@ -139,7 +141,7 @@ const RUNTIMES = Object.freeze([
     file: ".openclaw/config.json",
   }),
   Object.freeze({ id: "opencode", name: "OpenCode", file: "opencode.json" }),
-  Object.freeze({ id: "pi", name: "Pi", file: ".pi/prompts/README.md" }),
+  Object.freeze({ id: "pi", name: "Pi", file: ".pi/README.md" }),
   Object.freeze({ id: "omp", name: "omp (oh-my-pi)", file: ".omp/mcp.json" }),
   Object.freeze({ id: "adal", name: "AdaL", file: ".adalrules" }),
   Object.freeze({
@@ -208,41 +210,12 @@ const FELLOWSHIP = Object.freeze([
  * @throws {Error} If filesystem I/O fails during directory traversal.
  */
 function querySkillDomains(rootDirectory) {
-  const skillsDirectory = path.join(rootDirectory, "skills");
-
-  if (!fs.existsSync(skillsDirectory)) {
-    return [];
-  }
-
-  try {
-    /** @type {string[]} */
-    const entries = fs.readdirSync(skillsDirectory);
-    // Filter to directories only; ignore loose readme files or hidden dot-files.
-    const domainNames = entries
-      .filter((/** @type {string} */ entry) =>
-        fs.statSync(path.join(skillsDirectory, entry)).isDirectory(),
-      )
-      .sort();
-
-    return domainNames.map((/** @type {string} */ domainName) => {
-      const domainPath = path.join(skillsDirectory, domainName);
-      /** @type {string[]} */
-      const domainEntries = fs.readdirSync(domainPath);
-      // Each skill within a domain is represented by its own subfolder containing a SKILL.md.
-      const skillNames = domainEntries
-        .filter((/** @type {string} */ entry) =>
-          fs.statSync(path.join(domainPath, entry)).isDirectory(),
-        )
-        .sort();
-
-      return {
-        name: domainName,
-        skills: skillNames,
-      };
-    });
-  } catch (error) {
-    throw new Error("Failed to read skill domains from disk", { cause: error });
-  }
+  const departments = listDepartments(rootDirectory);
+  const skills = listSkills(rootDirectory, departments);
+  return departments.map((name) => ({
+    name,
+    skills: skills.filter((skill) => skill.department === name).map((skill) => skill.name),
+  }));
 }
 
 /**
@@ -1230,6 +1203,7 @@ async function executeInitCommand(options) {
     dryRun,
     targetRuntimes: plan.runtimes,
     extras,
+    retiredInstallFiles: commandRetirements(SAURON_ROOT, plan),
   });
 
   // Runtime files are listed one by one; installed assets are summarized by action.

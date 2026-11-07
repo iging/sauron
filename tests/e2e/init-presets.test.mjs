@@ -248,6 +248,29 @@ describe("E2E: init presets and flags", () => {
     }
   });
 
+  it("sync installs command aliases and retires only unchanged legacy wrappers", async () => {
+    const other = fs.mkdtempSync(path.join(os.tmpdir(), "sauron-e2e-alias-"));
+    try {
+      await execFileAsync("node", [CLI_PATH, "init", "--yes", "--skills=workflow"], { cwd: other, maxBuffer: 16 * 1024 * 1024 });
+      const manager = new ConflictManager(other);
+      manager.safeWrite(".claude/commands/caveman.md", "# Old command", "install", false, { raw: true });
+      manager.safeWrite(".claude/commands/handoff.md", "# Old command", "install", false, { raw: true });
+      fs.appendFileSync(path.join(other, ".claude/commands/handoff.md"), "\nMy edit.\n");
+      await execFileAsync("node", [CLI_PATH, "sync"], { cwd: other, maxBuffer: 16 * 1024 * 1024 });
+      assert.ok(!fs.existsSync(path.join(other, ".claude/commands/caveman.md")));
+      assert.match(fs.readFileSync(path.join(other, ".claude/commands/handoff.md"), "utf8"), /My edit/);
+      assert.match(fs.readFileSync(path.join(other, ".claude/commands/sauron-caveman.md"), "utf8"), /\/sauron-caveman/);
+      assert.ok(fs.existsSync(path.join(other, ".claude/skills/caveman/SKILL.md")));
+      fs.writeFileSync(path.join(other, ".claude/commands/sauron-caveman.md"), "# User alias\n");
+      manager.safeWrite(".claude/commands/caveman.md", "# Old command", "install", false, { raw: true });
+      await execFileAsync("node", [CLI_PATH, "sync"], { cwd: other, maxBuffer: 16 * 1024 * 1024 });
+      assert.ok(fs.existsSync(path.join(other, ".claude/commands/caveman.md")), "keep the old wrapper when the replacement cannot install");
+      assert.equal(fs.readFileSync(path.join(other, ".claude/commands/sauron-caveman.md"), "utf8"), "# User alias\n");
+    } finally {
+      fs.rmSync(other, { recursive: true, force: true });
+    }
+  });
+
   it("rejects an unknown runtime with exit code 1", async () => {
     await assert.rejects(
       execFileAsync(

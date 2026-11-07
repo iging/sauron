@@ -1,10 +1,10 @@
 # Skills Catalog Overview
 
-Sauron equips AI coding agents with a structured library of modular skills organized across 8 functional domains. Each skill adheres to the Everything Claude Code (ECC) specification and Linux Foundation Agentic AI standards.
+Sauron equips AI coding agents with a structured library of 245 installable modular skills organized across 9 functional domains. Each skill adheres to the Everything Claude Code (ECC) specification and Linux Foundation Agentic AI standards.
 
 ---
 
-## The 8 Functional Domains
+## The 9 Functional Domains
 
 Sauron divides engineering capabilities into these dedicated domains:
 
@@ -16,8 +16,12 @@ Sauron divides engineering capabilities into these dedicated domains:
 6. **Security**: OWASP vulnerability audits, Agent Guard execution shields, and incident response runbooks.
 7. **DevOps**: CI/CD pipelines, Docker containerization, performance tuning, and cross-platform shell scripting.
 8. **Architecture**: Clean architecture enforcement, API design, and architecture decision records.
+9. **AI Engineering**: Agent orchestration, retrieval pipelines, context engineering, and evaluations.
 
 ---
+
+The installer and `sauron list-skills` use the same catalog. Container folders do not count as
+skills. Nested supporting files inside an installable skill do not add separate entries.
 
 ## SKILL.md Standard Format
 
