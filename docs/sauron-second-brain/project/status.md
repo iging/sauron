@@ -3,16 +3,16 @@
 Where the project stands. Update this note before every stop. See [[claude]].
 Last updated: 2026-11-07.
 
-## Phase 1 of 4.0.0
+## Phase 2 of 4.0.0
 
-- Miguel reports Phase 0 merged. Main pulls to `5dda456` with fast-forward only.
-- Branch: `codex/4.0.0-phase-1-fixes`. Miguel authorizes commit and push.
-- Notes move to runtime roots. Command wrappers get collision-free `sauron-` aliases.
-- Status, listing, installer, and generated references share 245 installable skills.
-- Node 20.20.2, 22.23.4, and 24.15.0 each pass build, typecheck, doc gate, and 147 tests.
-- Pack inspection and seven-runtime packed install pass. Local state stays preserved.
-- Real-tool checks and the landing page count remain open. See
-  [[session-2026-11-07-phase-1-fixes]].
+- Phase 1 is merged. Main pulls to `6e4b3de` with fast-forward only.
+- Branch: `codex/4.0.0-phase-2-config-v2`. Miguel authorizes report, commit, and push.
+- Config v2 activates runtime toggles and skill selectors. Saved choices lead init reruns.
+- Upgrade creates backups and reports. V1 init/sync block until upgrade. Lossy reversal fails.
+- Config rewrites use ConflictManager with a checked original snapshot and a backup.
+- Node 20.20.2, 22.23.4, and 24.15.0 each pass build, typecheck, doc gate, and 166 tests.
+- Packed init, sync, forward/reverse upgrade, backups, and reports pass.
+- Real-terminal defaults still need Miguel. See [[session-2026-11-07-phase-2-config-v2]].
 
 ## npm
 
@@ -21,7 +21,7 @@ Last updated: 2026-11-07.
 
 ## Git
 
-- Main is pulled to `5dda456` after the Phase 0 merge. Release tag `v3.2.0` stays at `de9de83`.
+- Main is pulled to `6e4b3de` after the Phase 1 merge. Release tag `v3.2.0` stays at `de9de83`.
 - omp is merged through PR #9 at `26669a8`.
 - Local worktree `.claude/worktrees/fix-readline-types` still exists. Its commit is on `main`.
 - Build, typecheck, 116 tests, and the pre-push documentation gate pass on 2026-10-27.
@@ -67,4 +67,4 @@ Last updated: 2026-11-07.
 
 1. Release 3.1.0 is live. Registry checksum matches the tested tarball.
 2. Real-terminal test of the arrow-key `init` (Git Bash and PowerShell).
-3. Review Phase 1 through its compare link. The approved 4.0.0 handoff sets the order.
+3. Review Phase 2 through its compare link. The approved 4.0.0 handoff sets the order.

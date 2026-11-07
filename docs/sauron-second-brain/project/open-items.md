@@ -3,13 +3,13 @@
 Things not finished or not decided. Update before every stop. See [[claude]] and [[status]].
 Last updated: 2026-11-07.
 
-## Phase 1 review
+## Phase 2 review
 
-- Phase 0 is merged and pulled. Phase 1 is ready for the authorized commit and push. See [[session-2026-11-07-phase-1-fixes]].
-- Miguel checks arrows, backspace, cancel, decline, and terminal exit in Git Bash and PowerShell.
+- Phase 1 is merged and pulled. Phase 2 is ready. See [[session-2026-11-07-phase-2-config-v2]].
+- Miguel checks saved defaults, arrows, backspace, cancel, decline, and exit in both terminals.
 - Miguel verifies root notes and skill or command invocation in the real tools.
 - Landing page still needs the 245 installable-skill count. Its repo is outside this workspace.
-- Miguel authorizes the Phase 1 commit and push. Pull request and hosted CI remain pending.
+- Miguel authorizes the Phase 2 report, commit, and push. Pull request and hosted CI stay pending.
 
 ## Remaining release verification
 
@@ -32,7 +32,7 @@ Last updated: 2026-11-07.
 
 - Collision aliases and note migration are built. Confirm them in Claude Code, Pi,
   Windsurf, Cline, Cursor, OpenCode, and omp before calling real-tool checks complete.
-- Interactive re-run of `init` shows Recommended, not the saved choices.
+- Saved-choice defaults are built and piped-input tested. Real arrow-key checks remain.
 - Caveman savings have no benchmark. Publish a figure only with a script and raw data.
 - `graph.html` loads `vis-network` from unpkg with no version pin. Pin it or bundle it.
 

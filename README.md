@@ -87,6 +87,10 @@ npx sauron-ai list-skills
 
 > **Prefer Global CLI?** Install once with `npm install -g sauron-ai` and run `sauron add <skill>` anywhere.
 
+Existing projects use [config v2](./docs/01-getting-started/config-v2.md). Preview a v1 migration
+with `sauron upgrade --dry-run`, run `sauron upgrade`, then `sauron sync`.
+Migration creates a config backup and report. It writes runtime files only when you run sync.
+
 ### 2. Full Harness Synchronization (20 Runtimes & Fellowship)
 
 `init` asks a few questions (Recommended or Custom: runtimes, subagents, skills, Caveman tier), shows a plan, and writes nothing until you confirm. It generates the shared `AGENTS.md` core plus native files for the runtimes you pick (`CLAUDE.md` + `.claude/`, `.cursor/rules/`, `.windsurf/rules/`, `.cline/rules/`, and more), and merges into files you already have instead of replacing them:

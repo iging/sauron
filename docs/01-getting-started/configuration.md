@@ -15,7 +15,9 @@ my-project/
 │   └── manifest.json
 ```
 
-Sauron validates this file against the JSON schema located at `schema/sauron.schema.json`.
+The repository schema lives at `schema/sauron.schema.json`. The CLI validates against its
+bundled copy at `config/schema/sauron.schema.json`, then checks runtime ids and skill selectors.
+See [Config v2 and migration](config-v2.md) before syncing an existing v1 project.
 
 ---
 
@@ -26,7 +28,7 @@ Sauron validates this file against the JSON schema located at `schema/sauron.sch
 The `project` block identifies target stack details:
 
 ```yaml
-version: "1.0.0"
+version: "2.0.0"
 
 project:
   name: "my-application"
@@ -46,29 +48,38 @@ The `runtimes` block enables or disables synchronization targets. Set any runtim
 
 ```yaml
 runtimes:
-  claude: true # Generates CLAUDE.md
-  cursor: true # Generates .cursor/rules/sauron.mdc and .cursor/{rules,skills}/README.md
-  windsurf: true # Generates .windsurfrules
-  copilot: true # Generates .github/copilot-instructions.md and hooks
-  cline: true # Generates .cline/ scaffold (rules, workflows, skills, hooks)
-  trae: true # Generates .traerules
-  zed: true # Generates .rules and .zed/settings.json
-  codex: true # Generates .codex/instructions.md
-  gemini: true # Generates GEMINI.md
-  hermes: true # Generates .hermesrules
-  kimi: true # Generates .kimi/prompt.md
-  kiro: true # Generates .kirorules
-  openclaw: true # Generates .openclaw/config.json
-  opencode: true # Generates .opencode/instructions.md
-  pi: true # Generates .pirules
-  qwen: true # Generates .qwen/system.md
-  adal: true # Generates .adalrules
-  codebuddy: true # Generates .codebuddy/rules/sauron.md and .codebuddy/skills/README.md
+  claude: true # CLAUDE.md and .claude/
+  cursor: false # .cursor/rules/sauron.mdc and .cursor/README.md
+  windsurf: false # .windsurf/rules/sauron.md and .windsurf/README.md
+  opencode: false # opencode.json and .opencode/
+  omp: false # .omp/mcp.json and .omp/
+  pi: false # .pi/README.md
+
 ```
 
-When you run `sauron sync`, Sauron only touches runtimes marked `true`.
+When you run `sauron sync`, only runtime ids marked `true` receive output. Omitted ids are
+disabled. The shared `AGENTS.md` core always applies, even when all runtime toggles are false.
+Disabling a runtime does not delete its existing output. See [runtime paths](../runtime-scaffolds.md)
+for all 20 supported ids.
 
-### 3. Fellowship Sub-Agents
+### 3. Install Choices
+
+`skills` accepts `all`, `none`, or a list of departments and `department/skill` entries.
+Use exact entries from `sauron list-skills`. The same selections work with `--skills=`.
+
+```yaml
+skills: [security, workflow/caveman]
+init:
+  agents: fellowship
+  commands: true
+  nativeRuntimes: [claude]
+```
+
+Invalid selectors fail before writes. `init.nativeRuntimes` preserves opt-in to native assets for Claude Code,
+OpenCode, and omp. It is filtered to enabled runtimes. `init.runtimes` and `init.skills`
+belong to config v1 and are rejected in v2. Interactive init offers saved choices first.
+
+### 4. Fellowship Sub-Agents
 
 The `fellowship` block configures the 9 persona agents:
 
