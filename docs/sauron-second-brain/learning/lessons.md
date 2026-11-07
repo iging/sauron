@@ -4,6 +4,16 @@ What went wrong and what we do now. Add new lessons at the top. See [[claude]].
 
 ## 2026-11-07
 
+- Inserting a function between a JSDoc block and its function moves the types. Run the strict
+  JavaScript check after every edit near a doc comment.
+- Uninstall must keep `sauron.config.yaml` and `.sauron/`, because `upgrade` records them as
+  managed files.
+
+- When local notes block checkout, stash only those paths and verify restoration before dropping it.
+
+- Adapter-only typechecks miss CLI JavaScript. Check the entry point with allowJs and checkJs.
+- Generic Clack helpers must use its exact CANCEL_SYMBOL type, not the broader symbol type.
+
 - Empty picker selections are choices. Preserve them on revisits instead of rechecking all skills.
 - Keep Back navigation outside installable values. Scope key listeners to one prompt and remove them.
 - Scripted arrow streams verify wiring. Real Git Bash and PowerShell checks remain separate.
@@ -23,6 +33,10 @@ What went wrong and what we do now. Add new lessons at the top. See [[claude]].
 - Use `npm pack --ignore-scripts` for isolated inspection when prepare would write Git config.
 
 ## 2026-11-02
+
+- npm warns "script name was invalid and removed" for a `./` bin path. npm keeps the entry and
+  only trims the prefix. Read the source before treating a warning as a real failure.
+- A guard regex can match `-F` after `git push` in one command. Keep pushes in their own command.
 
 - `npm publish` packs what is on disk, including untracked files. Leaving a note uncommitted does
   not keep it out of the package. Exclude it in `files`, then confirm with `npm pack --dry-run`.

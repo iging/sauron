@@ -16,7 +16,6 @@ import fs from "node:fs";
 import path from "node:path";
 import process from "node:process";
 import { fileURLToPath } from "node:url";
-import { parse as parseYaml } from "yaml";
 import { Transpiler } from "../dist/adapters/transpiler.js";
 import {
   AGENT_SETS,
@@ -44,9 +43,16 @@ import { ConflictManager } from "../dist/adapters/conflict-manager.js";
 import {
   parseConfig,
   configPlan,
+  configVersion,
   configWithPlan,
   migrateConfig,
 } from "../dist/adapters/config.js";
+import {
+  applyUninstall,
+  doctorFindings,
+  inspectInstall,
+  planUninstall,
+} from "../dist/adapters/lifecycle.js";
 import {
   pickSkills,
   parsePickerValues,
@@ -273,6 +279,18 @@ function printHelpMenu() {
   );
   console.log(
     "  add <skill>  Add one or more modular skills to local project workspace",
+  );
+  console.log(
+    "  list-installed List files Sauron installed and their state (--json)",
+  );
+  console.log(
+    "  doctor       Check Node, config, manifest, and installed files (--json)",
+  );
+  console.log(
+    "  repair       Restore missing files and blocks from saved choices (--dry-run)",
+  );
+  console.log(
+    "  uninstall    Remove unchanged Sauron files; preview unless --yes",
   );
   console.log(
     "  graph [path] Generate AST codebase knowledge graph (json, md, html)",
@@ -1305,6 +1323,178 @@ function readConfig(configPath) {
 }
 
 /**
+ * Reads the config version for `doctor`.
+ *
+ * @returns {string | null} The version, `"invalid"` when unreadable, or null without a config.
+ */
+function readConfigVersion() {
+  const configPath = path.join(process.cwd(), "sauron.config.yaml");
+  if (!fs.existsSync(configPath)) return null;
+  try {
+    return configVersion(parseConfig(fs.readFileSync(configPath, "utf8")));
+  } catch {
+    return "invalid";
+  }
+}
+
+/**
+ * Handles `list-installed`: every file Sauron recorded, with its state. Writes nothing.
+ *
+ * @param {string[]} argv - Arguments after the command name.
+ * @returns {void}
+ */
+function executeListInstalledCommand(argv) {
+  const inspection = inspectInstall(process.cwd());
+  if (argv.includes("--json")) {
+    console.log(JSON.stringify(inspection, null, 2));
+    return;
+  }
+  if (inspection.manifest !== "ok") {
+    console.log(
+      inspection.manifest === "missing"
+        ? "[LIST] Nothing installed: .sauron/manifest.json does not exist."
+        : "[LIST] .sauron/manifest.json is damaged. Run sauron doctor.",
+    );
+    if (inspection.manifest === "invalid") process.exitCode = 1;
+    return;
+  }
+  /** @type {Map<string, typeof inspection.files>} */
+  const byRuntime = new Map();
+  for (const file of inspection.files) {
+    byRuntime.set(file.runtime, [...(byRuntime.get(file.runtime) ?? []), file]);
+  }
+  for (const [runtime, files] of [...byRuntime].sort(([a], [b]) =>
+    a.localeCompare(b),
+  )) {
+    console.log(`\n${runtime} (${files.length})`);
+    for (const file of files) {
+      console.log(`  ${file.state.padEnd(8)} ${file.path}`);
+    }
+  }
+  /** @type {Record<string, number>} */
+  const counts = {};
+  for (const file of inspection.files)
+    counts[file.state] = (counts[file.state] ?? 0) + 1;
+  console.log(
+    `\n[LIST] ${inspection.files.length} file(s): ${
+      Object.entries(counts)
+        .map(([state, n]) => `${n} ${state}`)
+        .join(", ") || "none"
+    }`,
+  );
+}
+
+/**
+ * Handles `doctor`: checks Node, config, manifest, and installed files. Writes nothing.
+ * Exits non-zero when any finding is an error.
+ *
+ * @param {string[]} argv - Arguments after the command name.
+ * @returns {void}
+ */
+function executeDoctorCommand(argv) {
+  const findings = doctorFindings(inspectInstall(process.cwd()), {
+    nodeVersion: process.versions.node,
+    configVersion: readConfigVersion(),
+  });
+  if (findings.some((f) => f.level === "error")) process.exitCode = 1;
+  if (argv.includes("--json")) {
+    console.log(JSON.stringify(findings, null, 2));
+    return;
+  }
+  if (findings.length === 0) {
+    console.log("[DOCTOR] No problems found.");
+    return;
+  }
+  for (const finding of findings) {
+    console.log(`[${finding.level.toUpperCase()}] ${finding.message}`);
+  }
+}
+
+/**
+ * Handles `repair`: re-applies the saved choices so missing files and removed managed
+ * blocks come back. Files you changed are kept. Then prints `doctor` again.
+ *
+ * @param {boolean} dryRun - When true, nothing on disk changes.
+ * @returns {Promise<void>}
+ */
+async function executeRepairCommand(dryRun) {
+  const inspection = inspectInstall(process.cwd());
+  if (inspection.manifest === "invalid")
+    throw new Error(
+      ".sauron/manifest.json is damaged. Restore it from version control, then run repair.",
+    );
+  if (!fs.existsSync(path.join(process.cwd(), "sauron.config.yaml")))
+    throw new Error("No sauron.config.yaml found. Run sauron init.");
+  const missing = inspection.files.filter((f) => f.state === "missing").length;
+  const blocks = inspection.files.filter(
+    (f) => f.state === "merged" && f.blockPresent === false,
+  ).length;
+  console.log(
+    `[REPAIR] ${missing} missing file(s), ${blocks} removed block(s). Re-applying saved choices${dryRun ? " (dry run)" : ""}.`,
+  );
+  await executeInitCommand({ dryRun, argv: [], isSync: true });
+  if (!dryRun) executeDoctorCommand([]);
+}
+
+/**
+ * Handles `uninstall`: removes what Sauron installed and you never changed.
+ * Files you changed, user files Sauron merged into (except their managed block),
+ * `sauron.config.yaml`, and `.sauron/` stay. Applies only with `--yes`.
+ *
+ * @param {string[]} argv - Arguments after the command name.
+ * @param {boolean} dryRun - When true, nothing on disk changes.
+ * @returns {void}
+ */
+function executeUninstallCommand(argv, dryRun) {
+  const inspection = inspectInstall(process.cwd());
+  if (inspection.manifest === "invalid")
+    throw new Error(
+      ".sauron/manifest.json is damaged. Restore it from version control, then run uninstall.",
+    );
+  if (inspection.manifest === "missing" || inspection.files.length === 0) {
+    console.log("[UNINSTALL] Nothing recorded as installed.");
+    return;
+  }
+  const steps = planUninstall(inspection);
+  const apply = argv.includes("--yes") && !dryRun;
+  const { outcomes, removedDirs } = applyUninstall(
+    process.cwd(),
+    steps,
+    !apply,
+  );
+  const labels = {
+    remove: "remove",
+    "strip-block": "strip block",
+    forget: "forget",
+    "keep-edited": "keep, you changed it",
+    "keep-merged": "keep, merged user file",
+    "keep-protected": "keep, config or Sauron state",
+    "keep-unsafe": "keep, path leaves workspace",
+  };
+  for (const outcome of outcomes) {
+    console.log(`  ${labels[outcome.action].padEnd(30)} ${outcome.path}`);
+  }
+  /** @type {Record<string, number>} */
+  const counts = {};
+  for (const outcome of outcomes)
+    counts[outcome.result] = (counts[outcome.result] ?? 0) + 1;
+  console.log(
+    `\n[UNINSTALL] ${Object.entries(counts)
+      .map(([result, n]) => `${n} ${result}`)
+      .join(", ")}`,
+  );
+  if (removedDirs.length > 0)
+    console.log(`[UNINSTALL] Removed empty folders: ${removedDirs.join(", ")}`);
+  if (apply) {
+    console.log("[UNINSTALL] Backups are in .sauron/backups/.");
+  } else {
+    console.log(
+      "[UNINSTALL] Preview only. Nothing changed. Run sauron uninstall --yes to apply.",
+    );
+  }
+}
+
+/**
  * Initializes a repository: asks for (or reads) the install plan, then writes the
  * shared AGENTS.md core, the selected runtime scaffolds, skills, subagents, and commands.
  *
@@ -1998,6 +2188,30 @@ function main(commandLineArguments) {
     case "upgrade":
       try {
         executeUpgradeCommand(commandLineArguments.slice(1));
+      } catch (error) {
+        console.error(
+          `[ERROR] ${error instanceof Error ? error.message : String(error)}`,
+        );
+        process.exitCode = 1;
+      }
+      break;
+    case "list-installed":
+      executeListInstalledCommand(commandLineArguments.slice(1));
+      break;
+    case "doctor":
+      executeDoctorCommand(commandLineArguments.slice(1));
+      break;
+    case "repair":
+      executeRepairCommand(isDryRun).catch((error) => {
+        console.error(
+          `[ERROR] ${error instanceof Error ? error.message : String(error)}`,
+        );
+        process.exit(1);
+      });
+      break;
+    case "uninstall":
+      try {
+        executeUninstallCommand(commandLineArguments.slice(1), isDryRun);
       } catch (error) {
         console.error(
           `[ERROR] ${error instanceof Error ? error.message : String(error)}`,

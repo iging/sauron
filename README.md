@@ -91,6 +91,10 @@ Existing projects use [config v2](./docs/01-getting-started/config-v2.md). Previ
 with `sauron upgrade --dry-run`, run `sauron upgrade`, then `sauron sync`.
 Migration creates a config backup and report. It writes runtime files only when you run sync.
 
+Check an install with `sauron doctor`, restore missing files with `sauron repair`, and remove
+unchanged Sauron files with `sauron uninstall --yes`. See
+[Install Lifecycle](./docs/01-getting-started/install-lifecycle.md).
+
 Interactive Custom setup can [pick individual skills](./docs/01-getting-started/skill-picker.md)
 inside each department. New departments start fully checked. Revisit choices before confirming.
 

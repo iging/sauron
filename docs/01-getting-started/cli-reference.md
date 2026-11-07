@@ -110,6 +110,24 @@ node ./bin/sauron.mjs status
 
 ---
 
+### `list-installed`, `doctor`, `repair`, `uninstall`
+
+Manage what Sauron installed, using `.sauron/manifest.json`. See
+[Install Lifecycle](./install-lifecycle.md).
+
+```bash
+node ./bin/sauron.mjs list-installed [--json]
+node ./bin/sauron.mjs doctor [--json]
+node ./bin/sauron.mjs repair [--dry-run]
+node ./bin/sauron.mjs uninstall [--yes]
+```
+
+- `list-installed` and `doctor` write nothing. `doctor` exits with code 1 on an error.
+- `repair` applies saved choices again. Files you changed are kept.
+- `uninstall` previews unless `--yes` is given. Edited files, config, and `.sauron/` stay.
+
+---
+
 ### `list-skills`
 
 Lists all registered skills organized by functional domain.

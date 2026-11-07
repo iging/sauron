@@ -5,18 +5,22 @@ Last updated: 2026-11-07.
 
 ## Phase 3 review
 
-- Phase 2 is pulled. Phase 3 is ready. See [[session-2026-11-07-phase-3-skill-picker]].
+- Phase 3 is merged and main is pulled to `748ca5a`. See [[session-2026-11-07-phase-3-skill-picker]].
 - Miguel checks picker rendering, Backspace/Back, saved subsets, cancel, decline, and exit.
 - Run real-terminal checks in Git Bash and PowerShell. Scripted input is separate evidence.
 - Landing page still needs the 245 installable-skill count in its separate workspace.
-- Miguel authorizes progress-report, commit, and push. Pull request and hosted CI stay pending.
+- Phase 4 install lifecycle is built on branch `codex/4.0.0-phase-4-install-lifecycle`. Next: Phase 5.
+- Open for Phase 4: hosted CI on Node 20 and 22, and `uninstall --yes` on a real project.
+
+- CLI type fixes are pushed as `410d780`. Close the process holding the empty test folder.
+- Cleanup backs up 369 files through ConflictManager. See [[session-2026-11-07-cli-lint-cleanup]].
 
 ## Remaining release verification
 
 - omp is merged in PR #9. Release commit and tag are pushed.
 - Real-terminal test of the arrow-key `init` in Git Bash and PowerShell.
 - 3.1.0 is published and verified as npm `latest`. Registry checksum matches the tarball.
-- Do not repeat `release:minor`. The version is already 3.1.0.
+- Do not repeat `release:minor`. The version is already 3.2.0.
 - Full steps: [[release-and-publish]].
 
 ## Not verified yet
@@ -64,7 +68,7 @@ Last updated: 2026-11-07.
 - README notes for OpenCode and omp now sit at `.opencode/README.md` and `.omp/README.md`.
   Same check still open for Pi, Claude Code, Windsurf, Cline, and Cursor. See [[roadmap-ecc]].
 - [[plan-sauron-eye]] is approved for 3.3.0, not built. Future Eye work is listed in that note.
-- Proposed roadmap, awaiting approval one tier at a time: [[roadmap-ecc]].
+- Approved 4.0.0 handoff supersedes the older one-tier roadmap in [[roadmap-ecc]].
 - Same native install for Codex (TOML) and Copilot, after OpenCode and omp are proven.
 - Batch research, then `/plan-feature` Part 1 (product roadmap) and Part 2 (Agent
   Engineering Track). Briefs: `docs/handoffs/2026-10-20-sauron-v3-release-and-roadmap.md`
