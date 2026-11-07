@@ -30,3 +30,20 @@ build
 Thumbs.db
 .idea
 .vscode/*.local
+
+# Local runtime state, worktrees, and editor configuration
+.claude/worktrees/
+.sauron/
+.vscode/
+.codex/
+.agents/
+
+# Internal and local-only planning notes
+docs/handoffs/
+docs/sauron-second-brain/
+context/
+llm-wiki-sample.md
+video-*.md
+release-3.2.0-steps.md
+progress-report-result.md
+*.tgz

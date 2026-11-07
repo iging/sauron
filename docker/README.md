@@ -1,70 +1,52 @@
-# Docker Architecture & Containerization Guide
+# Sauron CLI with Docker
 
-This directory contains production-grade, hardened Docker configurations for **Sauron**, authored in strict compliance with [`skills/devops/docker-principles/SKILL.md`](../skills/devops/docker-principles/SKILL.md).
+Run Docker Compose from the repository root. The only Compose file is ../docker-compose.yml.
+It builds the CLI with Dockerfile.cli. The landing page is maintained in a separate repository.
 
----
+## Select the user project
 
-## 1. Architectural Highlights & Hardening Directives
+The CLI reads and writes /workspace. Set SAURON_WORKSPACE to an existing absolute project path
+before running init, add, repair, or uninstall. If unset, Compose mounts the Sauron clone itself.
+Build paths stay relative to this clone, independently of the mounted user project.
 
-- **Multi-Stage Build Discipline:** Build tools, TypeScript compilers, and intermediate layers are completely isolated from runtime containers to keep final images minimal (< 100MB).
-- **Mandatory Non-Root User Execution:** Container processes execute strictly as non-root user `sauron` (UID 10001) or `nextjs` (UID 10001). Zero root-privilege execution (`USER` directive enforced).
-- **Layer Caching Discipline:** Package manifests (`package*.json`, `tsconfig.json`) are copied and installed first to maximize layer cache hits during iterative changes.
-- **Zero Secrets in Image Layers:** No credentials or environment secrets are embedded in images; BuildKit cache cleanup is run in the same layer (`rm -rf /var/cache/apk/*`).
-- **Minimal Base Image:** Uses Alpine Linux (`node:22-alpine`) for a minimal attack surface and fast startup.
+PowerShell:
 
----
-
-## 2. Available Services & Dockerfiles
-
-| File                     | Purpose                             | Base Image       | Non-Root User    |
-| :----------------------- | :---------------------------------- | :--------------- | :--------------- |
-| **`Dockerfile.cli`**     | Sauron 20-Runtime Transpiler & CLI  | `node:22-alpine` | `sauron` (10001) |
-| **`Dockerfile.landing`** | Sauron Landing Page Next.js Web App | `node:22-alpine` | `nextjs` (10001) |
-| **`docker-compose.yml`** | Compose configuration for local dev | -                | -                |
-
----
-
-## 3. Quickstart & Usage
-
-### 3.1 Running Sauron CLI via Docker (Zero Local Node.js Required)
-
-You can run Sauron CLI commands directly without installing Node.js or npm on your host machine:
-
-```bash
-# Check Sauron status
+```powershell
+$env:SAURON_WORKSPACE = 'C:\path\to\your-project'
+docker compose config
+docker compose build sauron
 docker compose run --rm sauron status
-
-# List all available skills across 9 departments
-docker compose run --rm sauron list-skills
-
-# Initialize Sauron harness in your current workspace
-docker compose run --rm sauron init
-
-# Add a specific skill to your workspace
+docker compose run --rm sauron init --yes
 docker compose run --rm sauron add api-design
 ```
 
-### 3.2 Building and Running the Sauron Landing Page
-
-To test and preview the Next.js landing page inside a hardened container:
+Bash:
 
 ```bash
-# Start the landing page container
-docker compose up sauron-landing
-
-# Access in your browser:
-# http://localhost:3000
+export SAURON_WORKSPACE="/absolute/path/to/your-project"
+docker compose config
+docker compose build sauron
+docker compose run --rm sauron status
 ```
 
-### 3.3 Building Standalone Images Manually
+From another directory, use docker compose -f /absolute/path/to/sauron/docker-compose.yml.
+The root Compose file remains the only configuration. No entrypoint override is needed.
+
+## Image and permissions
+
+- The Node 22 Alpine builder copies package.json and package-lock.json, then runs npm ci.
+- TypeScript builds before the runtime image is assembled. Dependency or build failures stop it.
+- The runtime uses the sauron user with UID/GID 10001. The mounted project must allow this user
+  to write when running mutation commands. Docker Desktop handles Windows bind-mount access.
+- The entrypoint is node /opt/sauron/bin/sauron.mjs. It does not depend on shebang line endings.
+- Source .mjs and .sh files use LF through .gitattributes.
+- .dockerignore excludes dependencies, compiled output, runtime state, worktrees, editor settings,
+  secrets, and internal/local-only notes. Do not copy credentials into the build context.
+- Build tools remain in the copied application tree. No image-size target is claimed.
+
+## Standalone image
 
 ```bash
-# Build the CLI container
 docker build -t sauron-cli -f docker/Dockerfile.cli .
-
-# Run the CLI container
-docker run --rm -v "$(pwd)":/workspace sauron-cli status
-
-# Build the Landing Page container
-docker build -t sauron-landing -f docker/Dockerfile.landing .
+docker run --rm --mount type=bind,source=/absolute/path/to/your-project,target=/workspace sauron-cli status
 ```
