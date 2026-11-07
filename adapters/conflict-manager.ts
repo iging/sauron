@@ -238,6 +238,107 @@ export class ConflictManager {
   }
 
   /**
+   * Creates a new user-owned tree without installation tracking. Existing destinations
+   * are kept, including empty folders. The directory reservation and file writes are
+   * exclusive. Persistent knowledge must survive runtime repair and uninstall.
+   */
+  public createOnlyTree(
+    relativePath: string,
+    files: readonly { relativePath: string; content: string }[],
+    dryRun: boolean = false,
+  ): "created" | "skipped" | "simulated" {
+    const inside = (base: string, name: string): string => {
+      if (
+        !name.trim() ||
+        path.isAbsolute(name) ||
+        path.win32.isAbsolute(name) ||
+        name.split(/[\\/]/).includes("..") ||
+        /[\x00-\x1f]/.test(name)
+      )
+        throw new Error("New tree paths must stay inside the workspace.");
+      const target = path.resolve(base, name.replace(/[\\/]/g, path.sep));
+      const relative = path.relative(base, target);
+      if (
+        !relative ||
+        relative.startsWith(".." + path.sep) ||
+        path.isAbsolute(relative)
+      )
+        throw new Error("New tree paths must stay inside the workspace.");
+      return target;
+    };
+    const stat = (target: string): fs.Stats | undefined => {
+      try {
+        return fs.lstatSync(target);
+      } catch (error) {
+        if (
+          error instanceof Error &&
+          "code" in error &&
+          error.code === "ENOENT"
+        )
+          return undefined;
+        throw error;
+      }
+    };
+    const parents = (target: string): void => {
+      let current = this.workspaceRoot;
+      for (const part of [
+        "",
+        ...path
+          .relative(this.workspaceRoot, path.dirname(target))
+          .split(path.sep),
+      ]) {
+        current = path.join(current, part);
+        const info = stat(current);
+        if (info && (info.isSymbolicLink() || !info.isDirectory()))
+          throw new Error(
+            "New tree parent must be a real directory: " + current,
+          );
+      }
+    };
+    const destination = inside(this.workspaceRoot, relativePath);
+    const targets = files.map((file) => ({
+      ...file,
+      target: inside(destination, file.relativePath),
+    }));
+    const keys = targets.map(({ target }) =>
+      process.platform === "win32" ? target.toLowerCase() : target,
+    );
+    if (
+      keys.length === 0 ||
+      new Set(keys).size !== keys.length ||
+      keys.some((file) =>
+        keys.some((other) => other.startsWith(file + path.sep)),
+      )
+    )
+      throw new Error(
+        "New tree must contain unique file paths without file/directory collisions.",
+      );
+    parents(destination);
+    const existing = stat(destination);
+    if (existing?.isSymbolicLink())
+      throw new Error("New tree destination cannot be a symbolic link.");
+    if (existing) return "skipped";
+    if (dryRun) return "simulated";
+    fs.mkdirSync(path.dirname(destination), { recursive: true });
+    try {
+      fs.mkdirSync(destination);
+    } catch (error) {
+      if (error instanceof Error && "code" in error && error.code === "EEXIST")
+        return "skipped";
+      throw error;
+    }
+    for (const file of targets) {
+      parents(file.target);
+      fs.mkdirSync(path.dirname(file.target), { recursive: true });
+      fs.writeFileSync(file.target, file.content, {
+        encoding: "utf8",
+        flag: "wx",
+      });
+    }
+    return "created";
+  }
+
+  /**
    * Writes content to a destination file without destroying user content.
    *
    * Text files carry Sauron content inside a managed block delimited by
