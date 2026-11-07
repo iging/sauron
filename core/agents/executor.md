@@ -11,6 +11,9 @@ authority:
   can_modify: ["src/**/*", "tests/**/*"]
   must_not_modify: ["context/PRD.md", "context/ARCHITECTURE.md"]
 anti_patterns_prevented: ["AP-6", "AP-17", "AP-28"]
+toolset: builder
+shell: [test, build, lint, typecheck]
+model: balanced
 ---
 
 # Core Task Executor: Feature Implementation Engineer

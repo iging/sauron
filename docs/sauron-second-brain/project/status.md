@@ -3,10 +3,17 @@
 Where the project stands. Update this note before every stop. See [[claude]].
 Last updated: 2026-11-07.
 
+## Phase 5b of 4.0.0
+
+- Branch `codex/4.0.0-phase-5b-agent-tools-models` gives all 78 agents a toolset, shell intents,
+  and a model tier, rendered for Claude Code, OpenCode, and omp. Built by Claude Code. Not merged.
+- Node 24.15.0 passes build, typecheck, strict CLI and unused-code checks, doc gate, 218 tests.
+- Real OpenCode parsed the generated `permissions` rules. `claude plugin validate` still passes.
+- See [[session-2026-11-07-phase-5b-agent-tools-models]].
+
 ## Phase 5 of 4.0.0
 
-- Branch `codex/4.0.0-phase-5-profiles-plugin-tiers` adds `init --profile`, runtime support
-  tiers in `status`, and `sauron plugin`. Built by Claude Code on 2026-11-07. Not merged.
+- Merged in PR #24 at `540245a`. Adds `init --profile`, runtime tiers, and `sauron plugin`.
 - Node 24.15.0 passes build, typecheck, strict CLI and unused-code checks, doc gate, 207 tests.
 - `claude plugin validate` passes on the generated plugin and marketplace. Only warning: no icon.
 - See [[session-2026-11-07-phase-5-profiles-plugin-tiers]].
@@ -88,4 +95,4 @@ Last updated: 2026-11-07.
 
 1. Release 3.2.0 is live. Create the GitHub release.
 2. Real-terminal test of the arrow-key `init` (Git Bash and PowerShell).
-3. Miguel merges the Phase 5 pull request. Then Phase 5b: agent tools, shell commands, models.
+3. Miguel merges the Phase 5b pull request. Then Phase 6: Codex and Copilot subagents.

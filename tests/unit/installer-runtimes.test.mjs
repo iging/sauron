@@ -73,7 +73,9 @@ describe("Native subagent and command install", () => {
         "",
         `${name} must be left out`,
       );
-      const skillNames = new Set(listSkills(ROOT, listDepartments(ROOT)).map((skill) => skill.name));
+      const skillNames = new Set(
+        listSkills(ROOT, listDepartments(ROOT)).map((skill) => skill.name),
+      );
       const command = skillNames.has(name) ? `sauron-${name}` : name;
       assert.notEqual(
         contentOf(outputs(["opencode"]), `.opencode/commands/${command}.md`),
@@ -93,7 +95,10 @@ describe("Native subagent and command install", () => {
       /^---\nname: gandalf\ndescription: "/,
     );
     const opencode = contentOf(list, ".opencode/agents/gandalf.md");
-    assert.match(opencode, /^---\ndescription: ".*"\nmode: subagent\n---\n/);
+    assert.match(
+      opencode,
+      /^---\ndescription: ".*"\nmode: subagent\npermissions:\n(  - \{.*\}\n)+---\n/,
+    );
     assert.doesNotMatch(opencode, /^name:/m);
   });
 
@@ -194,38 +199,72 @@ describe("Saved native runtimes", () => {
   });
 });
 
-
 describe("Skill and command name collisions", () => {
   it("fails closed when an alias already belongs to a bundled command", () => {
-    const root = fs.mkdtempSync(path.join(os.tmpdir(), "sauron-alias-collision-"));
+    const root = fs.mkdtempSync(
+      path.join(os.tmpdir(), "sauron-alias-collision-"),
+    );
     try {
       fs.mkdirSync(path.join(root, "commands"), { recursive: true });
-      fs.mkdirSync(path.join(root, "skills/workflow/caveman"), { recursive: true });
-      fs.writeFileSync(path.join(root, "skills/workflow/caveman/SKILL.md"), "# Skill");
+      fs.mkdirSync(path.join(root, "skills/workflow/caveman"), {
+        recursive: true,
+      });
+      fs.writeFileSync(
+        path.join(root, "skills/workflow/caveman/SKILL.md"),
+        "# Skill",
+      );
       fs.writeFileSync(path.join(root, "commands/caveman.md"), "/caveman");
-      fs.writeFileSync(path.join(root, "commands/sauron-caveman.md"), "# Already taken");
-      assert.throws(() => buildInstallOutputs(root, resolvePlan({ skills: "none" })), /Command alias collides/);
+      fs.writeFileSync(
+        path.join(root, "commands/sauron-caveman.md"),
+        "# Already taken",
+      );
+      assert.throws(
+        () => buildInstallOutputs(root, resolvePlan({ skills: "none" })),
+        /Command alias collides/,
+      );
     } finally {
       fs.rmSync(root, { recursive: true, force: true });
     }
   });
   it("keeps skills and provides distinct command wrapper aliases in every native runtime", () => {
-    const skillNames = new Set(listSkills(ROOT, listDepartments(ROOT)).map((skill) => skill.name));
+    const skillNames = new Set(
+      listSkills(ROOT, listDepartments(ROOT)).map((skill) => skill.name),
+    );
     for (const runtime of NATIVE_RUNTIMES) {
       const target = NATIVE_TARGETS[runtime];
       const list = outputs([runtime], { skills: "all" });
       const commands = inDir(list, target.commandsDir);
-      assert.equal(new Set(commands.map((command) => command.relativePath)).size, commands.length);
+      assert.equal(
+        new Set(commands.map((command) => command.relativePath)).size,
+        commands.length,
+      );
       for (const command of commands) {
-        assert.ok(!skillNames.has(path.basename(command.relativePath, ".md")), command.relativePath);
+        assert.ok(
+          !skillNames.has(path.basename(command.relativePath, ".md")),
+          command.relativePath,
+        );
       }
-      const caveman = contentOf(list, `${target.commandsDir}/sauron-caveman.md`);
+      const caveman = contentOf(
+        list,
+        `${target.commandsDir}/sauron-caveman.md`,
+      );
       assert.match(caveman, /\/sauron-caveman/);
       assert.doesNotMatch(caveman, /\/caveman\b/);
-      assert.ok(list.some((file) => file.relativePath === ".agents/skills/caveman/SKILL.md"));
+      assert.ok(
+        list.some(
+          (file) => file.relativePath === ".agents/skills/caveman/SKILL.md",
+        ),
+      );
       const plan = resolvePlan({ runtimes: [runtime] });
-      assert.ok(commandRetirements(ROOT, plan).some((file) => file.relativePath === `${target.commandsDir}/caveman.md`));
-      assert.deepEqual(commandRetirements(ROOT, { ...plan, commands: false }), []);
+      assert.ok(
+        commandRetirements(ROOT, plan).some(
+          (file) => file.relativePath === `${target.commandsDir}/caveman.md`,
+        ),
+      );
+      assert.deepEqual(
+        commandRetirements(ROOT, { ...plan, commands: false }),
+        [],
+      );
     }
   });
 });

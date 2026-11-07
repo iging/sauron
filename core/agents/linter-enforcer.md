@@ -11,6 +11,9 @@ authority:
   can_modify: [".eslintrc*", "biome.json", ".prettierrc*"]
   must_not_modify: ["src/features/*"]
 anti_patterns_prevented: ["AP-18", "AP-41"]
+toolset: builder
+shell: [test, build, lint, typecheck]
+model: balanced
 ---
 
 # Linter Enforcer: ESLint, Biome, and Formatting Rule Custodian

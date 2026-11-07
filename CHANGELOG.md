@@ -29,6 +29,11 @@ Notable changes to Sauron. Versions follow [Semantic Versioning](https://semver.
 
 ### Added
 
+- Agent specs state a toolset, shell intents, and a model tier. Claude Code agents get `tools`
+  and `model`, OpenCode agents get `permissions` rules, omp read-only agents get `tools`, and
+  every agent gets an Access section. Shell intents resolve to the project's own commands.
+- `agents.models` in `sauron.config.yaml` sets the real model per runtime and tier.
+
 - `init --profile=minimal|recommended|frontend|backend|full`, named setups that skip the questions.
 - Runtime support tiers (stable, beta, instruction-only) with evidence, shown by `sauron status`.
 - `sauron plugin`, which builds a Claude Code plugin and a local marketplace that pass

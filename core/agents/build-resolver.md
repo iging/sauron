@@ -11,6 +11,9 @@ authority:
   can_modify: ["src/**/*", "tsconfig.json"]
   must_not_modify: ["context/ARCHITECTURE.md"]
 anti_patterns_prevented: ["AP-18", "AP-35", "AP-41"]
+toolset: builder
+shell: [test, build, lint, typecheck]
+model: balanced
 ---
 
 # Build & Type Resolver: Build and Compiler Diagnostics Specialist

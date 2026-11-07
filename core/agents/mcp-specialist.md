@@ -11,6 +11,9 @@ authority:
   can_modify: ["mcp.json", "docs/mcp/*"]
   must_not_modify: ["src/**/*"]
 anti_patterns_prevented: ["AP-18", "AP-53"]
+toolset: builder
+shell: [test, build, lint, typecheck]
+model: balanced
 ---
 
 # MCP Specialist: Model Context Protocol Server & Client Architect

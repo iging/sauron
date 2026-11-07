@@ -10,7 +10,9 @@ Last updated: 2026-11-07.
 - Run real-terminal checks in Git Bash and PowerShell. Scripted input is separate evidence.
 - Landing page still needs the 245 installable-skill count in its separate workspace.
 - Phase 4 is merged. Still open: `uninstall --yes` on a real project with user edits.
-- Phase 5 is on branch `codex/4.0.0-phase-5-profiles-plugin-tiers`. Next: Phase 5b.
+- Phase 5 is merged. Phase 5b is on branch `codex/4.0.0-phase-5b-agent-tools-models`. Next: Phase 6.
+- Open for Phase 5b: a Claude Code agent refusing a missing tool in a real session, and omp
+  reading `tools` in a real session. Claude Code cannot limit Bash per command in an agent file.
 - Open for Phase 5: install the plugin in a real Claude Code session, add a plugin icon, and
   record real-tool checks to promote beta runtimes. See `docs/04-runtime-adapters/runtime-tiers.md`.
 

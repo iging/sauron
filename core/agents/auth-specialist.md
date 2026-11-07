@@ -11,6 +11,9 @@ authority:
   can_modify: ["src/auth/**/*"]
   must_not_modify: ["src/frontend/components/*"]
 anti_patterns_prevented: ["AP-26", "AP-53"]
+toolset: builder
+shell: [test, build, lint, typecheck]
+model: balanced
 ---
 
 # Auth Specialist: Authentication & Role-Based Authorization Engineer

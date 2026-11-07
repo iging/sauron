@@ -95,6 +95,9 @@ Pick a ready setup with `sauron init --profile=frontend`, or build a Claude Code
 `sauron plugin`. See [Profiles and Plugin](./docs/01-getting-started/profiles-and-plugin.md) and
 [Runtime Tiers](./docs/04-runtime-adapters/runtime-tiers.md).
 
+Each agent gets only the tools, commands, and model its job needs. See
+[Agent Access](./docs/02-fellowship-agents/agent-access.md).
+
 Check an install with `sauron doctor`, restore missing files with `sauron repair`, and remove
 unchanged Sauron files with `sauron uninstall --yes`. See
 [Install Lifecycle](./docs/01-getting-started/install-lifecycle.md).

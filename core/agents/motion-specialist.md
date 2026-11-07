@@ -11,6 +11,9 @@ authority:
   can_modify: ["src/animations/*", "src/styles/motion.*"]
   must_not_modify: ["src/backend/*"]
 anti_patterns_prevented: ["AP-18", "AP-41"]
+toolset: builder
+shell: [test, build, lint, typecheck]
+model: balanced
 ---
 
 # Motion Specialist: Animation & Interaction Dynamics Engineer

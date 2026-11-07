@@ -12,6 +12,9 @@ authority:
   can_modify: ["src/*", "lib/*", "features/*"]
   must_not_modify: ["context/PRD.md", "context/ARCHITECTURE.md", "licenses/*"]
 anti_patterns_prevented: ["AP-8", "AP-28", "AP-48", "AP-59"]
+toolset: builder
+shell: [test, typecheck]
+model: balanced
 ---
 
 # Gimli: Refactorer and AST Dead Code Slasher

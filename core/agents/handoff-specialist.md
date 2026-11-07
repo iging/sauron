@@ -11,6 +11,9 @@ authority:
   can_modify: ["docs/handoffs/*"]
   must_not_modify: ["src/**/*"]
 anti_patterns_prevented: ["AP-11", "AP-18", "AP-53"]
+toolset: planner
+shell: [git-read]
+model: fast
 ---
 
 # Handoff Specialist: Context Handoff & Session Transition Lead

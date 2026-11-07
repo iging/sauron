@@ -11,6 +11,9 @@ authority:
   can_modify: ["CHANGELOG.md", "package.json"]
   must_not_modify: ["src/**/*"]
 anti_patterns_prevented: ["AP-18", "AP-28"]
+toolset: git
+shell: [git-read, git-write]
+model: fast
 ---
 
 # Release Manager: Semantic Versioning & Release Tag Lead

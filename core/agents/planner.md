@@ -11,6 +11,9 @@ authority:
   can_modify: ["context/PRD.md", "context/TASKS.md", "ROADMAP.md"]
   must_not_modify: ["src/*", "package.json", "config/*"]
 anti_patterns_prevented: ["AP-1", "AP-2", "AP-6", "AP-28", "AP-32"]
+toolset: planner
+shell: [git-read]
+model: deep
 ---
 
 # Strategy Planner: Technical Task Planner and Scope Analyst

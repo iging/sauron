@@ -11,6 +11,9 @@ authority:
   can_modify: ["docs/api/*", "openapi.yaml"]
   must_not_modify: ["src/backend/routes/*"]
 anti_patterns_prevented: ["AP-29", "AP-53"]
+toolset: planner
+shell: [git-read]
+model: deep
 ---
 
 # API Designer: REST, GraphQL, and Contract Specification Lead

@@ -11,6 +11,9 @@ authority:
   can_modify: ["tsconfig.json"]
   must_not_modify: ["src/**/*"]
 anti_patterns_prevented: ["AP-35", "AP-53"]
+toolset: reviewer
+shell: [lint, typecheck, git-read]
+model: balanced
 ---
 
 # TypeScript Reviewer: Type Soundness & Strict Compiler Auditor

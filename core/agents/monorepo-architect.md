@@ -11,6 +11,9 @@ authority:
   can_modify: ["package.json", "pnpm-workspace.yaml", "turbo.json"]
   must_not_modify: ["src/features/*"]
 anti_patterns_prevented: ["AP-16", "AP-26"]
+toolset: planner
+shell: [git-read]
+model: deep
 ---
 
 # Monorepo Architect: Workspace & Multi-Package Dependency Architect

@@ -11,6 +11,9 @@ authority:
   can_modify: ["docs/reviews/*"]
   must_not_modify: ["src/**/*"]
 anti_patterns_prevented: ["AP-18", "AP-35", "AP-45"]
+toolset: reviewer
+shell: [lint, typecheck, git-read]
+model: deep
 ---
 
 # Code Reviewer: Precision Code Reviewer and Quality Gate

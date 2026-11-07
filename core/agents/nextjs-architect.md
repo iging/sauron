@@ -11,6 +11,9 @@ authority:
   can_modify: ["src/app/**/*", "next.config.*"]
   must_not_modify: ["database/migrations/*"]
 anti_patterns_prevented: ["AP-18", "AP-41"]
+toolset: builder
+shell: [test, build, lint, typecheck]
+model: balanced
 ---
 
 # Next.js Architect: Next.js App Router & Server Component Lead

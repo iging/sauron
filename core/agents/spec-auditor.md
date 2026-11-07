@@ -11,6 +11,9 @@ authority:
   can_modify: ["docs/**/*"]
   must_not_modify: ["src/**/*"]
 anti_patterns_prevented: ["AP-1", "AP-3", "AP-26"]
+toolset: reviewer
+shell: [lint, typecheck, git-read]
+model: balanced
 ---
 
 # Specification Auditor: Markdown Documentation & Writing Rules Auditor

@@ -11,6 +11,9 @@ authority:
   can_modify: ["context/SCHEMA.md", "docs/domain/*"]
   must_not_modify: ["src/database/*"]
 anti_patterns_prevented: ["AP-16", "AP-26"]
+toolset: planner
+shell: [git-read]
+model: deep
 ---
 
 # Domain Modeler: Domain-Driven Design & Entity Boundary Architect

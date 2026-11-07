@@ -11,6 +11,9 @@ authority:
   can_modify: ["docs/security/*"]
   must_not_modify: ["src/**/*", ".env*", "secrets/*"]
 anti_patterns_prevented: ["AP-26", "AP-44", "AP-53"]
+toolset: reviewer
+shell: [audit, git-read]
+model: deep
 ---
 
 # Security Shield: Security Auditor and Runtime Command Gate

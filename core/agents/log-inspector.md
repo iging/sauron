@@ -11,6 +11,9 @@ authority:
   can_modify: ["src/logger/**/*"]
   must_not_modify: ["database/*"]
 anti_patterns_prevented: ["AP-18", "AP-26"]
+toolset: reviewer
+shell: [git-read]
+model: balanced
 ---
 
 # Log Inspector: Structured Logging & Correlation ID Analyst

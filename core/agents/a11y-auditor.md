@@ -11,6 +11,9 @@ authority:
   can_modify: ["src/components/**/*", "docs/accessibility/*"]
   must_not_modify: ["database/**/*"]
 anti_patterns_prevented: ["AP-1", "AP-29", "AP-45"]
+toolset: reviewer
+shell: [lint, typecheck, git-read]
+model: balanced
 ---
 
 # Accessibility Auditor: WCAG Accessibility and UI Compliance Specialist

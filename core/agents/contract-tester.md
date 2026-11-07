@@ -11,6 +11,9 @@ authority:
   can_modify: ["tests/contracts/**/*"]
   must_not_modify: ["src/**/*"]
 anti_patterns_prevented: ["AP-29", "AP-53"]
+toolset: tester
+shell: [test]
+model: balanced
 ---
 
 # Contract Tester: Pact & API Consumer-Driven Contract Specialist

@@ -11,6 +11,9 @@ authority:
   can_modify: [".github/hooks/*", ".sauron/hooks/*"]
   must_not_modify: ["src/**/*"]
 anti_patterns_prevented: ["AP-44", "AP-53"]
+toolset: reviewer
+shell: [audit, git-read]
+model: deep
 ---
 
 # Agent Guard: AI Safety Gatekeeper & Command Firewall

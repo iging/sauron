@@ -9,6 +9,17 @@ import * as fs from "node:fs";
 import * as path from "node:path";
 import { parse as parseYaml } from "yaml";
 import type { InitPlan } from "./init-plan.js";
+import {
+  DEFAULT_MODELS,
+  accessNote,
+  claudeAccessLines,
+  ompAccessLines,
+  opencodeAccessLines,
+  readAgentAccess,
+  type AgentAccess,
+  type ModelMap,
+  type ShellCommands,
+} from "./agent-access.js";
 
 /** One file to install. `raw` files are copied verbatim (no managed block). */
 export interface InstallOutput {
@@ -178,7 +189,20 @@ interface AgentSpec {
   id: string;
   description: string;
   body: string;
+  access: AgentAccess;
 }
+
+/** Project facts used to render agent access: shell commands and real models. */
+export interface AgentContext {
+  commands: ShellCommands;
+  models: ModelMap;
+}
+
+/** Context when no project is known: no shell commands, bundled models. */
+export const DEFAULT_AGENT_CONTEXT: Readonly<AgentContext> = Object.freeze({
+  commands: Object.freeze({}),
+  models: DEFAULT_MODELS,
+});
 
 /** Where one runtime keeps native subagents and slash commands, and their format. */
 export interface NativeTarget {
@@ -187,7 +211,7 @@ export interface NativeTarget {
   /** Workspace-relative slash command folder. */
   commandsDir: string;
   /** Renders the frontmatter lines of a subagent file. */
-  agentFrontmatter: (agent: AgentSpec) => string[];
+  agentFrontmatter: (agent: AgentSpec, context: AgentContext) => string[];
   /** True when the runtime documents the `argument-hint` command field. */
   argumentHint: boolean;
   /** Bundled commands left out because a built-in of the same name always wins. */
@@ -205,7 +229,10 @@ export const NATIVE_TARGETS: Readonly<Record<string, NativeTarget>> =
     claude: {
       agentsDir: ".claude/agents",
       commandsDir: ".claude/commands",
-      agentFrontmatter: namedAgent,
+      agentFrontmatter: (agent: AgentSpec, context: AgentContext) => [
+        ...namedAgent(agent),
+        ...claudeAccessLines(agent.access, context.models),
+      ],
       argumentHint: true,
       reservedCommands: [],
     },
@@ -213,9 +240,10 @@ export const NATIVE_TARGETS: Readonly<Record<string, NativeTarget>> =
       agentsDir: ".opencode/agents",
       commandsDir: ".opencode/commands",
       // OpenCode takes the agent name from the file name.
-      agentFrontmatter: (agent: AgentSpec) => [
+      agentFrontmatter: (agent: AgentSpec, context: AgentContext) => [
         `description: ${yamlString(agent.description)}`,
         "mode: subagent",
+        ...opencodeAccessLines(agent.access, context.commands, context.models),
       ],
       argumentHint: false,
       reservedCommands: [],
@@ -223,7 +251,10 @@ export const NATIVE_TARGETS: Readonly<Record<string, NativeTarget>> =
     omp: {
       agentsDir: ".omp/agents",
       commandsDir: ".omp/prompts",
-      agentFrontmatter: namedAgent,
+      agentFrontmatter: (agent: AgentSpec, context: AgentContext) => [
+        ...namedAgent(agent),
+        ...ompAccessLines(agent.access, context.models),
+      ],
       argumentHint: false,
       // Built-in omp commands beat prompt templates. See https://omp.sh/docs/slash.
       reservedCommands: ["handoff", "loop", "plan", "security"],
@@ -250,23 +281,37 @@ function loadAgents(
       const name = typeof data["name"] === "string" ? data["name"] : id;
       const title = typeof data["title"] === "string" ? data["title"] : name;
       const invocation = data["invocation"] as
-        | Record<string, unknown>
-        | undefined;
+        Record<string, unknown> | undefined;
       const keywords = Array.isArray(invocation?.["intent_keywords"])
         ? (invocation?.["intent_keywords"] as unknown[]).map(String).join(", ")
         : typeof data["department"] === "string"
           ? data["department"]
           : "";
       const description = `${title} (${name}).${keywords ? ` Use proactively for: ${keywords}.` : ""}`;
-      return { id, description, body: body.replace(/^\s+/, "") };
+      return {
+        id,
+        description,
+        body: body.replace(/^\s+/, ""),
+        access: readAgentAccess(data, id),
+      };
     });
 }
 
 /** Renders one subagent file for a runtime. */
-function renderAgent(target: NativeTarget, agent: AgentSpec): string {
-  return ["---", ...target.agentFrontmatter(agent), "---", "", agent.body].join(
-    "\n",
-  );
+function renderAgent(
+  target: NativeTarget,
+  agent: AgentSpec,
+  context: AgentContext,
+): string {
+  return [
+    "---",
+    ...target.agentFrontmatter(agent, context),
+    "---",
+    "",
+    agent.body.replace(/\s+$/, ""),
+    "",
+    accessNote(agent.access, context.commands),
+  ].join("\n");
 }
 
 /** Renders the slash command that hands a task to one Fellowship member. */
@@ -355,6 +400,7 @@ export function commandRetirements(
 export function buildInstallOutputs(
   sauronRoot: string,
   plan: InitPlan,
+  context: Readonly<AgentContext> = DEFAULT_AGENT_CONTEXT,
 ): InstallOutput[] {
   const outputs: InstallOutput[] = [];
 
@@ -394,7 +440,7 @@ export function buildInstallOutputs(
     for (const agent of [...fellowship, ...core]) {
       outputs.push({
         relativePath: `${target.agentsDir}/${agent.id}.md`,
-        content: renderAgent(target, agent),
+        content: renderAgent(target, agent, context),
         raw: true,
       });
     }

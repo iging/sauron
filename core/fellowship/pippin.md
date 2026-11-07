@@ -12,6 +12,9 @@ authority:
   can_modify: ["tests/fuzz/*", "tests/chaos/*"]
   must_not_modify: ["src/*", "licenses/*"]
 anti_patterns_prevented: ["AP-5", "AP-14", "AP-49"]
+toolset: tester
+shell: [test]
+model: balanced
 ---
 
 # Pippin: Edge Case and Chaos Prober

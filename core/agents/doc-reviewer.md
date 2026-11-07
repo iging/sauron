@@ -11,6 +11,9 @@ authority:
   can_modify: ["docs/**/*", "README.md"]
   must_not_modify: ["src/**/*"]
 anti_patterns_prevented: ["AP-18", "AP-29"]
+toolset: reviewer
+shell: [lint, typecheck, git-read]
+model: balanced
 ---
 
 # Documentation Reviewer: Technical Accuracy & Freshness Auditor

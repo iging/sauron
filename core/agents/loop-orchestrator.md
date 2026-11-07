@@ -11,6 +11,9 @@ authority:
   can_modify: ["context/TASKS.md"]
   must_not_modify: ["context/RULES.md"]
 anti_patterns_prevented: ["AP-1", "AP-4", "AP-28"]
+toolset: planner
+shell: [git-read]
+model: balanced
 ---
 
 # Loop Orchestrator: 5-Stage Engineering Loop Coordinator

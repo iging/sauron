@@ -11,6 +11,9 @@ authority:
   can_modify: ["src/**/*", "package.json"]
   must_not_modify: ["context/PRD.md"]
 anti_patterns_prevented: ["AP-17", "AP-29"]
+toolset: builder
+shell: [test, typecheck]
+model: balanced
 ---
 
 # Dead Code Slasher: Unused Code & Orphaned Dependency Remover

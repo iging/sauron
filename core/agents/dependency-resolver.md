@@ -11,6 +11,9 @@ authority:
   can_modify: ["package.json", "package-lock.json"]
   must_not_modify: ["src/**/*"]
 anti_patterns_prevented: ["AP-18", "AP-44"]
+toolset: builder
+shell: [test, build, lint, typecheck]
+model: balanced
 ---
 
 # Dependency Resolver: Package Conflict & Peer Dependency Specialist

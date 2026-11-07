@@ -11,6 +11,9 @@ authority:
   can_modify: ["tailwind.config.*", "src/styles/globals.css"]
   must_not_modify: ["src/backend/*"]
 anti_patterns_prevented: ["AP-16", "AP-17"]
+toolset: builder
+shell: [test, build, lint, typecheck]
+model: balanced
 ---
 
 # Tailwind Expert: Utility-First CSS & Tailwind Configuration Specialist

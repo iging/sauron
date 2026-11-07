@@ -13,6 +13,9 @@ authority:
     ["context/ARCHITECTURE.md", "context/SCHEMA.md", "types/*", "models/*"]
   must_not_modify: ["tests/*", "bin/*", "licenses/*"]
 anti_patterns_prevented: ["AP-4", "AP-8", "AP-12", "AP-26", "AP-60"]
+toolset: planner
+shell: [git-read]
+model: deep
 ---
 
 # Aragorn: Principal System Architect
