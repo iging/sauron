@@ -22,12 +22,19 @@ Notable changes to Sauron. Versions follow [Semantic Versioning](https://semver.
 
 ### Fixed
 
+- Align all installers with Node 20.12.0 and use one CLI-only Docker Compose configuration.
+- Select the user-project mount with SAURON_WORKSPACE, lock Docker installs to npm ci, invoke
+  Node directly on Windows clones, and exclude local state and worktrees from build contexts.
+
 - Correct CLI picker JSDoc and narrow Clack cancellation symbols during JavaScript type checks.
 - Remove an unused `yaml` import from the CLI entry point.
 
 - Keep normalized npm executable paths without a leading `./`.
 
 ### Added
+
+- Native Codex TOML and Copilot .agent.md subagents, with shared access notes and model tiers.
+- Preserve saved native opt-ins and edited agents across sync, repair, and uninstall.
 
 - Agent specs state a toolset, shell intents, and a model tier. Claude Code agents get `tools`
   and `model`, OpenCode agents get `permissions` rules, omp read-only agents get `tools`, and

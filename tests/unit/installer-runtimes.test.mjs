@@ -135,7 +135,7 @@ describe("Native subagent and command install", () => {
   });
 
   it("other runtimes get no subagents or commands", () => {
-    assert.deepEqual(outputs(["cursor", "codex"]), []);
+    assert.deepEqual(outputs(["cursor", "windsurf"]), []);
   });
 });
 
@@ -232,6 +232,13 @@ describe("Skill and command name collisions", () => {
     );
     for (const runtime of NATIVE_RUNTIMES) {
       const target = NATIVE_TARGETS[runtime];
+      if (!target.commandsDir) {
+        assert.deepEqual(
+          commandRetirements(ROOT, resolvePlan({ runtimes: [runtime] })),
+          [],
+        );
+        continue;
+      }
       const list = outputs([runtime], { skills: "all" });
       const commands = inDir(list, target.commandsDir);
       assert.equal(

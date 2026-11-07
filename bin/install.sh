@@ -20,13 +20,13 @@ echo ""
 # Step 1: Verify prerequisites
 if ! command -v node >/dev/null 2>&1; then
   echo "[ERROR] Node.js is required but not found in PATH."
-  echo "Please install Node.js (version 18 or newer) before installing sauron."
+  echo "Please install Node.js (version 20.12.0 or newer) before installing sauron."
   exit 1
 fi
 
-NODE_VERSION=$(node -v | sed 's/^v//' | cut -d. -f1)
-if [ "${NODE_VERSION}" -lt 18 ]; then
-  echo "[ERROR] Detected Node.js v${NODE_VERSION}. Sauron requires Node.js 18 or newer."
+NODE_VERSION=$(node -v | sed 's/^v//')
+if ! node -e 'const [major, minor] = process.versions.node.split(".").map(Number); process.exit(major > 20 || (major === 20 && minor >= 12) ? 0 : 1)'; then
+  echo "[ERROR] Detected Node.js v${NODE_VERSION}. Sauron requires Node.js 20.12.0 or newer."
   exit 1
 fi
 

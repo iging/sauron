@@ -55,6 +55,8 @@ left out.
 | Claude Code | `tools:` with Read, Grep, Glob, plus Edit, Write, Bash when allowed | Bash is all or nothing in an agent file. Each command still goes through Claude Code permission prompts. | `fast: haiku`, `balanced: sonnet`, `deep: opus` |
 | OpenCode    | `permissions:` denies edits, or limits them to docs or tests        | Shell asks by default. Listed commands are allowed. `git push` is denied for `git`.                      | Inherits unless set in config                   |
 | omp         | `tools: [read, grep, glob]` for read-only agents only               | omp has no per-command rule in agent files                                                               | Inherits unless set in config                   |
+| Codex | No per-tool allowlist. No-shell specs disable features.shell_tool. | Parent permissions inherited. Path and command limits are instructions. | Inherits unless set in config |
+| Copilot | Explicit read, search, edit, execute aliases by toolset | Shell is all or nothing. Path and command limits are instructions. | Inherits unless set in config |
 
 Every runtime also gets an `## Access` section in the agent body that states the same limits.
 OpenCode's parsing of these rules was checked with `opencode debug agents` on 2026-11-07.
@@ -76,3 +78,5 @@ agents:
 ```
 
 A tier you do not set keeps the default, or inherits the session model.
+Codex and Copilot accept the same tier mappings under agents.models.codex and agents.models.copilot.
+See [Codex and Copilot agents](codex-copilot-agents.md) for native formats and limits.

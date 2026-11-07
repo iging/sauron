@@ -8,8 +8,8 @@
 FROM node:22-alpine AS builder
 
 WORKDIR /app
-COPY package.json tsconfig.json ./
-RUN npm ci || npm install --ignore-scripts
+COPY package.json package-lock.json tsconfig.json ./
+RUN npm ci
 
 COPY . .
 RUN npx tsc --project tsconfig.json
@@ -41,5 +41,5 @@ RUN ln -s /opt/sauron/bin/sauron.mjs /usr/local/bin/sauron && \
 # Security: Drop root privileges permanently
 USER sauron:sauron
 
-ENTRYPOINT ["sauron"]
+ENTRYPOINT ["node", "/opt/sauron/bin/sauron.mjs"]
 CMD ["status"]

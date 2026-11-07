@@ -11,6 +11,9 @@ import {
   type TranspileOutput,
 } from "./types.js";
 
+const SUBAGENTS_DOC_URL =
+  "https://learn.chatgpt.com/docs/agent-configuration/subagents";
+
 const AGENTS_MD_DOC_URL =
   "https://learn.chatgpt.com/docs/agent-configuration/agents-md";
 
@@ -78,6 +81,26 @@ export class CodexAdapter implements RuntimeAdapter {
     );
     lines.push(
       "<!-- unverified: .agents/skills location from Codex skills docs; not confirmed on the AGENTS.md doc page -->",
+    );
+    lines.push("");
+    lines.push("## Native agents");
+    lines.push(
+      "Sauron init installs selected agents as standalone TOML files in `agents/`. " +
+        "Each file defines name, description, and developer_instructions. No config registration is needed.",
+    );
+    lines.push(
+      "Agents inherit parent permissions. Access notes describe edit paths and shell limits, " +
+        "but do not enforce a separate sandbox or a per-tool allowlist. Models inherit unless configured.",
+    );
+    lines.push(
+      "A spec without shell intents disables features.shell_tool. Agents with shell intents inherit it.",
+    );
+    lines.push(
+      "No Sauron slash commands are copied for Codex. Ask Codex to use a named agent.",
+    );
+    lines.push(`Official doc: ${SUBAGENTS_DOC_URL}`);
+    lines.push(
+      "Support tier: beta. Confirm discovery and behavior in a real Codex session.",
     );
     lines.push("");
     lines.push("## How to add a setting");

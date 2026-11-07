@@ -24,6 +24,9 @@ the tier next to each runtime. The source of truth is `RUNTIME_SUPPORT` in
 | :--------- | :------- | :-------------------------------------------------------------- |
 | 2026-11-01 | OpenCode | `opencode debug agents` listed the installed Fellowship agents. |
 
+Codex and Copilot native agent formats are added in Phase 6. Both stay beta.
+See [their install guide](../02-fellowship-agents/codex-copilot-agents.md) for pending checks.
+
 ## Promote a runtime
 
 1. Run `sauron init` with that runtime in a fresh Git repository.

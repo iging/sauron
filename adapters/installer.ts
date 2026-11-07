@@ -13,6 +13,8 @@ import {
   DEFAULT_MODELS,
   accessNote,
   claudeAccessLines,
+  codexAccessLines,
+  copilotAccessLines,
   ompAccessLines,
   opencodeAccessLines,
   readAgentAccess,
@@ -208,8 +210,11 @@ export const DEFAULT_AGENT_CONTEXT: Readonly<AgentContext> = Object.freeze({
 export interface NativeTarget {
   /** Workspace-relative subagent folder. */
   agentsDir: string;
-  /** Workspace-relative slash command folder. */
-  commandsDir: string;
+  /** Workspace-relative slash command folder, or null for agent-only targets. */
+  commandsDir: string | null;
+  /** File suffix and serialization of native agents. Markdown is the default. */
+  agentExtension?: ".toml" | ".agent.md";
+  agentFormat?: "toml";
   /** Renders the frontmatter lines of a subagent file. */
   agentFrontmatter: (agent: AgentSpec, context: AgentContext) => string[];
   /** True when the runtime documents the `argument-hint` command field. */
@@ -248,6 +253,30 @@ export const NATIVE_TARGETS: Readonly<Record<string, NativeTarget>> =
       argumentHint: false,
       reservedCommands: [],
     },
+    codex: {
+      agentsDir: ".codex/agents",
+      agentExtension: ".toml",
+      agentFormat: "toml",
+      commandsDir: null,
+      agentFrontmatter: (agent: AgentSpec, context: AgentContext) => [
+        `name = ${JSON.stringify(agent.id)}`,
+        `description = ${JSON.stringify(agent.description)}`,
+        ...codexAccessLines(agent.access, context.models),
+      ],
+      argumentHint: false,
+      reservedCommands: [],
+    },
+    copilot: {
+      agentsDir: ".github/agents",
+      agentExtension: ".agent.md",
+      commandsDir: null,
+      agentFrontmatter: (agent: AgentSpec, context: AgentContext) => [
+        ...namedAgent(agent),
+        ...copilotAccessLines(agent.access, context.models),
+      ],
+      argumentHint: false,
+      reservedCommands: [],
+    },
     omp: {
       agentsDir: ".omp/agents",
       commandsDir: ".omp/prompts",
@@ -281,7 +310,8 @@ function loadAgents(
       const name = typeof data["name"] === "string" ? data["name"] : id;
       const title = typeof data["title"] === "string" ? data["title"] : name;
       const invocation = data["invocation"] as
-        Record<string, unknown> | undefined;
+        | Record<string, unknown>
+        | undefined;
       const keywords = Array.isArray(invocation?.["intent_keywords"])
         ? (invocation?.["intent_keywords"] as unknown[]).map(String).join(", ")
         : typeof data["department"] === "string"
@@ -303,6 +333,14 @@ function renderAgent(
   agent: AgentSpec,
   context: AgentContext,
 ): string {
+  if (target.agentFormat === "toml") {
+    const instructions = `${agent.body.trimEnd()}\n\n${accessNote(agent.access, context.commands)}`;
+    return [
+      ...target.agentFrontmatter(agent, context),
+      `developer_instructions = ${JSON.stringify(instructions)}`,
+      "",
+    ].join("\n");
+  }
   return [
     "---",
     ...target.agentFrontmatter(agent, context),
@@ -379,7 +417,7 @@ export function commandRetirements(
   const commands = loadBundledCommands(sauronRoot);
   return plan.nativeRuntimes.flatMap((runtime) => {
     const target = NATIVE_TARGETS[runtime];
-    if (!target) return [];
+    if (!target?.commandsDir) return [];
     return commands
       .filter(
         ({ file, sourceFile }) =>
@@ -439,13 +477,13 @@ export function buildInstallOutputs(
 
     for (const agent of [...fellowship, ...core]) {
       outputs.push({
-        relativePath: `${target.agentsDir}/${agent.id}.md`,
+        relativePath: `${target.agentsDir}/${agent.id}${target.agentExtension ?? ".md"}`,
         content: renderAgent(target, agent, context),
         raw: true,
       });
     }
 
-    if (!plan.commands) continue;
+    if (!plan.commands || !target.commandsDir) continue;
 
     // Slash commands: the bundled command set, plus one per installed Fellowship member.
     for (const { file, sourceFile, content } of bundledCommands) {

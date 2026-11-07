@@ -1,24 +1,15 @@
 {
   "type": "object",
-  "required": [
-    "version",
-    "project",
-    "runtimes"
-  ],
+  "required": ["version", "project", "runtimes"],
   "properties": {
     "version": {
       "type": "string",
-      "enum": [
-        "1.0.0",
-        "2.0.0"
-      ]
+      "enum": ["1.0.0", "2.0.0"]
     },
     "project": {
       "type": "object",
       "description": "Target project metadata",
-      "required": [
-        "name"
-      ],
+      "required": ["name"],
       "properties": {
         "name": {
           "type": "string",
@@ -31,14 +22,7 @@
         "language": {
           "type": "string",
           "description": "Primary programming language",
-          "enum": [
-            "typescript",
-            "javascript",
-            "python",
-            "rust",
-            "go",
-            "multi"
-          ]
+          "enum": ["typescript", "javascript", "python", "rust", "go", "multi"]
         },
         "framework": {
           "type": "string",
@@ -133,10 +117,7 @@
             }
           }
         },
-        "required": [
-          "enabled",
-          "role"
-        ],
+        "required": ["enabled", "role"],
         "additionalProperties": false
       }
     },
@@ -181,9 +162,51 @@
         "models": {
           "type": "object",
           "properties": {
-            "claude": { "type": "object", "properties": { "fast": { "type": "string" }, "balanced": { "type": "string" }, "deep": { "type": "string" } }, "additionalProperties": false },
-            "opencode": { "type": "object", "properties": { "fast": { "type": "string" }, "balanced": { "type": "string" }, "deep": { "type": "string" } }, "additionalProperties": false },
-            "omp": { "type": "object", "properties": { "fast": { "type": "string" }, "balanced": { "type": "string" }, "deep": { "type": "string" } }, "additionalProperties": false }
+            "claude": {
+              "type": "object",
+              "properties": {
+                "fast": { "type": "string" },
+                "balanced": { "type": "string" },
+                "deep": { "type": "string" }
+              },
+              "additionalProperties": false
+            },
+            "opencode": {
+              "type": "object",
+              "properties": {
+                "fast": { "type": "string" },
+                "balanced": { "type": "string" },
+                "deep": { "type": "string" }
+              },
+              "additionalProperties": false
+            },
+            "omp": {
+              "type": "object",
+              "properties": {
+                "fast": { "type": "string" },
+                "balanced": { "type": "string" },
+                "deep": { "type": "string" }
+              },
+              "additionalProperties": false
+            },
+            "codex": {
+              "type": "object",
+              "properties": {
+                "fast": { "type": "string" },
+                "balanced": { "type": "string" },
+                "deep": { "type": "string" }
+              },
+              "additionalProperties": false
+            },
+            "copilot": {
+              "type": "object",
+              "properties": {
+                "fast": { "type": "string" },
+                "balanced": { "type": "string" },
+                "deep": { "type": "string" }
+              },
+              "additionalProperties": false
+            }
           },
           "additionalProperties": false
         }
@@ -197,12 +220,7 @@
         "default_mode": {
           "type": "string",
           "description": "Default Caveman compression level",
-          "enum": [
-            "lite",
-            "full",
-            "ultra",
-            "off"
-          ]
+          "enum": ["lite", "full", "ultra", "off"]
         },
         "enforce_on_commits": {
           "type": "boolean",
@@ -322,20 +340,12 @@
           "uniqueItems": true
         },
         "agents": {
-          "enum": [
-            "fellowship",
-            "core",
-            "both",
-            "none"
-          ]
+          "enum": ["fellowship", "core", "both", "none"]
         },
         "skills": {
           "oneOf": [
             {
-              "enum": [
-                "all",
-                "none"
-              ]
+              "enum": ["all", "none"]
             },
             {
               "type": "array",
@@ -353,11 +363,7 @@
         "nativeRuntimes": {
           "type": "array",
           "items": {
-            "enum": [
-              "claude",
-              "opencode",
-              "omp"
-            ]
+            "enum": ["claude", "opencode", "omp", "codex", "copilot"]
           },
           "uniqueItems": true
         }
@@ -367,10 +373,7 @@
     "skills": {
       "oneOf": [
         {
-          "enum": [
-            "all",
-            "none"
-          ]
+          "enum": ["all", "none"]
         },
         {
           "type": "array",
@@ -398,9 +401,7 @@
       }
     },
     {
-      "required": [
-        "skills"
-      ],
+      "required": ["skills"],
       "properties": {
         "version": {
           "const": "2.0.0"

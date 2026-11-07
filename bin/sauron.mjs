@@ -911,7 +911,9 @@ async function promptInitPlan(
       }
       const native = nativeRuntimesFor(answers.runtimes).length > 0;
       if (!answers.agents && native) {
-        console.log("\nSubagents for Claude Code, OpenCode, and omp:");
+        console.log(
+          "\nSubagents for Claude Code, OpenCode, omp, Codex, and Copilot:",
+        );
         console.log(
           "  fellowship : 9 Fellowship agents (/gandalf, /frodo, ...)",
         );
@@ -967,7 +969,10 @@ async function promptInitPlan(
               ? base.skills
               : parseSkills(mode, departments, selectors);
       }
-      if (answers.commands === undefined && native) {
+      if (
+        answers.commands === undefined &&
+        answers.runtimes.some((id) => NATIVE_TARGETS[id]?.commandsDir)
+      ) {
         answers.commands =
           (await ask(
             rl,
@@ -1179,7 +1184,10 @@ async function promptInitPlanArrows(
               )
             : /** @type {"all" | "none"} */ (mode);
     }
-    if (answers.commands === undefined && native) {
+    if (
+      answers.commands === undefined &&
+      answers.runtimes.some((id) => NATIVE_TARGETS[id]?.commandsDir)
+    ) {
       answers.commands = ok(
         await confirm({
           message: "Install Sauron slash commands?",
@@ -1706,7 +1714,7 @@ async function executeInitCommand(options) {
     `  Subagents : ${installedInto(targets.map((t) => t.agentsDir))} (${plan.agents})`,
   );
   console.log(
-    `  Commands  : ${installedInto(targets.map((t) => t.commandsDir))}`,
+    `  Commands  : ${installedInto(targets.flatMap((t) => (t.commandsDir ? [t.commandsDir] : [])))}`,
   );
   console.log(`  Caveman   : ${plan.caveman}`);
   console.log(

@@ -107,6 +107,9 @@ inside each department. New departments start fully checked. Revisit choices bef
 
 ### 2. Full Harness Synchronization (20 Runtimes & Fellowship)
 
+Codex and Copilot native agents are available in the unreleased 4.0.0 work.
+See the [native agent guide](docs/02-fellowship-agents/codex-copilot-agents.md) for formats and limits.
+
 `init` asks a few questions (Recommended or Custom: runtimes, subagents, skills, Caveman tier), shows a plan, and writes nothing until you confirm. It generates the shared `AGENTS.md` core plus native files for the runtimes you pick (`CLAUDE.md` + `.claude/`, `.cursor/rules/`, `.windsurf/rules/`, `.cline/rules/`, and more), and merges into files you already have instead of replacing them:
 
 ```bash
@@ -140,20 +143,30 @@ irm https://raw.githubusercontent.com/iging/sauron/main/bin/install.ps1 | iex
 
 ### 4. Running via Docker (Zero Local Node.js Required)
 
-For zero-dependency execution without installing Node.js on your machine:
+Clone this repository and run Compose from its root. The single root Compose file builds
+only the CLI. The landing page lives in a separate repository and has no service here.
+Set SAURON_WORKSPACE to the absolute path of the project Sauron should inspect or modify.
+The default is the Sauron clone itself, so set it before init, add, repair, or uninstall.
 
-```bash
-# Check Sauron status
+PowerShell:
+
+```powershell
+$env:SAURON_WORKSPACE = 'C:\path\to\your-project'
+docker compose build sauron
 docker compose run --rm sauron status
-
-# Add a modular skill to your workspace
 docker compose run --rm sauron add api-design
-
-# Run the Sauron landing page locally
-docker compose up sauron-landing
 ```
 
-See [`docker/README.md`](./docker/README.md) for full container architecture and hardening details.
+Bash:
+
+```bash
+export SAURON_WORKSPACE="/absolute/path/to/your-project"
+docker compose build sauron
+docker compose run --rm sauron status
+```
+
+The image invokes Node directly, including on CRLF Windows clones. Local Node.js is not required.
+See [docker/README.md](./docker/README.md) for mounts, permissions, and build details.
 
 ---
 
