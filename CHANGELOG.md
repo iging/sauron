@@ -33,6 +33,10 @@ Notable changes to Sauron. Versions follow [Semantic Versioning](https://semver.
 
 ### Added
 
+- Add sauron memory init with a portable second-brain startup set, index, and append-only log.
+- Create new vaults exclusively through ConflictManager, preserve existing destinations, and
+  keep user knowledge outside runtime install tracking so uninstall cannot delete it.
+
 - Native Codex TOML and Copilot .agent.md subagents, with shared access notes and model tiers.
 - Preserve saved native opt-ins and edited agents across sync, repair, and uninstall.
 

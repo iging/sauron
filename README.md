@@ -131,6 +131,20 @@ git clone https://github.com/iging/sauron.git
 cd sauron && npm install && npm run build
 ```
 
+#### Persistent Project Memory (Unreleased 4.0.0)
+
+Create a portable second brain from your project directory using the development launcher:
+
+```sh
+sauron memory init --dry-run
+sauron memory init
+sauron memory init --path docs/project-memory
+```
+
+The starter includes a small startup read set, index, append-only log, status, open items, and
+lessons. Every existing destination stays untouched. The vault survives runtime uninstall.
+See the [memory guide](docs/01-getting-started/memory-init.md) for paths, persistence, and limits.
+
 ### 3. Standalone One-Liner Installers
 
 ```bash

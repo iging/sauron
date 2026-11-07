@@ -12,6 +12,7 @@ Read one row after [[resume-brief]]. Paths are repository-relative.
 | Native subagents, commands | `adapters/installer.ts`, `adapters/init-plan.ts` | [[agent-runtimes]] |
 | Skill lookup | `adapters/skill-finder.ts` | [[history-skills-and-discipline]] |
 | Graph | `scripts/graph/generate-graph.mjs` | [[history-releases-and-init]] |
+| Memory scaffolding | `adapters/memory.ts`, `bin/sauron.mjs` | [[status]] |
 | Config | `config/`, `schema/`, `sauron.config.yaml` | [[decisions]] |
 | New skill | `skills/_template/skill-name/SKILL.md` | [[working-rules]] |
 | Fellowship | `core/fellowship/<name>.md` | [[project-overview]] |

@@ -42,6 +42,7 @@ import {
   skillFileOutputs,
 } from "../dist/adapters/installer.js";
 import { ConflictManager } from "../dist/adapters/conflict-manager.js";
+import { DEFAULT_MEMORY_PATH, initMemory } from "../dist/adapters/memory.js";
 import {
   parseConfig,
   configPlan,
@@ -297,6 +298,7 @@ function printHelpMenu() {
   console.log(
     "  list-installed List files Sauron installed and their state (--json)",
   );
+  console.log("  memory init  Create a second brain (--path <dir>, --dry-run)");
   console.log(
     "  plugin       Build a Claude Code plugin and local marketplace (--out <dir>)",
   );
@@ -1581,6 +1583,50 @@ function executePluginCommand(argv, dryRun) {
   console.log(`  /plugin install ${PLUGIN_NAME}@${MARKETPLACE_NAME}`);
 }
 
+/** Creates a persistent second brain without changing an existing destination.
+ * @param {string[]} argv
+ */
+function executeMemoryCommand(argv) {
+  if (argv[0] !== "init")
+    throw new Error("Usage: sauron memory init [--path <dir>] [--dry-run]");
+  let directory = DEFAULT_MEMORY_PATH;
+  let dryRun = false;
+  let pathGiven = false;
+  for (let index = 1; index < argv.length; index++) {
+    const arg = argv[index];
+    if (arg === "--dry-run") {
+      dryRun = true;
+      continue;
+    }
+    if (arg === "--path" || arg?.startsWith("--path=")) {
+      if (pathGiven) throw new Error("Specify --path only once.");
+      const value = arg === "--path" ? argv[++index] : arg.slice(7);
+      if (!value || value.startsWith("--"))
+        throw new Error("--path requires a workspace-relative folder.");
+      directory = value;
+      pathGiven = true;
+      continue;
+    }
+    throw new Error("Unknown memory option: " + arg);
+  }
+  const result = initMemory(process.cwd(), directory, dryRun);
+  if (result.action === "skipped") {
+    console.log(
+      "[MEMORY] Existing path kept: " + directory + ". Nothing written.",
+    );
+    return;
+  }
+  console.log(
+    "[MEMORY] " +
+      (dryRun ? "Dry run: would create " : "Created ") +
+      result.files.length +
+      " notes in " +
+      directory +
+      "/",
+  );
+  console.log("[MEMORY] Start: " + path.join(directory, "claude.md"));
+}
+
 /**
  * Initializes a repository: asks for (or reads) the install plan, then writes the
  * shared AGENTS.md core, the selected runtime scaffolds, skills, subagents, and commands.
@@ -2295,6 +2341,16 @@ function main(commandLineArguments) {
       break;
     case "list-installed":
       executeListInstalledCommand(commandLineArguments.slice(1));
+      break;
+    case "memory":
+      try {
+        executeMemoryCommand(commandLineArguments.slice(1));
+      } catch (error) {
+        console.error(
+          `[ERROR] ${error instanceof Error ? error.message : String(error)}`,
+        );
+        process.exitCode = 1;
+      }
       break;
     case "plugin":
       try {
