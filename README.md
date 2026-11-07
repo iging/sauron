@@ -91,6 +91,9 @@ Existing projects use [config v2](./docs/01-getting-started/config-v2.md). Previ
 with `sauron upgrade --dry-run`, run `sauron upgrade`, then `sauron sync`.
 Migration creates a config backup and report. It writes runtime files only when you run sync.
 
+Interactive Custom setup can [pick individual skills](./docs/01-getting-started/skill-picker.md)
+inside each department. New departments start fully checked. Revisit choices before confirming.
+
 ### 2. Full Harness Synchronization (20 Runtimes & Fellowship)
 
 `init` asks a few questions (Recommended or Custom: runtimes, subagents, skills, Caveman tier), shows a plan, and writes nothing until you confirm. It generates the shared `AGENTS.md` core plus native files for the runtimes you pick (`CLAUDE.md` + `.claude/`, `.cursor/rules/`, `.windsurf/rules/`, `.cline/rules/`, and more), and merges into files you already have instead of replacing them:

@@ -3,13 +3,13 @@
 Things not finished or not decided. Update before every stop. See [[claude]] and [[status]].
 Last updated: 2026-11-07.
 
-## Phase 2 review
+## Phase 3 review
 
-- Phase 1 is merged and pulled. Phase 2 is ready. See [[session-2026-11-07-phase-2-config-v2]].
-- Miguel checks saved defaults, arrows, backspace, cancel, decline, and exit in both terminals.
-- Miguel verifies root notes and skill or command invocation in the real tools.
-- Landing page still needs the 245 installable-skill count. Its repo is outside this workspace.
-- Miguel authorizes the Phase 2 report, commit, and push. Pull request and hosted CI stay pending.
+- Phase 2 is pulled. Phase 3 is ready. See [[session-2026-11-07-phase-3-skill-picker]].
+- Miguel checks picker rendering, Backspace/Back, saved subsets, cancel, decline, and exit.
+- Run real-terminal checks in Git Bash and PowerShell. Scripted input is separate evidence.
+- Landing page still needs the 245 installable-skill count in its separate workspace.
+- Miguel authorizes progress-report, commit, and push. Pull request and hosted CI stay pending.
 
 ## Remaining release verification
 

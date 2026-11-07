@@ -4,6 +4,10 @@ What went wrong and what we do now. Add new lessons at the top. See [[claude]].
 
 ## 2026-11-07
 
+- Empty picker selections are choices. Preserve them on revisits instead of rechecking all skills.
+- Keep Back navigation outside installable values. Scope key listeners to one prompt and remove them.
+- Scripted arrow streams verify wiring. Real Git Bash and PowerShell checks remain separate.
+
 - Config format versions differ from package versions. Validate config before output writes.
 - YAML setIn needs collection nodes. Use createNode when adding an empty mapping.
 - Save a reviewed config with a checked checksum and backup. Test edits made during confirmation.

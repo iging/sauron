@@ -132,6 +132,42 @@ function readFrontmatter(raw: string): {
   return { data, body: raw.slice(match[0].length) };
 }
 
+/** One picker option. Identity comes from the source path, labels from frontmatter. */
+export interface SkillChoice {
+  value: string;
+  label: string;
+  hint: string;
+}
+
+/** Read picker metadata only for the departments the user opens. */
+export function listSkillChoices(
+  sauronRoot: string,
+  departments: readonly string[],
+): SkillChoice[] {
+  return listSkills(sauronRoot, departments).map((skill) => {
+    const { data } = readFrontmatter(
+      fs.readFileSync(path.join(skill.dir, "SKILL.md"), "utf8"),
+    );
+    const name = data["name"];
+    const description = data["description"];
+    if (
+      typeof name !== "string" ||
+      !name.trim() ||
+      typeof description !== "string" ||
+      !description.trim()
+    ) {
+      throw new Error(
+        `Missing picker name or description: ${skill.department}/${skill.name}`,
+      );
+    }
+    return {
+      value: `${skill.department}/${skill.name}`,
+      label: name.replace(/\s+/g, " ").trim(),
+      hint: description.replace(/\s+/g, " ").trim(),
+    };
+  });
+}
+
 /** Quotes a value for a single-line YAML scalar. */
 function yamlString(value: string): string {
   return JSON.stringify(value.replace(/\s+/g, " ").trim());

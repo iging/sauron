@@ -26,6 +26,11 @@ Notable changes to Sauron. Versions follow [Semantic Versioning](https://semver.
 
 ### Added
 
+- Per-skill interactive init in both arrow-key and numbered flows, with frontmatter names
+  and description hints. Revisit departments, keep checked subsets, select none, or cancel.
+- Backspace returns from an arrow skill list to departments. Numbered input accepts back or 0.
+- Save picker choices as explicit skill ids so future sync does not widen a checked subset.
+
 - `sauron upgrade` with dry-run preview, exact config backups, and migration reports.
 - `sauron upgrade --to=1` for reversible department-based configs, with lossy conversion refused.
 - Schema and catalog validation before configuration or runtime writes.

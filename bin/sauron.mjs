@@ -41,7 +41,17 @@ import {
   skillFileOutputs,
 } from "../dist/adapters/installer.js";
 import { ConflictManager } from "../dist/adapters/conflict-manager.js";
-import { parseConfig, configPlan, configWithPlan, migrateConfig } from "../dist/adapters/config.js";
+import {
+  parseConfig,
+  configPlan,
+  configWithPlan,
+  migrateConfig,
+} from "../dist/adapters/config.js";
+import {
+  pickSkills,
+  parsePickerValues,
+  SkillPickerCancelled,
+} from "../dist/adapters/skill-picker.js";
 
 // Determine canonical package root dynamically to ensure path resolution works
 // identically regardless of whether installed globally or executed from within a submodule.
@@ -215,7 +225,9 @@ function querySkillDomains(rootDirectory) {
   const skills = listSkills(rootDirectory, departments);
   return departments.map((name) => ({
     name,
-    skills: skills.filter((skill) => skill.department === name).map((skill) => skill.name),
+    skills: skills
+      .filter((skill) => skill.department === name)
+      .map((skill) => skill.name),
   }));
 }
 
@@ -256,7 +268,9 @@ function printHelpMenu() {
     "               --no-commands                   Skip slash commands",
   );
   console.log("  sync         Apply config v2 choices without prompts");
-  console.log("  upgrade      Migrate config with a backup and report (--dry-run, --to=1|2)");
+  console.log(
+    "  upgrade      Migrate config with a backup and report (--dry-run, --to=1|2)",
+  );
   console.log(
     "  add <skill>  Add one or more modular skills to local project workspace",
   );
@@ -453,8 +467,10 @@ function executeAddCommand(skillNames, options) {
     baseDirs = [path.relative(cwd, absolute).split(path.sep).join("/") || "."];
   } else {
     const stored = readConfig(path.join(cwd, "sauron.config.yaml"));
-    const saved = stored["version"] === "2.0.0" ? configPlan(stored, SAURON_ROOT)
-      : planFromConfig(stored["init"], listDepartments(SAURON_ROOT));
+    const saved =
+      stored["version"] === "2.0.0"
+        ? configPlan(stored, SAURON_ROOT)
+        : planFromConfig(stored["init"], listDepartments(SAURON_ROOT));
     const claude = saved
       ? saved.runtimes.includes("claude")
       : fs.existsSync(path.join(cwd, ".claude"));
@@ -640,6 +656,140 @@ async function ask(prompter, question, fallback, isValid, hint) {
   }
 }
 
+/** Numbered picker uses the same state flow as the arrow interface.
+ * @param {{question: (text: string) => Promise<string>}} prompter
+ * @param {string[]} departments
+ * @param {import("../dist/adapters/init-plan.js").InitPlan["skills"]} initial
+ */
+async function promptSkillPickerNumbered(prompter, departments, initial) {
+  async function selection(message, values, defaults, canBack = false) {
+    const fallback =
+      defaults.length && defaults.length === values.length
+        ? "all"
+        : defaults.length
+          ? defaults.map((value) => values.indexOf(value) + 1).join(",")
+          : "none";
+    for (;;) {
+      const input =
+        (await prompter.question(`? ${message} [${fallback}]: `))
+          .trim()
+          .toLowerCase() || fallback;
+      if (input === "cancel")
+        throw new SkillPickerCancelled("Setup cancelled.");
+      if (canBack && (input === "back" || input === "0")) return "back";
+      try {
+        return parsePickerValues(input, values);
+      } catch (error) {
+        console.log(
+          `  ${error instanceof Error ? error.message : String(error)}`,
+        );
+      }
+    }
+  }
+  return pickSkills(SAURON_ROOT, departments, initial, {
+    async departments(available, defaults) {
+      console.log("\nDepartments (numbers or ids, comma separated):");
+      available.forEach((value, index) =>
+        console.log(`  ${index + 1}) ${value}`),
+      );
+      const values = await selection(
+        "Departments (all, none, or cancel)",
+        available,
+        defaults,
+      );
+      if (values === "back")
+        throw new InitPlanError("Invalid department navigation.");
+      return values;
+    },
+    async skills(department, options, defaults) {
+      console.log(`\nSkills in ${department}:`);
+      options.forEach((option, index) =>
+        console.log(
+          `  ${index + 1}) ${option.label} [${option.value}] : ${option.hint}`,
+        ),
+      );
+      console.log("  0) Back to departments");
+      return selection(
+        `Skills in ${department} (numbers or ids, all, none, back, cancel)`,
+        options.map((option) => option.value),
+        defaults,
+        true,
+      );
+    },
+    async action() {
+      console.log(
+        "\n  1) Pick another department\n  2) Done\n  3) Back to departments",
+      );
+      const value = await ask(
+        prompter,
+        "Next",
+        "2",
+        (answer) => ["1", "2", "3", "cancel"].includes(answer),
+        "Type 1, 2, 3, or cancel.",
+      );
+      if (value === "cancel")
+        throw new SkillPickerCancelled("Setup cancelled.");
+      return value === "1" ? "another" : value === "3" ? "back" : "done";
+    },
+  });
+}
+
+/** Arrow picker keeps navigation separate from installable skill ids.
+ * @param {typeof import("@clack/prompts")} clack
+ * @param {string[]} departments
+ * @param {import("../dist/adapters/init-plan.js").InitPlan["skills"]} initial
+ */
+async function promptSkillPickerArrows(clack, departments, initial) {
+  const ok = (value) => unlessCancelled(value, clack.isCancel, clack.cancel);
+  return pickSkills(SAURON_ROOT, departments, initial, {
+    departments: async (available, defaults) =>
+      ok(
+        await clack.multiselect({
+          message: "Pick departments (space to toggle, enter to continue)",
+          options: available.map((value) => ({ value, label: value })),
+          initialValues: [...defaults],
+          required: false,
+        }),
+      ),
+    skills: async (department, options, defaults) => {
+      const controller = new AbortController();
+      let goBack = false;
+      const onKeypress = (_input, key) => {
+        if (key?.name === "backspace") {
+          goBack = true;
+          controller.abort();
+        }
+      };
+      process.stdin.on("keypress", onKeypress);
+      try {
+        const values = await clack.multiselect({
+          message: `Pick skills in ${department} (Backspace: Back to departments)`,
+          options: [...options],
+          initialValues: [...defaults],
+          cursorAt: options[0]?.value,
+          required: false,
+          signal: controller.signal,
+        });
+        return goBack ? "back" : ok(values);
+      } finally {
+        process.stdin.off("keypress", onKeypress);
+      }
+    },
+    action: async () =>
+      ok(
+        await clack.select({
+          message: "Continue skill selection?",
+          options: [
+            { value: "another", label: "Pick another department" },
+            { value: "done", label: "Done" },
+            { value: "back", label: "Back to departments" },
+          ],
+          initialValue: "done",
+        }),
+      ),
+  });
+}
+
 /**
  * Runs the shadcn-style init questions. Flags already given are not asked again.
  *
@@ -650,7 +800,13 @@ async function ask(prompter, question, fallback, isValid, hint) {
  * @param {import("../dist/adapters/init-plan.js").InitPlan | undefined} savedPlan - Saved choices.
  * @returns {Promise<import("../dist/adapters/init-plan.js").InitPlan>} Final plan.
  */
-async function promptInitPlan(rl, flags, departments, defaultCaveman, savedPlan) {
+async function promptInitPlan(
+  rl,
+  flags,
+  departments,
+  defaultCaveman,
+  savedPlan,
+) {
   {
     console.log("Setup presets:");
     console.log(
@@ -668,7 +824,11 @@ async function promptInitPlan(rl, flags, departments, defaultCaveman, savedPlan)
 
     /** @type {import("../dist/adapters/init-plan.js").InitFlags} */
     const answers = { ...flags };
-    if (preset === "3" && savedPlan) return resolvePlan({ caveman: parseCaveman(defaultCaveman), ...flags }, savedPlan);
+    if (preset === "3" && savedPlan)
+      return resolvePlan(
+        { caveman: parseCaveman(defaultCaveman), ...flags },
+        savedPlan,
+      );
     const base = preset === "2" && savedPlan ? savedPlan : PRESET_RECOMMENDED;
     if (preset === "2") {
       if (!answers.runtimes) {
@@ -716,26 +876,43 @@ async function promptInitPlan(rl, flags, departments, defaultCaveman, savedPlan)
       }
       if (!answers.skills) {
         console.log(
-          `\nSkills: all, none, departments, or department/skill (${departments.join(", ")})`,
+          "\nSkills: all, none, pick (departments then individual skills), or saved.",
         );
-        answers.skills = parseSkills(
-          await ask(
-            rl,
-            "Skills",
-            Array.isArray(base.skills) ? base.skills.join(",") : base.skills,
-            (a) => {
-              try {
-                parseSkills(a, departments, listSkills(SAURON_ROOT, departments).map((skill) => `${skill.department}/${skill.name}`));
-                return true;
-              } catch {
-                return false;
-              }
-            },
-            "Use all, none, or departments and department/skill entries.",
-          ),
-          departments,
-          listSkills(SAURON_ROOT, departments).map((skill) => `${skill.department}/${skill.name}`),
+        const selectors = listSkills(SAURON_ROOT, departments).map(
+          (skill) => `${skill.department}/${skill.name}`,
         );
+        const mode = await ask(
+          rl,
+          "Skills",
+          Array.isArray(base.skills) ? "saved" : base.skills,
+          (value) => {
+            if (
+              value === "pick" ||
+              value === "cancel" ||
+              (value === "saved" && savedPlan)
+            )
+              return true;
+            try {
+              parseSkills(value, departments, selectors);
+              return true;
+            } catch {
+              return false;
+            }
+          },
+          "Use all, none, pick, saved, or department/skill entries.",
+        );
+        if (mode === "cancel")
+          throw new SkillPickerCancelled("Setup cancelled.");
+        answers.skills =
+          mode === "pick"
+            ? await promptSkillPickerNumbered(
+                rl,
+                departments,
+                savedPlan?.skills ?? "none",
+              )
+            : mode === "saved"
+              ? base.skills
+              : parseSkills(mode, departments, selectors);
       }
       if (answers.commands === undefined && native) {
         answers.commands =
@@ -833,7 +1010,12 @@ function unlessCancelled(value, isCancel, cancel) {
  * @param {import("../dist/adapters/init-plan.js").InitPlan | undefined} savedPlan - Saved choices.
  * @returns {Promise<import("../dist/adapters/init-plan.js").InitPlan>} Final plan.
  */
-async function promptInitPlanArrows(flags, departments, defaultCaveman, savedPlan) {
+async function promptInitPlanArrows(
+  flags,
+  departments,
+  defaultCaveman,
+  savedPlan,
+) {
   const clack = await import("@clack/prompts");
   const { intro, select, multiselect, confirm, isCancel, cancel } = clack;
   /** @template T @param {T | symbol} value @returns {T} */
@@ -845,7 +1027,15 @@ async function promptInitPlanArrows(flags, departments, defaultCaveman, savedPla
     await select({
       message: "How do you want to set up Sauron?",
       options: [
-        ...(savedPlan ? [{ value: "saved", label: "Saved choices", hint: "keep your current config" }] : []),
+        ...(savedPlan
+          ? [
+              {
+                value: "saved",
+                label: "Saved choices",
+                hint: "keep your current config",
+              },
+            ]
+          : []),
         {
           value: "recommended",
           label: "Recommended",
@@ -863,8 +1053,13 @@ async function promptInitPlanArrows(flags, departments, defaultCaveman, savedPla
 
   /** @type {import("../dist/adapters/init-plan.js").InitFlags} */
   const answers = { ...flags };
-  if (preset === "saved" && savedPlan) return resolvePlan({ caveman: parseCaveman(defaultCaveman), ...flags }, savedPlan);
-  const base = preset === "custom" && savedPlan ? savedPlan : PRESET_RECOMMENDED;
+  if (preset === "saved" && savedPlan)
+    return resolvePlan(
+      { caveman: parseCaveman(defaultCaveman), ...flags },
+      savedPlan,
+    );
+  const base =
+    preset === "custom" && savedPlan ? savedPlan : PRESET_RECOMMENDED;
   if (preset === "custom") {
     if (!answers.runtimes) {
       answers.runtimes = ok(
@@ -906,32 +1101,30 @@ async function promptInitPlanArrows(flags, departments, defaultCaveman, savedPla
         await select({
           message: "Which skills?",
           options: [
-            ...(savedPlan ? [{ value: "saved", label: "Saved selection" }] : []),
+            ...(savedPlan
+              ? [{ value: "saved", label: "Saved selection" }]
+              : []),
             {
               value: "all",
               label: "All skills",
               hint: `${departments.length} departments`,
             },
-            { value: "pick", label: "Pick departments" },
+            { value: "pick", label: "Pick departments and skills" },
             { value: "none", label: "None" },
           ],
           initialValue: savedPlan ? "saved" : "all",
         }),
       );
       answers.skills =
-        mode === "saved" ? base.skills : mode === "pick"
-          ? ok(
-              await multiselect({
-                message: "Which departments? (space to toggle)",
-                options: departments.map((dept) => ({
-                  value: dept,
-                  label: dept,
-                })),
-                initialValues: base.skills === "all" ? departments : base.skills === "none" ? [] : [...new Set(base.skills.map((skill) => skill.split("/")[0]))],
-                required: true,
-              }),
-            )
-          : /** @type {"all" | "none"} */ (mode);
+        mode === "saved"
+          ? base.skills
+          : mode === "pick"
+            ? await promptSkillPickerArrows(
+                clack,
+                departments,
+                savedPlan?.skills ?? "none",
+              )
+            : /** @type {"all" | "none"} */ (mode);
     }
     if (answers.commands === undefined && native) {
       answers.commands = ok(
@@ -996,41 +1189,99 @@ function setInitPlanInConfig(configPath, plan, original, isNewConfig, dryRun) {
   const content = configWithPlan(original, plan);
   configPlan(parseConfig(content), SAURON_ROOT);
   const manager = new ConflictManager(path.dirname(configPath));
-  if (isNewConfig && fs.existsSync(configPath)) throw new Error("Config appears during setup. Run init again.");
-  const result = manager.safeWrite(path.basename(configPath), content, "config", dryRun, {
-    raw: true,
-    ...(isNewConfig ? {} : { expectedChecksum: manager.computeChecksum(original) }),
-  });
-  if (result.action === "skipped") throw new Error("Configuration could not be saved safely.");
+  if (isNewConfig && fs.existsSync(configPath))
+    throw new Error("Config appears during setup. Run init again.");
+  const result = manager.safeWrite(
+    path.basename(configPath),
+    content,
+    "config",
+    dryRun,
+    {
+      raw: true,
+      ...(isNewConfig
+        ? {}
+        : { expectedChecksum: manager.computeChecksum(original) }),
+    },
+  );
+  if (result.action === "skipped")
+    throw new Error("Configuration could not be saved safely.");
 }
 
 /** Migrate only the config. Runtime output waits for a separate sync.
  * @param {string[]} argv
  */
 function executeUpgradeCommand(argv) {
-  const unknown = argv.filter((arg) => !["--dry-run", "--to=1", "--to=2"].includes(arg));
-  if (unknown.length || argv.includes("--to=1") && argv.includes("--to=2")) throw new Error("Use upgrade [--dry-run] [--to=1|2].");
+  const unknown = argv.filter(
+    (arg) => !["--dry-run", "--to=1", "--to=2"].includes(arg),
+  );
+  if (unknown.length || (argv.includes("--to=1") && argv.includes("--to=2")))
+    throw new Error("Use upgrade [--dry-run] [--to=1|2].");
   const configPath = path.join(process.cwd(), "sauron.config.yaml");
-  if (!fs.existsSync(configPath)) throw new Error("No sauron.config.yaml found. Run sauron init.");
+  if (!fs.existsSync(configPath))
+    throw new Error("No sauron.config.yaml found. Run sauron init.");
   const raw = fs.readFileSync(configPath, "utf8");
-  const migration = migrateConfig(raw, SAURON_ROOT, path.basename(process.cwd()), argv.includes("--to=1") ? "1.0.0" : "2.0.0");
-  if (!migration.changed) { console.log(`[UPGRADE] Config is already v${migration.to}. Nothing changes.`); return; }
+  const migration = migrateConfig(
+    raw,
+    SAURON_ROOT,
+    path.basename(process.cwd()),
+    argv.includes("--to=1") ? "1.0.0" : "2.0.0",
+  );
+  if (!migration.changed) {
+    console.log(
+      `[UPGRADE] Config is already v${migration.to}. Nothing changes.`,
+    );
+    return;
+  }
   const dryRun = argv.includes("--dry-run");
-  console.log(`[UPGRADE] Config v${migration.from} -> v${migration.to}${dryRun ? " (dry run)" : ""}`);
+  console.log(
+    `[UPGRADE] Config v${migration.from} -> v${migration.to}${dryRun ? " (dry run)" : ""}`,
+  );
   for (const change of migration.changes) console.log(`  - ${change}`);
   const manager = new ConflictManager(process.cwd());
   manager.beginBatch();
   try {
-    const result = manager.safeWrite("sauron.config.yaml", migration.content, "config", dryRun, { raw: true, expectedChecksum: manager.computeChecksum(raw) });
-    if (dryRun) { console.log("[UPGRADE] Config, backup, report, and runtime files remain unchanged."); return; }
+    const result = manager.safeWrite(
+      "sauron.config.yaml",
+      migration.content,
+      "config",
+      dryRun,
+      { raw: true, expectedChecksum: manager.computeChecksum(raw) },
+    );
+    if (dryRun) {
+      console.log(
+        "[UPGRADE] Config, backup, report, and runtime files remain unchanged.",
+      );
+      return;
+    }
     console.log(`[UPGRADE] Backup: ${result.backupPath}`);
     const reportPath = `.sauron/upgrade-reports/${new Date().toISOString().replace(/[:.]/g, "-")}.json`;
-    const report = { from: migration.from, to: migration.to, config: "sauron.config.yaml", backup: result.backupPath, before: manager.computeChecksum(raw), after: manager.computeChecksum(migration.content), changes: migration.changes };
-    const saved = manager.safeWrite(reportPath, JSON.stringify(report, null, 2) + "\n", "config", false, { raw: true });
-    if (saved.action === "skipped") throw new Error("Migration report could not be saved.");
+    const report = {
+      from: migration.from,
+      to: migration.to,
+      config: "sauron.config.yaml",
+      backup: result.backupPath,
+      before: manager.computeChecksum(raw),
+      after: manager.computeChecksum(migration.content),
+      changes: migration.changes,
+    };
+    const saved = manager.safeWrite(
+      reportPath,
+      JSON.stringify(report, null, 2) + "\n",
+      "config",
+      false,
+      { raw: true },
+    );
+    if (saved.action === "skipped")
+      throw new Error("Migration report could not be saved.");
     console.log(`[UPGRADE] Report: ${reportPath}`);
-    console.log(migration.to === "2.0.0" ? "[UPGRADE] Run sauron sync to apply config v2." : "[UPGRADE] Config v1 restored. Use the matching legacy CLI or upgrade again.");
-  } finally { manager.endBatch(); }
+    console.log(
+      migration.to === "2.0.0"
+        ? "[UPGRADE] Run sauron sync to apply config v2."
+        : "[UPGRADE] Config v1 restored. Use the matching legacy CLI or upgrade again.",
+    );
+  } finally {
+    manager.endBatch();
+  }
 }
 
 /**
@@ -1075,11 +1326,17 @@ async function executeInitCommand(options) {
     "sauron.config.yaml",
   );
   const isNewConfig = !fs.existsSync(targetConfigPath);
-  if (isSync && isNewConfig) throw new Error("No sauron.config.yaml found. Run sauron init.");
-  const originalConfig = fs.readFileSync(isNewConfig ? defaultTemplatePath : targetConfigPath, "utf8");
+  if (isSync && isNewConfig)
+    throw new Error("No sauron.config.yaml found. Run sauron init.");
+  const originalConfig = fs.readFileSync(
+    isNewConfig ? defaultTemplatePath : targetConfigPath,
+    "utf8",
+  );
   const config = isNewConfig ? {} : parseConfig(originalConfig);
   const departments = listDepartments(SAURON_ROOT);
-  const selectors = listSkills(SAURON_ROOT, departments).map((skill) => `${skill.department}/${skill.name}`);
+  const selectors = listSkills(SAURON_ROOT, departments).map(
+    (skill) => `${skill.department}/${skill.name}`,
+  );
   const flags = parseInitFlags(argv, departments, selectors);
   const savedPlan = isNewConfig ? undefined : configPlan(config, SAURON_ROOT);
   const savedCaveman = /** @type {Record<string, unknown> | undefined} */ (
@@ -1106,12 +1363,26 @@ async function executeInitCommand(options) {
     process.stdin.isTTY === true &&
     !argv.includes("--interactive");
   if (useArrows) {
-    plan = await promptInitPlanArrows(flags, departments, defaultCaveman, savedPlan);
+    plan = await promptInitPlanArrows(
+      flags,
+      departments,
+      defaultCaveman,
+      savedPlan,
+    );
   } else if (interactive) {
     prompter = await createPrompter();
-    plan = await promptInitPlan(prompter, flags, departments, defaultCaveman, savedPlan);
+    plan = await promptInitPlan(
+      prompter,
+      flags,
+      departments,
+      defaultCaveman,
+      savedPlan,
+    );
   } else {
-    plan = resolvePlan({ caveman: parseCaveman(defaultCaveman), ...flags }, savedPlan ?? PRESET_RECOMMENDED);
+    plan = resolvePlan(
+      { caveman: parseCaveman(defaultCaveman), ...flags },
+      savedPlan ?? PRESET_RECOMMENDED,
+    );
     if (!isSync && !assumeYes && Object.keys(flags).length === 0) {
       console.log(
         "  [NOTICE] No terminal detected and no flags given: using the Recommended preset.",
@@ -1169,10 +1440,18 @@ async function executeInitCommand(options) {
     return;
   }
 
-  setInitPlanInConfig(targetConfigPath, plan, originalConfig, isNewConfig, dryRun);
-  console.log(isNewConfig
-    ? `  [CONFIG] sauron.config.yaml ${dryRun ? "(simulated)" : "created"} at ${targetConfigPath}`
-    : "  [CONFIG] Existing sauron.config.yaml detected. Preserving unrelated settings and comments.");
+  setInitPlanInConfig(
+    targetConfigPath,
+    plan,
+    originalConfig,
+    isNewConfig,
+    dryRun,
+  );
+  console.log(
+    isNewConfig
+      ? `  [CONFIG] sauron.config.yaml ${dryRun ? "(simulated)" : "created"} at ${targetConfigPath}`
+      : "  [CONFIG] Existing sauron.config.yaml detected. Preserving unrelated settings and comments.",
+  );
 
   console.log(
     `\n[WRITING] AGENTS.md core + ${plan.runtimes.length} runtime(s) + ${extras.length} skill/agent/command file(s)...`,
@@ -1696,6 +1975,10 @@ function main(commandLineArguments) {
         argv: commandLineArguments.slice(1),
         isSync: primaryCommand === "sync",
       }).catch((error) => {
+        if (error instanceof SkillPickerCancelled) {
+          console.log("[ABORTED] Setup cancelled. Nothing was written.");
+          process.exit(0);
+        }
         const message = error instanceof Error ? error.message : String(error);
         console.error(
           `${error instanceof InitPlanError ? "[INVALID FLAG]" : "[ERROR]"} ${message}`,
@@ -1704,8 +1987,14 @@ function main(commandLineArguments) {
       });
       break;
     case "upgrade":
-      try { executeUpgradeCommand(commandLineArguments.slice(1)); }
-      catch (error) { console.error(`[ERROR] ${error instanceof Error ? error.message : String(error)}`); process.exitCode = 1; }
+      try {
+        executeUpgradeCommand(commandLineArguments.slice(1));
+      } catch (error) {
+        console.error(
+          `[ERROR] ${error instanceof Error ? error.message : String(error)}`,
+        );
+        process.exitCode = 1;
+      }
       break;
     case "graph": {
       const targetDir = commandLineArguments[1] || ".";
