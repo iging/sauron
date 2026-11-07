@@ -29,6 +29,11 @@ Notable changes to Sauron. Versions follow [Semantic Versioning](https://semver.
 
 ### Added
 
+- `init --profile=minimal|recommended|frontend|backend|full`, named setups that skip the questions.
+- Runtime support tiers (stable, beta, instruction-only) with evidence, shown by `sauron status`.
+- `sauron plugin`, which builds a Claude Code plugin and a local marketplace that pass
+  `claude plugin validate`.
+
 - `sauron list-installed` and `sauron doctor`, read-only checks of Node, config, manifest, and
   installed files. `doctor` exits with code 1 on an error.
 - `sauron repair`, which applies saved choices again so missing files and blocks come back.

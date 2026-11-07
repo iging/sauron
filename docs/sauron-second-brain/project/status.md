@@ -3,10 +3,17 @@
 Where the project stands. Update this note before every stop. See [[claude]].
 Last updated: 2026-11-07.
 
+## Phase 5 of 4.0.0
+
+- Branch `codex/4.0.0-phase-5-profiles-plugin-tiers` adds `init --profile`, runtime support
+  tiers in `status`, and `sauron plugin`. Built by Claude Code on 2026-11-07. Not merged.
+- Node 24.15.0 passes build, typecheck, strict CLI and unused-code checks, doc gate, 207 tests.
+- `claude plugin validate` passes on the generated plugin and marketplace. Only warning: no icon.
+- See [[session-2026-11-07-phase-5-profiles-plugin-tiers]].
+
 ## Phase 4 of 4.0.0
 
-- Branch `codex/4.0.0-phase-4-install-lifecycle` adds `list-installed`, `doctor`, `repair`,
-  and `uninstall`. Built by Claude Code on 2026-11-07 while Codex usage was out. Not merged.
+- Merged in PR #23 at `27324a5`. Adds `list-installed`, `doctor`, `repair`, and `uninstall`.
 - Node 24.15.0 passes build, typecheck, strict CLI check, doc gate, and 194 tests.
 - Node 20 and 22 were not run locally. Hosted CI covers them on the pull request.
 - See [[session-2026-11-07-phase-4-install-lifecycle]].
@@ -81,4 +88,4 @@ Last updated: 2026-11-07.
 
 1. Release 3.2.0 is live. Create the GitHub release.
 2. Real-terminal test of the arrow-key `init` (Git Bash and PowerShell).
-3. Miguel opens and merges the Phase 4 pull request. Then Phase 5: profiles, plugin, and tiers.
+3. Miguel merges the Phase 5 pull request. Then Phase 5b: agent tools, shell commands, models.
