@@ -33,6 +33,10 @@ Notable changes to Sauron. Versions follow [Semantic Versioning](https://semver.
 
 ### Added
 
+- Add read-only sauron scan for selected agent prompts, hooks, MCP config, and permissions.
+- Emit redacted text, JSON, and SARIF review hints, explicit coverage diagnostics, and CI exits
+  with bounded file traversal and no execution, network access, or repair actions.
+
 - Add sauron memory init with a portable second-brain startup set, index, and append-only log.
 - Create new vaults exclusively through ConflictManager, preserve existing destinations, and
   keep user knowledge outside runtime install tracking so uninstall cannot delete it.

@@ -44,6 +44,11 @@ import {
 import { ConflictManager } from "../dist/adapters/conflict-manager.js";
 import { DEFAULT_MEMORY_PATH, initMemory } from "../dist/adapters/memory.js";
 import {
+  scanWorkspace,
+  scanExitCode,
+  scanSarif,
+} from "../dist/adapters/security-scan.js";
+import {
   parseConfig,
   configPlan,
   configVersion,
@@ -329,6 +334,9 @@ function printHelpMenu() {
   console.log("  trace-report Summarize Fellowship tracing events");
   console.log("  fitness      Run harness fitness checks with remediation");
   console.log("  worktree-plan Generate isolated git worktree assignments");
+  console.log(
+    "  scan [path]  Review agent config read-only (--json, --sarif, --fail-on=error|warning|none)",
+  );
   console.log("  slop-scan    Score packages and scan unsafe sinks to SARIF");
   console.log(
     "  import       Migrate Cursor Copilot Windsurf configs to Sauron",
@@ -2041,6 +2049,79 @@ async function executeWorktreePlanCommand(args) {
   }
 }
 
+/** Read-only agent-configuration review. Never echo source values or exception text.
+ * @param {string[]} args
+ */
+function executeScanCommand(args) {
+  let root = process.cwd();
+  let hasRoot = false;
+  let format = "text";
+  /** @type {"error" | "warning" | "none"} */
+  let failOn = "error";
+  for (const arg of args) {
+    if (arg === "--json" || arg === "--sarif") {
+      if (format !== "text") throw new Error("Choose one scan output format.");
+      format = arg.slice(2);
+    } else if (arg.startsWith("--fail-on=")) {
+      const value = arg.slice(10);
+      if (value !== "error" && value !== "warning" && value !== "none")
+        throw new Error("--fail-on must be error, warning, or none.");
+      failOn = value;
+    } else if (arg.startsWith("-") || hasRoot)
+      throw new Error(
+        "Usage: sauron scan [path] [--json|--sarif] [--fail-on=error|warning|none]",
+      );
+    else {
+      root = path.resolve(arg);
+      hasRoot = true;
+    }
+  }
+  const report = scanWorkspace(root);
+  if (format === "json") console.log(JSON.stringify(report, null, 2));
+  else if (format === "sarif") console.log(scanSarif(report));
+  else {
+    console.log(LOTR_BANNER);
+    console.log(
+      "[SCAN] Static agent-config review: " +
+        report.scannedFiles.length +
+        " files, " +
+        report.findings.length +
+        " findings, " +
+        report.diagnostics.length +
+        " diagnostics.",
+    );
+    for (const finding of report.findings)
+      console.log(
+        "[" +
+          finding.severity.toUpperCase() +
+          "] " +
+          JSON.stringify(finding.file) +
+          ":" +
+          finding.line +
+          " " +
+          finding.rule +
+          " - " +
+          finding.message,
+      );
+    for (const diagnostic of report.diagnostics)
+      console.log(
+        "[INCOMPLETE] " +
+          JSON.stringify(diagnostic.file) +
+          " " +
+          diagnostic.code +
+          " - " +
+          diagnostic.message,
+      );
+    if (report.scannedFiles.length === 0)
+      console.log(
+        "[SCAN] No selected files inspected. No security conclusion.",
+      );
+    for (const limitation of report.limitations)
+      console.log("[LIMIT] " + limitation);
+  }
+  process.exitCode = scanExitCode(report, failOn);
+}
+
 /**
  * Handles the `slop-scan` command by scoring packages and scanning sinks.
  *
@@ -2428,6 +2509,16 @@ function main(commandLineArguments) {
       executeWorktreePlanCommand(
         commandLineArguments.slice(1).filter((arg) => arg !== "--dry-run"),
       );
+      break;
+    case "scan":
+      try {
+        executeScanCommand(commandLineArguments.slice(1));
+      } catch {
+        console.error(
+          "[SCAN] Invalid scan request or inspection failure. Use sauron --help.",
+        );
+        process.exitCode = 2;
+      }
       break;
     case "slop-scan":
       executeSlopScanCommand(commandLineArguments.slice(1));
