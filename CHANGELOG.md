@@ -22,6 +22,8 @@ Notable changes to Sauron. Versions follow [Semantic Versioning](https://semver.
 
 ### Fixed
 
+- Correct CLI picker JSDoc and narrow Clack cancellation symbols during JavaScript type checks.
+
 - Keep normalized npm executable paths without a leading `./`.
 
 ### Added

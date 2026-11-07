@@ -662,6 +662,13 @@ async function ask(prompter, question, fallback, isValid, hint) {
  * @param {import("../dist/adapters/init-plan.js").InitPlan["skills"]} initial
  */
 async function promptSkillPickerNumbered(prompter, departments, initial) {
+  /**
+   * @param {string} message
+   * @param {readonly string[]} values
+   * @param {readonly string[]} defaults
+   * @param {boolean} [canBack]
+   * @returns {Promise<string[] | "back">}
+   */
   async function selection(message, values, defaults, canBack = false) {
     const fallback =
       defaults.length && defaults.length === values.length
@@ -740,6 +747,7 @@ async function promptSkillPickerNumbered(prompter, departments, initial) {
  * @param {import("../dist/adapters/init-plan.js").InitPlan["skills"]} initial
  */
 async function promptSkillPickerArrows(clack, departments, initial) {
+  /** @template T @param {T | typeof import("@clack/prompts").CANCEL_SYMBOL} value @returns {T} */
   const ok = (value) => unlessCancelled(value, clack.isCancel, clack.cancel);
   return pickSkills(SAURON_ROOT, departments, initial, {
     departments: async (available, defaults) =>
@@ -754,6 +762,7 @@ async function promptSkillPickerArrows(clack, departments, initial) {
     skills: async (department, options, defaults) => {
       const controller = new AbortController();
       let goBack = false;
+      /** @param {string | undefined} _input @param {import("node:readline").Key} key */
       const onKeypress = (_input, key) => {
         if (key?.name === "backspace") {
           goBack = true;
@@ -988,7 +997,7 @@ const RUNTIME_HINTS = Object.freeze({
  * Stops the setup when the user presses Ctrl+C or Esc in the arrow-key UI.
  *
  * @template T
- * @param {T | symbol} value - Value returned by a clack prompt.
+ * @param {T | typeof import("@clack/prompts").CANCEL_SYMBOL} value - Prompt result.
  * @param {(value: unknown) => boolean} isCancel - clack's cancel detector.
  * @param {(message: string) => void} cancel - clack's cancel printer.
  * @returns {T} The value when not cancelled.
@@ -1018,7 +1027,7 @@ async function promptInitPlanArrows(
 ) {
   const clack = await import("@clack/prompts");
   const { intro, select, multiselect, confirm, isCancel, cancel } = clack;
-  /** @template T @param {T | symbol} value @returns {T} */
+  /** @template T @param {T | typeof import("@clack/prompts").CANCEL_SYMBOL} value @returns {T} */
   const ok = (value) => unlessCancelled(value, isCancel, cancel);
 
   intro("Sauron setup");
