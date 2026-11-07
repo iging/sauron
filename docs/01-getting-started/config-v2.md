@@ -52,8 +52,8 @@ An empty runtime mapping, or all-false toggles, still generates the shared core.
 from a disabled runtime stays on disk. Removing it belongs to the later uninstall phase.
 
 Use actual names from `sauron list-skills` for an individual entry. The department is shown
-above each skill list. Per-skill interactive picking comes in Phase 3. Config and script flags
-already accept individual entries so v2 choices are usable in this phase.
+above each skill list. [Interactive picking](skill-picker.md) saves the checked individual ids.
+Config and script flags also accept individual entries.
 
 ## Preserved choices
 

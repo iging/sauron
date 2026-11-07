@@ -23,7 +23,7 @@ Short record of decisions and why. See [[claude]] and [[project-overview]].
 - Use top-level runtime toggles and skill selectors. Saved v2 choices lead reruns.
 - Upgrade v1 with backup and report before init/sync. Refuse lossy reverse conversion.
 - Fresh Recommended chooses Claude Code. Keep shared and Claude skill copies until verified.
-- Accept individual config/flag selections now so v2 is usable before the Phase 3 picker.
+- Picker saves explicit skill ids. Fresh departments start checked. Revisited subsets persist.
 
 ## Runtimes
 
