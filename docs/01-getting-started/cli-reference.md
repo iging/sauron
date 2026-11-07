@@ -110,6 +110,19 @@ node ./bin/sauron.mjs status
 
 ---
 
+### `plugin`
+
+Builds a Claude Code plugin and a local marketplace. See
+[Profiles and Plugin](./profiles-and-plugin.md).
+
+```bash
+node ./bin/sauron.mjs plugin [--out <dir>] [--dry-run]
+```
+
+`init --profile=<name>` picks a named setup: minimal, recommended, frontend, backend, or full.
+
+---
+
 ### `list-installed`, `doctor`, `repair`, `uninstall`
 
 Manage what Sauron installed, using `.sauron/manifest.json`. See

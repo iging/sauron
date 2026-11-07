@@ -9,8 +9,10 @@ Last updated: 2026-11-07.
 - Miguel checks picker rendering, Backspace/Back, saved subsets, cancel, decline, and exit.
 - Run real-terminal checks in Git Bash and PowerShell. Scripted input is separate evidence.
 - Landing page still needs the 245 installable-skill count in its separate workspace.
-- Phase 4 install lifecycle is built on branch `codex/4.0.0-phase-4-install-lifecycle`. Next: Phase 5.
-- Open for Phase 4: hosted CI on Node 20 and 22, and `uninstall --yes` on a real project.
+- Phase 4 is merged. Still open: `uninstall --yes` on a real project with user edits.
+- Phase 5 is on branch `codex/4.0.0-phase-5-profiles-plugin-tiers`. Next: Phase 5b.
+- Open for Phase 5: install the plugin in a real Claude Code session, add a plugin icon, and
+  record real-tool checks to promote beta runtimes. See `docs/04-runtime-adapters/runtime-tiers.md`.
 
 - CLI type fixes are pushed as `410d780`. Close the process holding the empty test folder.
 - Cleanup backs up 369 files through ConflictManager. See [[session-2026-11-07-cli-lint-cleanup]].

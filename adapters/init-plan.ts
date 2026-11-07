@@ -76,6 +76,114 @@ export const PRESET_RECOMMENDED: Readonly<InitPlan> = Object.freeze({
   nativeRuntimes: ["claude"],
 });
 
+/** Named install profiles for `--profile=<name>`. Explicit flags still override each field. */
+export const INSTALL_PROFILES: Readonly<Record<string, Readonly<InitPlan>>> =
+  Object.freeze({
+    minimal: Object.freeze({
+      runtimes: ["claude"],
+      agents: "none",
+      skills: "none",
+      caveman: "full",
+      commands: false,
+      nativeRuntimes: ["claude"],
+    }),
+    recommended: PRESET_RECOMMENDED,
+    frontend: Object.freeze({
+      runtimes: ["claude"],
+      agents: "fellowship",
+      skills: ["frontend", "quality"],
+      caveman: "full",
+      commands: true,
+      nativeRuntimes: ["claude"],
+    }),
+    backend: Object.freeze({
+      runtimes: ["claude"],
+      agents: "fellowship",
+      skills: ["backend", "database", "devops", "security"],
+      caveman: "full",
+      commands: true,
+      nativeRuntimes: ["claude"],
+    }),
+    full: Object.freeze({
+      runtimes: [...RUNTIME_IDS],
+      agents: "both",
+      skills: "all",
+      caveman: "full",
+      commands: true,
+      nativeRuntimes: [...NATIVE_RUNTIMES],
+    }),
+  });
+
+/** How far Sauron's output for a runtime is proven. */
+export type RuntimeTier = "stable" | "beta" | "instruction-only";
+
+/** Support tier of one runtime, with the evidence behind it. */
+export interface RuntimeSupport {
+  tier: RuntimeTier;
+  evidence: string;
+}
+
+const DOCUMENTED =
+  "Paths match official docs. No recorded run in the real tool yet.";
+const LEGACY =
+  "Paths come from unofficial sources. Sauron writes an instruction file only.";
+
+/**
+ * Support tier per runtime. `stable` needs a recorded check in the real tool.
+ * `beta` has paths from official docs. `instruction-only` has no official source.
+ * Promote a runtime only with a new entry in `docs/04-runtime-adapters/runtime-tiers.md`.
+ */
+export const RUNTIME_SUPPORT: Readonly<Record<string, RuntimeSupport>> =
+  Object.freeze({
+    claude: { tier: "beta", evidence: DOCUMENTED },
+    cursor: { tier: "beta", evidence: DOCUMENTED },
+    windsurf: { tier: "beta", evidence: DOCUMENTED },
+    copilot: { tier: "beta", evidence: DOCUMENTED },
+    vscode: { tier: "beta", evidence: DOCUMENTED },
+    cline: { tier: "beta", evidence: DOCUMENTED },
+    trae: { tier: "instruction-only", evidence: LEGACY },
+    zed: { tier: "beta", evidence: DOCUMENTED },
+    codex: { tier: "beta", evidence: DOCUMENTED },
+    gemini: { tier: "beta", evidence: DOCUMENTED },
+    qwen: { tier: "beta", evidence: DOCUMENTED },
+    kimi: { tier: "instruction-only", evidence: LEGACY },
+    kiro: { tier: "beta", evidence: DOCUMENTED },
+    hermes: { tier: "instruction-only", evidence: LEGACY },
+    openclaw: { tier: "instruction-only", evidence: LEGACY },
+    opencode: {
+      tier: "stable",
+      evidence:
+        "On 2026-11-01, `opencode debug agents` listed the installed Fellowship agents.",
+    },
+    pi: { tier: "beta", evidence: DOCUMENTED },
+    omp: { tier: "beta", evidence: DOCUMENTED },
+    adal: { tier: "instruction-only", evidence: LEGACY },
+    codebuddy: { tier: "beta", evidence: DOCUMENTED },
+  });
+
+/**
+ * Validates a profile name and returns its plan.
+ *
+ * @throws InitPlanError when the name is unknown.
+ */
+export function parseProfile(value: string): Readonly<InitPlan> {
+  const profile = INSTALL_PROFILES[value.trim().toLowerCase()];
+  if (!profile) {
+    throw new InitPlanError(
+      `Unknown profile '${value}'. Valid: ${Object.keys(INSTALL_PROFILES).join(", ")}.`,
+    );
+  }
+  return profile;
+}
+
+/** Reads `--profile=<name>`, or undefined when absent. */
+export function readProfileFlag(
+  argv: readonly string[],
+): Readonly<InitPlan> | undefined {
+  const value = readFlag(argv, "profile");
+  return value === undefined ? undefined : parseProfile(value);
+}
+
 /** Thrown when a flag value is invalid; the CLI prints it and exits 1. */
 export class InitPlanError extends Error {
   public constructor(message: string) {

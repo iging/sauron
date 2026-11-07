@@ -91,6 +91,10 @@ Existing projects use [config v2](./docs/01-getting-started/config-v2.md). Previ
 with `sauron upgrade --dry-run`, run `sauron upgrade`, then `sauron sync`.
 Migration creates a config backup and report. It writes runtime files only when you run sync.
 
+Pick a ready setup with `sauron init --profile=frontend`, or build a Claude Code plugin with
+`sauron plugin`. See [Profiles and Plugin](./docs/01-getting-started/profiles-and-plugin.md) and
+[Runtime Tiers](./docs/04-runtime-adapters/runtime-tiers.md).
+
 Check an install with `sauron doctor`, restore missing files with `sauron repair`, and remove
 unchanged Sauron files with `sauron uninstall --yes`. See
 [Install Lifecycle](./docs/01-getting-started/install-lifecycle.md).

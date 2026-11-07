@@ -4,6 +4,11 @@ What went wrong and what we do now. Add new lessons at the top. See [[claude]].
 
 ## 2026-11-07
 
+- `claude plugin validate` is available locally. Run it on generated plugins. It flags
+  commands with no frontmatter, a missing README, and a missing icon.
+- Prettier warns on CRLF working copies from `core.autocrlf`. Check committed content before
+  calling it a lint error.
+
 - Inserting a function between a JSDoc block and its function moves the types. Run the strict
   JavaScript check after every edit near a doc comment.
 - Uninstall must keep `sauron.config.yaml` and `.sauron/`, because `upgrade` records them as

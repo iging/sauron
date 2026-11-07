@@ -22,6 +22,8 @@ import {
   InitPlanError,
   PRESET_RECOMMENDED,
   RUNTIME_IDS,
+  RUNTIME_SUPPORT,
+  readProfileFlag,
   nativeRuntimesFor,
   parseAgents,
   parseCaveman,
@@ -47,6 +49,11 @@ import {
   configWithPlan,
   migrateConfig,
 } from "../dist/adapters/config.js";
+import {
+  MARKETPLACE_NAME,
+  PLUGIN_NAME,
+  buildClaudePlugin,
+} from "../dist/adapters/plugin.js";
 import {
   applyUninstall,
   doctorFindings,
@@ -273,6 +280,9 @@ function printHelpMenu() {
   console.log(
     "               --no-commands                   Skip slash commands",
   );
+  console.log(
+    "               --profile=minimal|recommended|frontend|backend|full  Named setup, no prompts",
+  );
   console.log("  sync         Apply config v2 choices without prompts");
   console.log(
     "  upgrade      Migrate config with a backup and report (--dry-run, --to=1|2)",
@@ -282,6 +292,9 @@ function printHelpMenu() {
   );
   console.log(
     "  list-installed List files Sauron installed and their state (--json)",
+  );
+  console.log(
+    "  plugin       Build a Claude Code plugin and local marketplace (--out <dir>)",
   );
   console.log(
     "  doctor       Check Node, config, manifest, and installed files (--json)",
@@ -339,8 +352,17 @@ function executeStatusCommand() {
     "--- The 20 Runtimes Bound by sauron (+ shared AGENTS.md core) ---",
   );
   for (const runtime of RUNTIMES) {
-    console.log(`  [OK] ${runtime.name.padEnd(20)} -> ${runtime.file}`);
+    const tier = RUNTIME_SUPPORT[runtime.id]?.tier ?? "core";
+    console.log(
+      `  [${tier.toUpperCase().padEnd(16)}] ${runtime.name.padEnd(20)} -> ${runtime.file}`,
+    );
   }
+  console.log(
+    "  Tiers: STABLE has a recorded real-tool check. BETA follows official docs.",
+  );
+  console.log(
+    "         INSTRUCTION-ONLY has no official source. See docs/04-runtime-adapters/runtime-tiers.md",
+  );
 
   console.log("\n--- The Fellowship of 9 Sub-Agents ---");
   for (const agent of FELLOWSHIP) {
@@ -1495,6 +1517,59 @@ function executeUninstallCommand(argv, dryRun) {
 }
 
 /**
+ * Handles `plugin`: writes a Claude Code plugin and a local marketplace into one folder.
+ * Files go through ConflictManager, so a rerun keeps files you changed.
+ *
+ * @param {string[]} argv - Arguments after the command name.
+ * @param {boolean} dryRun - When true, nothing on disk changes.
+ * @returns {void}
+ */
+function executePluginCommand(argv, dryRun) {
+  const outIndex = argv.indexOf("--out");
+  const outArg = outIndex >= 0 ? argv[outIndex + 1] : undefined;
+  if (outIndex >= 0 && (outArg === undefined || outArg.startsWith("--")))
+    throw new Error("Use plugin [--out <dir>] [--dry-run].");
+  const outDir = path.relative(
+    process.cwd(),
+    path.resolve(process.cwd(), outArg ?? "sauron-plugin"),
+  );
+  if (outDir.length === 0 || outDir.startsWith("..") || path.isAbsolute(outDir))
+    throw new Error("The plugin folder must be inside the current folder.");
+  const files = buildClaudePlugin(SAURON_ROOT, VERSION);
+  const manager = new ConflictManager(process.cwd());
+  /** @type {Record<string, number>} */
+  const counts = {};
+  manager.beginBatch();
+  try {
+    for (const file of files) {
+      const result = manager.safeWrite(
+        `${outDir.split(path.sep).join("/")}/${file.relativePath}`,
+        file.content,
+        "claude-plugin",
+        dryRun,
+        { raw: true },
+      );
+      counts[result.action] = (counts[result.action] ?? 0) + 1;
+    }
+  } finally {
+    manager.endBatch();
+  }
+  console.log(
+    `[PLUGIN] ${files.length} file(s) into ${outDir}${dryRun ? " (dry run)" : ""}: ${Object.entries(
+      counts,
+    )
+      .map(([action, n]) => `${n} ${action}`)
+      .join(", ")}`,
+  );
+  if (counts["skipped"]) console.log("[PLUGIN] Files you changed were kept.");
+  console.log("[PLUGIN] In Claude Code, run:");
+  console.log(
+    `  /plugin marketplace add ./${outDir.split(path.sep).join("/")}`,
+  );
+  console.log(`  /plugin install ${PLUGIN_NAME}@${MARKETPLACE_NAME}`);
+}
+
+/**
  * Initializes a repository: asks for (or reads) the install plan, then writes the
  * shared AGENTS.md core, the selected runtime scaffolds, skills, subagents, and commands.
  *
@@ -1537,6 +1612,7 @@ async function executeInitCommand(options) {
     (skill) => `${skill.department}/${skill.name}`,
   );
   const flags = parseInitFlags(argv, departments, selectors);
+  const profile = readProfileFlag(argv);
   const savedPlan = isNewConfig ? undefined : configPlan(config, SAURON_ROOT);
   const savedCaveman = /** @type {Record<string, unknown> | undefined} */ (
     config["caveman"]
@@ -1547,9 +1623,11 @@ async function executeInitCommand(options) {
       : "full";
   const assumeYes = argv.includes("--yes") || argv.includes("-y");
   // `--interactive` forces the prompts without a TTY (piped answers, tests).
+  // A named profile is already a full answer, so it skips the questions.
   const interactive =
     !isSync &&
     !assumeYes &&
+    profile === undefined &&
     (process.stdin.isTTY === true || argv.includes("--interactive"));
 
   /** @type {import("../dist/adapters/init-plan.js").InitPlan} */
@@ -1580,9 +1658,14 @@ async function executeInitCommand(options) {
   } else {
     plan = resolvePlan(
       { caveman: parseCaveman(defaultCaveman), ...flags },
-      savedPlan ?? PRESET_RECOMMENDED,
+      profile ?? savedPlan ?? PRESET_RECOMMENDED,
     );
-    if (!isSync && !assumeYes && Object.keys(flags).length === 0) {
+    if (
+      !isSync &&
+      !assumeYes &&
+      profile === undefined &&
+      Object.keys(flags).length === 0
+    ) {
       console.log(
         "  [NOTICE] No terminal detected and no flags given: using the Recommended preset.",
       );
@@ -2197,6 +2280,16 @@ function main(commandLineArguments) {
       break;
     case "list-installed":
       executeListInstalledCommand(commandLineArguments.slice(1));
+      break;
+    case "plugin":
+      try {
+        executePluginCommand(commandLineArguments.slice(1), isDryRun);
+      } catch (error) {
+        console.error(
+          `[ERROR] ${error instanceof Error ? error.message : String(error)}`,
+        );
+        process.exitCode = 1;
+      }
       break;
     case "doctor":
       executeDoctorCommand(commandLineArguments.slice(1));
