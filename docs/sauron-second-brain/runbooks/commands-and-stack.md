@@ -4,8 +4,8 @@ See [[claude]] and [[git-and-pr-flow]].
 
 ## Stack
 
-- Node 18 or newer. TypeScript 7 strict, ES modules. `tsc` builds `adapters/` into `dist/`.
-- Dependencies: `@clack/prompts` 0.11.0, `chalk`, `commander`, `yaml`. Dev: `husky`,
+- Node 20.12.0 or newer. TypeScript 7 strict, ES modules. `tsc` builds `adapters/` into `dist/`.
+- Dependencies: `@clack/prompts` 1.x and `yaml`. Dev: `@types/node` major 20, `husky`,
   `typescript`.
 - Tests: native `node --test`. They import from `dist/`, so build first.
 

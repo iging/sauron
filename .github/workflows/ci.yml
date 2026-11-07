@@ -11,7 +11,11 @@ permissions:
 
 jobs:
   verify:
-    name: Verify Quality, Security, and Tests
+    name: Verify on Node ${{ matrix.node }}
+    strategy:
+      fail-fast: false
+      matrix:
+        node: [20, 22, 24]
     runs-on: ubuntu-latest
     timeout-minutes: 15
 
@@ -24,14 +28,17 @@ jobs:
       - name: Set up Node.js runtime
         uses: actions/setup-node@949feb2413d6458794dcd2491c4babbbce0c15c1 # v7.1.0
         with:
-          node-version: 22
+          node-version: ${{ matrix.node }}
           cache: "npm"
 
       - name: Install dependencies strictly
-        run: npm ci || npm install --ignore-scripts
+        run: npm ci
+
+      - name: Build engine
+        run: npm run build
 
       - name: Run TypeScript type checking
-        run: npx tsc --project tsconfig.json
+        run: npx tsc --noEmit
 
       - name: Verify zero pending documentation debt
         run: npm run check-docs -- --pre-push

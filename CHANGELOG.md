@@ -4,6 +4,20 @@ Notable changes to Sauron. Versions follow [Semantic Versioning](https://semver.
 
 ## [Unreleased]
 
+### Changed
+
+- Require Node.js 20.12.0 or newer and verify CI on Node 20, 22, and 24.
+- Pin `@clack/prompts` to 1.8.1 and keep `@types/node` on major 20.
+- Align plugin, Python, and installer versions with package version 3.2.0.
+
+### Fixed
+
+- Keep normalized npm executable paths without a leading `./`.
+
+### Removed
+
+- Unused `chalk` and `commander` dependencies.
+
 ## [3.2.0] - 2026-11-02
 
 ### Added

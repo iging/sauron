@@ -1,7 +1,13 @@
 # Open Items
 
 Things not finished or not decided. Update before every stop. See [[claude]] and [[status]].
-Last updated: 2026-11-02.
+Last updated: 2026-11-07.
+
+## Phase 0 review
+
+- Baseline is ready for the authorized commit and push. See [[session-2026-11-07-phase-0-baseline]].
+- Miguel checks arrows, backspace, cancel, decline, and terminal exit in Git Bash and PowerShell.
+- GitHub CI matrix awaits a future pull request. Miguel opens the pull request.
 
 ## Remaining release verification
 
@@ -40,7 +46,9 @@ Last updated: 2026-11-02.
 - Landing gaps from that run: no trademark search record, no breach runbook, no error alerts,
   no CSP or `X-Content-Type-Options`, and no event for the primary action.
 - `sauron status` prints 173 skills while the site says 370+. Pick one count for 3.2.1.
-- `plugin.json` and `pyproject.toml` still say version 1.0.0. `npm version` does not touch them.
+- Phase 0 removes `chalk` and `commander`. Dependabot #13 and #18 stay closed.
+- Old holds for #16 and #17 end. Clack is pinned to 1.8.1 and `@types/node` stays on major 20.
+- Plugin, Python, and installer versions now match 3.2.0. Future releases must keep them aligned.
 - Older gaps: [[historical-open-items]].
 - Sauron Obsidian UI check remains pending. Disk checks are separate.
 - Remove the locked worktree `fix-readline-types` after closing its session.

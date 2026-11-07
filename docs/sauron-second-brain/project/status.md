@@ -1,7 +1,16 @@
 # Status
 
 Where the project stands. Update this note before every stop. See [[claude]].
-Last updated: 2026-11-02.
+Last updated: 2026-11-07.
+
+## Phase 0 of 4.0.0
+
+- Branch: `codex/4.0.0-phase-0-baseline`. Miguel authorizes commit and push.
+- Node 20.12.0 baseline, exact Clack 1.8.1 pin, dependency cleanup, CI matrix, and metadata align.
+- Node 20.20.2, 22.23.4, and 24.15.0 each pass build, typecheck, doc gate, and 138 tests.
+- Runtime audit finds zero vulnerabilities. Packed version, status, and init dry run pass.
+- Real-terminal arrows and stdin exit remain Miguel's checks. See
+  [[session-2026-11-07-phase-0-baseline]]. No release runs.
 
 ## npm
 
