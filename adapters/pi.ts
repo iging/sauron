@@ -1,7 +1,7 @@
 /**
  * @fileoverview Pi adapter scaffolding the .pi/ prompts and skills folders.
  * Pi reads project instructions from AGENTS.md (emitted by the shared AGENTS.md adapter).
- * Unverified source: https://wener.me/notes/ai/agent/pi
+ * Prompt discovery: https://github.com/badlogic/pi-mono/blob/main/packages/coding-agent/docs/prompt-templates.md
  */
 
 import {
@@ -13,16 +13,16 @@ import {
 
 const PI_PROMPTS_README = ".pi/prompts/README.md";
 const PI_SKILLS_README = ".pi/skills/README.md";
-const PI_SOURCE = "https://wener.me/notes/ai/agent/pi";
+const PI_SOURCE = "https://github.com/badlogic/pi-mono/blob/main/packages/coding-agent/docs/prompt-templates.md";
 
 export class PiAdapter implements RuntimeAdapter {
   public readonly id = "pi";
   public readonly name = "Pi";
-  public readonly targetFiles = [PI_PROMPTS_README, PI_SKILLS_README];
+  public readonly targetFiles = [".pi/README.md"];
+  public readonly retiredFiles = [PI_PROMPTS_README, PI_SKILLS_README];
 
   public transpile(context: TranspileContext): TranspileOutput[] {
     const prompts: string[] = [];
-    prompts.push(`<!-- unverified: ${PI_SOURCE} -->`);
     prompts.push(`# Pi Prompts for ${context.projectName}`);
     prompts.push(`Governed by Sauron v${context.version}`);
     prompts.push("");
@@ -58,7 +58,6 @@ export class PiAdapter implements RuntimeAdapter {
     prompts.push("");
 
     const skills: string[] = [];
-    skills.push(`<!-- unverified: ${PI_SOURCE} -->`);
     skills.push(`# Pi Skills for ${context.projectName}`);
     skills.push(`Governed by Sauron v${context.version}`);
     skills.push("");
@@ -81,13 +80,8 @@ export class PiAdapter implements RuntimeAdapter {
 
     return [
       {
-        relativePath: PI_PROMPTS_README,
-        content: prompts.join("\n"),
-        format: "markdown",
-      },
-      {
-        relativePath: PI_SKILLS_README,
-        content: skills.join("\n"),
+        relativePath: ".pi/README.md",
+        content: [...prompts, ...skills].join("\n"),
         format: "markdown",
       },
     ];

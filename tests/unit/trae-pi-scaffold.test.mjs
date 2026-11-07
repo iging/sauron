@@ -25,14 +25,14 @@ describe("Trae + Pi scaffold", () => {
     assert.ok(out[0].content.startsWith("<!-- unverified: https://www.trae.ai/"));
   });
 
-  it("Pi emits prompts and skills READMEs with unverified note, no AGENTS.md", () => {
+  it("Pi keeps prompt and skill instructions in one README outside discovery folders", () => {
     const adapter = new PiAdapter();
     const out = adapter.transpile(/** @type {any} */ (context));
     const paths = out.map((o) => o.relativePath);
-    assert.deepEqual(paths, [".pi/prompts/README.md", ".pi/skills/README.md"]);
+    assert.deepEqual(paths, [".pi/README.md"]);
     assert.deepEqual(adapter.targetFiles, paths);
     for (const o of out) {
-      assert.ok(o.content.startsWith("<!-- unverified: https://wener.me/"));
+      assert.ok(o.content.includes("github.com/badlogic/pi-mono"));
     }
     assert.ok(out[0].content.includes("$ARGUMENTS"));
     assert.ok(out[0].content.includes("no-barrels"));

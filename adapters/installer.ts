@@ -249,17 +249,58 @@ function renderDelegateCommand(target: NativeTarget, agent: AgentSpec): string {
 /** Reads the bundled command set, sorted by file name. */
 function loadBundledCommands(
   sauronRoot: string,
-): { file: string; content: string }[] {
+): { file: string; sourceFile: string; content: string }[] {
   const commandsDir = path.join(sauronRoot, "commands");
   if (!fs.existsSync(commandsDir)) return [];
-  return fs
-    .readdirSync(commandsDir)
+  const files = fs.readdirSync(commandsDir)
     .filter((file) => file.endsWith(".md"))
-    .sort()
-    .map((file) => ({
-      file,
-      content: fs.readFileSync(path.join(commandsDir, file), "utf8"),
-    }));
+    .sort();
+  const skillNames = new Set(
+    listSkills(sauronRoot, listDepartments(sauronRoot)).map((skill) => skill.name),
+  );
+  const commandNames = new Set(files.map((file) => file.slice(0, -3)));
+  return files.map((sourceFile) => {
+    const name = sourceFile.slice(0, -3);
+    const alias = skillNames.has(name) ? `sauron-${name}` : name;
+    if (alias !== name && (skillNames.has(alias) || commandNames.has(alias))) {
+      throw new Error(`Command alias collides with an existing name: ${alias}`);
+    }
+    const content = fs.readFileSync(path.join(commandsDir, sourceFile), "utf8");
+    return {
+      sourceFile,
+      file: `${alias}.md`,
+      content: alias === name
+        ? content
+        : content.replace(new RegExp(`/${name}(?![a-zA-Z0-9_-])`, "g"), `/${alias}`),
+    };
+  });
+}
+
+/** One legacy install file and the new file that must exist before removing it. */
+export interface InstallRetirement {
+  relativePath: string;
+  replacementPath: string;
+}
+
+/** Old command wrappers are retired after their aliases are installed successfully. */
+export function commandRetirements(
+  sauronRoot: string,
+  plan: InitPlan,
+): InstallRetirement[] {
+  if (!plan.commands) return [];
+  const commands = loadBundledCommands(sauronRoot);
+  return plan.nativeRuntimes.flatMap((runtime) => {
+    const target = NATIVE_TARGETS[runtime];
+    if (!target) return [];
+    return commands
+      .filter(({ file, sourceFile }) =>
+        file !== sourceFile && !target.reservedCommands.includes(sourceFile.slice(0, -3)),
+      )
+      .map(({ sourceFile, file }) => ({
+        relativePath: `${target.commandsDir}/${sourceFile}`,
+        replacementPath: `${target.commandsDir}/${file}`,
+      }));
+  });
 }
 
 /**
@@ -311,8 +352,8 @@ export function buildInstallOutputs(
     if (!plan.commands) continue;
 
     // Slash commands: the bundled command set, plus one per installed Fellowship member.
-    for (const { file, content } of bundledCommands) {
-      if (target.reservedCommands.includes(file.replace(/\.md$/, ""))) continue;
+    for (const { file, sourceFile, content } of bundledCommands) {
+      if (target.reservedCommands.includes(sourceFile.replace(/\.md$/, ""))) continue;
       outputs.push({
         relativePath: `${target.commandsDir}/${file}`,
         content,

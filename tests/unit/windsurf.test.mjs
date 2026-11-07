@@ -27,8 +27,7 @@ describe("WindsurfAdapter", () => {
     const paths = adapter.transpile(makeContext(3)).map((o) => o.relativePath);
     assert.deepEqual(paths, [
       ".windsurf/rules/sauron.md",
-      ".windsurf/workflows/README.md",
-      ".windsurf/skills/README.md",
+      ".windsurf/README.md",
     ]);
     assert.deepEqual([...adapter.targetFiles], paths);
   });

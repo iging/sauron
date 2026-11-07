@@ -1,83 +1,41 @@
-# The 20 AI Coding Runtime Adapter Matrix
+# Runtime Adapter Matrix
 
-> Authoritative specification and feature parity matrix for the 20 AI coding runtimes supported by **Sauron AI**.
+Derived from [Runtime Scaffolds](../docs/runtime-scaffolds.md), reviewed 2026-11-07.
+The source document records loader behavior and evidence. This matrix lists all 20 runtime
+adapters. The shared `AGENTS.md` core is additional and is emitted once.
 
----
+V means documented. U means unverified. A documented path does not prove a real-tool check.
+Some rows describe runtime-supported paths beyond the files Sauron currently emits.
 
-## 1. Overview & Single-Source-of-Truth Doctrine
+| Runtime                  | Sauron primary path               | Scaffold                                                                                                                                                                                                                                                                  | Status               | Source                                                                                       |
+| ------------------------ | --------------------------------- | ------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- | -------------------- | -------------------------------------------------------------------------------------------- |
+| Claude Code              | `CLAUDE.md`                       | `CLAUDE.md`, `.claude/{rules,skills,agents,workflows,output-styles,agent-memory,docs}/`, `.claude/settings.json`, `.mcp.json`. `commands/` is legacy and replaced by skills.                                                                                              | V                    | https://code.claude.com/docs/en/claude-directory                                             |
+| Codex                    | `.codex/config.toml`              | `AGENTS.md` (V), `.agents/skills/` (U), `.codex/config.toml` (U)                                                                                                                                                                                                          | V/U                  | https://learn.chatgpt.com/docs/agent-configuration/agents-md                                 |
+| Cursor                   | `.cursor/rules/sauron.mdc`        | `.cursor/rules/*.mdc` (`description`, `globs`, `alwaysApply`), `.cursor/skills/`. Also reads `AGENTS.md` and `.agents/skills`. `.cursorrules` is legacy.                                                                                                                  | V                    | https://cursor.com/docs/context/rules                                                        |
+| GitHub Copilot           | `.github/copilot-instructions.md` | `.github/copilot-instructions.md`, `.github/instructions/*.instructions.md`, `.github/prompts/*.prompt.md`, `.github/agents/*.agent.md`, `.github/skills/`                                                                                                                | V                    | https://code.visualstudio.com/docs/copilot/customization/overview                            |
+| VS Code                  | `.vscode/settings.json`           | Uses the `.github/` Copilot scaffold above.                                                                                                                                                                                                                               | V                    | https://code.visualstudio.com/docs/copilot/customization/overview                            |
+| Windsurf (Devin Desktop) | `.windsurf/rules/sauron.md`       | `.windsurf/rules/*.md` (`trigger:` frontmatter), `.windsurf/workflows/`, `.windsurf/skills/`. These paths are legacy but still read. `.devin/` is the preferred path.                                                                                                     | V                    | https://docs.devin.ai/desktop/cascade/memories                                               |
+| Cline                    | `.cline/rules/sauron.md`          | `.clinerules/` directory **or** `.cline/rules/`, plus `.cline/{workflows,skills,hooks}/`                                                                                                                                                                                  | V                    | https://docs.cline.bot/features/cline-rules                                                  |
+| Gemini CLI               | `GEMINI.md`                       | `GEMINI.md`, `.gemini/skills/` (alias `.agents/skills/`) (V). `.gemini/settings.json` and `.gemini/commands/*.toml` (U). The free tier moved to Antigravity CLI on 2026-06-18.                                                                                            | V/U                  | https://geminicli.com/docs/cli/gemini-md                                                     |
+| Qwen Code                | `QWEN.md`                         | `.qwen/skills/` (V). `QWEN.md` and `.qwen/{settings.json,agents,commands}` (U).                                                                                                                                                                                           | V/U                  | https://qwenlm.github.io/qwen-code-docs                                                      |
+| OpenCode                 | `opencode.json`                   | `AGENTS.md`, `opencode.json`, `.opencode/{agents,commands,skills,modes,plugins,tools}/`. Sauron installs native subagents and commands here.                                                                                                                              | V                    | https://opencode.ai/docs/rules                                                               |
+| Kiro                     | `.kiro/steering/sauron.md`        | `.kiro/steering/*.md` (`inclusion:`), `.kiro/skills/`. Also reads `AGENTS.md`.                                                                                                                                                                                            | V                    | https://kiro.dev/docs/steering                                                               |
+| CodeBuddy                | `.codebuddy/rules/sauron.md`      | `CODEBUDDY.md` (falls back to `AGENTS.md`), `.codebuddy/rules/`, `.codebuddy/skills/<n>/SKILL.md`                                                                                                                                                                         | V                    | https://www.tencentcloud.com/document/product/1256/77282                                     |
+| Zed                      | `.rules`                          | Reads the first match of `.rules`, ..., `AGENTS.md` (V). `.zed/settings.json` (U).                                                                                                                                                                                        | V/U                  | https://zed.dev/docs/ai/rules                                                                |
+| Trae                     | `.trae/rules/project_rules.md`    | `.trae/rules/project_rules.md` (multiple unofficial sources)                                                                                                                                                                                                              | U                    | none (needs an official source)                                                              |
+| Pi                       | `.pi/README.md`                   | `AGENTS.md`, `.pi/skills/`, `.agents/skills/`, `.pi/prompts/`. The README is a Sauron note outside prompt discovery.                                                                                                                                                      | V (prompt discovery) | https://github.com/badlogic/pi-mono/blob/main/packages/coding-agent/docs/prompt-templates.md |
+| omp (oh-my-pi)           | `.omp/mcp.json`                   | `AGENTS.md`, `.omp/skills/<n>/SKILL.md`, `.omp/prompts/*.md`, `.omp/agents/*.md`, `.omp/mcp.json`. Sauron installs native subagents and commands here. Also discovers `.agents/skills/` and `.claude/skills/`. `.omp/rules/` (TTSR) and `.omp/hooks/` are not scaffolded. | V                    | https://omp.sh/docs/context-files                                                            |
+| Kimi                     | `.kimi/prompt.md`                 | Legacy path kept                                                                                                                                                                                                                                                          | U                    | none                                                                                         |
+| Hermes                   | `.hermesrules`                    | Legacy path kept                                                                                                                                                                                                                                                          | U                    | none                                                                                         |
+| OpenClaw                 | `.openclaw/config.json`           | Legacy path kept                                                                                                                                                                                                                                                          | U                    | none                                                                                         |
+| AdaL                     | `.adalrules`                      | Legacy path kept                                                                                                                                                                                                                                                          | U                    | none                                                                                         |
 
-Modern AI-assisted engineering suffers from runtime fragmentation. When development teams use disparate IDEs and CLI agents—such as Cursor, Windsurf, Claude Code, and GitHub Copilot—rules drift, architectural constraints are forgotten, and security policies are bypassed.
+## Installation behavior
 
-Sauron solves this by compiling a single declarative configuration (`sauron.config.yaml`) into native instructions tailored to each runtime's parser, token window, and file structure.
-
----
-
-## 2. Comprehensive 20-Runtime Comparison Table
-
-| #   | Runtime / Tool       | Primary Configuration File        | Additional Paths / Commands | Format          | Frontmatter MDC | Slash Commands | Output Strategy                                           |
-| :-- | :------------------- | :-------------------------------- | :-------------------------- | :-------------- | :-------------: | :------------: | :-------------------------------------------------------- |
-| 1   | **Claude Code**      | `CLAUDE.md`                       | `.claude/commands/`         | Markdown        |       ❌        |   ✅ Native    | Compact root Markdown with modular sub-command scripts    |
-| 2   | **Cursor**           | `.cursorrules`                    | `.cursor/rules/*.mdc`       | Markdown / MDC  |    ✅ Native    |    ✅ Rules    | Hierarchical glob-matched `.mdc` rules with root fallback |
-| 3   | **Windsurf**         | `.windsurfrules`                  | `.windsurf/memories/`       | Markdown        |       ❌        |  ✅ Workflows  | Signal-dense Markdown with Cascade memory hooks           |
-| 4   | **GitHub Copilot**   | `.github/copilot-instructions.md` | `.vscode/settings.json`     | Markdown        |       ❌        |   🟡 Limited   | Repository-wide custom instructions for VS Code & CLI     |
-| 5   | **Cline**            | `.clinerules`                     | `.cline/room-rules/`        | Markdown        |       ❌        |   ✅ Custom    | Strict autonomous boundary instructions                   |
-| 6   | **Trae**             | `.traerules`                      | `.trae/`                    | Markdown        |       ❌        |  ✅ Workflows  | Adaptive workspace rules for ByteDance Trae               |
-| 7   | **Zed**              | `.zed/settings.json`              | `.zed/prompts/`             | JSON / Prompts  |       ❌        |   ✅ Prompts   | Structured prompt templates and editor setting overrides  |
-| 8   | **Codex**            | `.codex/instructions.md`          | `.codex/tasks/`             | Markdown        |       ❌        |   🟡 Limited   | Deterministic instruction set for OpenAI Codex CLI        |
-| 9   | **Gemini CLI**       | `GEMINI.md`                       | `.gemini/commands/`         | Markdown        |       ❌        |    ✅ Slash    | Persistent high-context instructions for Google Gemini    |
-| 10  | **Hermes**           | `.hermesrules`                    | `.hermes/`                  | Markdown        |       ❌        |   🟡 Limited   | Spartan execution rules for Hermes agent harness          |
-| 11  | **Kimi**             | `.kimi/prompt.md`                 | `.kimi/context/`            | Markdown        |       ❌        |   🟡 Limited   | High-density long-context prompt for Moonshot Kimi        |
-| 12  | **Kiro**             | `.kirorules`                      | `.kiro/hooks/`              | Markdown        |       ❌        |    ✅ Hooks    | Autonomous agent guidelines and execution bounds          |
-| 13  | **OpenClaw**       | `.openclaw/config.json`         | `.openclaw/instructions/` | JSON / Markdown |       ❌        |  ✅ Commands   | Open-source Claude API harness instructions               |
-| 14  | **OpenCode**         | `.opencode/instructions.md`       | `.opencode/rules/`          | Markdown        |       ❌        |    ✅ Modes    | Universal open-source terminal coding harness             |
-| 15  | **Pi**               | `.pirules`                        | `.pi/`                      | Plaintext       |       ❌        |   🟡 Limited   | Spartan plain-text instruction constraints                |
-| 16  | **Qwen**             | `.qwen/system.md`                 | `.qwen/`                    | Markdown        |       ❌        |   🟡 Limited   | System instructions optimized for Alibaba Qwen-Coder      |
-| 17  | **Adal & CodeBuddy** | `.adalrules`                      | `.codebuddy_rules.md`       | Markdown        |       ❌        |   🟡 Limited   | Dual-engine rules for enterprise CodeBuddy environments   |
-| 18  | **omp (oh-my-pi)**   | `AGENTS.md`                       | `.omp/{skills,prompts,agents}/`, `.omp/mcp.json` | Markdown / JSON |       ❌        |  ✅ Prompts    | Shared AGENTS.md core plus native `.omp/` scaffold READMEs |
-
----
-
-## 3. Transpilation & Synchronization Pipeline
-
-```text
-       sauron.config.yaml (Master Spec)
-                      │
-                      ▼
-           Sauron Transpiler Engine
-                      │
-    ┌─────────────────┴─────────────────┐
-    ▼                                   ▼
-Text-Based Runtimes             Frontmatter / MDC Runtimes
-- CLAUDE.md                     - .cursor/rules/*.mdc
-- .windsurfrules                - .trae/
-- .github/copilot-instructions.md
-                      │
-                      ▼
-           ConflictManager Audit
-           - Checks SHA-256 diff
-           - Backs up existing files (.bak)
-                      │
-                      ▼
-            Local Disk Mutation
-```
-
----
-
-## 4. Execution Strategies by Environment
-
-### 4.1 CLI Terminal Agents (Claude Code, Gemini CLI, OpenCode)
-
-- Injected with explicit slash commands (`/plan`, `/commit`, `/refactor`, `/caveman`).
-- Enforces strict shell boundaries to prevent unverified bash execution.
-- Intercepted by `scripts/hooks/agent-guard.mjs`.
-
-### 4.2 Visual Editors (Cursor, Windsurf, Trae, VS Code)
-
-- Injected with file-glob matching rules.
-- Scoped rules ensure backend rules only activate on backend files, frontend rules on frontend components.
-- Zero barrel-file (`index.ts`) rules enforced via editor linters.
-
-### 4.3 Containerized / Headless Agents (Docker, CI/CD)
-
-- Injected with non-root UID 10001 execution constraints.
-- Sandboxed filesystem targets only designated mounted volumes.
+- Native subagents and command wrappers install for Claude Code, OpenCode, and omp only.
+- Skill discovery and counts use `listSkills`. The current catalog has 245 installable entries
+  across nine departments. Container folders and nested supporting files are excluded.
+- A command wrapper sharing a skill name uses `/sauron-<name>`. Skill names stay unchanged.
+- Pi, Claude Code, Windsurf, Cline, Cursor, OpenCode, and omp keep notes at their runtime root.
+- Sync retires old notes and wrappers through ConflictManager. User edits remain on disk.
+- Unverified paths keep their source warnings. Real-tool checks remain separate.

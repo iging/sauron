@@ -73,8 +73,8 @@ Expected output:
 
 --- The 20 Runtimes Bound by sauron ---
   [OK] Claude Code          -> CLAUDE.md
-  [OK] Cursor               -> .cursorrules
-  [OK] Windsurf             -> .windsurfrules
+  [OK] Cursor               -> .cursor/rules/sauron.mdc
+  [OK] Windsurf             -> .windsurf/rules/sauron.md
   [OK] GitHub Copilot       -> .github/copilot-instructions.md
   ...
 
@@ -85,7 +85,7 @@ Expected output:
   ...
 
 --- Skill Ecosystem ---
-  [OK] 67 ECC-standard skills across 8 domains
+  [OK] 245 ECC-standard skills across 9 domains
 ```
 
 To list all available skills by domain, run:

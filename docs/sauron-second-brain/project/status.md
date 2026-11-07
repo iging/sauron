@@ -3,14 +3,16 @@
 Where the project stands. Update this note before every stop. See [[claude]].
 Last updated: 2026-11-07.
 
-## Phase 0 of 4.0.0
+## Phase 1 of 4.0.0
 
-- Branch: `codex/4.0.0-phase-0-baseline`. Miguel authorizes commit and push.
-- Node 20.12.0 baseline, exact Clack 1.8.1 pin, dependency cleanup, CI matrix, and metadata align.
-- Node 20.20.2, 22.23.4, and 24.15.0 each pass build, typecheck, doc gate, and 138 tests.
-- Runtime audit finds zero vulnerabilities. Packed version, status, and init dry run pass.
-- Real-terminal arrows and stdin exit remain Miguel's checks. See
-  [[session-2026-11-07-phase-0-baseline]]. No release runs.
+- Miguel reports Phase 0 merged. Main pulls to `5dda456` with fast-forward only.
+- Branch: `codex/4.0.0-phase-1-fixes`. Miguel authorizes commit and push.
+- Notes move to runtime roots. Command wrappers get collision-free `sauron-` aliases.
+- Status, listing, installer, and generated references share 245 installable skills.
+- Node 20.20.2, 22.23.4, and 24.15.0 each pass build, typecheck, doc gate, and 147 tests.
+- Pack inspection and seven-runtime packed install pass. Local state stays preserved.
+- Real-tool checks and the landing page count remain open. See
+  [[session-2026-11-07-phase-1-fixes]].
 
 ## npm
 
@@ -19,7 +21,7 @@ Last updated: 2026-11-07.
 
 ## Git
 
-- `main` on GitHub is at `73350d9` (PR #10). Release tag `v3.1.0` is at `1a185e9`.
+- Main is pulled to `5dda456` after the Phase 0 merge. Release tag `v3.2.0` stays at `de9de83`.
 - omp is merged through PR #9 at `26669a8`.
 - Local worktree `.claude/worktrees/fix-readline-types` still exists. Its commit is on `main`.
 - Build, typecheck, 116 tests, and the pre-push documentation gate pass on 2026-10-27.
@@ -65,4 +67,4 @@ Last updated: 2026-11-07.
 
 1. Release 3.1.0 is live. Registry checksum matches the tested tarball.
 2. Real-terminal test of the arrow-key `init` (Git Bash and PowerShell).
-3. Roadmap research and `/plan-feature` Parts 1 and 2. See [[open-items]].
+3. Review Phase 1 through its compare link. The approved 4.0.0 handoff sets the order.

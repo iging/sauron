@@ -74,19 +74,19 @@ const CLAUDE_FOLDERS: readonly ClaudeFolder[] = [
  */
 function renderFolderReadme(folder: ClaudeFolder): string {
   return [
-    `# .claude/${folder.name}/`,
+    `## .claude/${folder.name}/`,
     "",
     "> Managed by Sauron.",
     "",
-    "## Purpose",
+    "### Purpose",
     "",
     folder.purpose,
     "",
-    "## How to add a file",
+    "### How to add a file",
     "",
     folder.howToAdd,
     "",
-    "## File format",
+    "### File format",
     "",
     folder.format,
     "",
@@ -123,6 +123,7 @@ function renderRootReadme(): string {
     "",
     CLAUDE_DIRECTORY_DOCS,
     "",
+    ...CLAUDE_FOLDERS.map(renderFolderReadme),
   ].join("\n");
 }
 
@@ -141,6 +142,9 @@ export class ClaudeAdapter implements RuntimeAdapter {
     ".claude/README.md",
     ".claude/settings.json",
     ".claude/output-styles/caveman.md",
+  ];
+  /** Older scaffold notes are removed only while Sauron still owns them. */
+  public readonly retiredFiles = [
     ...CLAUDE_FOLDERS.map((folder) => `.claude/${folder.name}/README.md`),
   ];
 
@@ -242,13 +246,7 @@ export class ClaudeAdapter implements RuntimeAdapter {
         format: "json",
       },
       ...outputStyle,
-      ...CLAUDE_FOLDERS.map(
-        (folder): TranspileOutput => ({
-          relativePath: `.claude/${folder.name}/README.md`,
-          content: renderFolderReadme(folder),
-          format: "markdown",
-        }),
-      ),
+
     ];
   }
 }

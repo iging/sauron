@@ -4,6 +4,10 @@ What went wrong and what we do now. Add new lessons at the top. See [[claude]].
 
 ## 2026-11-07
 
+- Count installable entries with listSkills. Counting folders misses nested suites and adds containers.
+- Retire a renamed wrapper only after its replacement installs. An edited alias blocks retirement.
+- A README can become a rule, prompt, or output style. Keep setup notes outside loader folders.
+
 - Pin prompt upgrades exactly when requested and keep the root lockfile spec in sync.
 - Clack 1.8.1 needs Node 20.12.0. Check the exact floor, not only a supported major.
 - Scripted prompt input checks API compatibility. Real-terminal checks remain separate.

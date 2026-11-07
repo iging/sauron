@@ -43,17 +43,12 @@ describe("Transpiler 20-Runtime Generation (Milestone 6.2)", () => {
     const expectedPaths = [
       "CLAUDE.md",
       ".cursor/rules/sauron.mdc",
-      ".cursor/rules/README.md",
-      ".cursor/skills/README.md",
+      ".cursor/README.md",
       ".windsurf/rules/sauron.md",
-      ".windsurf/workflows/README.md",
-      ".windsurf/skills/README.md",
+      ".windsurf/README.md",
       ".github/copilot-instructions.md",
       ".cline/rules/sauron.md",
       ".cline/README.md",
-      ".cline/workflows/README.md",
-      ".cline/skills/README.md",
-      ".cline/hooks/README.md",
       ".trae/rules/project_rules.md",
       ".zed/settings.json",
       ".codex/config.toml",
@@ -78,8 +73,7 @@ describe("Transpiler 20-Runtime Generation (Milestone 6.2)", () => {
       ".hermesrules",
       ".openclaw/config.json",
       ".opencode/README.md",
-      ".pi/prompts/README.md",
-      ".pi/skills/README.md",
+      ".pi/README.md",
       ".omp/README.md",
       ".adalrules",
       ".codebuddy/rules/sauron.md",
@@ -147,9 +141,6 @@ describe("CodeBuddy + Zed scaffold paths", () => {
       for (const rel of [
         ".cline/rules/sauron.md",
         ".cline/README.md",
-        ".cline/workflows/README.md",
-        ".cline/skills/README.md",
-        ".cline/hooks/README.md",
       ]) {
         assert.ok(fs.existsSync(path.join(ws, rel)), `Missing ${rel}`);
       }

@@ -3,11 +3,13 @@
 Things not finished or not decided. Update before every stop. See [[claude]] and [[status]].
 Last updated: 2026-11-07.
 
-## Phase 0 review
+## Phase 1 review
 
-- Baseline is ready for the authorized commit and push. See [[session-2026-11-07-phase-0-baseline]].
+- Phase 0 is merged and pulled. Phase 1 is ready for the authorized commit and push. See [[session-2026-11-07-phase-1-fixes]].
 - Miguel checks arrows, backspace, cancel, decline, and terminal exit in Git Bash and PowerShell.
-- GitHub CI matrix awaits a future pull request. Miguel opens the pull request.
+- Miguel verifies root notes and skill or command invocation in the real tools.
+- Landing page still needs the 245 installable-skill count. Its repo is outside this workspace.
+- Miguel authorizes the Phase 1 commit and push. Pull request and hosted CI remain pending.
 
 ## Remaining release verification
 
@@ -28,12 +30,9 @@ Last updated: 2026-11-07.
 
 ## Known gaps
 
-- A skill and a command share a name (`caveman`, `handoff`, and others). Check which wins in
-  Claude Code, then rename or dedupe.
+- Collision aliases and note migration are built. Confirm them in Claude Code, Pi,
+  Windsurf, Cline, Cursor, OpenCode, and omp before calling real-tool checks complete.
 - Interactive re-run of `init` shows Recommended, not the saved choices.
-- `.cursor/rules/README.md` may load as a Cursor rule. Move it to `.cursor/README.md`.
-- `references/runtime-matrix.md` table has 18 rows and some stale paths. Rebuild it from
-  `docs/runtime-scaffolds.md`.
 - Caveman savings have no benchmark. Publish a figure only with a script and raw data.
 - `graph.html` loads `vis-network` from unpkg with no version pin. Pin it or bundle it.
 
@@ -45,7 +44,7 @@ Last updated: 2026-11-07.
   landing page on 2026-11-02. The report is local: `../sauron-landing/launch-audit-2026-11-02.md`.
 - Landing gaps from that run: no trademark search record, no breach runbook, no error alerts,
   no CSP or `X-Content-Type-Options`, and no event for the primary action.
-- `sauron status` prints 173 skills while the site says 370+. Pick one count for 3.2.1.
+- CLI and repo docs count 245 installable skills. The landing page count still needs its own update.
 - Phase 0 removes `chalk` and `commander`. Dependabot #13 and #18 stay closed.
 - Old holds for #16 and #17 end. Clack is pinned to 1.8.1 and `@types/node` stays on major 20.
 - Plugin, Python, and installer versions now match 3.2.0. Future releases must keep them aligned.

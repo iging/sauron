@@ -37,7 +37,12 @@ import { AgentsMdAdapter } from "./agents-md.js";
 
 import { parse as parseYaml } from "yaml";
 import { CAVEMAN_MODES } from "./types.js";
-import type { InstallOutput } from "./installer.js";
+import {
+  listDepartments,
+  listSkills,
+  type InstallOutput,
+  type InstallRetirement,
+} from "./installer.js";
 import type {
   CavemanMode,
   FellowshipAgentIR,
@@ -188,7 +193,7 @@ export class Transpiler {
   }
 
   /**
-   * Discovers and compiles modular skills from `core/skills/`.
+   * Compiles the same installable skill catalog used by the CLI and installer.
    *
    * Traverses functional department subdirectories and constructs intermediate
    * representation objects for cataloging across adapter outputs.
@@ -196,38 +201,14 @@ export class Transpiler {
    * @returns Array of SkillIR representations.
    */
   public loadSkills(): SkillIR[] {
-    const skills: SkillIR[] = [];
-    const coreSkillsDir = path.join(this.sauronRoot, "core", "skills");
-
-    if (fs.existsSync(coreSkillsDir)) {
-      const departments = fs.readdirSync(coreSkillsDir);
-      for (const dep of departments) {
-        const depPath = path.join(coreSkillsDir, dep);
-        if (fs.statSync(depPath).isDirectory()) {
-          const files = fs
-            .readdirSync(depPath)
-            .filter((f: string): boolean => f.endsWith(".md"));
-          for (const file of files) {
-            const skillId = file.replace(".md", "");
-            skills.push({
-              id: skillId,
-              name: skillId
-                .split("-")
-                .map(
-                  (w: string): string => w.charAt(0).toUpperCase() + w.slice(1),
-                )
-                .join(" "),
-              department: dep,
-              ownerAgent: "fellowship",
-              triggerCommand: `/${skillId}`,
-              summary: `Engineering skill for ${dep} department.`,
-            });
-          }
-        }
-      }
-    }
-
-    return skills;
+    return listSkills(this.sauronRoot, listDepartments(this.sauronRoot)).map((skill) => ({
+      id: skill.name,
+      name: skill.name,
+      department: skill.department,
+      ownerAgent: "fellowship",
+      triggerCommand: `/${skill.name}`,
+      summary: `Engineering skill for ${skill.department} department.`,
+    }));
   }
 
   /**
@@ -347,6 +328,7 @@ export class Transpiler {
       dryRun?: boolean;
       targetRuntimes?: string[];
       extras?: InstallOutput[];
+      retiredInstallFiles?: readonly InstallRetirement[];
     } = {},
   ): TranspileReport {
     const dryRun = options.dryRun ?? false;
@@ -404,6 +386,29 @@ export class Transpiler {
             },
           ),
         );
+      }
+      for (const retired of options.retiredInstallFiles ?? []) {
+        const replacement = results.find(
+          (file) => file.filePath === retired.replacementPath,
+        );
+        if (
+          !replacement ||
+          !["created", "updated", "unchanged", "simulated"].includes(replacement.action)
+        ) {
+          results.push({
+            filePath: retired.relativePath,
+            runtime: "install",
+            action: "skipped",
+            backupPath: null,
+          });
+          continue;
+        }
+        const removal = this.conflictManager.retireFile(
+          retired.relativePath,
+          "install",
+          dryRun,
+        );
+        if (removal) results.push(removal);
       }
     } finally {
       this.conflictManager.endBatch();

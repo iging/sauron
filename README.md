@@ -156,6 +156,11 @@ Sauron executes locally and provides full source transparency:
 
 ---
 
+Skill names keep their slash commands. A bundled command with the same name installs as
+`/sauron-<name>`, for example `/sauron-caveman` and `/sauron-handoff`.
+The skill stays available as `/caveman` or `/handoff`. Existing edited command files stay in place
+and appear as skipped during sync. See [runtime scaffolds](./docs/runtime-scaffolds.md).
+
 ## The 20 Runtimes Configured by Sauron
 
 Sauron generates native configuration files for:
@@ -201,7 +206,7 @@ Every runtime also shares the `AGENTS.md` core and `.agents/skills/`.
 
 ## Flagship Engineering Capabilities
 
-Sauron ships with 374 modular skills across 9 functional departments, plus 114 CLI commands. Four flagship capability pillars anchor the developer and agent experience:
+Sauron ships with 245 installable modular skills across 9 functional departments, plus 114 CLI commands. Counts come from the installable catalog used by `sauron list-skills`. Nested supporting skill files inside a selected skill are part of that skill, rather than separate entries. Four flagship capability pillars anchor the developer and agent experience:
 
 ---
 

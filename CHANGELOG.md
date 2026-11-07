@@ -6,6 +6,12 @@ Notable changes to Sauron. Versions follow [Semantic Versioning](https://semver.
 
 ### Changed
 
+- Keep scaffold notes at the Pi, Claude Code, Windsurf, Cline, and Cursor runtime roots.
+- Use one installable catalog for status, skill lists, and generated skill references: 245 skills
+  across nine departments. Rebuild the 20-runtime matrix from the scaffold reference.
+- Prefix colliding bundled command wrappers with `sauron-` while keeping skill names unchanged.
+- Retire unchanged old notes and command wrappers during sync, with backups. Keep user edits.
+
 - Require Node.js 20.12.0 or newer and verify CI on Node 20, 22, and 24.
 - Pin `@clack/prompts` to 1.8.1 and keep `@types/node` on major 20.
 - Align plugin, Python, and installer versions with package version 3.2.0.
