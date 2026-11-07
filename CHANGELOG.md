@@ -29,6 +29,9 @@ Notable changes to Sauron. Versions follow [Semantic Versioning](https://semver.
 
 ### Added
 
+- Native Codex TOML and Copilot .agent.md subagents, with shared access notes and model tiers.
+- Preserve saved native opt-ins and edited agents across sync, repair, and uninstall.
+
 - Agent specs state a toolset, shell intents, and a model tier. Claude Code agents get `tools`
   and `model`, OpenCode agents get `permissions` rules, omp read-only agents get `tools`, and
   every agent gets an Access section. Shell intents resolve to the project's own commands.

@@ -42,10 +42,16 @@ export const RUNTIME_IDS: readonly string[] = [
   "codebuddy",
 ];
 
-/** Runtimes that receive Sauron subagents and slash commands as native files. */
-export const NATIVE_RUNTIMES: readonly string[] = ["claude", "opencode", "omp"];
+/** Runtimes that receive Sauron subagents as native files. Commands depend on the target. */
+export const NATIVE_RUNTIMES: readonly string[] = [
+  "claude",
+  "opencode",
+  "omp",
+  "codex",
+  "copilot",
+];
 
-/** Keeps only the runtimes that receive native subagents and slash commands. */
+/** Keeps only the runtimes that receive native subagents. */
 export function nativeRuntimesFor(runtimes: readonly string[]): string[] {
   return runtimes.filter((id) => NATIVE_RUNTIMES.includes(id));
 }
@@ -60,7 +66,7 @@ export interface InitPlan {
   skills: "all" | "none" | string[];
   /** Default Caveman Mode tier. */
   caveman: CavemanMode;
-  /** Copy Sauron slash commands into each runtime in `nativeRuntimes`. */
+  /** Copy Sauron slash commands where a native runtime supports them. */
   commands: boolean;
   /** Runtimes opted in to native subagents and commands. Saved so `sync` adds no others. */
   nativeRuntimes: string[];
@@ -435,7 +441,7 @@ export function planFromConfig(
       caveman: mode,
       nativeRuntimes:
         native === undefined
-          ? nativeRuntimesFor(runtimes)
+          ? runtimes.filter((id) => ["claude", "opencode", "omp"].includes(id))
           : native.filter((id) => runtimes.includes(id)),
     });
   }

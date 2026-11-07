@@ -180,12 +180,12 @@ const SCAFFOLD_READMES: readonly ScaffoldReadme[] = [
     folder: ".github/agents",
     title: "Copilot Custom Agents",
     purpose:
-      "Custom agent personas with their own instructions and tool sets. Replaces deprecated `.chatmode.md` files.",
+      "Custom agent personas with their own instructions and tool sets. Sauron init installs selected agents as .agent.md files here. Support tier: beta until a real-tool check.",
     howToAdd: "Create `<name>.agent.md` in this folder.",
     format: [
       "---",
       'description: "Plan features without editing code"',
-      "tools: ['search', 'fetch']",
+      "tools: ['read', 'search']",
       "---",
       "",
       "You are a planning agent.",

@@ -107,6 +107,9 @@ inside each department. New departments start fully checked. Revisit choices bef
 
 ### 2. Full Harness Synchronization (20 Runtimes & Fellowship)
 
+Codex and Copilot native agents are available in the unreleased 4.0.0 work.
+See the [native agent guide](docs/02-fellowship-agents/codex-copilot-agents.md) for formats and limits.
+
 `init` asks a few questions (Recommended or Custom: runtimes, subagents, skills, Caveman tier), shows a plan, and writes nothing until you confirm. It generates the shared `AGENTS.md` core plus native files for the runtimes you pick (`CLAUDE.md` + `.claude/`, `.cursor/rules/`, `.windsurf/rules/`, `.cline/rules/`, and more), and merges into files you already have instead of replacing them:
 
 ```bash

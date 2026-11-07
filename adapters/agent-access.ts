@@ -7,6 +7,8 @@
  * - Claude Code: https://code.claude.com/docs/en/sub-agents.md
  * - OpenCode: https://opencode.ai/docs/agents and https://opencode.ai/docs/permissions
  * - omp: https://omp.sh/docs/subagent-authoring
+ * - Codex: https://learn.chatgpt.com/docs/agent-configuration/subagents
+ * - Copilot: https://docs.github.com/en/copilot/reference/custom-agents-configuration
  * No barrel files.
  */
 
@@ -21,7 +23,13 @@ export type ModelTier = "fast" | "balanced" | "deep";
 
 /** Named groups of shell commands. Resolved per project. */
 export type ShellIntent =
-  "test" | "lint" | "typecheck" | "build" | "audit" | "git-read" | "git-write";
+  | "test"
+  | "lint"
+  | "typecheck"
+  | "build"
+  | "audit"
+  | "git-read"
+  | "git-write";
 
 export const TOOLSETS: readonly Toolset[] = [
   "planner",
@@ -279,6 +287,36 @@ export function ompAccessLines(
   const model = modelFor("omp", access.model, models);
   if (model) lines.push(`model: ${model}`);
   return lines;
+}
+
+/**
+ * Codex standalone agent settings. Parent permissions are inherited. Only disable the
+ * documented shell capability when no shell intent is present. No tool allowlist exists.
+ */
+export function codexAccessLines(
+  access: AgentAccess,
+  models: ModelMap,
+): string[] {
+  const model = modelFor("codex", access.model, models);
+  return [
+    ...(model ? [`model = ${JSON.stringify(model)}`] : []),
+    ...(access.shell.length === 0 ? ["features.shell_tool = false"] : []),
+  ];
+}
+
+/** Copilot's portable tool aliases. Path and command scopes remain body instructions. */
+export function copilotAccessLines(
+  access: AgentAccess,
+  models: ModelMap,
+): string[] {
+  const tools = ["read", "search"];
+  if (TOOLSET_EDIT[access.toolset] !== "none") tools.push("edit");
+  if (access.shell.length > 0) tools.push("execute");
+  const model = modelFor("copilot", access.model, models);
+  return [
+    `tools: ${JSON.stringify(tools)}`,
+    ...(model ? [`model: ${JSON.stringify(model)}`] : []),
+  ];
 }
 
 /**
