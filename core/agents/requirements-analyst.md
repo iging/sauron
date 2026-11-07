@@ -11,6 +11,9 @@ authority:
   can_modify: ["context/PRD.md"]
   must_not_modify: ["src/*", "tests/*"]
 anti_patterns_prevented: ["AP-1", "AP-3", "AP-6"]
+toolset: planner
+shell: [git-read]
+model: deep
 ---
 
 # Requirements Analyst: Product Requirements & Acceptance Criteria Specialist

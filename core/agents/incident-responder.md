@@ -11,6 +11,9 @@ authority:
   can_modify: ["docs/security/incidents/*"]
   must_not_modify: ["src/**/*"]
 anti_patterns_prevented: ["AP-18", "AP-28"]
+toolset: reviewer
+shell: [audit, git-read]
+model: deep
 ---
 
 # Incident Responder: Security Incident Triage & Containment Coordinator

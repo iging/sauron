@@ -50,6 +50,10 @@ import {
   migrateConfig,
 } from "../dist/adapters/config.js";
 import {
+  detectShellCommands,
+  modelsFromConfig,
+} from "../dist/adapters/agent-access.js";
+import {
   MARKETPLACE_NAME,
   PLUGIN_NAME,
   buildClaudePlugin,
@@ -1672,7 +1676,10 @@ async function executeInitCommand(options) {
     }
   }
 
-  const extras = buildInstallOutputs(SAURON_ROOT, plan);
+  const extras = buildInstallOutputs(SAURON_ROOT, plan, {
+    commands: detectShellCommands(currentWorkingDirectory),
+    models: modelsFromConfig(config),
+  });
   const skillCount = new Set(
     extras
       .filter((e) => e.relativePath.startsWith(".agents/skills/"))

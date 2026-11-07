@@ -11,6 +11,9 @@ authority:
   can_modify: ["prisma/*", "drizzle/*", "migrations/*", "context/SCHEMA.md"]
   must_not_modify: ["src/frontend/**/*"]
 anti_patterns_prevented: ["AP-29", "AP-44", "AP-53"]
+toolset: builder
+shell: [test, build, lint, typecheck]
+model: balanced
 ---
 
 # Database Administrator: Database Schema and Migration Specialist

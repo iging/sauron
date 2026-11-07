@@ -4,6 +4,10 @@ What went wrong and what we do now. Add new lessons at the top. See [[claude]].
 
 ## 2026-11-07
 
+- OpenCode moved to V2 `permissions` lists. `opencode debug agents` shows the parsed rules, and
+  its own defaults come first, so Sauron rules placed after them win.
+- Claude Code subagent `tools` takes bare names only. Per-command Bash rules live in settings.
+
 - `claude plugin validate` is available locally. Run it on generated plugins. It flags
   commands with no frontmatter, a missing README, and a missing icon.
 - Prettier warns on CRLF working copies from `core.autocrlf`. Check committed content before

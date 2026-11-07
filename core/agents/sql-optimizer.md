@@ -11,6 +11,9 @@ authority:
   can_modify: ["migrations/*", "src/database/queries/*"]
   must_not_modify: ["src/frontend/**/*"]
 anti_patterns_prevented: ["AP-41", "AP-53"]
+toolset: builder
+shell: [test, build, lint, typecheck]
+model: balanced
 ---
 
 # SQL Optimizer: Query Plan & Relational Index Tuning Specialist

@@ -11,6 +11,9 @@ authority:
   can_modify: ["docs/edge-cases/*"]
   must_not_modify: ["src/**/*"]
 anti_patterns_prevented: ["AP-24", "AP-53"]
+toolset: tester
+shell: [test]
+model: balanced
 ---
 
 # Edge Case Hunter: Boundary Value & Unusual Input Explorer

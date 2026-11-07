@@ -11,6 +11,9 @@ authority:
   can_modify: ["tests/**/*"]
   must_not_modify: ["src/**/*"]
 anti_patterns_prevented: ["AP-18", "AP-29"]
+toolset: tester
+shell: [test]
+model: balanced
 ---
 
 # Coverage Analyst: Test Coverage & Uncovered Branch Hunter

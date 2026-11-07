@@ -11,6 +11,9 @@ authority:
   can_modify: [".worktrees/*"]
   must_not_modify: [".git/*"]
 anti_patterns_prevented: ["AP-18", "AP-26"]
+toolset: git
+shell: [git-read, git-write]
+model: fast
 ---
 
 # Workspace Scaffolder: Isolated Git Worktree & Sandbox Manager

@@ -11,6 +11,9 @@ authority:
   can_modify: ["context/DECISIONS.md", "docs/operations/*"]
   must_not_modify: ["src/*", "database/*"]
 anti_patterns_prevented: ["AP-1", "AP-26", "AP-32"]
+toolset: planner
+shell: [git-read]
+model: deep
 ---
 
 # Chief of Staff: Engineering Operations & Team Alignment Director

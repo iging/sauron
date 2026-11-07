@@ -11,6 +11,9 @@ authority:
   can_modify: ["src/**/*"]
   must_not_modify: ["context/PRD.md"]
 anti_patterns_prevented: ["AP-6", "AP-17"]
+toolset: builder
+shell: [test, build, lint, typecheck]
+model: balanced
 ---
 
 # Atomic Implementer: Micro-Commit Code Implementer

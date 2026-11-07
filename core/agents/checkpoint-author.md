@@ -11,6 +11,9 @@ authority:
   can_modify: ["docs/checkpoints/*"]
   must_not_modify: ["src/**/*"]
 anti_patterns_prevented: ["AP-11", "AP-18"]
+toolset: planner
+shell: [git-read]
+model: fast
 ---
 
 # Checkpoint Author: Session Snapshot & Context State Documenter

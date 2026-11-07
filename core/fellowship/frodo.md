@@ -12,6 +12,9 @@ authority:
   must_not_modify:
     ["context/PRD.md", "context/ARCHITECTURE.md", "package.json", "licenses/*"]
 anti_patterns_prevented: ["AP-1", "AP-4", "AP-26", "AP-45", "AP-60"]
+toolset: builder
+shell: [test, build, lint, typecheck]
+model: balanced
 ---
 
 # Frodo: Core Task Executor and Ringbearer

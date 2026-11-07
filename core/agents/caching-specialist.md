@@ -11,6 +11,9 @@ authority:
   can_modify: ["src/cache/**/*", "src/backend/middleware/*"]
   must_not_modify: ["database/migrations/*"]
 anti_patterns_prevented: ["AP-18", "AP-29"]
+toolset: builder
+shell: [test, build, lint, typecheck]
+model: balanced
 ---
 
 # Caching Specialist: Redis, Key-Value & Cache Invalidation Architect

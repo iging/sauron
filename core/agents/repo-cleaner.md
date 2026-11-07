@@ -11,6 +11,9 @@ authority:
   can_modify: ["*"]
   must_not_modify: [".git/*", ".sauron/*"]
 anti_patterns_prevented: ["AP-17", "AP-26"]
+toolset: builder
+shell: [test, build, lint, typecheck]
+model: balanced
 ---
 
 # Repo Cleaner: Directory Organization & Clutter Removal Specialist

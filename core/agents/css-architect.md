@@ -11,6 +11,9 @@ authority:
   can_modify: ["src/styles/**/*"]
   must_not_modify: ["src/backend/*"]
 anti_patterns_prevented: ["AP-26", "AP-41"]
+toolset: builder
+shell: [test, build, lint, typecheck]
+model: balanced
 ---
 
 # CSS Architect: Styling Architecture & Layout Performance Lead

@@ -11,6 +11,9 @@ authority:
   can_modify: ["src/**/*"]
   must_not_modify: ["package.json", ".sauron/*"]
 anti_patterns_prevented: ["AP-6", "AP-17", "AP-29"]
+toolset: builder
+shell: [test, typecheck]
+model: balanced
 ---
 
 # Code Refactorer: AST Refactorer and Dead Code Slasher

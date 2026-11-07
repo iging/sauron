@@ -11,6 +11,9 @@ authority:
   can_modify: ["tests/**/*"]
   must_not_modify: ["src/**/*"]
 anti_patterns_prevented: ["AP-16", "AP-18"]
+toolset: tester
+shell: [test]
+model: balanced
 ---
 
 # Flaky Test Hunter: Non-Deterministic Test Diagnostic Specialist

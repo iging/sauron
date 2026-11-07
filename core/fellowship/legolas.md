@@ -12,6 +12,9 @@ authority:
   can_modify: ["tsconfig.json", ".eslintrc*", "linter/*", "src/*"]
   must_not_modify: ["context/PRD.md", "licenses/*"]
 anti_patterns_prevented: ["AP-13", "AP-16", "AP-57"]
+toolset: reviewer
+shell: [lint, typecheck, git-read]
+model: balanced
 ---
 
 # Legolas: Precision Linter and Syntax Bug Hunter

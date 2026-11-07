@@ -11,6 +11,9 @@ authority:
   can_modify: ["context/ARCHITECTURE.md", "context/DESIGN.md"]
   must_not_modify: ["src/features/*"]
 anti_patterns_prevented: ["AP-16", "AP-26", "AP-29"]
+toolset: planner
+shell: [git-read]
+model: deep
 ---
 
 # System Architect: Principal System Architect

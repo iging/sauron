@@ -11,6 +11,9 @@ authority:
   can_modify: ["tests/**/*", "__tests__/**/*"]
   must_not_modify: ["src/**/*"]
 anti_patterns_prevented: ["AP-16", "AP-29", "AP-45"]
+toolset: tester
+shell: [test]
+model: balanced
 ---
 
 # QA Specialist: Test-Driven Development and Test Suite Specialist

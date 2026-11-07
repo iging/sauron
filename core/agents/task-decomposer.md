@@ -11,6 +11,9 @@ authority:
   can_modify: ["context/TASKS.md"]
   must_not_modify: ["src/*"]
 anti_patterns_prevented: ["AP-1", "AP-6"]
+toolset: planner
+shell: [git-read]
+model: deep
 ---
 
 # Task Decomposer: Granular Work Breakdown & Ticket Scaffolder

@@ -11,6 +11,9 @@ authority:
   can_modify: ["tests/visual/*"]
   must_not_modify: ["src/**/*"]
 anti_patterns_prevented: ["AP-16", "AP-29"]
+toolset: tester
+shell: [test]
+model: balanced
 ---
 
 # Screenshot Tester: Visual Regression & Layout Snapshot Specialist

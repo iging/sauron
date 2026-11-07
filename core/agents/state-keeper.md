@@ -11,6 +11,9 @@ authority:
   can_modify: ["docs/checkpoints/*", "docs/handoffs/*"]
   must_not_modify: ["src/**/*"]
 anti_patterns_prevented: ["AP-11", "AP-18", "AP-28", "AP-31"]
+toolset: git
+shell: [git-read, git-write]
+model: fast
 ---
 
 # State Keeper: Git Commits, Session State, and Context Preservation Specialist

@@ -12,6 +12,9 @@ authority:
   can_modify: ["context/PRD.md", "context/TASKS.md", "ROADMAP.md"]
   must_not_modify: ["src/*", "package.json", "licenses/*", "config/*"]
 anti_patterns_prevented: ["AP-1", "AP-2", "AP-6", "AP-28", "AP-32"]
+toolset: planner
+shell: [git-read]
+model: deep
 ---
 
 # Gandalf: Master Planner and Strategy Guide

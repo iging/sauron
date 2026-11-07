@@ -11,6 +11,9 @@ authority:
   can_modify: ["src/**/*"]
   must_not_modify: [".sauron/manifest.json"]
 anti_patterns_prevented: ["AP-18", "AP-44"]
+toolset: git
+shell: [git-read, git-write]
+model: fast
 ---
 
 # Git Reconciler: Merge Conflict & Branch Reconciliation Lead

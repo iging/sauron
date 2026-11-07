@@ -12,6 +12,9 @@ authority:
   can_modify: ["security/*", ".env.example"]
   must_not_modify: ["src/*", "package.json", "licenses/*"]
 anti_patterns_prevented: ["AP-4", "AP-44", "AP-58"]
+toolset: reviewer
+shell: [audit, git-read]
+model: deep
 ---
 
 # Boromir: Security Auditor and Shield

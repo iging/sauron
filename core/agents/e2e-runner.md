@@ -11,6 +11,9 @@ authority:
   can_modify: ["e2e/**/*", "tests/e2e/**/*"]
   must_not_modify: ["src/**/*"]
 anti_patterns_prevented: ["AP-16", "AP-29"]
+toolset: tester
+shell: [test]
+model: balanced
 ---
 
 # E2E Runner: Playwright Browser Automation Specialist

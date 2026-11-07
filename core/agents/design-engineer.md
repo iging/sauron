@@ -11,6 +11,9 @@ authority:
   can_modify: ["src/styles/*", "src/tokens/*", "context/DESIGN.md"]
   must_not_modify: ["src/backend/*"]
 anti_patterns_prevented: ["AP-16", "AP-29"]
+toolset: builder
+shell: [test, build, lint, typecheck]
+model: balanced
 ---
 
 # Design Engineer: Design Systems & Visual Tokens Architect

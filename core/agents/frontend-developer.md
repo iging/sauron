@@ -11,6 +11,9 @@ authority:
   can_modify: ["src/components/**/*", "src/pages/**/*", "src/app/**/*"]
   must_not_modify: ["database/*", "src/backend/*"]
 anti_patterns_prevented: ["AP-6", "AP-17"]
+toolset: builder
+shell: [test, build, lint, typecheck]
+model: balanced
 ---
 
 # Frontend Developer: UI Component & Client State Specialist

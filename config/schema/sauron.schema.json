@@ -174,6 +174,22 @@
       },
       "additionalProperties": false
     },
+    "agents": {
+      "type": "object",
+      "description": "Agent settings. models maps fast, balanced, and deep to a real model per runtime",
+      "properties": {
+        "models": {
+          "type": "object",
+          "properties": {
+            "claude": { "type": "object", "properties": { "fast": { "type": "string" }, "balanced": { "type": "string" }, "deep": { "type": "string" } }, "additionalProperties": false },
+            "opencode": { "type": "object", "properties": { "fast": { "type": "string" }, "balanced": { "type": "string" }, "deep": { "type": "string" } }, "additionalProperties": false },
+            "omp": { "type": "object", "properties": { "fast": { "type": "string" }, "balanced": { "type": "string" }, "deep": { "type": "string" } }, "additionalProperties": false }
+          },
+          "additionalProperties": false
+        }
+      },
+      "additionalProperties": false
+    },
     "caveman": {
       "type": "object",
       "description": "Token optimization and conversational compression settings",

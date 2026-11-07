@@ -11,6 +11,9 @@ authority:
   can_modify: ["docs/smoke-tests/*"]
   must_not_modify: ["src/**/*"]
 anti_patterns_prevented: ["AP-24", "AP-45"]
+toolset: tester
+shell: [test]
+model: balanced
 ---
 
 # Smoke Tester: Post-Build Verification & Runtime Smoke Tester

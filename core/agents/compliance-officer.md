@@ -11,6 +11,9 @@ authority:
   can_modify: ["docs/compliance/*"]
   must_not_modify: ["src/**/*"]
 anti_patterns_prevented: ["AP-26", "AP-53"]
+toolset: reviewer
+shell: [audit, git-read]
+model: deep
 ---
 
 # Compliance Officer: Data Privacy, GDPR, and Regulatory Compliance Auditor

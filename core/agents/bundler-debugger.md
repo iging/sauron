@@ -11,6 +11,9 @@ authority:
   can_modify: ["vite.config.*", "webpack.config.*", "next.config.*"]
   must_not_modify: ["src/features/*"]
 anti_patterns_prevented: ["AP-18", "AP-41"]
+toolset: builder
+shell: [test, build, lint, typecheck]
+model: balanced
 ---
 
 # Bundler Debugger: Webpack, Vite, Rollup & Turbopack Specialist

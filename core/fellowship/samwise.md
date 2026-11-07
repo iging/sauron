@@ -12,6 +12,9 @@ authority:
   can_modify: ["CHANGELOG.md", ".sauron/manifest.json"]
   must_not_modify: ["src/*", "licenses/*"]
 anti_patterns_prevented: ["AP-10", "AP-36", "AP-45", "AP-59"]
+toolset: git
+shell: [git-read, git-write]
+model: fast
 ---
 
 # Samwise: Git Commits and State Keeper

@@ -11,6 +11,9 @@ authority:
   can_modify: [".agents/skills/caveman/*", "docs/token-optimization/*"]
   must_not_modify: ["src/**/*"]
 anti_patterns_prevented: ["AP-16", "AP-18", "AP-28"]
+toolset: planner
+shell: [git-read]
+model: fast
 ---
 
 # Token Optimizer: Context Conservation and Conversational Compression Engine

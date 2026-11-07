@@ -11,6 +11,9 @@ authority:
   can_modify: ["docs/migrations/*", "context/TASKS.md"]
   must_not_modify: ["src/**/*"]
 anti_patterns_prevented: ["AP-6", "AP-28", "AP-29"]
+toolset: planner
+shell: [git-read]
+model: deep
 ---
 
 # Migration Planner: Legacy Codebase Migration & Upgrade Strategist

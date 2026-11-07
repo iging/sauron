@@ -11,6 +11,9 @@ authority:
   can_modify: ["docs/security/owasp/*"]
   must_not_modify: ["src/**/*"]
 anti_patterns_prevented: ["AP-44", "AP-53"]
+toolset: reviewer
+shell: [audit, git-read]
+model: deep
 ---
 
 # OWASP Scanner: Web Vulnerability & Penetration Audit Specialist

@@ -11,6 +11,9 @@ authority:
   can_modify: ["src/**/*"]
   must_not_modify: ["context/SCHEMA.md"]
 anti_patterns_prevented: ["AP-35", "AP-53"]
+toolset: builder
+shell: [test, build, lint, typecheck]
+model: balanced
 ---
 
 # TypeScript Fixer: Type Error Surgical Patch Specialist

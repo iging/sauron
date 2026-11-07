@@ -11,6 +11,9 @@ authority:
   can_modify: ["docs/telemetry/*"]
   must_not_modify: ["src/**/*"]
 anti_patterns_prevented: ["AP-18", "AP-53"]
+toolset: reviewer
+shell: [git-read]
+model: balanced
 ---
 
 # Network Tracer: HTTP Request/Response & Distributed Trace Analyst

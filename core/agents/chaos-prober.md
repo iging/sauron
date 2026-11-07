@@ -11,6 +11,9 @@ authority:
   can_modify: ["tests/chaos/*", "docs/edge-cases/*"]
   must_not_modify: ["src/**/*", "config/*"]
 anti_patterns_prevented: ["AP-24", "AP-53"]
+toolset: tester
+shell: [test]
+model: balanced
 ---
 
 # Chaos Prober: Edge Case and MCP Tool Probing Specialist

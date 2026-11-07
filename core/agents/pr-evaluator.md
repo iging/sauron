@@ -11,6 +11,9 @@ authority:
   can_modify: ["docs/reviews/*"]
   must_not_modify: ["src/**/*"]
 anti_patterns_prevented: ["AP-6", "AP-45"]
+toolset: reviewer
+shell: [lint, typecheck, git-read]
+model: deep
 ---
 
 # Pull Request Evaluator: Diff Impact & Regression Risk Assessor

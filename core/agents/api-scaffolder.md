@@ -11,6 +11,9 @@ authority:
   can_modify: ["src/backend/routes/**/*"]
   must_not_modify: ["database/*"]
 anti_patterns_prevented: ["AP-6", "AP-53"]
+toolset: builder
+shell: [test, build, lint, typecheck]
+model: balanced
 ---
 
 # API Scaffolder: Rapid Endpoint Generator & Route Template Author

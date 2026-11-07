@@ -20,6 +20,9 @@ authority:
   can_modify: ["tests/*", "vitest.config.*", "jest.config.*"]
   must_not_modify: ["context/PRD.md", "licenses/*"]
 anti_patterns_prevented: ["AP-3", "AP-9", "AP-57"]
+toolset: tester
+shell: [test]
+model: balanced
 ---
 
 # Merry: QA and TDD Specialist

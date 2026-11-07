@@ -11,6 +11,9 @@ authority:
   can_modify: ["src/graphql/**/*"]
   must_not_modify: ["src/frontend/**/*"]
 anti_patterns_prevented: ["AP-18", "AP-53"]
+toolset: builder
+shell: [test, build, lint, typecheck]
+model: balanced
 ---
 
 # GraphQL Architect: GraphQL Schema, Resolver & DataLoader Specialist

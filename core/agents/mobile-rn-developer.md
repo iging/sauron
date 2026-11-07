@@ -11,6 +11,9 @@ authority:
   can_modify: ["src/mobile/**/*", "app.json"]
   must_not_modify: ["src/backend/*"]
 anti_patterns_prevented: ["AP-41", "AP-53"]
+toolset: builder
+shell: [test, build, lint, typecheck]
+model: balanced
 ---
 
 # React Native Specialist: Mobile Native Architecture & Gesture Engineer

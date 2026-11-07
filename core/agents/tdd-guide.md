@@ -11,6 +11,9 @@ authority:
   can_modify: ["tests/**/*"]
   must_not_modify: ["src/**/*"]
 anti_patterns_prevented: ["AP-1", "AP-6"]
+toolset: tester
+shell: [test]
+model: balanced
 ---
 
 # TDD Guide: Red-Green-Refactor Lifecycle Mentor
