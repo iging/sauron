@@ -4,6 +4,11 @@ What went wrong and what we do now. Add new lessons at the top. See [[claude]].
 
 ## 2026-11-07
 
+- Config format versions differ from package versions. Validate config before output writes.
+- YAML setIn needs collection nodes. Use createNode when adding an empty mapping.
+- Save a reviewed config with a checked checksum and backup. Test edits made during confirmation.
+- Empty runtime selection means shared core only. Never turn it into an all-runtime fallback.
+
 - Count installable entries with listSkills. Counting folders misses nested suites and adds containers.
 - Retire a renamed wrapper only after its replacement installs. An edited alias blocks retirement.
 - A README can become a rule, prompt, or output style. Keep setup notes outside loader folders.

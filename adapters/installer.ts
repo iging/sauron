@@ -252,11 +252,14 @@ function loadBundledCommands(
 ): { file: string; sourceFile: string; content: string }[] {
   const commandsDir = path.join(sauronRoot, "commands");
   if (!fs.existsSync(commandsDir)) return [];
-  const files = fs.readdirSync(commandsDir)
+  const files = fs
+    .readdirSync(commandsDir)
     .filter((file) => file.endsWith(".md"))
     .sort();
   const skillNames = new Set(
-    listSkills(sauronRoot, listDepartments(sauronRoot)).map((skill) => skill.name),
+    listSkills(sauronRoot, listDepartments(sauronRoot)).map(
+      (skill) => skill.name,
+    ),
   );
   const commandNames = new Set(files.map((file) => file.slice(0, -3)));
   return files.map((sourceFile) => {
@@ -269,9 +272,13 @@ function loadBundledCommands(
     return {
       sourceFile,
       file: `${alias}.md`,
-      content: alias === name
-        ? content
-        : content.replace(new RegExp(`/${name}(?![a-zA-Z0-9_-])`, "g"), `/${alias}`),
+      content:
+        alias === name
+          ? content
+          : content.replace(
+              new RegExp(`/${name}(?![a-zA-Z0-9_-])`, "g"),
+              `/${alias}`,
+            ),
     };
   });
 }
@@ -293,8 +300,10 @@ export function commandRetirements(
     const target = NATIVE_TARGETS[runtime];
     if (!target) return [];
     return commands
-      .filter(({ file, sourceFile }) =>
-        file !== sourceFile && !target.reservedCommands.includes(sourceFile.slice(0, -3)),
+      .filter(
+        ({ file, sourceFile }) =>
+          file !== sourceFile &&
+          !target.reservedCommands.includes(sourceFile.slice(0, -3)),
       )
       .map(({ sourceFile, file }) => ({
         relativePath: `${target.commandsDir}/${sourceFile}`,
@@ -314,16 +323,21 @@ export function buildInstallOutputs(
   const outputs: InstallOutput[] = [];
 
   // Skills: shared copy for every runtime, plus Claude Code's own folder.
-  const departments =
+  const catalog = listSkills(sauronRoot, listDepartments(sauronRoot));
+  const selected =
     plan.skills === "all"
-      ? listDepartments(sauronRoot)
+      ? catalog
       : plan.skills === "none"
         ? []
-        : plan.skills;
+        : catalog.filter(
+            (skill) =>
+              plan.skills.includes(skill.department) ||
+              plan.skills.includes(`${skill.department}/${skill.name}`),
+          );
   const skillBases = plan.runtimes.includes("claude")
     ? [".agents/skills", ".claude/skills"]
     : [".agents/skills"];
-  for (const skill of listSkills(sauronRoot, departments)) {
+  for (const skill of selected) {
     outputs.push(...skillFileOutputs(skill.dir, skill.name, skillBases));
   }
 
@@ -353,7 +367,8 @@ export function buildInstallOutputs(
 
     // Slash commands: the bundled command set, plus one per installed Fellowship member.
     for (const { file, sourceFile, content } of bundledCommands) {
-      if (target.reservedCommands.includes(sourceFile.replace(/\.md$/, ""))) continue;
+      if (target.reservedCommands.includes(sourceFile.replace(/\.md$/, "")))
+        continue;
       outputs.push({
         relativePath: `${target.commandsDir}/${file}`,
         content,

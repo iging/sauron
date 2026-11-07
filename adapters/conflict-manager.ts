@@ -261,6 +261,8 @@ export class ConflictManager {
    * @param dryRun - When true, evaluates changes without modifying disk. Defaults to false.
    * @param options - `raw: true` copies the content verbatim (no managed block) and
    *   skips the file when the user has changed it.
+   *   `expectedChecksum` authorizes an intentional replacement of a reviewed snapshot.
+   *   A missing or changed snapshot fails before writing. Replacements keep a backup.
    * @returns Detailed WriteFileResult summarizing action taken and backup location.
    */
   public safeWrite(
@@ -268,7 +270,7 @@ export class ConflictManager {
     content: string,
     runtime: string,
     dryRun: boolean = false,
-    options: { raw?: boolean } = {},
+    options: { raw?: boolean; expectedChecksum?: string } = {},
   ): WriteFileResult {
     const targetPath = path.join(this.workspaceRoot, relativePath);
     const raw = options.raw === true;
@@ -286,6 +288,9 @@ export class ConflictManager {
     });
 
     if (!fs.existsSync(targetPath)) {
+      if (options.expectedChecksum !== undefined) {
+        throw new Error(`File no longer exists: ${relativePath}`);
+      }
       if (dryRun) {
         return result("simulated");
       }
@@ -301,19 +306,27 @@ export class ConflictManager {
     }
 
     const existing = fs.readFileSync(targetPath, "utf8");
+    if (
+      options.expectedChecksum !== undefined &&
+      options.expectedChecksum !== this.computeChecksum(existing)
+    ) {
+      throw new Error(`File changes after it is read: ${relativePath}`);
+    }
     if (existing === rendered) {
       return result("unchanged");
     }
 
     // Sauron owns the file only if it wrote the whole file (never merged into
-    // a user file) and nobody has edited it since.
+    // a user file) and nobody has edited it since. An explicit reviewed checksum
+    // also authorizes replacement after the snapshot check above.
     const record = this.loadManifest().managedFiles.find(
       (f) => f.path === relativePath,
     );
     const ownedByUs =
-      record !== undefined &&
-      record.merged !== true &&
-      record.checksum === this.computeChecksum(existing);
+      options.expectedChecksum !== undefined ||
+      (record !== undefined &&
+        record.merged !== true &&
+        record.checksum === this.computeChecksum(existing));
 
     let next: string;
     let action: WriteFileResult["action"];

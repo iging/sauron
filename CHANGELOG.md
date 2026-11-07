@@ -6,6 +6,10 @@ Notable changes to Sauron. Versions follow [Semantic Versioning](https://semver.
 
 ### Changed
 
+- Use config v2 runtime toggles and top-level skill selections as the install source of truth.
+- Require existing v1 projects to run `sauron upgrade` before `init` or `sync`.
+- Preselect saved choices when interactive `init` runs again.
+
 - Keep scaffold notes at the Pi, Claude Code, Windsurf, Cline, and Cursor runtime roots.
 - Use one installable catalog for status, skill lists, and generated skill references: 245 skills
   across nine departments. Rebuild the 20-runtime matrix from the scaffold reference.
@@ -19,6 +23,13 @@ Notable changes to Sauron. Versions follow [Semantic Versioning](https://semver.
 ### Fixed
 
 - Keep normalized npm executable paths without a leading `./`.
+
+### Added
+
+- `sauron upgrade` with dry-run preview, exact config backups, and migration reports.
+- `sauron upgrade --to=1` for reversible department-based configs, with lossy conversion refused.
+- Schema and catalog validation before configuration or runtime writes.
+- Mixed department and individual skill selections in config and script flags.
 
 ### Removed
 

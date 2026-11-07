@@ -18,12 +18,12 @@ Short record of decisions and why. See [[claude]] and [[project-overview]].
 - Count `listSkills` entries, not folders or nested supporting files. The current count is 245.
 - Keep setup notes at runtime roots, including Cursor where plain Markdown rules are ignored.
 
-## Init
+## Config v2 and init, 2026-11-07
 
-- Recommended targets Claude Code only. Other tools still get `AGENTS.md`, which most
-  runtimes read. This avoids clutter.
-- Skills are copied to `.agents/skills/` and `.claude/skills/`, because Claude Code reading
-  `.agents/skills/` is not verified. Cost is about 21 MB for Recommended.
+- Use top-level runtime toggles and skill selectors. Saved v2 choices lead reruns.
+- Upgrade v1 with backup and report before init/sync. Refuse lossy reverse conversion.
+- Fresh Recommended chooses Claude Code. Keep shared and Claude skill copies until verified.
+- Accept individual config/flag selections now so v2 is usable before the Phase 3 picker.
 
 ## Runtimes
 

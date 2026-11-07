@@ -10,6 +10,7 @@ import fs from "node:fs";
 import path from "node:path";
 import os from "node:os";
 import { promisify } from "node:util";
+import { parse as parseYaml } from "yaml";
 import { ConflictManager } from "../../dist/adapters/conflict-manager.js";
 
 const execFileAsync = promisify(execFile);
@@ -78,10 +79,14 @@ describe("E2E: init presets and flags", () => {
       path.join(dir, "sauron.config.yaml"),
       "utf8",
     );
-    assert.match(
-      config,
-      /^init:\n  runtimes: \[claude\]\n  agents: fellowship\n  skills: all\n  commands: true/m,
-    );
+    const saved = parseYaml(config);
+    assert.equal(saved.version, "2.0.0");
+    assert.equal(saved.runtimes.claude, true);
+    assert.equal(saved.runtimes.cursor, false);
+    assert.equal(saved.skills, "all");
+    assert.equal(saved.init.agents, "fellowship");
+    assert.equal(saved.init.commands, true);
+    assert.ok(!("runtimes" in saved.init));
   });
 
   it("sync reuses the saved choices and keeps user-edited skills", async () => {
@@ -185,7 +190,7 @@ describe("E2E: init presets and flags", () => {
         path.join(other, "sauron.config.yaml"),
         "utf8",
       );
-      assert.match(config, /nativeRuntimes: \[opencode, omp\]/);
+      assert.deepEqual(parseYaml(config).init.nativeRuntimes, ["opencode", "omp"]);
 
       const agent = path.join(other, ".opencode/agents/frodo.md");
       fs.appendFileSync(agent, "\nMy local tweak.\n");
@@ -207,6 +212,7 @@ describe("E2E: init presets and flags", () => {
         path.join(other, "sauron.config.yaml"),
         "init:\n  runtimes: [opencode, omp]\n  agents: fellowship\n  skills: none\n  commands: true\n",
       );
+      await execFileAsync("node", [CLI_PATH, "upgrade"], { cwd: other });
       await execFileAsync("node", [CLI_PATH, "sync"], {
         cwd: other,
         maxBuffer: 16 * 1024 * 1024,
@@ -231,6 +237,7 @@ describe("E2E: init presets and flags", () => {
         path.join(other, "sauron.config.yaml"),
         "init:\n  runtimes: [opencode]\n  agents: none\n  skills: none\n  commands: false\n",
       );
+      await execFileAsync("node", [CLI_PATH, "upgrade"], { cwd: other });
       const manager = new ConflictManager(other);
       manager.safeWrite(".opencode/agents/README.md", "# Old note", "opencode");
       manager.safeWrite(".opencode/commands/README.md", "# Old note", "opencode");

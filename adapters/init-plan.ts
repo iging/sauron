@@ -56,7 +56,7 @@ export interface InitPlan {
   runtimes: string[];
   /** Subagent set installed into each runtime in `nativeRuntimes`. */
   agents: AgentSet;
-  /** `all`, `none`, or a list of skill departments to install into `.agents/skills/`. */
+  /** `all`, `none`, or department and department/skill selections for `.agents/skills/`. */
   skills: "all" | "none" | string[];
   /** Default Caveman Mode tier. */
   caveman: CavemanMode;
@@ -119,22 +119,25 @@ export function parseRuntimes(value: string): string[] {
 }
 
 /**
- * Validates a skills value against the available departments.
+ * Validates a skills value against available departments and catalog selectors.
  *
- * @throws InitPlanError when a department is unknown.
+ * @throws InitPlanError when a selection is unknown.
  */
 export function parseSkills(
   value: string,
   departments: readonly string[],
+  selectors: readonly string[] = [],
 ): InitPlan["skills"] {
   const items = splitList(value);
   if (items.length === 1 && (items[0] === "all" || items[0] === "none")) {
     return items[0];
   }
-  const unknown = items.filter((dept) => !departments.includes(dept));
+  const unknown = items.filter(
+    (item) => !departments.includes(item) && !selectors.includes(item),
+  );
   if (unknown.length > 0 || items.length === 0) {
     throw new InitPlanError(
-      `Unknown skill department '${unknown.join(", ") || value}'. Valid: all, none, ${departments.join(", ")}.`,
+      `Unknown skill selection '${unknown.join(", ") || value}'. Valid: all, none, ${departments.join(", ")}.`,
     );
   }
   return [...new Set(items)];
@@ -173,6 +176,7 @@ export type InitFlags = Partial<InitPlan>;
 export function parseInitFlags(
   argv: readonly string[],
   departments: readonly string[],
+  selectors: readonly string[] = [],
 ): InitFlags {
   const flags: InitFlags = {};
   const runtimes = readFlag(argv, "runtimes");
@@ -181,7 +185,8 @@ export function parseInitFlags(
   const caveman = readFlag(argv, "caveman");
   if (runtimes !== undefined) flags.runtimes = parseRuntimes(runtimes);
   if (agents !== undefined) flags.agents = parseAgents(agents);
-  if (skills !== undefined) flags.skills = parseSkills(skills, departments);
+  if (skills !== undefined)
+    flags.skills = parseSkills(skills, departments, selectors);
   if (caveman !== undefined) flags.caveman = parseCaveman(caveman);
   if (argv.includes("--no-commands")) flags.commands = false;
   return flags;
@@ -223,17 +228,109 @@ function savedNativeRuntimes(
 }
 
 /**
- * Reads a previously saved plan from the parsed `init:` section of
+ * Reads a config v2 document or a legacy `init:` section from
  * `sauron.config.yaml`. Returns undefined when the section is missing or invalid.
  */
 export function planFromConfig(
   section: unknown,
   departments: readonly string[],
+  selectors: readonly string[] = [],
 ): InitPlan | undefined {
   if (!section || typeof section !== "object") {
     return undefined;
   }
   const record = section as Record<string, unknown>;
+  if (record["version"] === "2.0.0") {
+    const runtimeBlock = record["runtimes"];
+    if (
+      !runtimeBlock ||
+      typeof runtimeBlock !== "object" ||
+      Array.isArray(runtimeBlock)
+    ) {
+      throw new InitPlanError("Config v2 requires a runtimes mapping.");
+    }
+    const entries = Object.entries(runtimeBlock);
+    if (
+      entries.some(
+        ([id, enabled]) =>
+          !RUNTIME_IDS.includes(id) || typeof enabled !== "boolean",
+      )
+    ) {
+      throw new InitPlanError(
+        "Config v2 runtime entries must be known ids with boolean values.",
+      );
+    }
+    const runtimes = entries.filter(([, enabled]) => enabled).map(([id]) => id);
+    const init = record["init"];
+    if (
+      init !== undefined &&
+      (!init || typeof init !== "object" || Array.isArray(init))
+    ) {
+      throw new InitPlanError("Config v2 init choices must be a mapping.");
+    }
+    const choices = (init ?? {}) as Record<string, unknown>;
+    if ("runtimes" in choices || "skills" in choices) {
+      throw new InitPlanError("Config v2 uses top-level runtimes and skills.");
+    }
+    const rawSkills = record["skills"];
+    if (
+      typeof rawSkills !== "string" &&
+      (!Array.isArray(rawSkills) ||
+        !rawSkills.every((item) => typeof item === "string"))
+    ) {
+      throw new InitPlanError(
+        "Config v2 requires skills: all, none, or a selection list.",
+      );
+    }
+    if (
+      Array.isArray(rawSkills) &&
+      rawSkills.some((item) => item === "all" || item === "none")
+    ) {
+      throw new InitPlanError("Use all or none as a scalar, not a list item.");
+    }
+    if (
+      choices["commands"] !== undefined &&
+      typeof choices["commands"] !== "boolean"
+    ) {
+      throw new InitPlanError("init.commands must be boolean.");
+    }
+    const native = choices["nativeRuntimes"];
+    if (
+      native !== undefined &&
+      (!Array.isArray(native) ||
+        !native.every(
+          (id) => typeof id === "string" && NATIVE_RUNTIMES.includes(id),
+        ))
+    ) {
+      throw new InitPlanError(
+        "init.nativeRuntimes must list known native runtime ids.",
+      );
+    }
+    const caveman = record["caveman"];
+    const mode =
+      caveman && typeof caveman === "object" && "default_mode" in caveman
+        ? parseCaveman(String(caveman.default_mode))
+        : "full";
+    return resolvePlan({
+      runtimes,
+      skills: parseSkills(
+        Array.isArray(rawSkills) ? rawSkills.join(",") : rawSkills,
+        departments,
+        selectors,
+      ),
+      agents:
+        choices["agents"] === undefined
+          ? "fellowship"
+          : parseAgents(String(choices["agents"])),
+      commands:
+        choices["commands"] === undefined ? true : choices["commands"] === true,
+      caveman: mode,
+      nativeRuntimes:
+        native === undefined
+          ? nativeRuntimesFor(runtimes)
+          : native.filter((id) => runtimes.includes(id)),
+    });
+  }
   try {
     const runtimes = Array.isArray(record["runtimes"])
       ? parseRuntimes((record["runtimes"] as unknown[]).join(","))
@@ -241,9 +338,9 @@ export function planFromConfig(
     const skillsRaw = record["skills"];
     const skills =
       typeof skillsRaw === "string"
-        ? parseSkills(skillsRaw, departments)
+        ? parseSkills(skillsRaw, departments, selectors)
         : Array.isArray(skillsRaw)
-          ? parseSkills(skillsRaw.join(","), departments)
+          ? parseSkills(skillsRaw.join(","), departments, selectors)
           : undefined;
     return resolvePlan({
       ...(runtimes ? { runtimes } : {}),

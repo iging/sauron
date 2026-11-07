@@ -1,18 +1,24 @@
 {
-  "$schema": "http://json-schema.org/draft-07/schema#",
-  "title": "SauronConfig",
-  "description": "Configuration schema for Sauron Universal AI Agent Harness",
   "type": "object",
-  "required": ["version", "project", "runtimes"],
+  "required": [
+    "version",
+    "project",
+    "runtimes"
+  ],
   "properties": {
     "version": {
       "type": "string",
-      "description": "Sauron configuration schema version"
+      "enum": [
+        "1.0.0",
+        "2.0.0"
+      ]
     },
     "project": {
       "type": "object",
       "description": "Target project metadata",
-      "required": ["name"],
+      "required": [
+        "name"
+      ],
       "properties": {
         "name": {
           "type": "string",
@@ -25,7 +31,14 @@
         "language": {
           "type": "string",
           "description": "Primary programming language",
-          "enum": ["typescript", "javascript", "python", "rust", "go", "multi"]
+          "enum": [
+            "typescript",
+            "javascript",
+            "python",
+            "rust",
+            "go",
+            "multi"
+          ]
         },
         "framework": {
           "type": "string",
@@ -38,26 +51,66 @@
       "type": "object",
       "description": "Toggle active status for the 20 AI coding runtimes",
       "properties": {
-        "claude": { "type": "boolean" },
-        "cursor": { "type": "boolean" },
-        "windsurf": { "type": "boolean" },
-        "copilot": { "type": "boolean" },
-        "vscode": { "type": "boolean" },
-        "cline": { "type": "boolean" },
-        "trae": { "type": "boolean" },
-        "zed": { "type": "boolean" },
-        "codex": { "type": "boolean" },
-        "gemini": { "type": "boolean" },
-        "hermes": { "type": "boolean" },
-        "kimi": { "type": "boolean" },
-        "kiro": { "type": "boolean" },
-        "openclaw": { "type": "boolean" },
-        "opencode": { "type": "boolean" },
-        "pi": { "type": "boolean" },
-        "omp": { "type": "boolean" },
-        "qwen": { "type": "boolean" },
-        "adal": { "type": "boolean" },
-        "codebuddy": { "type": "boolean" }
+        "claude": {
+          "type": "boolean"
+        },
+        "cursor": {
+          "type": "boolean"
+        },
+        "windsurf": {
+          "type": "boolean"
+        },
+        "copilot": {
+          "type": "boolean"
+        },
+        "vscode": {
+          "type": "boolean"
+        },
+        "cline": {
+          "type": "boolean"
+        },
+        "trae": {
+          "type": "boolean"
+        },
+        "zed": {
+          "type": "boolean"
+        },
+        "codex": {
+          "type": "boolean"
+        },
+        "gemini": {
+          "type": "boolean"
+        },
+        "hermes": {
+          "type": "boolean"
+        },
+        "kimi": {
+          "type": "boolean"
+        },
+        "kiro": {
+          "type": "boolean"
+        },
+        "openclaw": {
+          "type": "boolean"
+        },
+        "opencode": {
+          "type": "boolean"
+        },
+        "pi": {
+          "type": "boolean"
+        },
+        "omp": {
+          "type": "boolean"
+        },
+        "qwen": {
+          "type": "boolean"
+        },
+        "adal": {
+          "type": "boolean"
+        },
+        "codebuddy": {
+          "type": "boolean"
+        }
       },
       "additionalProperties": false
     },
@@ -67,14 +120,23 @@
       "additionalProperties": {
         "type": "object",
         "properties": {
-          "enabled": { "type": "boolean" },
-          "role": { "type": "string" },
+          "enabled": {
+            "type": "boolean"
+          },
+          "role": {
+            "type": "string"
+          },
           "alias": {
             "type": "array",
-            "items": { "type": "string" }
+            "items": {
+              "type": "string"
+            }
           }
         },
-        "required": ["enabled", "role"],
+        "required": [
+          "enabled",
+          "role"
+        ],
         "additionalProperties": false
       }
     },
@@ -82,15 +144,33 @@
       "type": "object",
       "description": "Toggle active skill domains",
       "properties": {
-        "architecture": { "type": "boolean" },
-        "ai-engineering": { "type": "boolean" },
-        "backend": { "type": "boolean" },
-        "database": { "type": "boolean" },
-        "devops": { "type": "boolean" },
-        "frontend": { "type": "boolean" },
-        "quality": { "type": "boolean" },
-        "security": { "type": "boolean" },
-        "workflow": { "type": "boolean" }
+        "architecture": {
+          "type": "boolean"
+        },
+        "ai-engineering": {
+          "type": "boolean"
+        },
+        "backend": {
+          "type": "boolean"
+        },
+        "database": {
+          "type": "boolean"
+        },
+        "devops": {
+          "type": "boolean"
+        },
+        "frontend": {
+          "type": "boolean"
+        },
+        "quality": {
+          "type": "boolean"
+        },
+        "security": {
+          "type": "boolean"
+        },
+        "workflow": {
+          "type": "boolean"
+        }
       },
       "additionalProperties": false
     },
@@ -101,7 +181,12 @@
         "default_mode": {
           "type": "string",
           "description": "Default Caveman compression level",
-          "enum": ["lite", "full", "ultra", "off"]
+          "enum": [
+            "lite",
+            "full",
+            "ultra",
+            "off"
+          ]
         },
         "enforce_on_commits": {
           "type": "boolean",
@@ -155,7 +240,162 @@
         }
       },
       "additionalProperties": false
+    },
+    "registry": {
+      "type": "object",
+      "description": "Versioned skills registry with lockfile and governance gate",
+      "properties": {
+        "lockfile": {
+          "type": "string"
+        },
+        "minimum_score": {
+          "type": "integer"
+        },
+        "frozen_lockfile_ci": {
+          "type": "boolean"
+        }
+      },
+      "additionalProperties": false
+    },
+    "tracing": {
+      "type": "object",
+      "description": "Fellowship tracing with OTLP compatible export",
+      "properties": {
+        "enabled": {
+          "type": "boolean"
+        },
+        "endpoint": {
+          "type": "string"
+        },
+        "capture_prompts": {
+          "type": "boolean"
+        }
+      },
+      "additionalProperties": false
+    },
+    "init": {
+      "type": "object",
+      "properties": {
+        "runtimes": {
+          "type": "array",
+          "items": {
+            "enum": [
+              "claude",
+              "cursor",
+              "windsurf",
+              "copilot",
+              "vscode",
+              "cline",
+              "trae",
+              "zed",
+              "codex",
+              "gemini",
+              "qwen",
+              "kimi",
+              "kiro",
+              "hermes",
+              "openclaw",
+              "opencode",
+              "pi",
+              "omp",
+              "adal",
+              "codebuddy"
+            ]
+          },
+          "minItems": 1,
+          "uniqueItems": true
+        },
+        "agents": {
+          "enum": [
+            "fellowship",
+            "core",
+            "both",
+            "none"
+          ]
+        },
+        "skills": {
+          "oneOf": [
+            {
+              "enum": [
+                "all",
+                "none"
+              ]
+            },
+            {
+              "type": "array",
+              "items": {
+                "type": "string"
+              },
+              "minItems": 1,
+              "uniqueItems": true
+            }
+          ]
+        },
+        "commands": {
+          "type": "boolean"
+        },
+        "nativeRuntimes": {
+          "type": "array",
+          "items": {
+            "enum": [
+              "claude",
+              "opencode",
+              "omp"
+            ]
+          },
+          "uniqueItems": true
+        }
+      },
+      "additionalProperties": false
+    },
+    "skills": {
+      "oneOf": [
+        {
+          "enum": [
+            "all",
+            "none"
+          ]
+        },
+        {
+          "type": "array",
+          "items": {
+            "type": "string",
+            "pattern": "^(?!all$|none$)[a-z][a-z0-9-]*(/[a-z][a-z0-9-]*)?$"
+          },
+          "minItems": 1,
+          "uniqueItems": true
+        }
+      ]
     }
   },
-  "additionalProperties": false
+  "additionalProperties": false,
+  "$schema": "http://json-schema.org/draft-07/schema#",
+  "title": "SauronConfig",
+  "description": "Versioned project configuration for Sauron",
+  "oneOf": [
+    {
+      "properties": {
+        "version": {
+          "const": "1.0.0"
+        },
+        "skills": false
+      }
+    },
+    {
+      "required": [
+        "skills"
+      ],
+      "properties": {
+        "version": {
+          "const": "2.0.0"
+        },
+        "init": {
+          "properties": {
+            "runtimes": false,
+            "skills": false
+          }
+        }
+      }
+    }
+  ]
 }

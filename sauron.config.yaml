@@ -1,5 +1,5 @@
 # yaml-language-server: $schema=./schema/sauron.schema.json
-version: "1.0.0"
+version: "2.0.0"
 
 project:
   name: "sauron-workspace"
@@ -10,25 +10,33 @@ project:
 # The 20 Runtimes Bound by sauron (set true/false per workspace)
 runtimes:
   claude: true
-  cursor: true
-  windsurf: true
-  copilot: true
-  vscode: true
-  cline: true
-  trae: true
-  zed: true
-  codex: true
-  gemini: true
-  hermes: true
-  kimi: true
-  kiro: true
-  openclaw: true
-  opencode: true
-  pi: true
-  omp: true
-  qwen: true
-  adal: true
-  codebuddy: true
+  cursor: false
+  windsurf: false
+  copilot: false
+  vscode: false
+  cline: false
+  trae: false
+  zed: false
+  codex: false
+  gemini: false
+  hermes: false
+  kimi: false
+  kiro: false
+  openclaw: false
+  opencode: false
+  pi: false
+  omp: false
+  qwen: false
+  adal: false
+  codebuddy: false
+
+# Install all skills, none, departments, or department/skill entries.
+skills: all
+
+init:
+  agents: fellowship
+  commands: true
+  nativeRuntimes: [claude]
 
 # The Fellowship: 9 Specialized Sub-Agents
 fellowship:

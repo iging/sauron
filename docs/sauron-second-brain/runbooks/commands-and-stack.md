@@ -33,9 +33,10 @@ See [[claude]] and [[git-and-pr-flow]].
 ## CLI commands (from `sauron --help`)
 
 - `init`: setup. Flags `--yes`, `--runtimes=a,b|all`, `--agents=fellowship|core|both|none`,
-  `--skills=all|none|<dept,...>`, `--caveman=off|lite|full|ultra`, `--no-commands`,
+  `--skills=all|none|<dept,dept/skill,...>`, `--caveman=off|lite|full|ultra`, `--no-commands`,
   `--interactive`, `--dry-run`.
-- `sync`: re-apply saved choices. `add <skill>`: add skills (`--to <dir>`).
+- `upgrade`: migrate config with backup and report. Flags `--dry-run`, `--to=1|2`.
+- `sync`: apply v2 runtime toggles and skill choices. `add <skill>`: add skills (`--to <dir>`).
 - `graph [path]`: code graph into `.sauron/graph/` (json, md, html).
 - `list-skills`, `find-skill <task>`, `diff`, `mcp-index`, `trace-report`, `fitness`,
   `worktree-plan`, `slop-scan`, `import`, `registry-build`.

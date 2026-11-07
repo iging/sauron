@@ -201,14 +201,16 @@ export class Transpiler {
    * @returns Array of SkillIR representations.
    */
   public loadSkills(): SkillIR[] {
-    return listSkills(this.sauronRoot, listDepartments(this.sauronRoot)).map((skill) => ({
-      id: skill.name,
-      name: skill.name,
-      department: skill.department,
-      ownerAgent: "fellowship",
-      triggerCommand: `/${skill.name}`,
-      summary: `Engineering skill for ${skill.department} department.`,
-    }));
+    return listSkills(this.sauronRoot, listDepartments(this.sauronRoot)).map(
+      (skill) => ({
+        id: skill.name,
+        name: skill.name,
+        department: skill.department,
+        ownerAgent: "fellowship",
+        triggerCommand: `/${skill.name}`,
+        summary: `Engineering skill for ${skill.department} department.`,
+      }),
+    );
   }
 
   /**
@@ -338,7 +340,7 @@ export class Transpiler {
     // Filter to specific runtimes if requested, otherwise compile every runtime.
     // The shared AGENTS.md core is always generated.
     const activeAdapterIds =
-      options.targetRuntimes && options.targetRuntimes.length > 0
+      options.targetRuntimes !== undefined
         ? [...new Set([...options.targetRuntimes, "agents-md"])]
         : Array.from(this.adapters.keys());
 
@@ -393,7 +395,9 @@ export class Transpiler {
         );
         if (
           !replacement ||
-          !["created", "updated", "unchanged", "simulated"].includes(replacement.action)
+          !["created", "updated", "unchanged", "simulated"].includes(
+            replacement.action,
+          )
         ) {
           results.push({
             filePath: retired.relativePath,
