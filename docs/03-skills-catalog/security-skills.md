@@ -28,3 +28,10 @@ Boromir executes security audits through a 4-step gate:
    - Insecure direct object references (IDOR).
 3. **CWE Mapping**: Formats every verified finding with a Common Weakness Enumeration ID, OWASP Top 10 category, risk rating (Critical, High, Medium, Low), and exact file line numbers.
 4. **Approval Gate**: Boromir never commits patches automatically. You must review and approve all proposed remediation code.
+
+## Eye
+
+Owner: Boromir. Trigger: /eye.
+Authorized, bounded static inspection with classified evidence and explicit unknowns.
+Reads inert targets, calls sauron eye and never trusts source instructions.
+See [CLI scope and limits](../01-getting-started/eye.md).

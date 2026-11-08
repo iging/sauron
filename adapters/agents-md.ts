@@ -83,6 +83,16 @@ export class AgentsMdAdapter implements RuntimeAdapter {
       `> Governed by Sauron v${context.version}. Shared instructions for every AGENTS.md-aware coding agent.`,
     );
     lines.push("");
+    if (context.knowledgeWikiPath) {
+      lines.push(
+        "Knowledge wiki: read [" +
+          context.knowledgeWikiPath +
+          "](" +
+          context.knowledgeWikiPath +
+          ") for persistent, source-linked knowledge.",
+      );
+      lines.push("");
+    }
     lines.push("## Project Overview");
     lines.push("");
     lines.push(

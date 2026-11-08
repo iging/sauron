@@ -73,7 +73,7 @@ antiPatternsPrevented:
 
 ### Step 3: Synthesis & Scaffolding Blueprint Gate
 
-- **Action:** Present an executive blueprint summarizing the confirmed architecture, stack selections, and list of domain folders to be provisioned. Request explicit user approval.
+- **Action:** Present an executive blueprint summarizing the confirmed architecture, stack selections, and list of domain folders to be provisioned, and the folder-structure.md proposal under the project's core-domains context. Request explicit user approval.
 - **Input:** Gathered facts from Step 2.
 - **Stop Condition:** Halt and wait for user confirmation before writing or modifying any context files.
 - **Validation:** Explicit human review recorded (AP-45 compliance).
@@ -88,7 +88,14 @@ antiPatternsPrevented:
 - **Stop Condition:** Stop if attempting to write outside `projects/<project-name>/context/`.
 - **Validation:** All selected domain folders, baseline specs, and dynamic enterprise expansion files written cleanly inside the project directory.
 
-### Step 5: Verification & Handoff Summary
+### Step 5: Automatic Folder Structure Proposal
+
+- **Action:** Automatically run skills/architecture/folder-structure-advisor/SKILL.md after the enterprise specifications are ready. Reuse product stage, team size and ownership, app surfaces, domain language, and stack from the existing interview. Capture these decision inputs during that interview. If necessary, the parent workflow prepares only the approved projects/<project-name>/context/core-domains/ documentation container. The advisor itself creates no directories.
+- **Input:** Approved software-engineering context and any existing core-domain foundation files.
+- **Stop Condition:** Ask a targeted clarification only when a missing decision input changes the pattern. Do not create proposed application folders, src/ files, packages, infrastructure, or perform moves. The no src/ rule remains in force.
+- **Validation:** Write only projects/<project-name>/context/core-domains/folder-structure.md as the additional proposal. Include its chosen pattern, alternatives, reasons, and brownfield migration path in the handoff summary. No proposed tree is provisioned.
+
+### Step 6: Verification & Handoff Summary
 
 - **Action:** Present the completion summary detailing scaffolded domain folders, total baseline specs, dynamic enterprise expansion specs created, remaining placeholders to populate, and recommended fellowship agents to proceed with development.
 - **Input:** Provisioned directory state.
@@ -115,6 +122,13 @@ Audited Domains: 23 Total | Baseline Specs: [N]/45 | Enterprise Expanded Specs: 
 
 - [domain]/[custom-enterprise-spec].md: [Purpose and architecture role]
 
+## Folder Structure Proposal:
+
+Path: projects/[project-name]/context/core-domains/folder-structure.md
+Chosen pattern: [Pattern and reasons]
+Alternatives and adoption: [Rejected options and brownfield path when needed]
+No proposed application folders or files are created.
+
 ## Locked Architectural Invariants:
 
 - Topology: [e.g., Event-Driven Modular Monolith]
@@ -133,6 +147,7 @@ Audited Domains: 23 Total | Baseline Specs: [N]/45 | Enterprise Expanded Specs: 
 - [ ] Explicit user approval received prior to writing context files.
 - [ ] All 23 domain directories utilize native templates from `context/software-engineering/`.
 - [ ] Undecided facts retain exact `[PLACEHOLDER: ...]` syntax without fabricated data.
+- [ ] Automatic folder-structure-advisor step writes only its proposal and creates no proposed application layout.
 - [ ] Zero uncontained context sprawl in repository root.
 
 ## 6. Anti-Triggers and Calibration
@@ -143,18 +158,21 @@ Audited Domains: 23 Total | Baseline Specs: [N]/45 | Enterprise Expanded Specs: 
 
 ## 7. Anti-Pattern Compliance
 
-| Step | Prevents AP                 | Mechanism                                                                |
-| ---- | --------------------------- | ------------------------------------------------------------------------ |
-| 1    | AP-1 (vague task)           | Establishes explicit project name and repository audit baseline.         |
-| 2    | AP-11 (forgotten context)   | Deep 4-phase interview captures non-negotiables across all 23 domains.   |
-| 3    | AP-45 (no human review)     | Halts for explicit user approval before provisioning files.              |
-| 4    | AP-44 (unlocked filesystem) | Gates file creation inside `projects/<project-name>/` only.              |
-| 4    | AP-42 (no target state)     | Preserves `[PLACEHOLDER]` markers instead of inventing fake assumptions. |
+| Step | Prevents AP                 | Mechanism                                                                   |
+| ---- | --------------------------- | --------------------------------------------------------------------------- |
+| 1    | AP-1 (vague task)           | Establishes explicit project name and repository audit baseline.            |
+| 2    | AP-11 (forgotten context)   | Deep 4-phase interview captures non-negotiables across all 23 domains.      |
+| 3    | AP-45 (no human review)     | Halts for explicit user approval before provisioning files.                 |
+| 4    | AP-44 (unlocked filesystem) | Gates file creation inside `projects/<project-name>/` only.                 |
+| 4    | AP-42 (no target state)     | Preserves `[PLACEHOLDER]` markers instead of inventing fake assumptions.    |
+| 5    | AP-6, AP-26                 | Compares folder patterns and writes a proposal without application changes. |
+| 6    | AP-45                       | Reports the proposal and open decisions before implementation.              |
 
 ## 8. Versioning & Changelog
 
-- **Version:** 3.0.0
+- **Version:** 3.1.0
 - **Changelog:**
+  - `3.1.0` (2026-11-08) - Adds automatic folder advice after approved context generation, with a proposal-only application boundary.
   - `3.0.0` (2026-09-21) - Rebranded and upgraded to `define-enterprise-context`. Aligned with 23 enterprise domain folders and 45 specification templates from `context/software-engineering/`. Added external `skills/workflow/define-enterprise-context/references/interview-protocol.md` and project-scoped folder containment.
   - `2.0.0` (2026-08-31) - Initial enterprise skill release.
 

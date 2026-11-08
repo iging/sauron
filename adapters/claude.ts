@@ -10,7 +10,8 @@ import {
 } from "./types.js";
 
 /** Official documentation for the `.claude/` directory layout. */
-const CLAUDE_DIRECTORY_DOCS = "https://code.claude.com/docs/en/claude-directory";
+const CLAUDE_DIRECTORY_DOCS =
+  "https://code.claude.com/docs/en/claude-directory";
 
 /** Describes one scaffold folder under `.claude/`. */
 interface ClaudeFolder {
@@ -24,44 +25,56 @@ interface ClaudeFolder {
 const CLAUDE_FOLDERS: readonly ClaudeFolder[] = [
   {
     name: "rules",
-    purpose: "Modular project instructions loaded alongside `CLAUDE.md`, optionally scoped to file paths.",
+    purpose:
+      "Modular project instructions loaded alongside `CLAUDE.md`, optionally scoped to file paths.",
     howToAdd: "Create `.claude/rules/<topic>.md`, one topic per file.",
-    format: "Markdown. Optional YAML frontmatter `paths:` (list of globs) limits when the rule loads.",
+    format:
+      "Markdown. Optional YAML frontmatter `paths:` (list of globs) limits when the rule loads.",
   },
   {
     name: "skills",
-    purpose: "Reusable skills Claude loads on demand or via `/<skill-name>`. Skills replace the legacy `.claude/commands/` folder.",
-    howToAdd: "Create `.claude/skills/<skill-name>/SKILL.md` plus any supporting files in that folder.",
-    format: "`SKILL.md` with YAML frontmatter `name` and `description`, followed by Markdown instructions.",
+    purpose:
+      "Reusable skills Claude loads on demand or via `/<skill-name>`. Skills replace the legacy `.claude/commands/` folder.",
+    howToAdd:
+      "Create `.claude/skills/<skill-name>/SKILL.md` plus any supporting files in that folder.",
+    format:
+      "`SKILL.md` with YAML frontmatter `name` and `description`, followed by Markdown instructions.",
   },
   {
     name: "agents",
-    purpose: "Project subagents with their own system prompt, tools, and model.",
+    purpose:
+      "Project subagents with their own system prompt, tools, and model.",
     howToAdd: "Create `.claude/agents/<agent-name>.md`.",
-    format: "Markdown with YAML frontmatter `name`, `description`, optional `tools` and `model`; body is the system prompt.",
+    format:
+      "Markdown with YAML frontmatter `name`, `description`, optional `tools` and `model`; body is the system prompt.",
   },
   {
     name: "workflows",
     purpose: "Multi-step workflow definitions shared with the team.",
     howToAdd: "Create `.claude/workflows/<workflow-name>.md`.",
-    format: "Markdown describing the steps; see the official docs for supported frontmatter.",
+    format:
+      "Markdown describing the steps; see the official docs for supported frontmatter.",
   },
   {
     name: "output-styles",
     purpose: "Custom output styles that change how Claude responds.",
     howToAdd: "Create `.claude/output-styles/<style-name>.md`.",
-    format: "Markdown with YAML frontmatter `name` and `description`; body is the style prompt.",
+    format:
+      "Markdown with YAML frontmatter `name` and `description`; body is the style prompt.",
   },
   {
     name: "agent-memory",
     purpose: "Persistent memory files written by subagents across sessions.",
-    howToAdd: "Usually managed by Claude; add `.md` notes only when seeding memory deliberately.",
+    howToAdd:
+      "Usually managed by Claude; add `.md` notes only when seeding memory deliberately.",
     format: "Plain Markdown.",
   },
   {
     name: "docs",
-    purpose: "Reference documents Claude can read on demand without loading them into every session.",
-    howToAdd: "Add Markdown files and reference them from `CLAUDE.md` or rules with `@.claude/docs/<file>.md`.",
+    purpose:
+      "Reference documents Claude can read on demand without loading them into every session.",
+    howToAdd:
+      "Add Markdown files and reference them from `CLAUDE.md` or rules with `@.claude/docs/<file>.md`.",
     format: "Plain Markdown.",
   },
 ];
@@ -163,6 +176,16 @@ export class ClaudeAdapter implements RuntimeAdapter {
       `> Managed by Sauron v${context.version}. Persistent instruction manual for Claude Code.`,
     );
     lines.push("");
+    if (context.knowledgeWikiPath) {
+      lines.push(
+        "Knowledge wiki: read [" +
+          context.knowledgeWikiPath +
+          "](" +
+          context.knowledgeWikiPath +
+          ") for persistent, source-linked knowledge.",
+      );
+      lines.push("");
+    }
     lines.push("## Where Things Live");
     lines.push("");
     lines.push(
@@ -183,14 +206,20 @@ export class ClaudeAdapter implements RuntimeAdapter {
       lines.push(`- ${rule}`);
     }
     lines.push("");
-    const install = context.claudeInstall ?? { agents: "fellowship", commands: true };
-    const fellowshipInstalled = install.agents === "fellowship" || install.agents === "both";
+    const install = context.claudeInstall ?? {
+      agents: "fellowship",
+      commands: true,
+    };
+    const fellowshipInstalled =
+      install.agents === "fellowship" || install.agents === "both";
     lines.push("## Fellowship Sub-Agents");
     lines.push("");
     if (fellowshipInstalled) {
       for (const agent of context.fellowship) {
         const id = agent.slashCommand.replace(/^\//, "");
-        const invoke = install.commands ? `\`@${id}\` or \`${agent.slashCommand}\`` : `\`@${id}\``;
+        const invoke = install.commands
+          ? `\`@${id}\` or \`${agent.slashCommand}\``
+          : `\`@${id}\``;
         lines.push(`- **${agent.name}** (${invoke}): ${agent.role}`);
       }
     } else {
@@ -246,7 +275,6 @@ export class ClaudeAdapter implements RuntimeAdapter {
         format: "json",
       },
       ...outputStyle,
-
     ];
   }
 }

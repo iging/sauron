@@ -151,6 +151,8 @@ export interface TranspileContext {
   antiPatternsDoc?: string;
   /** Default Caveman Mode tier, read from `caveman.default_mode` in `sauron.config.yaml`. */
   cavemanMode?: CavemanMode;
+  /** Actual selected skill output, absent when llm-wiki is not installed. */
+  knowledgeWikiPath?: string;
   /**
    * What `init` installs for Claude Code, so CLAUDE.md lists only commands that exist.
    * Absent means the Fellowship subagents and their slash commands are installed.

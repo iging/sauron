@@ -262,7 +262,7 @@ Every runtime also shares the `AGENTS.md` core and `.agents/skills/`.
 
 ## Flagship Engineering Capabilities
 
-Sauron ships with 245 installable modular skills across 9 functional departments, plus 114 CLI commands. Counts come from the installable catalog used by `sauron list-skills`. Nested supporting skill files inside a selected skill are part of that skill, rather than separate entries. Four flagship capability pillars anchor the developer and agent experience:
+Sauron ships with 248 installable modular skills across 9 functional departments, plus 114 CLI commands. Counts come from the installable catalog used by `sauron list-skills`. Nested supporting skill files inside a selected skill are part of that skill, rather than separate entries. Four flagship capability pillars anchor the developer and agent experience:
 
 ---
 
@@ -410,3 +410,11 @@ Sauron is available under your choice of one of these licenses:
 - [MIT License](./licenses/LICENSE-MIT)
 - [Apache License 2.0](./licenses/LICENSE-APACHE-2.0)
 - [The Unlicense](./licenses/LICENSE-UNLICENSE)
+
+## Static inspection and knowledge skills
+
+Use [Sauron Eye](docs/01-getting-started/eye.md) for bounded, read-only static evidence from
+builds, archives, captures and binary metadata. Targets never run. Reports expose unknowns.
+Use /folder-structure-advisor to propose a folder tree from context without creating app folders,
+and /llm-wiki to link immutable sources to a maintained wiki. Generated guides mention llm-wiki
+only when that skill is selected for installation.

@@ -16,6 +16,13 @@ import fs from "node:fs";
 import path from "node:path";
 import process from "node:process";
 import { fileURLToPath } from "node:url";
+import {
+  inspectEye,
+  diffEye,
+  reuseEye,
+  eyeTextReport,
+} from "../dist/adapters/eye-features.js";
+import { serveEyeMcp } from "../dist/adapters/eye-mcp.js";
 import { Transpiler } from "../dist/adapters/transpiler.js";
 import {
   AGENT_SETS,
@@ -336,6 +343,9 @@ function printHelpMenu() {
   console.log("  worktree-plan Generate isolated git worktree assignments");
   console.log(
     "  scan [path]  Review agent config read-only (--json, --sarif, --fail-on=error|warning|none)",
+  );
+  console.log(
+    "  eye <file>  Inspect static evidence (--json, --out); diff, export, reuse, mcp",
   );
   console.log("  slop-scan    Score packages and scan unsafe sinks to SARIF");
   console.log(
@@ -2363,9 +2373,9 @@ async function executeTraceReportCommand(args) {
  * CLI dispatcher resolving arguments and executing corresponding command functions.
  *
  * @param {string[]} commandLineArguments - Command-line arguments passed from process.argv.
- * @returns {void}
+ * @returns {Promise<void>}
  */
-function main(commandLineArguments) {
+async function main(commandLineArguments) {
   const primaryCommand = commandLineArguments[0] ?? "";
   const isHelpRequested =
     !primaryCommand ||
@@ -2510,6 +2520,16 @@ function main(commandLineArguments) {
         commandLineArguments.slice(1).filter((arg) => arg !== "--dry-run"),
       );
       break;
+    case "eye":
+      try {
+        await executeEyeCommand(commandLineArguments.slice(1));
+      } catch {
+        console.error(
+          "[EYE] Invalid request, unavailable file or report boundary. Use sauron --help.",
+        );
+        process.exitCode = 2;
+      }
+      break;
     case "scan":
       try {
         executeScanCommand(commandLineArguments.slice(1));
@@ -2537,6 +2557,68 @@ function main(commandLineArguments) {
       printHelpMenu();
       process.exit(1);
   }
+}
+
+/**
+ * Inspect inert files and compare/export/reuse bounded static evidence.
+ * @param {string[]} args
+ */
+async function executeEyeCommand(args) {
+  if (args[0] === "mcp") {
+    if (args.length !== 1) throw new Error("MCP takes no options.");
+    await serveEyeMcp(process.cwd(), process.stdin, process.stdout);
+    return;
+  }
+  let json = false;
+  /** @type {string | undefined} */
+  let out;
+  /** @type {string[]} */
+  const positional = [];
+  for (let i = 0; i < args.length; i++) {
+    const arg = args[i];
+    if (arg === "--json" && !json) json = true;
+    else if (
+      arg === "--out" &&
+      out === undefined &&
+      args[i + 1] &&
+      !args[i + 1].startsWith("--")
+    )
+      out = args[++i];
+    else if (arg.startsWith("--")) throw new Error("Invalid Eye option.");
+    else positional.push(arg);
+  }
+  const mode = positional[0];
+  const subcommand = mode === "diff" || mode === "export" || mode === "reuse";
+  if (
+    !positional.length ||
+    positional.length !==
+      (mode === "diff" || mode === "reuse" ? 3 : mode === "export" ? 2 : 1)
+  )
+    throw new Error(
+      "Usage: sauron eye <file>|diff <old> <new>|export <file>|reuse <report> <file> [--json] [--out <new-file>]",
+    );
+  if (mode === "export") json = true;
+  const report =
+    mode === "diff"
+      ? diffEye(positional[1], positional[2])
+      : mode === "reuse"
+        ? reuseEye(positional[1], positional[2])
+        : inspectEye(positional[subcommand ? 1 : 0]);
+  const rendered =
+    json || "mode" in report
+      ? JSON.stringify(report, null, 2) + "\n"
+      : eyeTextReport(report);
+  if (out !== undefined) {
+    const target = path.resolve(out);
+    const relative = path.relative(process.cwd(), target);
+    if (
+      positional
+        .slice(subcommand ? 1 : 0)
+        .some((input) => path.resolve(input) === target)
+    )
+      throw new Error("Output cannot replace an input.");
+    new ConflictManager(process.cwd()).createOnlyFile(relative, rendered);
+  } else process.stdout.write(rendered);
 }
 
 main(process.argv.slice(2));

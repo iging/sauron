@@ -199,3 +199,10 @@ node ./bin/sauron.mjs sync [options]
 
 - `--version`: Displays the current version of the Sauron engine.
 - `--help`: Displays the CLI help menu and usage instructions.
+
+## Eye
+
+sauron eye <file> [--json] [--out <new-file>] reads bounded static evidence. Subcommands:
+diff <old> <new>, export <file>, reuse <report> <file>, and mcp (stdio only).
+No target execution, network access or implicit writes. See [Eye](eye.md) for metadata support,
+resource limits, partial reports, redaction and signature limitations.
