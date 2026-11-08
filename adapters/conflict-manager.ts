@@ -339,6 +339,38 @@ export class ConflictManager {
   }
 
   /**
+   * Writes a single user-owned report exclusively, without installation state.
+   * Only existing real parent directories are accepted; no overwrite or links.
+   */
+  public createOnlyFile(relativePath: string, content: string): void {
+    if (
+      !relativePath.trim() ||
+      path.isAbsolute(relativePath) ||
+      path.win32.isAbsolute(relativePath) ||
+      relativePath.split(/[\\/]/).includes("..") ||
+      /[\x00-\x1f:]/.test(relativePath)
+    )
+      throw new Error("Report path must stay inside the workspace.");
+    const target = path.resolve(this.workspaceRoot, relativePath);
+    const rel = path.relative(this.workspaceRoot, target);
+    if (!rel || rel.startsWith(".." + path.sep) || path.isAbsolute(rel))
+      throw new Error("Report path must stay inside the workspace.");
+    let current = this.workspaceRoot;
+    for (const part of [
+      "",
+      ...path
+        .relative(this.workspaceRoot, path.dirname(target))
+        .split(path.sep),
+    ]) {
+      current = path.join(current, part);
+      const stat = fs.lstatSync(current);
+      if (!stat.isDirectory() || stat.isSymbolicLink())
+        throw new Error("Report parent must be a real directory.");
+    }
+    fs.writeFileSync(target, content, { encoding: "utf8", flag: "wx" });
+  }
+
+  /**
    * Writes content to a destination file without destroying user content.
    *
    * Text files carry Sauron content inside a managed block delimited by
