@@ -1,6 +1,6 @@
 # Skills Catalog Overview
 
-Sauron equips AI coding agents with a structured library of 245 installable modular skills organized across 9 functional domains. Each skill adheres to the Everything Claude Code (ECC) specification and Linux Foundation Agentic AI standards.
+Sauron equips AI coding agents with a structured library of 248 installable modular skills organized across 9 functional domains. Each skill adheres to the Everything Claude Code (ECC) specification and Linux Foundation Agentic AI standards.
 
 ---
 

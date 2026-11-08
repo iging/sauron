@@ -86,7 +86,14 @@ antiPatternsPrevented:
 - **Stop Condition:** If a required domain template is missing, report the missing template. If any task in `task-backlog.md` does not map to an MVP story in `product-requirements.md`, resolve the discrepancy.
 - **Validation:** All files written cleanly inside `projects/<project-name>/context/core-domains/`. Root directory remains uncluttered.
 
-### Step 4: Final Review & Approval
+### Step 4: Automatic Folder Structure Proposal
+
+- **Action:** Automatically run skills/architecture/folder-structure-advisor/SKILL.md after the domain files are ready. Reuse the confirmed context, product stage, team size and ownership, app surfaces, domain language, and stack. Include these decision inputs in the existing interview rounds rather than guessing them at the end.
+- **Input:** Generated project context and its existing core-domains documentation directory.
+- **Stop Condition:** Ask a targeted clarification only when a missing fact changes the proposed pattern. Never create application folders, source files, or move existing files. The no src/ rule remains in force.
+- **Validation:** Write only projects/<project-name>/context/core-domains/folder-structure.md. The tree is a proposal with reasons, alternatives, and a brownfield adoption path when needed. Include it in the final review.
+
+### Step 5: Final Review & Approval
 
 - **Action:** Present a concise summary of the generated project context files and request human approval. Output file paths and structural bullet points; do not flood chat with raw file dumps.
 - **Input:** Generated files under `projects/<project-name>/context/core-domains/`.
@@ -119,6 +126,7 @@ Target Path: projects/[project-name]/context/core-domains/
 ## Additional Domain Files Generated:
 
 - engineering-rules.md, design-system.md, glossary.md, [api-contracts.md...]
+- folder-structure.md: chosen pattern, annotated tree, reasons, alternatives, and brownfield adoption path when needed. Proposed application paths are text only.
 ```
 
 ## 5. Validation Gate
@@ -130,6 +138,7 @@ Run before declaring completion:
 - [ ] All generated domain files populate native templates from `context/core-domains/`.
 - [ ] Every line item in `task-backlog.md` traces to an MVP story in `product-requirements.md`.
 - [ ] Zero uncontained file sprawl in repository root.
+- [ ] Automatic folder-structure-advisor step writes the proposal only, without application scaffolding or moves.
 - [ ] User approval recorded.
 
 ## 6. Anti-Triggers and Calibration
@@ -140,17 +149,19 @@ Run before declaring completion:
 
 ## 7. Anti-Pattern Compliance
 
-| Step             | Prevents AP                          | Mechanism                                                   |
-| ---------------- | ------------------------------------ | ----------------------------------------------------------- |
-| 1 (Scope)        | AP-1, AP-26 (vague / scope boundary) | Establishes explicit project name and folder containment.   |
-| 2 (Grilling)     | AP-11, AP-12 (forgotten context)     | 3-round interview captures non-negotiables and boundaries.  |
-| 3 (Generation)   | AP-42, AP-44 (no target / file leak) | Generates standardized templates in project-scoped context. |
-| 4 (Final review) | AP-45 (no human review trigger)      | Human approval gate before proceeding.                      |
+| Step              | Prevents AP                          | Mechanism                                                                  |
+| ----------------- | ------------------------------------ | -------------------------------------------------------------------------- |
+| 1 (Scope)         | AP-1, AP-26 (vague / scope boundary) | Establishes explicit project name and folder containment.                  |
+| 2 (Grilling)      | AP-11, AP-12 (forgotten context)     | 3-round interview captures non-negotiables and boundaries.                 |
+| 3 (Generation)    | AP-42, AP-44 (no target / file leak) | Generates standardized templates in project-scoped context.                |
+| 4 (Folder advice) | AP-6, AP-26                          | Proposal-only layout with recorded alternatives and no application writes. |
+| 5 (Final review)  | AP-45 (no human review trigger)      | Human approval gate before proceeding.                                     |
 
 ## 8. Versioning & Changelog
 
-- **Version:** 3.0.0
+- **Version:** 3.1.0
 - **Changelog:**
+  - `3.1.0` (2026-11-08) - Adds automatic proposal-only folder structure advice before final review.
   - `3.0.0` (2026-09-21) - Renamed from `define-foundation` to `define-core-domains`. Upgraded to use 23 modular templates in `context/core-domains/`. Enforced project-scoped directory structure (`projects/<project-name>/context/core-domains/`) to eliminate workspace clutter.
   - `2.0.0` (2026-08-08) - Elevated to Tier 5 specification.
 

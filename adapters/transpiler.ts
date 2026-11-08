@@ -335,6 +335,12 @@ export class Transpiler {
   ): TranspileReport {
     const dryRun = options.dryRun ?? false;
     const context = this.buildContext();
+    context.knowledgeWikiPath = options.extras?.find((file) =>
+      /^\.agents\/skills\/llm-wiki\/SKILL\.md$/.test(file.relativePath),
+    )?.relativePath;
+    context.knowledgeWikiPath ??= options.extras?.find((file) =>
+      /^\.claude\/skills\/llm-wiki\/SKILL\.md$/.test(file.relativePath),
+    )?.relativePath;
     const results: WriteFileResult[] = [];
 
     // Filter to specific runtimes if requested, otherwise compile every runtime.

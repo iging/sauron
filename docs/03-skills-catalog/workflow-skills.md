@@ -57,3 +57,10 @@ The Workflow domain houses skills that govern project lifecycles, feature decomp
 | **evaluate-pr-suggestions**                 | Legolas | `/evaluate-pr-suggestions`                 | Evaluates pull request comments and categorizes actionable changes.                 |
 | **radon-mcp**                               | Pippin  | `/radon-mcp`                               | Integrates Model Context Protocol tools to probe components, logs, and screenshots. |
 | **adapt-project**                           | Frodo   | `/adapt-project`                           | Converts projects into standardized modular configurations.                         |
+
+## LLM Wiki
+
+Owner: Gandalf, Context Steward. Trigger: /llm-wiki.
+Re-authored from Andrej Karpathy's idea, with the requested credit in the skill.
+Compiles immutable sources into an interlinked wiki with index-first queries, cited pages,
+append-only operations and lint reports. Includes schema, operations, tips and idea coverage.

@@ -11,7 +11,7 @@ Notable changes to Sauron. Versions follow [Semantic Versioning](https://semver.
 - Preselect saved choices when interactive `init` runs again.
 
 - Keep scaffold notes at the Pi, Claude Code, Windsurf, Cline, and Cursor runtime roots.
-- Use one installable catalog for status, skill lists, and generated skill references: 245 skills
+- Use one installable catalog for status, skill lists, and generated skill references: 248 skills
   across nine departments. Rebuild the 20-runtime matrix from the scaffold reference.
 - Prefix colliding bundled command wrappers with `sauron-` while keeping skill names unchanged.
 - Retire unchanged old notes and command wrappers during sync, with backups. Keep user edits.
@@ -32,6 +32,10 @@ Notable changes to Sauron. Versions follow [Semantic Versioning](https://semver.
 - Keep normalized npm executable paths without a leading `./`.
 
 ### Added
+
+- Add Sauron Eye with bounded static parsers, evidence ledgers, diff/export/reuse and MCP stdio.
+- Add folder-structure-advisor and its proposal step after both context workflows.
+- Add the attributed, re-authored llm-wiki skill and selected-install guide pointers.
 
 - Add read-only sauron scan for selected agent prompts, hooks, MCP config, and permissions.
 - Emit redacted text, JSON, and SARIF review hints, explicit coverage diagnostics, and CI exits
