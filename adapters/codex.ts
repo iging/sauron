@@ -109,6 +109,7 @@ export class CodexAdapter implements RuntimeAdapter {
     );
     lines.push("");
     lines.push(...formatCavemanSection("##", context.cavemanMode));
+
     return lines.join("\n");
   }
 }

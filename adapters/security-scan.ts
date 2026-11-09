@@ -12,6 +12,7 @@ export const SCAN_LIMITS = Object.freeze({
   fileBytes: 1024 * 1024,
   totalBytes: 16 * 1024 * 1024,
 });
+
 export const SCAN_FILES: readonly string[] = [
   "AGENTS.md",
   "CLAUDE.md",
@@ -39,6 +40,7 @@ export const SCAN_FILES: readonly string[] = [
   ".omp/mcp.json",
   ".pi/settings.json",
 ];
+
 export const SCAN_DIRECTORIES: readonly string[] = [
   ".claude/agents",
   ".claude/commands",
@@ -68,6 +70,7 @@ export const SCAN_DIRECTORIES: readonly string[] = [
   ".windsurf/rules",
   ".cline/rules",
 ];
+
 const EXCLUDED = new Set([
   ".git",
   ".sauron",
@@ -78,6 +81,7 @@ const EXCLUDED = new Set([
   "credentials.json",
   "secrets.json",
 ]);
+
 const EXTENSIONS = new Set([
   "md",
   "mdc",
@@ -142,6 +146,7 @@ export function scanWorkspace(workspaceRoot: string): ScanReport {
     if (!fs.statSync(root).isDirectory()) throw new Error("not a directory");
   } catch {
     issue(".", "scan-root", "Target directory cannot be inspected.");
+
     return report;
   }
   const metadata = (
@@ -149,6 +154,7 @@ export function scanWorkspace(workspaceRoot: string): ScanReport {
   ): { full: string; stat: fs.Stats } | undefined => {
     let full = root;
     const parts = relative.split("/");
+
     for (let index = 0; index < parts.length; index++) {
       full = path.join(full, parts[index] ?? "");
       let stat: fs.Stats;
@@ -162,6 +168,7 @@ export function scanWorkspace(workspaceRoot: string): ScanReport {
         )
           return undefined;
         issue(relative, "scan-read", "Selected path cannot be inspected.");
+
         return undefined;
       }
       if (stat.isSymbolicLink()) {
@@ -170,14 +177,17 @@ export function scanWorkspace(workspaceRoot: string): ScanReport {
           "scan-link",
           "Selected symlink or junction is not followed.",
         );
+
         return undefined;
       }
       if (index < parts.length - 1 && !stat.isDirectory()) {
         issue(relative, "scan-read", "Selected parent is not a directory.");
+
         return undefined;
       }
       if (index === parts.length - 1) return { full, stat };
     }
+
     return undefined;
   };
   const files = new Map<string, { full: string; stat: fs.Stats }>();
@@ -185,18 +195,23 @@ export function scanWorkspace(workspaceRoot: string): ScanReport {
   let capped = false;
   const visit = (relative: string, depth: number): void => {
     if (capped) return;
+
     const info = metadata(relative);
+
     if (!info) return;
     if (info.stat.isDirectory()) {
       if (depth > SCAN_LIMITS.depth) {
         issue(relative, "scan-depth", "Selected tree exceeds the depth limit.");
+
         return;
       }
+
       let directory: fs.Dir | undefined;
       try {
         directory = fs.opendirSync(info.full);
         for (;;) {
           const entry = directory.readSync();
+
           if (!entry) break;
           if (++entries > SCAN_LIMITS.entries) {
             capped = true;
@@ -247,15 +262,18 @@ export function scanWorkspace(workspaceRoot: string): ScanReport {
       if (files.size >= SCAN_LIMITS.files) {
         capped = true;
         issue(relative, "scan-limit", "Selected files exceed the file limit.");
+
         return;
       }
       files.set(relative, info);
     } else
       issue(relative, "scan-special", "Selected special file is not opened.");
   };
+
   for (const relative of [...SCAN_FILES, ...SCAN_DIRECTORIES])
     visit(relative, 0);
   let total = 0;
+
   for (const [relative, info] of [...files].sort(([a], [b]) =>
     a.localeCompare(b),
   )) {
@@ -275,6 +293,7 @@ export function scanWorkspace(workspaceRoot: string): ScanReport {
       );
       break;
     }
+
     let fd: number | undefined;
     try {
       if (!metadata(relative)) continue;
@@ -285,6 +304,7 @@ export function scanWorkspace(workspaceRoot: string): ScanReport {
           (fs.constants.O_NONBLOCK ?? 0),
       );
       const before = fs.fstatSync(fd);
+
       if (
         !before.isFile() ||
         before.ino !== info.stat.ino ||
@@ -300,10 +320,12 @@ export function scanWorkspace(workspaceRoot: string): ScanReport {
         );
         continue;
       }
+
       const buffer = Buffer.alloc(
         Math.min(before.size + 1, SCAN_LIMITS.fileBytes + 1),
       );
       let bytes = 0;
+
       while (bytes < buffer.length) {
         const count = fs.readSync(
           fd,
@@ -312,10 +334,12 @@ export function scanWorkspace(workspaceRoot: string): ScanReport {
           buffer.length - bytes,
           null,
         );
+
         if (count === 0) break;
         bytes += count;
       }
       const after = fs.fstatSync(fd);
+
       if (
         bytes > SCAN_LIMITS.fileBytes ||
         bytes !== after.size ||
@@ -333,10 +357,12 @@ export function scanWorkspace(workspaceRoot: string): ScanReport {
       const text = new TextDecoder("utf-8", { fatal: true }).decode(
         buffer.subarray(0, bytes),
       );
+
       if (text.includes("\0")) {
         issue(relative, "scan-binary", "Selected file is not supported text.");
         continue;
       }
+
       const analysis = analyzeAgentFile(relative, text);
       report.scannedFiles.push(relative);
       if (analysis.heuristic) report.heuristicFiles.push(relative);
@@ -372,6 +398,7 @@ export function scanWorkspace(workspaceRoot: string): ScanReport {
   report.diagnostics.sort(
     (a, b) => a.file.localeCompare(b.file) || a.code.localeCompare(b.code),
   );
+
   return report;
 }
 
@@ -381,6 +408,7 @@ export function scanExitCode(
   failOn: "error" | "warning" | "none" = "error",
 ): number {
   if (!report.complete) return 2;
+
   return failOn !== "none" &&
     report.findings.some(
       (finding) => failOn === "warning" || finding.severity === "error",
@@ -401,6 +429,7 @@ export function scanSarif(report: ScanReport): string {
       message: entry.message,
     })),
   ];
+
   return toSarif(
     results.map((entry) => ({
       ...entry,

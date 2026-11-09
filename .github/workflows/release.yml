@@ -1,73 +1,121 @@
 name: Release Sauron Harness
-
 on:
   push:
     tags:
-      - "v*"
-  workflow_dispatch:
-
+      - v*
+  workflow_dispatch: null
 concurrency:
   group: sauron-release-${{ github.ref }}
   cancel-in-progress: false
-
 jobs:
   release:
     name: Build, Test, and Publish Sauron Release
     runs-on: ubuntu-latest
     permissions:
       contents: write
-
     steps:
       - name: Checkout Repository
         uses: actions/checkout@v7
         with:
           fetch-depth: 0
-
       - name: Set up Node.js Runtime
         uses: actions/setup-node@v7
         with:
           node-version: 22
-          cache: "npm"
+          cache: npm
           cache-dependency-path: package-lock.json
-
       - name: Install Dependencies
         run: npm ci
-
       - name: Run TypeScript 7 Type Checking
         run: npx tsc --noEmit
-
       - name: Verify Zero Documentation Debt
         run: npm run check-docs -- --pre-push
-
       - name: Build Sauron Distribution
         run: npm run build
-
       - name: Execute Automated Test Suite
         run: npm test
-
       - name: Extract Version from Package or Tag
         id: version_meta
         run: |
           VERSION=$(node -p "require('./package.json').version")
-          TAG_NAME="${GITHUB_REF#refs/tags/}"
-          if [ -z "$TAG_NAME" ] || [ "$TAG_NAME" = "main" ]; then
+          if [[ "$GITHUB_REF" == refs/tags/v* ]]; then
+            TAG_NAME="${GITHUB_REF#refs/tags/}"
+            test "$TAG_NAME" = "v$VERSION" || exit 1
+          else
             TAG_NAME="v$VERSION"
           fi
-          echo "tag=$TAG_NAME" >> $GITHUB_OUTPUT
-          echo "RELEASE_TAG=$TAG_NAME" >> $GITHUB_ENV
-
+          echo "tag=$TAG_NAME" >> "$GITHUB_OUTPUT"
+          echo "RELEASE_TAG=$TAG_NAME" >> "$GITHUB_ENV"
       - name: Package Sauron Distribution Bundle
-        run: |
-          zip -r sauron-harness.zip bin/ dist/ config/ skills/ adapters/ references/ core/ package.json README.md LICENSE -x "node_modules/*"
-
+        run: >
+          zip -r sauron-harness.zip bin/ dist/ config/ skills/ adapters/ references/ core/
+          package.json README.md LICENSE -x "node_modules/*"
+      - name: Download verified Windows bundle
+        uses: actions/download-artifact@9000827ccba6bdab643e8b6fd33ac0654aef8333
+        with:
+          name: sauron-windows
+          path: build/windows
       - name: Create GitHub Release and Attach Bundle
         uses: softprops/action-gh-release@v3
         with:
           tag_name: ${{ steps.version_meta.outputs.tag }}
           name: Sauron Release ${{ steps.version_meta.outputs.tag }}
           generate_release_notes: true
-          files: sauron-harness.zip
+          files: |-
+            sauron-harness.zip
+            build/windows/*.zip
           draft: false
           prerelease: false
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+    needs:
+      - windows
+  windows:
+    name: Build and verify Windows portable executable
+    runs-on: windows-latest
+    timeout-minutes: 20
+    permissions:
+      contents: read
+    steps:
+      - name: Check out repository
+        uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1
+      - name: Set up Node.js 24
+        uses: actions/setup-node@949feb2413d6458794dcd2491c4babbbce0c15c1
+        with:
+          node-version: 24
+          cache: npm
+      - name: Install dependencies strictly
+        run: npm ci
+      - name: Build and typecheck
+        run: |-
+          npm run build
+          npx tsc --noEmit
+      - name: Run tests
+        run: npm test
+      - name: Verify release tag matches package
+        shell: pwsh
+        run: >-
+          if ($env:GITHUB_REF -like "refs/tags/v*") {
+            $version = (Get-Content package.json -Raw | ConvertFrom-Json).version
+            if ($env:GITHUB_REF -cne "refs/tags/v$version") { throw "Tag and package version differ." }
+          }
+      - name: Build Windows portable zip
+        run: node scripts/packaging/build-windows.mjs --out build/windows
+      - name: Smoke test extracted zip without Node on PATH
+        shell: pwsh
+        run: >-
+          $zip = @(Get-ChildItem -LiteralPath build/windows -Filter "*.zip")
+
+          if ($zip.Count -ne 1) { throw "Expected one Windows zip." }
+
+          node scripts/packaging/smoke-windows.mjs --archive $zip[0].FullName --work
+          build/windows-smoke
+
+          if ($LASTEXITCODE -ne 0) { exit $LASTEXITCODE }
+      - name: Upload Windows release bundle
+        uses: actions/upload-artifact@cf430e030ddbb5b0abf93d22962f4752f3646cd9
+        with:
+          name: sauron-windows
+          path: build/windows/*.zip
+          if-no-files-found: error
+          compression-level: 0

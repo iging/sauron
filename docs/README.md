@@ -1,6 +1,6 @@
 # Sauron Documentation Portal
 
-> Universal AI Agent Harness for 20 runtimes. Governed by Sauron v1.0.0.
+> Universal AI Agent Harness for 20 runtimes. Upcoming 4.0.0 documentation. Package version stays 3.2.0 until release.
 
 Welcome to the Sauron documentation portal. This directory provides complete, structured guides covering the Sauron architecture, Fellowship sub-agents, skill ecosystem, runtime adapters, token conservation engine, and safety mechanisms.
 
@@ -17,6 +17,14 @@ Browse the documentation by topic:
 - [CLI Command Reference](01-getting-started/cli-reference.md) : Syntax, flags, and options for `init`, `status`, `list-skills`, and `sync`.
 - [Frequently Asked Questions (FAQ)](01-getting-started/faq.md) : Common questions on backups, zero-telemetry, migration, and multi-IDE synchronization.
 
+- [Config v2 and Migration](01-getting-started/config-v2.md): Preview, backup, migrate and sync.
+- [Install Lifecycle](01-getting-started/install-lifecycle.md): Inspect, diagnose, repair and uninstall.
+- [Skill Picker](01-getting-started/skill-picker.md): Department and individual skill selection.
+- [Profiles and Plugin](01-getting-started/profiles-and-plugin.md): Named installs and local marketplace.
+- [Memory Init](01-getting-started/memory-init.md): Create-only second brain starter.
+- [Eye](01-getting-started/eye.md): Bounded static inspection and explicit partial coverage.
+- [Windows Portable](01-getting-started/windows-portable.md): Bundle layout and unverified install gates.
+
 ### [02. The Fellowship of 9 Sub-Agents](02-fellowship-agents/overview.md)
 
 - [Fellowship Overview](02-fellowship-agents/overview.md) : Multi-agent coordination model, authority boundaries, and handoff protocols.
@@ -32,7 +40,7 @@ Browse the documentation by topic:
 
 ### [03. Skills Catalog](03-skills-catalog/overview.md)
 
-- [Skills Overview](03-skills-catalog/overview.md) : Standard SKILL.md format, trigger matrix conventions, and 8 functional domains.
+- [Skills Overview](03-skills-catalog/overview.md) : Standard SKILL.md format, trigger matrix conventions, and nine functional departments.
 - [Workflow Skills](03-skills-catalog/workflow-skills.md) : Autonomous development, 5-stage engineering loop, PRD generator, and project onboarding.
 - [Frontend Skills](03-skills-catalog/frontend-skills.md) : Design engineering, visual token extractors, accessibility auditing, and UI principles.
 - [Backend Skills](03-skills-catalog/backend-skills.md) : API endpoint generator, route validation, database principles, and language standards.
@@ -52,10 +60,12 @@ Browse the documentation by topic:
 ### [05. Token Optimization (Caveman Mode)](05-token-optimization/caveman-mode.md)
 
 - [Caveman Mode Guide](05-token-optimization/caveman-mode.md) : Conversational compression engine, compression levels (Lite, Full, Ultra), and sub-skills.
-- [Token Benchmarks](05-token-optimization/token-benchmarks.md) : Empirical measurements showing 60% to 75% conversational token reduction.
+- [Token Benchmarks](05-token-optimization/token-benchmarks.md) : Measurement guidance. No published token-savings benchmark exists.
 
 ### [06. Safety and Governance](06-safety-and-governance/conflict-manager.md)
 
+- [Agent Config Scan](05-security/agent-config-scan.md): Read-only selected-path review and diagnostics.
+- [Runtime Support Tiers](04-runtime-adapters/runtime-tiers.md): Evidence and manual verification limits.
 - [Conflict Manager](06-safety-and-governance/conflict-manager.md) : Zero unbacked destructive overwrites, SHA-256 validation, and timestamped backups.
 - [Anti-Pattern Guard](06-safety-and-governance/anti-pattern-guard.md) : Prevention of 53 credit-killing anti-patterns and deterministic validation gates.
 

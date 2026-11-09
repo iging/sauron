@@ -6,6 +6,10 @@ Notable changes to Sauron. Versions follow [Semantic Versioning](https://semver.
 
 ### Changed
 
+- Expand adapter source spacing and parser declarations, preserving comments and executable syntax.
+- Document evidence contracts, parser boundaries and contributor conventions in focused comments.
+
+
 - Use config v2 runtime toggles and top-level skill selections as the install source of truth.
 - Require existing v1 projects to run `sauron upgrade` before `init` or `sync`.
 - Preselect saved choices when interactive `init` runs again.
@@ -22,6 +26,14 @@ Notable changes to Sauron. Versions follow [Semantic Versioning](https://semver.
 
 ### Fixed
 
+- Correct runtime counts, migration guidance, CLI native-agent help, and Docker project/image names.
+- Pin the graph library CDN assets to vis-network 10.1.5.
+- Fall back to Windows PowerShell for installer checks when pwsh is unavailable.
+
+- Exclude credential-named files from portable assets while retaining explicit env templates.
+- Verify standalone legacy config upgrade backups/reports and linked executable asset roots.
+
+
 - Align all installers with Node 20.12.0 and use one CLI-only Docker Compose configuration.
 - Select the user-project mount with SAURON_WORKSPACE, lock Docker installs to npm ci, invoke
   Node directly on Windows clones, and exclude local state and worktrees from build contexts.
@@ -32,6 +44,11 @@ Notable changes to Sauron. Versions follow [Semantic Versioning](https://semver.
 - Keep normalized npm executable paths without a leading `./`.
 
 ### Added
+
+- Add native Windows SEA packaging, sibling asset resolution and verified portable zip smoke tests.
+- Generate winget zip/portable manifests from the real archive hash without publishing or installing.
+- Build the Windows zip in CI and attach the verified artifact in the release workflow.
+
 
 - Add Sauron Eye with bounded static parsers, evidence ledgers, diff/export/reuse and MCP stdio.
 - Add folder-structure-advisor and its proposal step after both context workflows.

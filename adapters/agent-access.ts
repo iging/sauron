@@ -38,7 +38,9 @@ export const TOOLSETS: readonly Toolset[] = [
   "tester",
   "git",
 ];
+
 export const MODEL_TIERS: readonly ModelTier[] = ["fast", "balanced", "deep"];
+
 export const SHELL_INTENTS: readonly ShellIntent[] = [
   "test",
   "lint",
@@ -111,6 +113,7 @@ export function readAgentAccess(
   const toolset = data["toolset"] ?? LEAST_ACCESS.toolset;
   const model = data["model"] ?? LEAST_ACCESS.model;
   const shell = data["shell"] ?? [];
+
   if (!TOOLSETS.includes(toolset as Toolset))
     throw new Error(`Agent ${id}: unknown toolset ${String(toolset)}.`);
   if (!MODEL_TIERS.includes(model as ModelTier))
@@ -120,6 +123,7 @@ export function readAgentAccess(
     shell.some((intent) => !SHELL_INTENTS.includes(intent as ShellIntent))
   )
     throw new Error(`Agent ${id}: shell must list known intents.`);
+
   return {
     toolset: toolset as Toolset,
     shell: [...new Set(shell as ShellIntent[])],
@@ -144,6 +148,7 @@ const GIT_COMMANDS: ShellCommands = Object.freeze({
 export function detectShellCommands(projectRoot: string): ShellCommands {
   const has = (file: string) => fs.existsSync(path.join(projectRoot, file));
   const commands: Partial<Record<ShellIntent, string[]>> = { ...GIT_COMMANDS };
+
   if (has("package.json")) {
     const runner = has("pnpm-lock.yaml")
       ? "pnpm"
@@ -161,6 +166,7 @@ export function detectShellCommands(projectRoot: string): ShellCommands {
         parsed && typeof parsed === "object"
           ? (parsed as { scripts?: unknown }).scripts
           : undefined;
+
       if (value && typeof value === "object")
         scripts = value as Record<string, unknown>;
     } catch {
@@ -168,6 +174,7 @@ export function detectShellCommands(projectRoot: string): ShellCommands {
     }
     const run = (name: string) =>
       runner === "npm" ? `npm run ${name}` : `${runner} run ${name}`;
+
     if ("test" in scripts) commands.test = [`${runner} test`];
     if ("lint" in scripts) commands.lint = [run("lint")];
     if ("typecheck" in scripts) commands.typecheck = [run("typecheck")];
@@ -180,6 +187,7 @@ export function detectShellCommands(projectRoot: string): ShellCommands {
     commands.typecheck = ["mypy"];
     commands.audit = ["pip-audit"];
   }
+
   return commands;
 }
 
@@ -203,8 +211,11 @@ export function modelsFromConfig(config: Record<string, unknown>): ModelMap {
     agents && typeof agents === "object"
       ? (agents as Record<string, unknown>)["models"]
       : undefined;
+
   if (!custom || typeof custom !== "object") return DEFAULT_MODELS;
+
   const merged: Record<string, Partial<Record<ModelTier, string>>> = {};
+
   for (const [runtime, tiers] of Object.entries(DEFAULT_MODELS))
     merged[runtime] = { ...tiers };
   for (const [runtime, tiers] of Object.entries(
@@ -213,10 +224,12 @@ export function modelsFromConfig(config: Record<string, unknown>): ModelMap {
     if (!tiers || typeof tiers !== "object") continue;
     for (const tier of MODEL_TIERS) {
       const value = (tiers as Record<string, unknown>)[tier];
+
       if (typeof value === "string" && value.trim().length > 0)
         merged[runtime] = { ...merged[runtime], [tier]: value.trim() };
     }
   }
+
   return merged;
 }
 
@@ -239,9 +252,12 @@ export function claudeAccessLines(
 ): string[] {
   const tools = ["Read", "Grep", "Glob"];
   const edit = TOOLSET_EDIT[access.toolset];
+
   if (edit !== "none") tools.push("Edit", "Write");
   if (access.shell.length > 0) tools.push("Bash");
+
   const model = modelFor("claude", access.model, models);
+
   return [`tools: ${tools.join(", ")}`, ...(model ? [`model: ${model}`] : [])];
 }
 
@@ -260,16 +276,20 @@ export function opencodeAccessLines(
       `  - { action: ${action}, resource: ${JSON.stringify(resource)}, effect: ${effect} }`,
     );
   const edit = TOOLSET_EDIT[access.toolset];
+
   if (edit !== "all") {
     rule("edit", "*", "deny");
     if (edit === "docs" || edit === "tests")
       for (const pattern of EDIT_PATTERNS[edit]) rule("edit", pattern, "allow");
   }
+
   const allowed = commandsFor(access, commands);
   rule("shell", "*", allowed.length > 0 ? "ask" : "deny");
   for (const command of allowed) rule("shell", `${command} *`, "allow");
   if (access.toolset === "git") rule("shell", "git push *", "deny");
+
   const model = modelFor("opencode", access.model, models);
+
   return [...(model ? [`model: ${model}`] : []), "permissions:", ...rules];
 }
 
@@ -282,10 +302,14 @@ export function ompAccessLines(
   models: ModelMap,
 ): string[] {
   const lines: string[] = [];
+
   if (TOOLSET_EDIT[access.toolset] === "none" && access.shell.length === 0)
     lines.push("tools: [read, grep, glob]");
+
   const model = modelFor("omp", access.model, models);
+
   if (model) lines.push(`model: ${model}`);
+
   return lines;
 }
 
@@ -298,6 +322,7 @@ export function codexAccessLines(
   models: ModelMap,
 ): string[] {
   const model = modelFor("codex", access.model, models);
+
   return [
     ...(model ? [`model = ${JSON.stringify(model)}`] : []),
     ...(access.shell.length === 0 ? ["features.shell_tool = false"] : []),
@@ -310,9 +335,12 @@ export function copilotAccessLines(
   models: ModelMap,
 ): string[] {
   const tools = ["read", "search"];
+
   if (TOOLSET_EDIT[access.toolset] !== "none") tools.push("edit");
   if (access.shell.length > 0) tools.push("execute");
+
   const model = modelFor("copilot", access.model, models);
+
   return [
     `tools: ${JSON.stringify(tools)}`,
     ...(model ? [`model: ${JSON.stringify(model)}`] : []),
@@ -344,5 +372,6 @@ export function accessNote(
     access.toolset === "git"
       ? " Never push, force push, or delete branches."
       : "";
+
   return `## Access\n\n- Toolset: ${access.toolset}. ${edit}\n- ${shell}${push}\n`;
 }

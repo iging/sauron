@@ -11,6 +11,7 @@ import {
 } from "./types.js";
 
 const DOCS_URL = "https://docs.cline.bot/features/cline-rules";
+
 const RULES_PATH = ".cline/rules/sauron.md";
 
 const ROOT_README = `# .cline/
@@ -102,10 +103,7 @@ Docs: https://docs.cline.bot/features/hooks
 export class ClineAdapter implements RuntimeAdapter {
   public readonly id = "cline";
   public readonly name = "Cline";
-  public readonly targetFiles = [
-    RULES_PATH,
-    ".cline/README.md",
-  ];
+  public readonly targetFiles = [RULES_PATH, ".cline/README.md"];
   public readonly retiredFiles = [
     ".cline/workflows/README.md",
     ".cline/skills/README.md",
@@ -146,10 +144,19 @@ export class ClineAdapter implements RuntimeAdapter {
     lines.push("");
 
     return [
-      { relativePath: RULES_PATH, content: lines.join("\n"), format: "markdown" },
+      {
+        relativePath: RULES_PATH,
+        content: lines.join("\n"),
+        format: "markdown",
+      },
       {
         relativePath: ".cline/README.md",
-        content: [ROOT_README, WORKFLOWS_README, SKILLS_README, HOOKS_README].join("\n"),
+        content: [
+          ROOT_README,
+          WORKFLOWS_README,
+          SKILLS_README,
+          HOOKS_README,
+        ].join("\n"),
         format: "markdown",
       },
     ];

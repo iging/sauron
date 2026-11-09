@@ -1,7 +1,7 @@
 /**
  * @fileoverview Zed editor adapter generating .rules and .zed/settings.json.
  * Zed loads only the FIRST match of .rules, .cursorrules, .windsurfrules, .clinerules,
- * .github/copilot-instructions.md, AGENT.md, AGENTS.md, CLAUDE.md, GEMINI.md — so
+ * .github/copilot-instructions.md, AGENT.md, AGENTS.md, CLAUDE.md, GEMINI.md ï¿½ so
  * .rules wins over AGENTS.md and the other runtime files.
  * @see https://zed.dev/docs/ai/rules
  */
@@ -16,10 +16,7 @@ import {
 export class ZedAdapter implements RuntimeAdapter {
   public readonly id = "zed";
   public readonly name = "Zed";
-  public readonly targetFiles = [
-    ".zed/settings.json",
-    ".rules",
-  ];
+  public readonly targetFiles = [".zed/settings.json", ".rules"];
 
   public transpile(context: TranspileContext): TranspileOutput[] {
     const promptLines: string[] = [];

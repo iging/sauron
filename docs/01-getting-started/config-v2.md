@@ -45,11 +45,12 @@ caveman:
   The installer deduplicates overlap between a department and one of its individual skills.
 - `init.agents`: `fellowship`, `core`, `both`, or `none`.
 - `init.commands`: whether to install bundled command wrappers.
-- `init.nativeRuntimes`: native-asset opt-in for enabled Claude Code, OpenCode, or omp targets.
+- `init.nativeRuntimes`: native-agent opt-in for enabled Claude Code, OpenCode, omp, Codex, or Copilot targets.
+  Command wrappers are available for Claude Code, OpenCode, and omp.
 - `caveman.default_mode`: `off`, `lite`, `full`, or `ultra`.
 
 An empty runtime mapping, or all-false toggles, still generates the shared core. Existing output
-from a disabled runtime stays on disk. Removing it belongs to the later uninstall phase.
+from a disabled runtime stays on disk. Use [uninstall](install-lifecycle.md) to remove unchanged managed output.
 
 Use actual names from `sauron list-skills` for an individual entry. The department is shown
 above each skill list. [Interactive picking](skill-picker.md) saves the checked individual ids.

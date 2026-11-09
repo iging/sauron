@@ -15,7 +15,7 @@
 import fs from "node:fs";
 import path from "node:path";
 import process from "node:process";
-import { fileURLToPath } from "node:url";
+import { resolveSauronRoot } from "../dist/adapters/package-root.js";
 import {
   inspectEye,
   diffEye,
@@ -83,11 +83,8 @@ import {
   SkillPickerCancelled,
 } from "../dist/adapters/skill-picker.js";
 
-// Determine canonical package root dynamically to ensure path resolution works
-// identically regardless of whether installed globally or executed from within a submodule.
-const __filename = fileURLToPath(import.meta.url);
-const __dirname = path.dirname(__filename);
-const SAURON_ROOT = Object.freeze(path.resolve(__dirname, ".."));
+// SEA assets live beside the real executable. npm assets live above bin/.
+const SAURON_ROOT = resolveSauronRoot(import.meta.url);
 const packageJsonPath = path.join(SAURON_ROOT, "package.json");
 const packageJson = JSON.parse(fs.readFileSync(packageJsonPath, "utf8"));
 
@@ -286,7 +283,7 @@ function printHelpMenu() {
     "               --runtimes=claude,cursor|all    Runtimes to generate (AGENTS.md always included)",
   );
   console.log(
-    "               --agents=fellowship|core|both|none  Subagents for Claude Code, OpenCode, omp",
+    "               --agents=fellowship|core|both|none  Subagents for Claude Code, OpenCode, omp, Codex, Copilot",
   );
   console.log(
     "               --skills=all|none|<dept,dept/skill,...>  Skill selection",
@@ -332,9 +329,6 @@ function printHelpMenu() {
   console.log("  list-skills  List all registered skills organized by domain");
   console.log(
     "  find-skill <task> Rank skills for a task (--limit n, --json, --root dir)",
-  );
-  console.log(
-    "  sync         Synchronize master configuration into target runtimes",
   );
   console.log("  diff         Show drift between lockfile pins and workspace");
   console.log("  mcp-index    Emit MCP skill index with skill:// resources");

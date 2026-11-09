@@ -5,7 +5,7 @@ import fs from "node:fs";
 import path from "node:path";
 
 const base = "skills/architecture/folder-structure-advisor";
-const read = (/** @type {string} */ file) => fs.readFileSync(file, "utf8");
+const read = (/** @type {string} */ file) => fs.readFileSync(file, "utf8").replace(/\r\n/g, "\n");
 const skill = read(base + "/SKILL.md");
 const matrix = read(base + "/references/decision-matrix.md");
 const proposal = read(base + "/references/proposal-template.md");

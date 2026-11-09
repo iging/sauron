@@ -76,7 +76,8 @@ init:
 ```
 
 Invalid selectors fail before writes. `init.nativeRuntimes` preserves opt-in to native assets for Claude Code,
-OpenCode, and omp. It is filtered to enabled runtimes. `init.runtimes` and `init.skills`
+OpenCode, omp, Codex, and Copilot. Command wrappers install only for the first three.
+It is filtered to enabled runtimes. `init.runtimes` and `init.skills`
 belong to config v1 and are rejected in v2. Interactive init offers saved choices first.
 
 ### 4. Fellowship Sub-Agents

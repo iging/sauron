@@ -15,9 +15,13 @@ import {
 export const WINDSURF_RULE_CHAR_LIMIT = 12000;
 
 const RULE_PATH = ".windsurf/rules/sauron.md";
+
 const WORKFLOWS_README = ".windsurf/workflows/README.md";
+
 const SKILLS_README = ".windsurf/skills/README.md";
+
 const DOC_URL = "https://docs.devin.ai/desktop/cascade/memories";
+
 const TRUNCATED_NOTE =
   "- (catalog truncated to fit the 12000 character rule limit)";
 
@@ -95,8 +99,10 @@ function buildRule(context: TranspileContext): string {
   // Reserve room for the truncation note plus trailing newlines.
   const budget = WINDSURF_RULE_CHAR_LIMIT - TRUNCATED_NOTE.length - 2;
   let length = out.join("\n").length;
+
   for (const skill of context.skills) {
     const line = `- ${skill.triggerCommand} -> ${skill.name}`;
+
     if (length + 1 + line.length > budget) {
       out.push(TRUNCATED_NOTE);
       break;
@@ -106,11 +112,13 @@ function buildRule(context: TranspileContext): string {
   }
   out.push("");
   const content = out.join("\n");
+
   if (content.length > WINDSURF_RULE_CHAR_LIMIT) {
     throw new Error(
       `Windsurf rule exceeds ${WINDSURF_RULE_CHAR_LIMIT} chars (${content.length}); reduce rules or anti-patterns.`,
     );
   }
+
   return content;
 }
 

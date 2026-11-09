@@ -56,6 +56,7 @@ export class AgentsMdAdapter implements RuntimeAdapter {
         format: "markdown",
       },
     ];
+
     if (hasAntiPatternsDoc(context)) {
       outputs.push({
         relativePath: ".agents/anti-patterns.md",
@@ -63,6 +64,7 @@ export class AgentsMdAdapter implements RuntimeAdapter {
         format: "markdown",
       });
     }
+
     return outputs;
   }
 
@@ -138,6 +140,7 @@ export class AgentsMdAdapter implements RuntimeAdapter {
       "- Shared Agent Skills live in `.agents/skills/<name>/SKILL.md`. See `.agents/skills/README.md`.",
     );
     lines.push("");
+
     return lines.join("\n");
   }
 

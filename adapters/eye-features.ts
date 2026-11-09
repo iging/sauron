@@ -4,9 +4,13 @@ import * as path from "node:path";
 import { inspectEyeFile } from "./eye-core.js";
 import { ADVANCED_EYE_PARSERS } from "./eye-advanced.js";
 import { EYE_LIMITS, type EyeReport, type EyeEvidence } from "./eye-types.js";
+
+/** Inspect a file with every approved passive extension enabled. */
 export function inspectEye(target: string): EyeReport {
   return inspectEyeFile(target, ADVANCED_EYE_PARSERS);
 }
+
+/** Compare semantic facts while ignoring root filenames, byte offsets and evidence IDs. */
 function key(item: EyeEvidence): string {
   return JSON.stringify([
     item.status,
@@ -19,6 +23,8 @@ function key(item: EyeEvidence): string {
     item.reason ?? "",
   ]);
 }
+
+/** Compare evidence as multisets so repeated facts are not silently collapsed. */
 export function diffEye(
   beforePath: string,
   afterPath: string,
@@ -31,22 +37,28 @@ export function diffEye(
   removed: { side: "before"; id: string }[];
   limitations: string[];
 } {
-  const before = inspectEye(beforePath),
-    after = inspectEye(afterPath);
+  const before = inspectEye(beforePath);
+  const after = inspectEye(afterPath);
   const subtract = (a: EyeEvidence[], b: EyeEvidence[]) => {
     const counts = new Map<string, number>();
+
     for (const item of b)
       counts.set(key(item), (counts.get(key(item)) ?? 0) + 1);
+
     return a.filter((item) => {
-      const k = key(item),
-        n = counts.get(k) ?? 0;
+      const k = key(item);
+      const n = counts.get(k) ?? 0;
+
       if (n) {
         counts.set(k, n - 1);
+
         return false;
       }
+
       return true;
     });
   };
+
   return {
     schemaVersion: 1,
     mode: "diff",
@@ -65,18 +77,23 @@ export function diffEye(
     ],
   };
 }
+
+/** Re-inspect the target and require cached identity/evidence to match the fresh ledger. */
 export function reuseEye(reportPath: string, target: string): EyeReport {
-  const full = path.resolve(reportPath),
-    parsed = path.parse(full);
+  const full = path.resolve(reportPath);
+  const parsed = path.parse(full);
   let prefix = parsed.root;
+
   for (const part of full.slice(parsed.root.length).split(path.sep)) {
     prefix = path.join(prefix, part);
     if (fs.lstatSync(prefix).isSymbolicLink())
       throw new Error("Report links are not accepted.");
   }
   const info = fs.lstatSync(full);
+
   if (!info.isFile() || info.size > 8 * 1024 * 1024)
     throw new Error("Report exceeds reuse limit.");
+
   const descriptor = fs.openSync(
     full,
     fs.constants.O_RDONLY |
@@ -86,6 +103,7 @@ export function reuseEye(reportPath: string, target: string): EyeReport {
   let raw: string;
   try {
     const stat = fs.fstatSync(descriptor);
+
     if (
       !stat.isFile() ||
       stat.ino !== info.ino ||
@@ -93,14 +111,18 @@ export function reuseEye(reportPath: string, target: string): EyeReport {
       stat.size !== info.size
     )
       throw new Error("Report changes while opening.");
+
     const data = Buffer.alloc(stat.size + 1);
     let n = 0;
+
     while (n < data.length) {
       const read = fs.readSync(descriptor, data, n, data.length - n, null);
+
       if (!read) break;
       n += read;
     }
     const after = fs.fstatSync(descriptor);
+
     if (
       n !== stat.size ||
       after.size !== stat.size ||
@@ -113,6 +135,7 @@ export function reuseEye(reportPath: string, target: string): EyeReport {
   }
   const cached: unknown = JSON.parse(raw);
   const fresh = inspectEye(target);
+
   // Fresh inspection is authoritative. Imported evidence is never printed or trusted.
   if (
     !cached ||
@@ -130,6 +153,7 @@ export function reuseEye(reportPath: string, target: string): EyeReport {
     cached.evidence.length > EYE_LIMITS.evidence
   )
     throw new Error("Report does not match the inspected target.");
+
   const imported = cached.evidence.map((item: unknown) => {
     if (
       !item ||
@@ -138,12 +162,17 @@ export function reuseEye(reportPath: string, target: string): EyeReport {
       typeof item.id !== "string"
     )
       throw new Error("Invalid imported evidence.");
+
     return item;
   });
+
   if (JSON.stringify(imported) !== JSON.stringify(fresh.evidence))
     throw new Error("Cached evidence does not match fresh inspection.");
+
   return fresh;
 }
+
+/** Render already-sanitized ledger entries with their classifications and sources. */
 export function eyeTextReport(report: EyeReport): string {
   const lines = [
     "SAURON EYE: bounded static inspection",
@@ -153,6 +182,7 @@ export function eyeTextReport(report: EyeReport): string {
     "Partial: " + report.partial,
     "",
   ];
+
   for (const item of report.evidence)
     lines.push(
       "[" +
@@ -174,8 +204,11 @@ export function eyeTextReport(report: EyeReport): string {
     lines.push("Diagnostic " + item.code + ": " + item.message);
   for (const limitation of report.limitations)
     lines.push("Limit: " + limitation);
+
   return lines.join("\n") + "\n";
 }
+
+/** Restrict MCP reads to real workspace descendants without linked path components. */
 export function eyeWorkspacePath(root: string, target: string): string {
   if (
     !target.trim() ||
@@ -185,15 +218,20 @@ export function eyeWorkspacePath(root: string, target: string): string {
     /[\x00-\x1f]/.test(target)
   )
     throw new Error("Eye MCP paths must be workspace-relative.");
+
   const full = path.resolve(root, target);
   const rel = path.relative(root, full);
+
   if (!rel || rel.startsWith(".." + path.sep) || path.isAbsolute(rel))
     throw new Error("Eye target escapes workspace.");
+
   let at = root;
+
   for (const part of rel.split(path.sep)) {
     at = path.join(at, part);
     if (fs.lstatSync(at).isSymbolicLink())
       throw new Error("Eye MCP does not follow links.");
   }
+
   return full;
 }

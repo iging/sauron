@@ -14,11 +14,15 @@ import {
   type EyeChildInspector,
   type EyeFormatParser,
 } from "./eye-types.js";
+
+/** Limit nested inspection to formats handled by the registered passive parsers. */
 function interesting(name: string): boolean {
   return /(?:\.(?:[cm]?js|jsx|tsx?|json|har|asar|zip|apk|exe|dll|so|dylib|dex|wasm|pyc|sqlite|db|pcap|pcapng|dmp|bin)|AndroidManifest\.xml)$/i.test(
     name,
   );
 }
+
+/** Reject archive traversal and absolute paths even though entries stay in memory. */
 function safeName(name: string): boolean {
   return (
     !/^(?:[\\/]|[a-z]:)/i.test(name) &&
@@ -26,21 +30,28 @@ function safeName(name: string): boolean {
     !name.includes("\0")
   );
 }
+
+/** Check ZIP entry integrity using the format's CRC-32 polynomial. */
 function crc32(data: Buffer): number {
   let crc = 0xffffffff;
+
   for (const byte of data) {
     crc ^= byte;
     for (let bit = 0; bit < 8; bit++)
       crc = (crc >>> 1) ^ (crc & 1 ? 0xedb88320 : 0);
   }
+
   return (crc ^ 0xffffffff) >>> 0;
 }
+
+/** Validate central/local records and cap inflated bytes before delegating entry content. */
 function parseZip(
   data: Buffer,
   ctx: EyeContext,
   inspect: EyeChildInspector,
 ): void {
   let end = -1;
+
   for (
     let offset = data.length - 22;
     offset >= Math.max(0, data.length - 65557);
@@ -54,6 +65,7 @@ function parseZip(
       break;
     }
   if (end < 0) throw new EyeParseError("zip-directory");
+
   const count = eyeU16(data, end + 10);
   const size = eyeU32(data, end + 12);
   const start = eyeU32(data, end + 16);
@@ -70,15 +82,19 @@ function parseZip(
     eyeU16(data, end + 8) !== count
   ) {
     ctx.unknown("zip.multidisk", "Multi-disk ZIP content is unsupported.");
+
     return;
   }
   if (count === 0xffff || start === 0xffffffff || size === 0xffffffff) {
     ctx.unknown("zip.zip64", "ZIP64 content is not decoded.");
+
     return;
   }
   eyeRange(data, start, size);
   if (start + size > end) throw new EyeParseError("zip-directory");
+
   let offset = start;
+
   for (let index = 0; index < count; index++) {
     if (++ctx.budget.entries > EYE_LIMITS.entries) {
       ctx.diagnostic(
@@ -90,6 +106,7 @@ function parseZip(
     eyeRange(data, offset, 46);
     if (eyeU32(data, offset) !== 0x02014b50)
       throw new EyeParseError("zip-directory");
+
     const flags = eyeU16(data, offset + 8);
     const method = eyeU16(data, offset + 10);
     const crc = eyeU32(data, offset + 16);
@@ -100,7 +117,9 @@ function parseZip(
     const commentLength = eyeU16(data, offset + 32);
     const local = eyeU32(data, offset + 42);
     const next = offset + 46 + nameLength + extraLength + commentLength;
+
     if (next > start + size) throw new EyeParseError("zip-directory");
+
     const rawName = eyeRange(data, offset + 46, nameLength);
     const name = rawName.toString(flags & 0x800 ? "utf8" : "latin1");
     const child = ctx.fork(name);
@@ -157,8 +176,10 @@ function parseZip(
         eyeU16(data, local + 8) !== method
       )
         throw new EyeParseError("zip-local");
+
       const localNameLength = eyeU16(data, local + 26);
       const localExtraLength = eyeU16(data, local + 28);
+
       if (!eyeRange(data, local + 30, localNameLength).equals(rawName))
         throw new EyeParseError("zip-name");
       if (
@@ -168,8 +189,11 @@ function parseZip(
           eyeU32(data, local + 22) !== sizeBytes)
       )
         throw new EyeParseError("zip-local");
+
       const body = local + 30 + localNameLength + localExtraLength;
+
       if (body + compressed > start) throw new EyeParseError("zip-overlap");
+
       const encoded = eyeRange(data, body, compressed);
       const bytes =
         method === 0
@@ -183,6 +207,7 @@ function parseZip(
                 ),
               ),
             });
+
       if (bytes.length !== sizeBytes || crc32(bytes) !== crc)
         throw new EyeParseError("zip-integrity");
       ctx.budget.inflatedBytes += bytes.length;
@@ -200,20 +225,26 @@ function parseZip(
       "Directory size does not match parsed member records.",
     );
 }
+
+/** Narrow JSON objects before following ASAR header fields. */
 function record(value: unknown): Record<string, unknown> | undefined {
   return value !== null && typeof value === "object" && !Array.isArray(value)
     ? (value as Record<string, unknown>)
     : undefined;
 }
+
+/** Walk bounded packed ASAR entries. External links and unpacked files are not followed. */
 function parseAsar(
   data: Buffer,
   ctx: EyeContext,
   inspect: EyeChildInspector,
 ): void {
   if (eyeU32(data, 0) !== 4) throw new EyeParseError("asar-header");
+
   const headerSize = eyeU32(data, 4);
   const payloadSize = eyeU32(data, 8);
   const jsonSize = eyeU32(data, 12);
+
   if (
     headerSize < 8 ||
     payloadSize !== headerSize - 4 ||
@@ -234,12 +265,14 @@ function parseAsar(
   );
   const visit = (files: unknown, prefix: string, depth: number): void => {
     const entries = record(files);
+
     if (!entries) throw new EyeParseError("asar-files");
     if (depth > EYE_LIMITS.depth) {
       ctx.diagnostic(
         "depth-limit",
         "ASAR directory nesting exceeds the inspection limit.",
       );
+
       return;
     }
     for (const [name, value] of Object.entries(entries)) {
@@ -248,11 +281,14 @@ function parseAsar(
           "entry-limit",
           "Additional archive entries exceed the shared entry limit.",
         );
+
         return;
       }
+
       const full = prefix + name;
       const item = record(value);
       const child = ctx.fork(full);
+
       if (!item || !safeName(full)) {
         child.diagnostic(
           "asar-entry",
@@ -281,7 +317,9 @@ function parseAsar(
         child.diagnostic("asar-entry", "Member offset or size is invalid.");
         continue;
       }
+
       const relative = Number(item.offset);
+
       if (!Number.isSafeInteger(relative)) {
         child.diagnostic(
           "asar-offset",
@@ -318,6 +356,8 @@ function parseAsar(
   };
   visit(record(parsed)?.files, "", 0);
 }
+
+/** Register in-memory container readers. No extraction path is exposed. */
 export const eyeArchiveParsers: readonly EyeFormatParser[] = [
   {
     format: "zip",

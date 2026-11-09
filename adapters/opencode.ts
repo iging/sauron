@@ -64,6 +64,7 @@ export class OpenCodeAdapter implements RuntimeAdapter {
       "Keep this note here. OpenCode loads every Markdown file in `agents/` and `commands/`, so a note in those folders becomes an agent or a command.",
       "",
     ];
+
     for (const folder of FOLDERS) {
       lines.push(
         `## ${folder.title}`,
@@ -78,6 +79,7 @@ export class OpenCodeAdapter implements RuntimeAdapter {
         "",
       );
     }
+
     return [
       {
         relativePath: "opencode.json",

@@ -68,22 +68,30 @@ export function parseLockfile(raw: unknown): SkillsLockfile {
   if (typeof raw !== "object" || raw === null) {
     throw new Error("Lockfile must be an object");
   }
+
   const record = raw as Record<string, unknown>;
+
   if (record["version"] !== "1.0.0") {
     throw new Error("Unsupported lockfile version");
   }
+
   const skillsRaw = record["skills"];
+
   if (typeof skillsRaw !== "object" || skillsRaw === null) {
     throw new Error("Lockfile skills must be an object");
   }
+
   const skills: Record<string, SkillLockEntry> = {};
+
   for (const [key, value] of Object.entries(
     skillsRaw as Record<string, unknown>,
   )) {
     if (typeof value !== "object" || value === null) {
       throw new Error(`Invalid entry for skill ${key}`);
     }
+
     const entry = value as Record<string, unknown>;
+
     if (
       typeof entry["name"] !== "string" ||
       typeof entry["version"] !== "string" ||
@@ -104,6 +112,7 @@ export function parseLockfile(raw: unknown): SkillsLockfile {
       installedAt: entry["installedAt"] as string,
     };
   }
+
   return { version: "1.0.0", skills };
 }
 
@@ -117,11 +126,14 @@ export function parseLockfile(raw: unknown): SkillsLockfile {
  */
 export function satisfiesRange(range: string, candidate: string): boolean {
   const cleanRange = range.trim();
+
   if (cleanRange === "*" || cleanRange === "latest") {
     return true;
   }
+
   const parse = (input: string): [number, number, number] | null => {
     const match = input.match(/^(\d+)\.(\d+)\.(\d+)$/);
+
     if (
       match === null ||
       match[1] === undefined ||
@@ -130,11 +142,14 @@ export function satisfiesRange(range: string, candidate: string): boolean {
     ) {
       return null;
     }
+
     return [Number(match[1]), Number(match[2]), Number(match[3])];
   };
+
   if (cleanRange.startsWith("^")) {
     const base = parse(cleanRange.slice(1));
     const cand = parse(candidate);
+
     if (base === null || cand === null) {
       return false;
     }
@@ -147,16 +162,20 @@ export function satisfiesRange(range: string, candidate: string): boolean {
     if (cand[1] === base[1] && cand[2] < base[2]) {
       return false;
     }
+
     return true;
   }
   if (cleanRange.startsWith("~")) {
     const base = parse(cleanRange.slice(1));
     const cand = parse(candidate);
+
     if (base === null || cand === null) {
       return false;
     }
+
     return cand[0] === base[0] && cand[1] === base[1] && cand[2] >= base[2];
   }
+
   return cleanRange === candidate;
 }
 
@@ -176,8 +195,10 @@ export function detectDrift(
   const missing: string[] = [];
   const changed: string[] = [];
   const outdated: string[] = [];
+
   for (const [name, entry] of Object.entries(lockfile.skills)) {
     const current = currentChecksums[name];
+
     if (current === undefined) {
       missing.push(name);
       continue;
@@ -185,7 +206,9 @@ export function detectDrift(
     if (current !== entry.integrity) {
       changed.push(name);
     }
+
     const available = availableVersions[name];
+
     if (available !== undefined && available !== entry.version) {
       outdated.push(name);
     }
@@ -197,6 +220,7 @@ export function detectDrift(
   changed.sort();
   untracked.sort();
   outdated.sort();
+
   return { missing, changed, untracked, outdated };
 }
 
@@ -223,5 +247,6 @@ export function formatDriftReport(report: DriftReport): string {
   for (const name of report.outdated) {
     lines.push(`  [OUTDATED] ${name}`);
   }
+
   return lines.join("\n");
 }

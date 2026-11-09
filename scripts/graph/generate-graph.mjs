@@ -819,8 +819,8 @@ function generateHtmlVisualizer(nodes, edges) {
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
   <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet">
-  <link rel="stylesheet" href="https://unpkg.com/vis-network/styles/vis-network.min.css" />
-  <script src="https://unpkg.com/vis-network/standalone/umd/vis-network.min.js"></script>
+  <link rel="stylesheet" href="https://unpkg.com/vis-network@10.1.5/styles/vis-network.min.css" />
+  <script src="https://unpkg.com/vis-network@10.1.5/standalone/umd/vis-network.min.js"></script>
   <style>
     /* Linear Brand Preset Tokens */
     :root {

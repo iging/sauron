@@ -17,11 +17,13 @@ import type {
   SauronManifest,
   WriteFileResult,
 } from "./types.js";
+
 export type { ManagedFileRecord, SauronManifest, WriteFileResult };
 
 /** Opening and closing marker text of the Sauron-managed block. */
 const MARKER_START =
   "sauron:start (managed by Sauron; edit outside this block)";
+
 const MARKER_END = "sauron:end";
 
 /**
@@ -32,6 +34,7 @@ function markersFor(relativePath: string): { start: string; end: string } {
   if (/\.(toml|ya?ml)$/i.test(relativePath)) {
     return { start: `# ${MARKER_START}`, end: `# ${MARKER_END}` };
   }
+
   return { start: `<!-- ${MARKER_START} -->`, end: `<!-- ${MARKER_END} -->` };
 }
 
@@ -41,21 +44,25 @@ function splitFrontmatter(content: string): {
   body: string;
 } {
   const match = /^---\r?\n[\s\S]*?\r?\n---\r?\n/.exec(content);
+
   if (!match) {
     return { frontmatter: "", body: content };
   }
+
   return { frontmatter: match[0], body: content.slice(match[0].length) };
 }
 
 /** Builds the managed block for a body of Sauron content. */
 function managedBlock(relativePath: string, body: string): string {
   const { start, end } = markersFor(relativePath);
+
   return `${start}\n${body.replace(/\s+$/, "")}\n${end}\n`;
 }
 
 /** Wraps new Sauron content in a managed block, keeping frontmatter first. */
 function wrapManagedBlock(relativePath: string, content: string): string {
   const { frontmatter, body } = splitFrontmatter(content);
+
   return frontmatter + managedBlock(relativePath, body);
 }
 
@@ -72,18 +79,23 @@ function mergeManagedBlock(
   const block = managedBlock(relativePath, splitFrontmatter(content).body);
   const startIndex = existing.indexOf(start);
   const endIndex = startIndex >= 0 ? existing.indexOf(end, startIndex) : -1;
+
   if (startIndex >= 0 && endIndex >= 0) {
     let after = endIndex + end.length;
+
     if (existing[after] === "\r") after += 1;
     if (existing[after] === "\n") after += 1;
+
     return existing.slice(0, startIndex) + block + existing.slice(after);
   }
+
   const separator =
     existing.length === 0 || existing.endsWith("\n\n")
       ? ""
       : existing.endsWith("\n")
         ? "\n"
         : "\n\n";
+
   return existing + separator + block;
 }
 
@@ -91,13 +103,17 @@ function mergeManagedBlock(
 function deepMergeUserWins(sauron: unknown, user: unknown): unknown {
   const isPlain = (v: unknown): v is Record<string, unknown> =>
     typeof v === "object" && v !== null && !Array.isArray(v);
+
   if (!isPlain(sauron) || !isPlain(user)) {
     return user;
   }
+
   const merged: Record<string, unknown> = { ...sauron };
+
   for (const [key, value] of Object.entries(user)) {
     merged[key] = key in sauron ? deepMergeUserWins(sauron[key], value) : value;
   }
+
   return merged;
 }
 
@@ -111,6 +127,7 @@ function mergeJsonPreservingUser(
 ): string | null {
   try {
     const merged = deepMergeUserWins(JSON.parse(content), JSON.parse(existing));
+
     return `${JSON.stringify(merged, null, 2)}\n`;
   } catch {
     return null;
@@ -208,6 +225,7 @@ export class ConflictManager {
 
     try {
       const raw = fs.readFileSync(this.manifestPath, "utf8");
+
       return JSON.parse(raw) as SauronManifest;
     } catch {
       // Fallback prevents CLI failure when manifest JSON contains syntax errors or partial writes.
@@ -244,7 +262,7 @@ export class ConflictManager {
    */
   public createOnlyTree(
     relativePath: string,
-    files: readonly { relativePath: string; content: string }[],
+    files: readonly { relativePath: string; content: string | Uint8Array }[],
     dryRun: boolean = false,
   ): "created" | "skipped" | "simulated" {
     const inside = (base: string, name: string): string => {
@@ -256,14 +274,17 @@ export class ConflictManager {
         /[\x00-\x1f]/.test(name)
       )
         throw new Error("New tree paths must stay inside the workspace.");
+
       const target = path.resolve(base, name.replace(/[\\/]/g, path.sep));
       const relative = path.relative(base, target);
+
       if (
         !relative ||
         relative.startsWith(".." + path.sep) ||
         path.isAbsolute(relative)
       )
         throw new Error("New tree paths must stay inside the workspace.");
+
       return target;
     };
     const stat = (target: string): fs.Stats | undefined => {
@@ -281,6 +302,7 @@ export class ConflictManager {
     };
     const parents = (target: string): void => {
       let current = this.workspaceRoot;
+
       for (const part of [
         "",
         ...path
@@ -289,6 +311,7 @@ export class ConflictManager {
       ]) {
         current = path.join(current, part);
         const info = stat(current);
+
         if (info && (info.isSymbolicLink() || !info.isDirectory()))
           throw new Error(
             "New tree parent must be a real directory: " + current,
@@ -303,6 +326,7 @@ export class ConflictManager {
     const keys = targets.map(({ target }) =>
       process.platform === "win32" ? target.toLowerCase() : target,
     );
+
     if (
       keys.length === 0 ||
       new Set(keys).size !== keys.length ||
@@ -315,6 +339,7 @@ export class ConflictManager {
       );
     parents(destination);
     const existing = stat(destination);
+
     if (existing?.isSymbolicLink())
       throw new Error("New tree destination cannot be a symbolic link.");
     if (existing) return "skipped";
@@ -335,6 +360,7 @@ export class ConflictManager {
         flag: "wx",
       });
     }
+
     return "created";
   }
 
@@ -342,7 +368,10 @@ export class ConflictManager {
    * Writes a single user-owned report exclusively, without installation state.
    * Only existing real parent directories are accepted; no overwrite or links.
    */
-  public createOnlyFile(relativePath: string, content: string): void {
+  public createOnlyFile(
+    relativePath: string,
+    content: string | Uint8Array,
+  ): void {
     if (
       !relativePath.trim() ||
       path.isAbsolute(relativePath) ||
@@ -351,11 +380,15 @@ export class ConflictManager {
       /[\x00-\x1f:]/.test(relativePath)
     )
       throw new Error("Report path must stay inside the workspace.");
+
     const target = path.resolve(this.workspaceRoot, relativePath);
     const rel = path.relative(this.workspaceRoot, target);
+
     if (!rel || rel.startsWith(".." + path.sep) || path.isAbsolute(rel))
       throw new Error("Report path must stay inside the workspace.");
+
     let current = this.workspaceRoot;
+
     for (const part of [
       "",
       ...path
@@ -364,6 +397,7 @@ export class ConflictManager {
     ]) {
       current = path.join(current, part);
       const stat = fs.lstatSync(current);
+
       if (!stat.isDirectory() || stat.isSymbolicLink())
         throw new Error("Report parent must be a real directory.");
     }
@@ -435,10 +469,12 @@ export class ConflictManager {
         null,
         this.computeChecksum(rendered),
       );
+
       return result("created");
     }
 
     const existing = fs.readFileSync(targetPath, "utf8");
+
     if (
       options.expectedChecksum !== undefined &&
       options.expectedChecksum !== this.computeChecksum(existing)
@@ -463,6 +499,7 @@ export class ConflictManager {
 
     let next: string;
     let action: WriteFileResult["action"];
+
     if (ownedByUs) {
       next = rendered;
       action = "updated";
@@ -471,6 +508,7 @@ export class ConflictManager {
       return result("skipped");
     } else if (isJson) {
       const merged = mergeJsonPreservingUser(content, existing);
+
       if (merged === null) {
         return result("skipped");
       }
@@ -497,6 +535,7 @@ export class ConflictManager {
       this.computeChecksum(next),
       action === "merged",
     );
+
     return result(action, path.relative(this.workspaceRoot, fullBackupPath));
   }
 
@@ -516,9 +555,11 @@ export class ConflictManager {
     dryRun: boolean = false,
   ): WriteFileResult | null {
     const targetPath = path.join(this.workspaceRoot, relativePath);
+
     if (!fs.existsSync(targetPath)) {
       return null;
     }
+
     const result = (
       action: WriteFileResult["action"],
       backupPath: string | null = null,
@@ -536,6 +577,7 @@ export class ConflictManager {
       record.merged !== true &&
       record.checksum ===
         this.computeChecksum(fs.readFileSync(targetPath, "utf8"));
+
     if (!ownedByUs) {
       return result("skipped");
     }
@@ -553,6 +595,7 @@ export class ConflictManager {
     } else {
       this.saveManifest(manifest);
     }
+
     return result("removed", path.relative(this.workspaceRoot, fullBackupPath));
   }
 
@@ -572,9 +615,11 @@ export class ConflictManager {
     dryRun: boolean = false,
   ): WriteFileResult | null {
     const targetPath = path.join(this.workspaceRoot, relativePath);
+
     if (!fs.existsSync(targetPath)) {
       return null;
     }
+
     const result = (
       action: WriteFileResult["action"],
       backupPath: string | null = null,
@@ -589,17 +634,22 @@ export class ConflictManager {
     const { start, end } = markersFor(relativePath);
     const startIndex = existing.indexOf(start);
     const endIndex = startIndex >= 0 ? existing.indexOf(end, startIndex) : -1;
+
     if (startIndex < 0 || endIndex < 0) {
       return result("skipped");
     }
+
     let after = endIndex + end.length;
+
     if (existing[after] === "\r") after += 1;
     if (existing[after] === "\n") after += 1;
+
     const next = (
       existing.slice(0, startIndex).replace(/\s+$/, "") +
       "\n" +
       existing.slice(after).replace(/^\s+/, "")
     ).replace(/^\n$/, "");
+
     if (dryRun) {
       return result("simulated");
     }
@@ -607,6 +657,7 @@ export class ConflictManager {
     const fullBackupPath = this.backupFile(relativePath, targetPath);
     fs.writeFileSync(targetPath, next, "utf8");
     this.forgetFile(relativePath);
+
     return result("removed", path.relative(this.workspaceRoot, fullBackupPath));
   }
 
@@ -630,6 +681,7 @@ export class ConflictManager {
     } else {
       this.saveManifest(manifest);
     }
+
     return true;
   }
 
@@ -643,6 +695,7 @@ export class ConflictManager {
   public pruneEmptyParents(relativePath: string): string[] {
     const removed: string[] = [];
     let dir = path.dirname(path.join(this.workspaceRoot, relativePath));
+
     while (
       dir !== this.workspaceRoot &&
       dir.startsWith(this.workspaceRoot + path.sep) &&
@@ -653,6 +706,7 @@ export class ConflictManager {
       removed.push(path.relative(this.workspaceRoot, dir));
       dir = path.dirname(dir);
     }
+
     return removed;
   }
 
@@ -664,6 +718,7 @@ export class ConflictManager {
     const fullBackupPath = path.join(this.backupDir, safeRelativeBackup);
     fs.mkdirSync(this.backupDir, { recursive: true });
     fs.copyFileSync(targetPath, fullBackupPath);
+
     return fullBackupPath;
   }
 
@@ -711,6 +766,7 @@ export class ConflictManager {
 
     if (this.batchManifest) {
       this.batchDirty = true;
+
       return;
     }
     this.saveManifest(manifest);

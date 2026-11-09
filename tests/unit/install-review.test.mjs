@@ -27,7 +27,13 @@ describe("Install review regressions", () => {
     }
   });
 
-  it("both PowerShell installers accept 20.12.0 and reject older minor versions before writes", () => {
+  it("both PowerShell installers accept 20.12.0 and reject older minor versions before writes", (t) => {
+    const shell = ["pwsh", "powershell.exe"].find((name) =>
+      spawnSync(name, ["-NoProfile", "-NonInteractive", "-Command", "exit 0"], { timeout: 20000 }).status === 0);
+    if (!shell) {
+      t.skip("Neither pwsh nor powershell.exe is available");
+      return;
+    }
     for (const file of ["bin/install.ps1", "scripts/install/install.ps1"]) {
       const source = fs.readFileSync(file, "utf8").replace(/\r\n/g, "\n");
       const prefix = source.split("# Step 2:")[0];
@@ -36,7 +42,7 @@ describe("Install review regressions", () => {
       assert.doesNotMatch(prefix, /version 18|Node\.js 18/);
       for (const [version, expected] of versions) {
         const script = 'function global:node { "v' + version + '" }; & {\n' + prefix + '\n}';
-        const result = spawnSync("pwsh", ["-NoLogo", "-NoProfile", "-NonInteractive", "-Command", script], { encoding: "utf8", timeout: 20000 });
+        const result = spawnSync(shell, ["-NoLogo", "-NoProfile", "-NonInteractive", "-Command", script], { encoding: "utf8", timeout: 20000 });
         assert.ifError(result.error);
         assert.equal(result.status, expected, file + " " + version + "\n" + result.stdout + result.stderr);
       }

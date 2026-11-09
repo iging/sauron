@@ -35,6 +35,7 @@ export function isValidBranchName(branch: string): boolean {
   if (branch === "main" || branch === "master") {
     return false;
   }
+
   return /^(feat|fix|refactor|chore|security)\/[a-z0-9][a-z0-9._-]*$/.test(
     branch,
   );
@@ -64,11 +65,14 @@ export function buildWorktreePlan(
   if (tasks.length > agents.length) {
     throw new Error("Task count exceeds available isolated agents");
   }
+
   const seenTasks = new Set<string>();
   const assignments: WorktreeAssignment[] = [];
+
   for (let index = 0; index < tasks.length; index += 1) {
     const task = tasks[index];
     const agent = agents[index];
+
     if (
       task === undefined ||
       agent === undefined ||
@@ -86,6 +90,7 @@ export function buildWorktreePlan(
       .replace(/[^a-z0-9]+/g, "-")
       .replace(/^-+|-+$/g, "");
     const branch = `feat/${slug}`;
+
     if (!isValidBranchName(branch)) {
       throw new Error(`Generated branch violates policy: ${branch}`);
     }
@@ -97,6 +102,7 @@ export function buildWorktreePlan(
       task,
     });
   }
+
   return assignments;
 }
 
@@ -110,6 +116,7 @@ export function formatWorktreeCommands(
   assignments: WorktreeAssignment[],
 ): string {
   const lines: string[] = [];
+
   for (const assignment of assignments) {
     lines.push(
       `git worktree add ${assignment.worktree} -b ${assignment.branch}`,
@@ -121,5 +128,6 @@ export function formatWorktreeCommands(
   lines.push(
     "# Human review remains required before merge to main. No force push allowed.",
   );
+
   return lines.join("\n");
 }

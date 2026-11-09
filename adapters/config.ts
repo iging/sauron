@@ -12,6 +12,7 @@ import {
 import { listDepartments, listSkills } from "./installer.js";
 
 export class ConfigError extends Error {}
+
 export type ConfigVersion = "1.0.0" | "2.0.0";
 
 function record(value: unknown): value is Record<string, unknown> {
@@ -20,6 +21,7 @@ function record(value: unknown): value is Record<string, unknown> {
 
 function document(raw: string) {
   const doc = parseDocument(raw);
+
   if (doc.errors.length || doc.warnings.length) {
     throw new ConfigError(
       "Invalid YAML configuration: " +
@@ -28,19 +30,27 @@ function document(raw: string) {
           .join(" "),
     );
   }
+
   const value: unknown = doc.toJS({ maxAliasCount: 100 });
+
   if (!record(value)) throw new ConfigError("Configuration must be a mapping.");
+
   return doc;
 }
 
+/** Parse a mapping with bounded YAML aliases and surface parse failures. */
 export function parseConfig(raw: string): Record<string, unknown> {
   const value: unknown = document(raw).toJS({ maxAliasCount: 100 });
+
   if (!record(value)) throw new ConfigError("Configuration must be a mapping.");
+
   return value;
 }
 
+/** Keep missing versions compatible with v1 while rejecting unsupported versions. */
 export function configVersion(config: Record<string, unknown>): ConfigVersion {
   const version = config["version"];
+
   if (version === undefined || version === "1.0.0") return "1.0.0";
   if (version === "2.0.0") return "2.0.0";
   throw new ConfigError(`Unsupported config version: ${String(version)}`);
@@ -48,12 +58,14 @@ export function configVersion(config: Record<string, unknown>): ConfigVersion {
 
 /** Validate the keyword subset used by the bundled schema, without new dependencies. */
 function check(value: unknown, rule: unknown, location: string): void {
-  if (rule === false) throw new ConfigError(`${location} is not allowed in this version.`);
+  if (rule === false)
+    throw new ConfigError(`${location} is not allowed in this version.`);
   if (rule === true) return;
   if (!record(rule)) throw new ConfigError("Invalid bundled schema.");
   if (Array.isArray(rule["oneOf"])) {
     let matches = 0;
     const errors: string[] = [];
+
     for (const option of rule["oneOf"]) {
       try {
         check(value, option, location);
@@ -72,7 +84,9 @@ function check(value: unknown, rule: unknown, location: string): void {
     throw new ConfigError(`${location} has the wrong version.`);
   if (Array.isArray(rule["enum"]) && !rule["enum"].includes(value))
     throw new ConfigError(`${location} has an unsupported value.`);
+
   const type = rule["type"];
+
   if (
     (type === "object" && !record(value)) ||
     (type === "array" && !Array.isArray(value)) ||
@@ -110,7 +124,9 @@ function check(value: unknown, rule: unknown, location: string): void {
           throw new ConfigError(`${location}.${key} is required.`);
       }
     }
+
     const properties = record(rule["properties"]) ? rule["properties"] : {};
+
     for (const [key, child] of Object.entries(value)) {
       if (key in properties)
         check(child, properties[key], `${location}.${key}`);
@@ -122,6 +138,7 @@ function check(value: unknown, rule: unknown, location: string): void {
   }
 }
 
+/** Validate against the bundled schema subset before resolving installation choices. */
 export function validateConfig(
   config: Record<string, unknown>,
   sauronRoot: string,
@@ -135,6 +152,7 @@ export function validateConfig(
   check(config, schema, "config");
 }
 
+/** Resolve a validated configuration into the same plan used by interactive init. */
 export function configPlan(
   config: Record<string, unknown>,
   sauronRoot: string,
@@ -149,8 +167,10 @@ export function configPlan(
     (skill) => `${skill.department}/${skill.name}`,
   );
   const plan = planFromConfig(config, departments, selectors);
+
   if (!plan)
     throw new ConfigError("Configuration does not contain a valid plan.");
+
   return plan;
 }
 
@@ -159,6 +179,7 @@ export function configWithPlan(raw: string, plan: InitPlan): string {
   if (plan.runtimes.some((id) => !RUNTIME_IDS.includes(id))) {
     throw new ConfigError("Cannot save unknown runtime ids.");
   }
+
   const doc = document(raw);
   doc.set("version", "2.0.0");
   if (!doc.has("runtimes")) doc.set("runtimes", doc.createNode({}));
@@ -174,6 +195,7 @@ export function configWithPlan(raw: string, plan: InitPlan): string {
   if (!doc.has("caveman")) doc.set("caveman", doc.createNode({}));
   doc.setIn(["caveman", "default_mode"], plan.caveman);
   const text = doc.toString();
+
   return raw.includes("\r\n") ? text.replace(/\n/g, "\r\n") : text;
 }
 
@@ -194,21 +216,33 @@ export function migrateConfig(
 ): ConfigMigration {
   const config = parseConfig(raw);
   const from = configVersion(config);
+
   if (from === target) {
     if (target === "2.0.0") configPlan(config, sauronRoot);
     else validateConfig(config, sauronRoot);
+
     return { from, to: target, content: raw, changed: false, changes: [] };
   }
+
   let content: string;
   let changes: string[];
+
   if (target === "2.0.0") {
     const departments = listDepartments(sauronRoot);
     const selectors = listSkills(sauronRoot, departments).map(
       (skill) => `${skill.department}/${skill.name}`,
     );
-    const normalized = { ...config, version: "1.0.0", project: config["project"] ?? { name: workspaceName }, runtimes: config["runtimes"] ?? Object.fromEntries(RUNTIME_IDS.map((id) => [id, true])) };
+    const normalized = {
+      ...config,
+      version: "1.0.0",
+      project: config["project"] ?? { name: workspaceName },
+      runtimes:
+        config["runtimes"] ??
+        Object.fromEntries(RUNTIME_IDS.map((id) => [id, true])),
+    };
     validateConfig(normalized, sauronRoot);
     const legacy = config["init"];
+
     if (
       legacy !== undefined &&
       (!record(legacy) ||
@@ -224,10 +258,14 @@ export function migrateConfig(
     ) {
       throw new ConfigError("Invalid legacy init choices.");
     }
+
     const saved = planFromConfig(legacy, departments, selectors);
+
     if (legacy !== undefined && !saved)
       throw new ConfigError("Invalid legacy init choices.");
+
     const toggles = config["runtimes"];
+
     if (
       toggles !== undefined &&
       (!record(toggles) ||
@@ -238,12 +276,15 @@ export function migrateConfig(
     ) {
       throw new ConfigError("Invalid legacy runtime toggles.");
     }
+
     const runtimes = record(toggles)
       ? Object.keys(toggles).filter((id) => toggles[id] === true)
       : [...RUNTIME_IDS];
     const caveman = config["caveman"];
+
     if (caveman !== undefined && !record(caveman))
       throw new ConfigError("Invalid caveman settings.");
+
     const mode =
       record(caveman) && caveman["default_mode"] !== undefined
         ? parseCaveman(String(caveman["default_mode"]))
@@ -260,7 +301,9 @@ export function migrateConfig(
       caveman: mode,
     };
     const doc = document(raw);
-    if (!doc.has("project")) doc.set("project", doc.createNode({ name: workspaceName }));
+
+    if (!doc.has("project"))
+      doc.set("project", doc.createNode({ name: workspaceName }));
     content = configWithPlan(doc.toString(), plan);
     configPlan(parseConfig(content), sauronRoot);
     changes = [
@@ -272,7 +315,11 @@ export function migrateConfig(
     ];
   } else {
     const plan = configPlan(config, sauronRoot);
-    if (plan.runtimes.length === 0) throw new ConfigError("Config v1 cannot represent an empty runtime list.");
+
+    if (plan.runtimes.length === 0)
+      throw new ConfigError(
+        "Config v1 cannot represent an empty runtime list.",
+      );
     if (
       Array.isArray(plan.skills) &&
       plan.skills.some((skill) => skill.includes("/"))
@@ -281,6 +328,7 @@ export function migrateConfig(
         "Config v1 cannot represent individual skills. Select departments before downgrading.",
       );
     }
+
     const doc = document(raw);
     doc.set("version", "1.0.0");
     doc.delete("skills");
@@ -297,5 +345,6 @@ export function migrateConfig(
     ];
   }
   if (raw.includes("\r\n")) content = content.replace(/\r?\n/g, "\r\n");
+
   return { from, to: target, content, changed: content !== raw, changes };
 }

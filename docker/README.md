@@ -1,6 +1,7 @@
 # Sauron CLI with Docker
 
 Run Docker Compose from the repository root. The only Compose file is ../docker-compose.yml.
+The Compose project is sauron-ai and its image is sauron-ai:local.
 It builds the CLI with Dockerfile.cli. The landing page is maintained in a separate repository.
 
 ## Select the user project
@@ -47,6 +48,6 @@ The root Compose file remains the only configuration. No entrypoint override is 
 ## Standalone image
 
 ```bash
-docker build -t sauron-cli -f docker/Dockerfile.cli .
-docker run --rm --mount type=bind,source=/absolute/path/to/your-project,target=/workspace sauron-cli status
+docker build -t sauron-ai:local -f docker/Dockerfile.cli .
+docker run --rm --mount type=bind,source=/absolute/path/to/your-project,target=/workspace sauron-ai:local status
 ```

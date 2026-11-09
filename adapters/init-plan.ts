@@ -131,6 +131,7 @@ export interface RuntimeSupport {
 
 const DOCUMENTED =
   "Paths match official docs. No recorded run in the real tool yet.";
+
 const LEGACY =
   "Paths come from unofficial sources. Sauron writes an instruction file only.";
 
@@ -174,11 +175,13 @@ export const RUNTIME_SUPPORT: Readonly<Record<string, RuntimeSupport>> =
  */
 export function parseProfile(value: string): Readonly<InitPlan> {
   const profile = INSTALL_PROFILES[value.trim().toLowerCase()];
+
   if (!profile) {
     throw new InitPlanError(
       `Unknown profile '${value}'. Valid: ${Object.keys(INSTALL_PROFILES).join(", ")}.`,
     );
   }
+
   return profile;
 }
 
@@ -187,6 +190,7 @@ export function readProfileFlag(
   argv: readonly string[],
 ): Readonly<InitPlan> | undefined {
   const value = readFlag(argv, "profile");
+
   return value === undefined ? undefined : parseProfile(value);
 }
 
@@ -202,6 +206,7 @@ export class InitPlanError extends Error {
 function readFlag(argv: readonly string[], name: string): string | undefined {
   const prefix = `--${name}=`;
   const hit = argv.find((arg) => arg.startsWith(prefix));
+
   return hit === undefined ? undefined : hit.slice(prefix.length).trim();
 }
 
@@ -220,15 +225,19 @@ function splitList(value: string): string[] {
  */
 export function parseRuntimes(value: string): string[] {
   const ids = splitList(value);
+
   if (ids.length === 1 && ids[0] === "all") {
     return [...RUNTIME_IDS];
   }
+
   const unknown = ids.filter((id) => !RUNTIME_IDS.includes(id));
+
   if (unknown.length > 0 || ids.length === 0) {
     throw new InitPlanError(
       `Unknown runtime '${unknown.join(", ") || value}'. Valid: all, ${RUNTIME_IDS.join(", ")}.`,
     );
   }
+
   return [...new Set(ids)];
 }
 
@@ -243,39 +252,47 @@ export function parseSkills(
   selectors: readonly string[] = [],
 ): InitPlan["skills"] {
   const items = splitList(value);
+
   if (items.length === 1 && (items[0] === "all" || items[0] === "none")) {
     return items[0];
   }
+
   const unknown = items.filter(
     (item) => !departments.includes(item) && !selectors.includes(item),
   );
+
   if (unknown.length > 0 || items.length === 0) {
     throw new InitPlanError(
       `Unknown skill selection '${unknown.join(", ") || value}'. Valid: all, none, ${departments.join(", ")}.`,
     );
   }
+
   return [...new Set(items)];
 }
 
 /** Validates an agent set. */
 export function parseAgents(value: string): AgentSet {
   const agents = value.trim().toLowerCase();
+
   if (!AGENT_SETS.includes(agents as AgentSet)) {
     throw new InitPlanError(
       `Unknown agent set '${value}'. Valid: ${AGENT_SETS.join(", ")}.`,
     );
   }
+
   return agents as AgentSet;
 }
 
 /** Validates a Caveman tier. */
 export function parseCaveman(value: string): CavemanMode {
   const mode = value.trim().toLowerCase();
+
   if (!CAVEMAN_MODES.includes(mode as CavemanMode)) {
     throw new InitPlanError(
       `Invalid caveman tier '${value}'. Valid: ${CAVEMAN_MODES.join(", ")}.`,
     );
   }
+
   return mode as CavemanMode;
 }
 
@@ -297,12 +314,14 @@ export function parseInitFlags(
   const agents = readFlag(argv, "agents");
   const skills = readFlag(argv, "skills");
   const caveman = readFlag(argv, "caveman");
+
   if (runtimes !== undefined) flags.runtimes = parseRuntimes(runtimes);
   if (agents !== undefined) flags.agents = parseAgents(agents);
   if (skills !== undefined)
     flags.skills = parseSkills(skills, departments, selectors);
   if (caveman !== undefined) flags.caveman = parseCaveman(caveman);
   if (argv.includes("--no-commands")) flags.commands = false;
+
   return flags;
 }
 
@@ -338,6 +357,7 @@ function savedNativeRuntimes(
   const chosen = Array.isArray(value)
     ? nativeRuntimesFor(value.map(String))
     : ["claude"];
+
   return chosen.filter((id) => runtimes.includes(id));
 }
 
@@ -353,9 +373,12 @@ export function planFromConfig(
   if (!section || typeof section !== "object") {
     return undefined;
   }
+
   const record = section as Record<string, unknown>;
+
   if (record["version"] === "2.0.0") {
     const runtimeBlock = record["runtimes"];
+
     if (
       !runtimeBlock ||
       typeof runtimeBlock !== "object" ||
@@ -363,7 +386,9 @@ export function planFromConfig(
     ) {
       throw new InitPlanError("Config v2 requires a runtimes mapping.");
     }
+
     const entries = Object.entries(runtimeBlock);
+
     if (
       entries.some(
         ([id, enabled]) =>
@@ -374,19 +399,25 @@ export function planFromConfig(
         "Config v2 runtime entries must be known ids with boolean values.",
       );
     }
+
     const runtimes = entries.filter(([, enabled]) => enabled).map(([id]) => id);
     const init = record["init"];
+
     if (
       init !== undefined &&
       (!init || typeof init !== "object" || Array.isArray(init))
     ) {
       throw new InitPlanError("Config v2 init choices must be a mapping.");
     }
+
     const choices = (init ?? {}) as Record<string, unknown>;
+
     if ("runtimes" in choices || "skills" in choices) {
       throw new InitPlanError("Config v2 uses top-level runtimes and skills.");
     }
+
     const rawSkills = record["skills"];
+
     if (
       typeof rawSkills !== "string" &&
       (!Array.isArray(rawSkills) ||
@@ -408,7 +439,9 @@ export function planFromConfig(
     ) {
       throw new InitPlanError("init.commands must be boolean.");
     }
+
     const native = choices["nativeRuntimes"];
+
     if (
       native !== undefined &&
       (!Array.isArray(native) ||
@@ -420,11 +453,13 @@ export function planFromConfig(
         "init.nativeRuntimes must list known native runtime ids.",
       );
     }
+
     const caveman = record["caveman"];
     const mode =
       caveman && typeof caveman === "object" && "default_mode" in caveman
         ? parseCaveman(String(caveman.default_mode))
         : "full";
+
     return resolvePlan({
       runtimes,
       skills: parseSkills(
@@ -456,6 +491,7 @@ export function planFromConfig(
         : Array.isArray(skillsRaw)
           ? parseSkills(skillsRaw.join(","), departments, selectors)
           : undefined;
+
     return resolvePlan({
       ...(runtimes ? { runtimes } : {}),
       ...(typeof record["agents"] === "string"
