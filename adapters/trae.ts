@@ -11,6 +11,7 @@ import {
 } from "./types.js";
 
 const TRAE_RULES_PATH = ".trae/rules/project_rules.md";
+
 const TRAE_SOURCE = "https://www.trae.ai/blog/trae_tutorial_0825";
 
 export class TraeAdapter implements RuntimeAdapter {

@@ -20,6 +20,7 @@ export function buildMemoryVault(
     new Date(date + "T00:00:00Z").toISOString().slice(0, 10) !== date
   )
     throw new Error("Memory date must be a real YYYY-MM-DD date.");
+
   const session = "session-" + date + "-memory-init";
   const notes: Record<string, string> = {
     "claude.md":
@@ -117,6 +118,7 @@ export function buildMemoryVault(
       "- No project code, configuration, or runtime behavior is verified by this scaffold.\n" +
       "- Next: curate [[resume-brief]], [[status]], and [[open-items]].\n",
   };
+
   return Object.entries(notes).map(([relativePath, content]) => ({
     relativePath,
     content,
@@ -138,6 +140,7 @@ export function initMemory(
     ".agents",
     "node_modules",
   ]);
+
   if (
     directory
       .split(/[\\/]/)
@@ -146,11 +149,13 @@ export function initMemory(
     throw new Error(
       "Memory vault cannot live inside runtime state, Git, or dependencies.",
     );
+
   const files = buildMemoryVault();
   const action = new ConflictManager(workspaceRoot).createOnlyTree(
     directory,
     files,
     dryRun,
   );
+
   return { action, directory, files };
 }

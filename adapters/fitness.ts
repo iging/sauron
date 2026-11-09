@@ -44,9 +44,11 @@ export function allowsImportDirection(
 ): boolean {
   const fromIndex = LAYER_ORDER.indexOf(fromLayer);
   const toIndex = LAYER_ORDER.indexOf(toLayer);
+
   if (fromIndex === -1 || toIndex === -1) {
     return false;
   }
+
   return toIndex >= fromIndex;
 }
 
@@ -64,14 +66,18 @@ export function checkLayerImports(
   const findings: FitnessFinding[] = [];
   const importPattern = /from\s+["']([^"']+)["']/g;
   let match: RegExpExecArray | null;
+
   while ((match = importPattern.exec(content)) !== null) {
     const specifier = match[1] ?? "";
     const parts = specifier.split("/");
+
     if (parts.length < 2) {
       continue;
     }
+
     const fromLayer = inferLayerFromFile(file);
     const toLayer = parts[parts.length - 2] ?? "";
+
     if (
       fromLayer !== "" &&
       toLayer !== "" &&
@@ -85,6 +91,7 @@ export function checkLayerImports(
       });
     }
   }
+
   return findings;
 }
 
@@ -96,6 +103,7 @@ export function checkLayerImports(
  */
 export function inferLayerFromFile(file: string): string {
   const normalized = file.replace(/\\/g, "/").toLowerCase();
+
   for (const layer of LAYER_ORDER) {
     if (
       normalized.includes(`/${layer}/`) ||
@@ -104,6 +112,7 @@ export function inferLayerFromFile(file: string): string {
       return layer;
     }
   }
+
   return "";
 }
 
@@ -124,10 +133,13 @@ export function checkDocFreshness(
 ): FitnessFinding[] {
   const codeTime = Date.parse(codeUpdatedAt);
   const docTime = Date.parse(docUpdatedAt);
+
   if (Number.isNaN(codeTime) || Number.isNaN(docTime)) {
     throw new Error("Invalid timestamp supplied to doc freshness check");
   }
+
   const driftDays = (codeTime - docTime) / 86400000;
+
   if (driftDays > 30 && content.includes("TODO: update")) {
     return [
       {
@@ -138,6 +150,7 @@ export function checkDocFreshness(
       },
     ];
   }
+
   return [];
 }
 
@@ -151,11 +164,14 @@ export function formatFitnessReport(findings: FitnessFinding[]): string {
   if (findings.length === 0) {
     return "fitness=pass findings=0";
   }
+
   const lines: string[] = [`fitness=review findings=${findings.length}`];
+
   for (const finding of findings) {
     lines.push(
       `  [${finding.severity.toUpperCase()}] ${finding.rule} ${finding.file}: ${finding.message}`,
     );
   }
+
   return lines.join("\n");
 }

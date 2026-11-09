@@ -1,103 +1,69 @@
 # Quickstart Guide
 
-Get started with Sauron in under two minutes. This guide covers prerequisites, installation, initialization, and configuration verification.
-
----
+The development branch targets Sauron 4.0.0. The package version remains 3.2.0 until release.
+Registry installations may therefore lack commands documented for the upcoming release.
 
 ## Prerequisites
 
-Before using Sauron, verify that your environment meets these requirements:
+npm and shell installations require Node.js 20.12.0 or newer. Docker includes Node.
+The Windows portable bundle includes Node too. Its production winget submission is pending.
+See [Windows portable](windows-portable.md).
 
-- **Node.js**: Version 20.0.0 or higher.
-- **npm**: Version 9.0.0 or higher.
-- **Git**: Working tree initialized with at least one initial commit.
-- **AI Coding Runtimes**: Any supported runtime (for example Claude Code, Cursor, Windsurf, Cline, Copilot).
+## Install
 
----
-
-## Installation
-
-Install Sauron dependencies from the package root:
+For the published package:
 
 ```bash
-git clone https://github.com/agent-spec/agent-spec.git
-cd agent-spec/sauron
-npm install
+npm install --global sauron-ai
+```
+
+For this development checkout:
+
+```bash
+git clone https://github.com/iging/sauron.git
+cd sauron
+npm ci
 npm run build
 ```
 
-The build command compiles TypeScript source files in `adapters/` to JavaScript files in `dist/adapters/`.
+Run the checkout CLI by its absolute path from the project you want to configure.
+Use `sauron` below only after installing the package globally.
 
----
-
-## Initialization
-
-Run the initialization command inside your target project directory:
+## Configure a project
 
 ```bash
-node ./bin/sauron.mjs init
+cd /path/to/your-project
+sauron init --dry-run --yes --runtimes=claude --skills=none
+sauron init
 ```
 
-This command performs three automated actions:
+The interactive flow selects runtimes, agents and skills, previews the plan, then asks before
+writing. Recommended selects Claude Code, all 248 installable skills and Fellowship agents.
+The shared `AGENTS.md` core installs with every plan. Other runtimes install only when selected.
 
-1. Generates `sauron.config.yaml` in your root directory if not present.
-2. Transpiles universal instructions to all 20 supported runtime configuration files.
-3. Initializes `.sauron/manifest.json` to track file checksums and prevent destructive overwrites.
-
-To preview actions without modifying files, pass the `--dry-run` flag:
+Existing config v1 projects must [migrate to config v2](config-v2.md) before init or sync:
 
 ```bash
-node ./bin/sauron.mjs init --dry-run
+sauron upgrade --dry-run
+sauron upgrade
+sauron sync --dry-run
+sauron sync
 ```
 
----
-
-## Verifying Installation
-
-Verify that all runtimes, agents, and skills are active:
+## Verify and maintain
 
 ```bash
-node ./bin/sauron.mjs status
+sauron status
+sauron list-installed
+sauron doctor
+sauron list-skills
 ```
 
-Expected output:
+Status reports the 20 available adapters and 248 installable skills across nine departments.
+Availability does not mean every runtime is installed or verified in its real tool.
+Read the [support tiers](../04-runtime-adapters/runtime-tiers.md).
 
-```text
-===================================================================
-                       S A U R O N
-  "One Harness to rule them all, One Harness to prompt them,
-   One Harness to sync them all, and in your codebase bind them."
-===================================================================
-
-[STATUS] sauron v1.0.0
-
---- The 20 Runtimes Bound by sauron ---
-  [OK] Claude Code          -> CLAUDE.md
-  [OK] Cursor               -> .cursor/rules/sauron.mdc
-  [OK] Windsurf             -> .windsurf/rules/sauron.md
-  [OK] GitHub Copilot       -> .github/copilot-instructions.md
-  ...
-
---- The Fellowship of 9 Sub-Agents ---
-  [OK] Gandalf    : Master Planner and Strategy Guide
-  [OK] Aragorn    : Principal System Architect
-  [OK] Legolas    : Precision Linter and Bug Hunter
-  ...
-
---- Skill Ecosystem ---
-  [OK] 245 ECC-standard skills across 9 domains
-```
-
-To list all available skills by domain, run:
-
-```bash
-node ./bin/sauron.mjs list-skills
-```
-
----
-
-## Next Steps
-
-- Review [Configuration Reference](configuration.md) to customize runtimes and agents.
-- Learn about the 9 specialized agents in [Fellowship Overview](../02-fellowship-agents/overview.md).
-- Activate [Caveman Mode](../05-token-optimization/caveman-mode.md) to reduce context consumption by up to 75%.
+Changed managed files receive backups or remain preserved, depending on the file type.
+See [install lifecycle](install-lifecycle.md) for repair and preview-first uninstall.
+See [CLI reference](cli-reference.md), [skill picker](skill-picker.md), and
+[profiles and plugin](profiles-and-plugin.md) for configuration options.

@@ -169,6 +169,7 @@ export class Transpiler {
    */
   public loadFellowship(): FellowshipAgentIR[] {
     const fellowshipDir = path.join(this.sauronRoot, "core", "fellowship");
+
     if (!fs.existsSync(fellowshipDir)) {
       return this.getDefaultFellowship();
     }
@@ -219,9 +220,11 @@ export class Transpiler {
    */
   private loadCavemanMode(): CavemanMode {
     const configPath = path.join(this.workspaceRoot, "sauron.config.yaml");
+
     if (!fs.existsSync(configPath)) {
       return "full";
     }
+
     const config: unknown = parseYaml(fs.readFileSync(configPath, "utf8"));
     const caveman =
       config && typeof config === "object"
@@ -231,6 +234,7 @@ export class Transpiler {
       caveman && typeof caveman === "object"
         ? (caveman as Record<string, unknown>)["default_mode"]
         : undefined;
+
     if (mode === undefined || mode === null) {
       return "full";
     }
@@ -239,6 +243,7 @@ export class Transpiler {
         `Invalid caveman.default_mode '${String(mode)}' in sauron.config.yaml. Use one of: ${CAVEMAN_MODES.join(", ")}.`,
       );
     }
+
     return mode as CavemanMode;
   }
 
@@ -277,6 +282,7 @@ export class Transpiler {
       configOverrides?.cavemanMode ??
       this.cavemanOverride ??
       this.loadCavemanMode();
+
     return {
       ...(antiPatternsDoc !== undefined ? { antiPatternsDoc } : {}),
       cavemanMode,
@@ -354,11 +360,13 @@ export class Transpiler {
     try {
       for (const adapterId of activeAdapterIds) {
         const adapter = this.adapters.get(adapterId);
+
         if (!adapter) {
           continue;
         }
 
         const outputs: TranspileOutput[] = adapter.transpile(context);
+
         for (const out of outputs) {
           // Enforce zero-destructive overwrites across every generated file.
           results.push(
@@ -376,6 +384,7 @@ export class Transpiler {
             adapter.id,
             dryRun,
           );
+
           if (removal) {
             results.push(removal);
           }
@@ -399,6 +408,7 @@ export class Transpiler {
         const replacement = results.find(
           (file) => file.filePath === retired.replacementPath,
         );
+
         if (
           !replacement ||
           !["created", "updated", "unchanged", "simulated"].includes(
@@ -413,11 +423,13 @@ export class Transpiler {
           });
           continue;
         }
+
         const removal = this.conflictManager.retireFile(
           retired.relativePath,
           "install",
           dryRun,
         );
+
         if (removal) results.push(removal);
       }
     } finally {

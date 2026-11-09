@@ -22,9 +22,7 @@ export class VSCodeAdapter implements RuntimeAdapter {
   /** Display name for VS Code. */
   public readonly name = "VS Code";
   /** Target files managed by this adapter. */
-  public readonly targetFiles = [
-    ".vscode/settings.json",
-  ];
+  public readonly targetFiles = [".vscode/settings.json"];
 
   /**
    * Compiles context into VS Code workspace settings.

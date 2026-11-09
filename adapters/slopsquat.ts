@@ -72,7 +72,9 @@ export function scorePackage(metadata: PackageMetadata): PackageVerdict {
       reason: `Package ${metadata.name} does not exist in registry. Refuse hallucinated dependency.`,
     };
   }
+
   let risk = 0;
+
   if (metadata.ageDays < 30) {
     risk += 40;
   } else if (metadata.ageDays < 90) {
@@ -88,7 +90,9 @@ export function scorePackage(metadata: PackageMetadata): PackageVerdict {
   } else if (metadata.maintainers === 1) {
     risk += 10;
   }
+
   const allow = risk < 70;
+
   return {
     name: metadata.name,
     risk,
@@ -152,8 +156,10 @@ export function scanUnsafeSinks(file: string, content: string): SinkFinding[] {
     },
   ];
   const lines = content.split(/\r?\n/);
+
   for (let index = 0; index < lines.length; index += 1) {
     const line = (lines[index] ?? "").trim();
+
     if (line.startsWith("#") || line.startsWith("//")) {
       continue;
     }
@@ -169,6 +175,7 @@ export function scanUnsafeSinks(file: string, content: string): SinkFinding[] {
       }
     }
   }
+
   return findings;
 }
 
@@ -217,5 +224,6 @@ export function toSarif(
       },
     ],
   };
+
   return JSON.stringify(sarif, null, 2);
 }

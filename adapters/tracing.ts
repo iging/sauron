@@ -55,6 +55,7 @@ export function validateTraceEvent(raw: unknown): TraceEvent {
   if (typeof raw !== "object" || raw === null) {
     throw new Error("Trace event must be an object");
   }
+
   const record = raw as Record<string, unknown>;
   const traceId = record["traceId"];
   const agent = record["agent"];
@@ -64,6 +65,7 @@ export function validateTraceEvent(raw: unknown): TraceEvent {
   const startedAt = record["startedAt"];
   const endedAt = record["endedAt"];
   const status = record["status"];
+
   if (
     typeof traceId !== "string" ||
     typeof agent !== "string" ||
@@ -87,11 +89,13 @@ export function validateTraceEvent(raw: unknown): TraceEvent {
   ) {
     throw new Error("Token counts must be non-negative integers");
   }
+
   const skillTagRaw = record["skillTag"];
   const skillTag =
     skillTagRaw === null || skillTagRaw === undefined
       ? null
       : String(skillTagRaw);
+
   return {
     traceId,
     agent,
@@ -119,18 +123,21 @@ export function summarizeTraces(events: TraceEvent[]): TraceSummary {
     string,
     { input: number; output: number; events: number }
   > = {};
+
   for (const event of events) {
     totalInputTokens += event.inputTokens;
     totalOutputTokens += event.outputTokens;
     if (event.status === "failed") {
       failedCount += 1;
     }
+
     const current = byAgent[event.agent] ?? { input: 0, output: 0, events: 0 };
     current.input += event.inputTokens;
     current.output += event.outputTokens;
     current.events += 1;
     byAgent[event.agent] = current;
   }
+
   return {
     totalInputTokens,
     totalOutputTokens,
@@ -170,13 +177,16 @@ export function formatTraceSummary(summary: TraceSummary): string {
     `events=${summary.eventCount} failed=${summary.failedCount} in=${summary.totalInputTokens} out=${summary.totalOutputTokens}`,
   );
   const agents = Object.keys(summary.byAgent).sort();
+
   for (const agent of agents) {
     const entry = summary.byAgent[agent];
+
     if (entry !== undefined) {
       lines.push(
         `  [TRACE] ${agent} events=${entry.events} in=${entry.input} out=${entry.output}`,
       );
     }
   }
+
   return lines.join("\n");
 }

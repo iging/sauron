@@ -38,8 +38,10 @@ export interface ImportStep {
  */
 export function detectPlatforms(files: string[]): SourcePlatform[] {
   const detected = new Set<SourcePlatform>();
+
   for (const file of files) {
     const normalized = file.replace(/\\/g, "/");
+
     if (normalized === "CLAUDE.md" || normalized.startsWith(".claude/")) {
       detected.add("claude");
     }
@@ -65,6 +67,7 @@ export function detectPlatforms(files: string[]): SourcePlatform[] {
       detected.add("copilot");
     }
   }
+
   return [...detected].sort();
 }
 
@@ -78,8 +81,10 @@ export function detectPlatforms(files: string[]): SourcePlatform[] {
  */
 export function buildImportPlan(files: string[]): ImportStep[] {
   const steps: ImportStep[] = [];
+
   for (const file of files) {
     const normalized = file.replace(/\\/g, "/");
+
     if (normalized === ".cursorrules") {
       steps.push({
         platform: "cursor",
@@ -147,6 +152,7 @@ export function buildImportPlan(files: string[]): ImportStep[] {
     throw new Error("No convertible platform files detected for import");
   }
   steps.sort((a, b) => a.destination.localeCompare(b.destination));
+
   return steps;
 }
 
@@ -159,13 +165,17 @@ export function buildImportPlan(files: string[]): ImportStep[] {
  */
 export function convertMdcToMarkdown(content: string): string {
   const match = content.match(/^---\r?\n([\s\S]*?)\r?\n---\r?\n?([\s\S]*)$/);
+
   if (match === null) {
     return content.trim();
   }
+
   const body = (match[2] ?? "").trim();
+
   if (body === "") {
     throw new Error("MDC body must not be empty");
   }
+
   return `${body}\n`;
 }
 
@@ -177,6 +187,7 @@ export function convertMdcToMarkdown(content: string): string {
  */
 export function formatImportPlan(steps: ImportStep[]): string {
   const lines: string[] = [`import-steps=${steps.length}`];
+
   for (const step of steps) {
     lines.push(
       `  [${step.action.toUpperCase()}] ${step.platform} ${step.source} -> ${step.destination}`,
@@ -185,5 +196,6 @@ export function formatImportPlan(steps: ImportStep[]): string {
   lines.push(
     "Run with --dry-run first. Existing files receive .bak backup before overwrite.",
   );
+
   return lines.join("\n");
 }

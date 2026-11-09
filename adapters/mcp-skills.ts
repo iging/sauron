@@ -49,6 +49,7 @@ export function buildSkillResourceUri(name: string): string {
   if (!/^[a-z0-9][a-z0-9_-]*$/.test(name)) {
     throw new Error(`Invalid skill name: ${name}`);
   }
+
   return `skill://${name}/SKILL.md`;
 }
 
@@ -61,9 +62,11 @@ export function buildSkillResourceUri(name: string): string {
  */
 export function parseSkillUri(uri: string): string {
   const match = uri.match(/^skill:\/\/([a-z0-9][a-z0-9_-]*)\/SKILL\.md$/);
+
   if (match === null || match[1] === undefined) {
     throw new Error(`Invalid skill resource URI: ${uri}`);
   }
+
   return match[1];
 }
 
@@ -79,6 +82,7 @@ export function buildSkillIndex(skills: IndexableSkill[]): SkillIndex {
     if (skill.name.trim() === "" || skill.description.trim() === "") {
       throw new Error("Skill name and description must not be empty");
     }
+
     return {
       type: "skill-md",
       name: skill.name,
@@ -86,6 +90,7 @@ export function buildSkillIndex(skills: IndexableSkill[]): SkillIndex {
       url: buildSkillResourceUri(skill.name),
     };
   });
+
   return {
     $schema: "https://sauron.ai/schemas/skill-index-1.0.0.json",
     skills: entries,
@@ -103,17 +108,23 @@ export function validateSkillIndex(raw: unknown): SkillIndex {
   if (typeof raw !== "object" || raw === null) {
     throw new Error("Skill index must be an object");
   }
+
   const record = raw as Record<string, unknown>;
   const skillsRaw = record["skills"];
+
   if (!Array.isArray(skillsRaw)) {
     throw new Error("Skill index skills must be an array");
   }
+
   const skills: SkillIndexEntry[] = [];
+
   for (const item of skillsRaw) {
     if (typeof item !== "object" || item === null) {
       throw new Error("Skill index entry must be an object");
     }
+
     const entry = item as Record<string, unknown>;
+
     if (
       entry["type"] !== "skill-md" ||
       typeof entry["name"] !== "string" ||
@@ -122,8 +133,10 @@ export function validateSkillIndex(raw: unknown): SkillIndex {
     ) {
       throw new Error("Malformed skill index entry");
     }
+
     const name = entry["name"] as string;
     const url = entry["url"] as string;
+
     if (parseSkillUri(url) !== name) {
       throw new Error(`Index URL mismatch for skill ${name}`);
     }
@@ -134,6 +147,7 @@ export function validateSkillIndex(raw: unknown): SkillIndex {
       url,
     });
   }
+
   return {
     $schema: "https://sauron.ai/schemas/skill-index-1.0.0.json",
     skills,

@@ -67,6 +67,7 @@ export interface UninstallStep {
 /** Paths uninstall never removes: user choices and Sauron's own records and backups. */
 function isProtected(relativePath: string): boolean {
   const normalized = relativePath.replace(/\\/g, "/");
+
   return (
     normalized === "sauron.config.yaml" || normalized.startsWith(".sauron/")
   );
@@ -77,8 +78,10 @@ export function isInsideWorkspace(root: string, relativePath: string): boolean {
   if (relativePath.length === 0 || path.isAbsolute(relativePath)) {
     return false;
   }
+
   const resolved = path.resolve(root, relativePath);
   const relative = path.relative(path.resolve(root), resolved);
+
   return (
     relative.length > 0 &&
     !relative.startsWith("..") &&
@@ -92,6 +95,7 @@ function readRecords(root: string): {
   records: ManagedFileRecord[];
 } {
   const manifestPath = path.join(root, ".sauron", "manifest.json");
+
   if (!fs.existsSync(manifestPath)) {
     return { status: "missing", records: [] };
   }
@@ -101,9 +105,11 @@ function readRecords(root: string): {
       parsed && typeof parsed === "object"
         ? (parsed as { managedFiles?: unknown }).managedFiles
         : undefined;
+
     if (!Array.isArray(files)) {
       return { status: "invalid", records: [] };
     }
+
     const records = files.filter(
       (f): f is ManagedFileRecord =>
         typeof f === "object" &&
@@ -111,6 +117,7 @@ function readRecords(root: string): {
         typeof (f as ManagedFileRecord).path === "string" &&
         typeof (f as ManagedFileRecord).checksum === "string",
     );
+
     return {
       status: records.length === files.length ? "ok" : "invalid",
       records,
@@ -123,6 +130,7 @@ function readRecords(root: string): {
 /** True when a text file still holds a complete Sauron managed block. */
 function hasManagedBlock(content: string): boolean {
   const start = content.indexOf("sauron:start");
+
   return start >= 0 && content.indexOf("sauron:end", start) >= 0;
 }
 
@@ -137,19 +145,25 @@ export function inspectInstall(root: string): InstallInspection {
   const { status, records } = readRecords(root);
   const files = records.map((record): InstalledFile => {
     const base = { path: record.path, runtime: record.runtime ?? "unknown" };
+
     if (!isInsideWorkspace(root, record.path)) {
       return { ...base, state: "unsafe" };
     }
+
     const target = path.join(root, record.path);
+
     if (!fs.existsSync(target) || !fs.statSync(target).isFile()) {
       return { ...base, state: "missing" };
     }
+
     const content = fs.readFileSync(target, "utf8");
+
     if (record.merged === true) {
       return record.path.toLowerCase().endsWith(".json")
         ? { ...base, state: "merged" }
         : { ...base, state: "merged", blockPresent: hasManagedBlock(content) };
     }
+
     return {
       ...base,
       state:
@@ -159,6 +173,7 @@ export function inspectInstall(root: string): InstallInspection {
     };
   });
   files.sort((a, b) => a.path.localeCompare(b.path));
+
   return { manifest: status, files };
 }
 
@@ -170,10 +185,13 @@ export function compareVersions(a: string, b: string): number {
       .split(".")
       .map((n) => Number.parseInt(n, 10) || 0);
   const [x, y] = [parts(a), parts(b)];
+
   for (let i = 0; i < Math.max(x.length, y.length); i += 1) {
     const diff = (x[i] ?? 0) - (y[i] ?? 0);
+
     if (diff !== 0) return diff;
   }
+
   return 0;
 }
 
@@ -190,6 +208,7 @@ export function doctorFindings(
   context: { nodeVersion: string; configVersion: string | null },
 ): DoctorFinding[] {
   const findings: DoctorFinding[] = [];
+
   if (compareVersions(context.nodeVersion, MIN_NODE_VERSION) < 0) {
     findings.push({
       level: "error",
@@ -224,8 +243,10 @@ export function doctorFindings(
         ".sauron/manifest.json is damaged. Restore it from version control before repair or uninstall.",
     });
   }
+
   const byState = (state: FileState): InstalledFile[] =>
     inspection.files.filter((f) => f.state === state);
+
   for (const file of byState("unsafe")) {
     findings.push({
       level: "error",
@@ -247,13 +268,16 @@ export function doctorFindings(
     });
   }
   const edited = byState("edited");
+
   if (edited.length > 0) {
     findings.push({
       level: "info",
       message: `${edited.length} file(s) changed by you. Sauron keeps them as they are.`,
     });
   }
+
   const order = { error: 0, warn: 1, info: 2 };
+
   return findings.sort((a, b) => order[a.level] - order[b.level]);
 }
 
@@ -266,6 +290,7 @@ export function doctorFindings(
 export function planUninstall(inspection: InstallInspection): UninstallStep[] {
   return inspection.files.map((file): UninstallStep => {
     const base = { path: file.path, runtime: file.runtime };
+
     if (file.state === "unsafe") return { ...base, action: "keep-unsafe" };
     if (isProtected(file.path)) return { ...base, action: "keep-protected" };
     switch (file.state) {
@@ -312,6 +337,7 @@ export function applyUninstall(
     for (const step of steps) {
       if (step.action === "remove") {
         const done = manager.retireFile(step.path, step.runtime, dryRun);
+
         if (done?.action === "removed") removedFiles.push(step.path);
         outcomes.push({
           ...step,
@@ -346,5 +372,6 @@ export function applyUninstall(
   const removedDirs = dryRun
     ? []
     : removedFiles.flatMap((file) => manager.pruneEmptyParents(file));
+
   return { outcomes, removedDirs };
 }

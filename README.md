@@ -168,6 +168,8 @@ irm https://raw.githubusercontent.com/iging/sauron/main/bin/install.ps1 | iex
 
 ### 4. Running via Docker (Zero Local Node.js Required)
 
+Compose uses project name `sauron-ai` and image `sauron-ai:local`.
+
 Clone this repository and run Compose from its root. The single root Compose file builds
 only the CLI. The landing page lives in a separate repository and has no service here.
 Set SAURON_WORKSPACE to the absolute path of the project Sauron should inspect or modify.
@@ -262,7 +264,7 @@ Every runtime also shares the `AGENTS.md` core and `.agents/skills/`.
 
 ## Flagship Engineering Capabilities
 
-Sauron ships with 248 installable modular skills across 9 functional departments, plus 114 CLI commands. Counts come from the installable catalog used by `sauron list-skills`. Nested supporting skill files inside a selected skill are part of that skill, rather than separate entries. Four flagship capability pillars anchor the developer and agent experience:
+Sauron ships with 248 installable modular skills across 9 functional departments, plus 114 bundled command specifications. Counts come from the installable catalog used by `sauron list-skills`. Nested supporting skill files inside a selected skill are part of that skill, rather than separate entries. Four flagship capability pillars anchor the developer and agent experience:
 
 ---
 
@@ -362,7 +364,7 @@ Autonomous AI agents must operate inside strict safety boundaries. Sauron embeds
 
 **Vibe coding is a recipe for disaster.** Prompting AI agents to build production features without architectural blueprints, state invariants, or test criteria leads to catastrophic technical debt, security breaches, and unmaintainable spaghetti code that breaks the moment it scales.
 
-Sauron eliminates vibe coding by connecting the AI directly to persistent, structured specifications under `context/`. Three core workflow skills enforce this discipline:
+Sauron supports agentic coding by connecting the AI directly to persistent, structured specifications under `context/`. Three core workflow skills enforce this discipline:
 
 - **`define-core-domains` (`/define-core-domains`) — Grounding Ideas into Architecture**:
   - **Overview**: Prevents AI from prematurely writing implementation code from raw ideas or unstructured notes.
@@ -418,3 +420,13 @@ builds, archives, captures and binary metadata. Targets never run. Reports expos
 Use /folder-structure-advisor to propose a folder tree from context without creating app folders,
 and /llm-wiki to link immutable sources to a maintained wiki. Generated guides mention llm-wiki
 only when that skill is selected for installation.
+
+## Windows portable builds
+
+Build a standalone Windows executable and asset zip with Node SEA. Users run sauron.exe
+without installing Node. Keep its sibling asset folders together. See
+[Windows portable packaging](docs/01-getting-started/windows-portable.md) for build and zip
+verification, winget manifest generation, unsigned-binary limits and manual release checks.
+No Windows zip or winget package is published by this development change.
+
+Adapter contributors: see [source layout and comments](docs/adapter-contributors.md).

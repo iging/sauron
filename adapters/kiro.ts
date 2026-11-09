@@ -12,7 +12,10 @@ import {
 export class KiroAdapter implements RuntimeAdapter {
   public readonly id = "kiro";
   public readonly name = "Kiro";
-  public readonly targetFiles = [".kiro/steering/sauron.md", ".kiro/skills/README.md"];
+  public readonly targetFiles = [
+    ".kiro/steering/sauron.md",
+    ".kiro/skills/README.md",
+  ];
 
   public transpile(context: TranspileContext): TranspileOutput[] {
     const lines: string[] = [];
@@ -60,8 +63,16 @@ export class KiroAdapter implements RuntimeAdapter {
     ];
 
     return [
-      { relativePath: ".kiro/steering/sauron.md", content: lines.join("\n"), format: "markdown" },
-      { relativePath: ".kiro/skills/README.md", content: readme.join("\n"), format: "markdown" },
+      {
+        relativePath: ".kiro/steering/sauron.md",
+        content: lines.join("\n"),
+        format: "markdown",
+      },
+      {
+        relativePath: ".kiro/skills/README.md",
+        content: readme.join("\n"),
+        format: "markdown",
+      },
     ];
   }
 }

@@ -51,6 +51,7 @@ export function validateEntry(raw: unknown): RegistryEntry {
   if (typeof raw !== "object" || raw === null) {
     throw new Error("Registry entry must be an object");
   }
+
   const record = raw as Record<string, unknown>;
   const slug = record["slug"];
   const name = record["name"];
@@ -61,6 +62,7 @@ export function validateEntry(raw: unknown): RegistryEntry {
   const version = record["version"];
   const status = record["status"];
   const score = record["score"];
+
   if (
     typeof slug !== "string" ||
     typeof name !== "string" ||
@@ -86,6 +88,7 @@ export function validateEntry(raw: unknown): RegistryEntry {
   if (!Number.isInteger(score) || score < 0 || score > 100) {
     throw new Error("Registry score must be an integer from 0 to 100");
   }
+
   return {
     slug,
     name,
@@ -109,6 +112,7 @@ export function computeCompletenessScore(
   entry: Omit<RegistryEntry, "score" | "status"> & { status?: string },
 ): number {
   let score = 0;
+
   if (entry.description.trim().length >= 20) {
     score += 30;
   } else if (entry.description.trim().length > 0) {
@@ -126,6 +130,7 @@ export function computeCompletenessScore(
   if (/^[0-9a-f]{7,40}$/i.test(entry.commit)) {
     score += 15;
   }
+
   return score;
 }
 
@@ -149,6 +154,7 @@ export function publishEntry(
       `Quality gate blocks publish: score ${entry.score} below ${minimumScore}`,
     );
   }
+
   return { ...entry, status: "published" };
 }
 
@@ -184,6 +190,7 @@ export function buildCatalog(
   const published = entries
     .filter((entry) => entry.status === "published" && !drifted.has(entry.slug))
     .sort((a, b) => a.slug.localeCompare(b.slug));
+
   return {
     specVersion: "1.0.0",
     exportedAt: new Date().toISOString(),

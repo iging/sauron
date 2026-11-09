@@ -19,6 +19,7 @@ interface FolderSpec {
 }
 
 const OMP_MCP = ".omp/mcp.json";
+
 const OMP_README = ".omp/README.md";
 
 const FOLDERS: readonly FolderSpec[] = [
@@ -67,6 +68,7 @@ export class OmpAdapter implements RuntimeAdapter {
       "Keep this note here. omp reads every Markdown file in `prompts/` as a command, so a note in that folder becomes a slash command.",
       "",
     ];
+
     for (const folder of FOLDERS) {
       lines.push(
         `## ${folder.title}`,
@@ -81,6 +83,7 @@ export class OmpAdapter implements RuntimeAdapter {
         "",
       );
     }
+
     return [
       {
         relativePath: OMP_MCP,

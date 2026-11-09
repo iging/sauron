@@ -1,6 +1,6 @@
 # Runtime Adapter Matrix
 
-Derived from [Runtime Scaffolds](../docs/runtime-scaffolds.md), reviewed 2026-11-07.
+Derived from [Runtime Scaffolds](../docs/runtime-scaffolds.md), reviewed 2026-11-09.
 The source document records loader behavior and evidence. This matrix lists all 20 runtime
 adapters. The shared `AGENTS.md` core is additional and is emitted once.
 
@@ -32,8 +32,9 @@ Some rows describe runtime-supported paths beyond the files Sauron currently emi
 
 ## Installation behavior
 
-- Native subagents and command wrappers install for Claude Code, OpenCode, and omp only.
-- Skill discovery and counts use `listSkills`. The current catalog has 245 installable entries
+- Native subagents install for Claude Code, OpenCode, omp, Codex, and GitHub Copilot.
+- Command wrappers install for Claude Code, OpenCode, and omp only.
+- Skill discovery and counts use `listSkills`. The current catalog has 248 installable entries
   across nine departments. Container folders and nested supporting files are excluded.
 - A command wrapper sharing a skill name uses `/sauron-<name>`. Skill names stay unchanged.
 - Pi, Claude Code, Windsurf, Cline, Cursor, OpenCode, and omp keep notes at their runtime root.

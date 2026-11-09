@@ -7,17 +7,23 @@ import {
   eyeHash,
   type EyeFormatParser,
 } from "./eye-types.js";
+
+/** Fail before iterating over an excessive number of records or nested tree nodes. */
 const cap = (n: number, max = 2000) => {
   if (n > max) throw new EyeParseError("count-limit");
+
   return n;
 };
+
+/** Check the SQLite header and first B-tree page without opening a database engine. */
 const sqlite: EyeFormatParser = {
   format: "SQLite",
   detect: (d) => d.subarray(0, 16).toString("binary") === "SQLite format 3\0",
   parse(d, c) {
     range(d, 0, 100);
-    const raw = u16(d, 16, false),
-      pageSize = raw === 1 ? 65536 : raw;
+    const raw = u16(d, 16, false);
+    const pageSize = raw === 1 ? 65536 : raw;
+
     if (
       pageSize < 512 ||
       pageSize > 65536 ||
@@ -25,8 +31,10 @@ const sqlite: EyeFormatParser = {
       d.length % pageSize
     )
       throw new EyeParseError("sqlite-page");
-    const pages = d.length / pageSize,
-      declared = u32(d, 28, false);
+
+    const pages = d.length / pageSize;
+    const declared = u32(d, 28, false);
+
     if (declared > pages) throw new EyeParseError("sqlite-size");
     c.observe(
       "sqlite.header",
@@ -42,16 +50,19 @@ const sqlite: EyeFormatParser = {
       0,
       100,
     );
-    const first = 100,
-      type = range(d, first, 1)[0]!;
+    const first = 100;
+    const type = range(d, first, 1)[0]!;
+
     if (![2, 5, 10, 13].includes(type)) throw new EyeParseError("sqlite-btree");
-    const cells = u16(d, first + 3, false),
-      header = type === 2 || type === 5 ? 12 : 8;
+
+    const cells = u16(d, first + 3, false);
+    const header = type === 2 || type === 5 ? 12 : 8;
     range(d, first, header + cells * 2);
     if (first + header + cells * 2 > pageSize)
       throw new EyeParseError("sqlite-cells");
     for (let i = 0; i < cells; i++) {
       const off = u16(d, first + header + i * 2, false);
+
       if (off < first + header + cells * 2 || off >= pageSize)
         throw new EyeParseError("sqlite-cell");
     }
@@ -68,18 +79,24 @@ const sqlite: EyeFormatParser = {
     );
   },
 };
+
 const pcapMagic = new Set(["d4c3b2a1", "a1b2c3d4", "4d3cb2a1", "a1b23c4d"]);
+
+/** Validate capture record lengths while deliberately omitting packet payloads. */
 const pcap: EyeFormatParser = {
   format: "PCAP",
   detect: (d) => pcapMagic.has(d.subarray(0, 4).toString("hex")),
   parse(d, c) {
     range(d, 0, 24);
-    const magic = d.subarray(0, 4).toString("hex"),
-      le = magic === "d4c3b2a1" || magic === "4d3cb2a1";
+    const magic = d.subarray(0, 4).toString("hex");
+    const le = magic === "d4c3b2a1" || magic === "4d3cb2a1";
+
     if (u16(d, 4, le) !== 2 || u16(d, 6, le) !== 4)
       throw new EyeParseError("pcap-version");
-    const snap = u32(d, 16, le),
-      link = u32(d, 20, le);
+
+    const snap = u32(d, 16, le);
+    const link = u32(d, 20, le);
+
     if (!snap || snap > 16 * 1024 * 1024) throw new EyeParseError("pcap-snap");
     c.observe(
       "pcap.header",
@@ -92,13 +109,15 @@ const pcap: EyeFormatParser = {
       0,
       24,
     );
-    let off = 24,
-      n = 0,
-      total = 0;
+    let off = 24;
+    let n = 0;
+    let total = 0;
+
     while (off < d.length) {
       cap(++n);
-      const size = u32(d, off + 8, le),
-        original = u32(d, off + 12, le);
+      const size = u32(d, off + 8, le);
+      const original = u32(d, off + 12, le);
+
       if (size > snap || size > original)
         throw new EyeParseError("pcap-record");
       range(d, off + 16, size);
@@ -115,28 +134,36 @@ const pcap: EyeFormatParser = {
     );
   },
 };
+
+/** Track byte order and interface numbering independently for each capture section. */
 const pcapng: EyeFormatParser = {
   format: "PCAPNG",
   detect: (d) => d.subarray(0, 4).toString("hex") === "0a0d0d0a",
   parse(d, c) {
-    let off = 0,
-      n = 0,
-      le = true,
-      interfaces = 0,
-      packets = 0;
+    let off = 0;
+    let n = 0;
+    let le = true;
+    let interfaces = 0;
+    let packets = 0;
+
     while (off < d.length) {
       cap(++n);
       if (d.subarray(off, off + 4).toString("hex") === "0a0d0d0a") {
         const bom = d.subarray(off + 8, off + 12).toString("hex");
+
         if (!["4d3c2b1a", "1a2b3c4d"].includes(bom))
           throw new EyeParseError("pcapng-bom");
         le = bom === "4d3c2b1a";
         interfaces = 0;
       }
-      const type = u32(d, off, le),
-        size = u32(d, off + 4, le);
+
+      const type = u32(d, off, le);
+      const size = u32(d, off + 4, le);
+
       if (size < 12 || size % 4) throw new EyeParseError("pcapng-block");
+
       const b = range(d, off, size);
+
       if (u32(b, size - 4, le) !== size)
         throw new EyeParseError("pcapng-trailer");
       if (type === 0x0a0d0d0a) {
@@ -152,7 +179,9 @@ const pcapng: EyeFormatParser = {
       } else if (type === 6) {
         if (size < 32 || u32(b, 8, le) >= interfaces)
           throw new EyeParseError("pcapng-packet");
+
         const bytes = u32(b, 20, le);
+
         if (bytes > u32(b, 24, le) || 28 + Math.ceil(bytes / 4) * 4 > size - 4)
           throw new EyeParseError("pcapng-packet");
         packets++;
@@ -166,14 +195,17 @@ const pcapng: EyeFormatParser = {
     );
   },
 };
+
+/** Read checked dump directories and selected system/exception metadata, not memory. */
 const minidump: EyeFormatParser = {
   format: "Minidump",
   detect: (d) => d.subarray(0, 4).toString() === "MDMP",
   parse(d, c) {
     range(d, 0, 32);
     if (u16(d, 4) !== 0xa793) throw new EyeParseError("minidump-version");
-    const n = cap(u32(d, 8)),
-      dir = u32(d, 12);
+
+    const n = cap(u32(d, 8));
+    const dir = u32(d, 12);
     range(d, dir, n * 12);
     c.observe(
       "crash.header",
@@ -183,10 +215,10 @@ const minidump: EyeFormatParser = {
       32,
     );
     for (let i = 0; i < n; i++) {
-      const at = dir + i * 12,
-        type = u32(d, at),
-        size = u32(d, at + 4),
-        off = u32(d, at + 8);
+      const at = dir + i * 12;
+      const type = u32(d, at);
+      const size = u32(d, at + 4);
+      const off = u32(d, at + 8);
       const b = range(d, off, size);
       c.observe("crash.stream", "Minidump stream", { type, size }, off, size);
       if (type === 7) {
@@ -218,6 +250,8 @@ const minidump: EyeFormatParser = {
     );
   },
 };
+
+/** Identify a declared core only after checking its complete ELF class header. */
 const elfCore: EyeFormatParser = {
   format: "ELF core",
   detect: (d) =>
@@ -232,25 +266,32 @@ const elfCore: EyeFormatParser = {
     c.unknown("crash.stack", "ELF notes and stacks are not unwound.");
   },
 };
+
+/** Validate fixed-size UF2 block framing without materializing or flashing payloads. */
 const uf2: EyeFormatParser = {
   format: "UF2 firmware",
   detect: (d) => d.subarray(0, 8).toString("hex") === "5546320a57515d9e",
   parse(d, c) {
     if (d.length % 512) throw new EyeParseError("uf2-size");
-    const blocks = cap(d.length / 512),
-      seen = new Set<number>();
+
+    const blocks = cap(d.length / 512);
+    const seen = new Set<number>();
     let total: number | undefined;
+
     for (let i = 0; i < blocks; i++) {
       const b = range(d, i * 512, 512);
+
       if (
         u32(b, 0) !== 0x0a324655 ||
         u32(b, 4) !== 0x9e5d5157 ||
         u32(b, 508) !== 0x0ab16f30
       )
         throw new EyeParseError("uf2-magic");
-      const size = u32(b, 16),
-        index = u32(b, 20),
-        declared = u32(b, 24);
+
+      const size = u32(b, 16);
+      const index = u32(b, 20);
+      const declared = u32(b, 24);
+
       if (
         size > 476 ||
         !declared ||
@@ -284,13 +325,15 @@ const uf2: EyeFormatParser = {
     );
   },
 };
+
+/** Describe the legacy U-Boot header. Compression, CRC and execution stay limited. */
 const uimage: EyeFormatParser = {
   format: "U-Boot uImage",
   detect: (d) => d.subarray(0, 4).toString("hex") === "27051956",
   parse(d, c, child) {
     range(d, 0, 64);
-    const size = u32(d, 12, false),
-      payload = range(d, 64, size);
+    const size = u32(d, 12, false);
+    const payload = range(d, 64, size);
     c.observe(
       "firmware.header",
       "Legacy U-Boot image metadata",
@@ -320,31 +363,38 @@ const uimage: EyeFormatParser = {
     );
   },
 };
+
+/** Walk aligned device-tree tokens and expose selected FIT metadata and payload hashes. */
 const fit: EyeFormatParser = {
   format: "FIT/Device Tree",
   detect: (d) => d.subarray(0, 4).toString("hex") === "d00dfeed",
   parse(d, c) {
     range(d, 0, 40);
-    const total = u32(d, 4, false),
-      so = u32(d, 8, false),
-      st = u32(d, 12, false),
-      ss = u32(d, 36, false),
-      ns = u32(d, 32, false);
+    const total = u32(d, 4, false);
+    const so = u32(d, 8, false);
+    const st = u32(d, 12, false);
+    const ss = u32(d, 36, false);
+    const ns = u32(d, 32, false);
+
     if (total !== d.length || u32(d, 20, false) < 17)
       throw new EyeParseError("fit-header");
-    const structure = range(d, so, ss),
-      names = range(d, st, ns);
-    let p = 0,
-      tokens = 0,
-      depth = 0,
-      ended = false;
+
+    const structure = range(d, so, ss);
+    const names = range(d, st, ns);
+    let p = 0;
+    let tokens = 0;
+    let depth = 0;
+    let ended = false;
+
     while (p < structure.length) {
       cap(++tokens);
       const token = u32(structure, p, false);
       p += 4;
       if (token === 1) {
         let end = structure.indexOf(0, p);
+
         if (end < 0 || end - p > 160) throw new EyeParseError("fit-node");
+
         const name = structure.subarray(p, end).toString("utf8");
         p = Math.ceil((end + 1) / 4) * 4;
         cap(++depth, 64);
@@ -352,15 +402,18 @@ const fit: EyeFormatParser = {
       } else if (token === 2) {
         if (--depth < 0) throw new EyeParseError("fit-depth");
       } else if (token === 3) {
-        const len = u32(structure, p, false),
-          nameAt = u32(structure, p + 4, false);
+        const len = u32(structure, p, false);
+        const nameAt = u32(structure, p + 4, false);
         p += 8;
         const value = range(structure, p, len);
         p += Math.ceil(len / 4) * 4;
         range(names, nameAt, 1);
         const end = names.indexOf(0, nameAt);
+
         if (end < 0 || end - nameAt > 80) throw new EyeParseError("fit-name");
+
         const name = names.subarray(nameAt, end).toString("ascii");
+
         if (name === "data")
           c.observe("firmware.payload", "Embedded image bytes", {
             bytes: len,
@@ -371,6 +424,7 @@ const fit: EyeFormatParser = {
             .subarray(0, 80)
             .toString("ascii")
             .replace(/\0+$/, "");
+
           if (/^[\w,+.-]*$/.test(text))
             c.observe("firmware.property", "Device tree property", {
               name,
@@ -391,29 +445,36 @@ const fit: EyeFormatParser = {
     );
   },
 };
+
+/** Validate Intel HEX record sizes, checksums, address ranges and terminal EOF. */
 const ihex: EyeFormatParser = {
   format: "Intel HEX",
   detect: (d, n) => /\.hex$/i.test(n) && d[0] === 58,
   parse(d, c) {
-    let records = 0,
-      bytes = 0,
-      eof = false,
-      base = 0;
+    let records = 0;
+    let bytes = 0;
+    let eof = false;
+    let base = 0;
+
     for (const line of d.toString("ascii").split(/\r?\n/)) {
       if (!line.trim()) continue;
       cap(++records);
       if (eof || !/^:[0-9a-f]+$/i.test(line) || line.length % 2 !== 1)
         throw new EyeParseError("hex-record");
-      const b = Buffer.from(line.slice(1), "hex"),
-        n = b[0];
+
+      const b = Buffer.from(line.slice(1), "hex");
+      const n = b[0];
+
       if (
         n === undefined ||
         b.length !== n + 5 ||
         b.reduce((a, x) => a + x, 0) % 256
       )
         throw new EyeParseError("hex-checksum");
-      const type = b[3]!,
-        address = u16(b, 1, false);
+
+      const type = b[3]!;
+      const address = u16(b, 1, false);
+
       if (type === 0) {
         if (base + address + n > 0x100000000)
           throw new EyeParseError("hex-address");
@@ -439,6 +500,8 @@ const ihex: EyeFormatParser = {
     );
   },
 };
+
+/** Register passive metadata readers for database, capture, crash and firmware inputs. */
 export const CONTAINER_PARSERS: readonly EyeFormatParser[] = [
   sqlite,
   pcap,

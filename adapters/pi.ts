@@ -12,8 +12,11 @@ import {
 } from "./types.js";
 
 const PI_PROMPTS_README = ".pi/prompts/README.md";
+
 const PI_SKILLS_README = ".pi/skills/README.md";
-const PI_SOURCE = "https://github.com/badlogic/pi-mono/blob/main/packages/coding-agent/docs/prompt-templates.md";
+
+const PI_SOURCE =
+  "https://github.com/badlogic/pi-mono/blob/main/packages/coding-agent/docs/prompt-templates.md";
 
 export class PiAdapter implements RuntimeAdapter {
   public readonly id = "pi";

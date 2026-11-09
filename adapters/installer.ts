@@ -46,9 +46,11 @@ interface SkillSource {
 /** Lists the skill departments bundled with Sauron (excluding `_template`). */
 export function listDepartments(sauronRoot: string): string[] {
   const skillsDir = path.join(sauronRoot, "skills");
+
   if (!fs.existsSync(skillsDir)) {
     return [];
   }
+
   return fs
     .readdirSync(skillsDir, { withFileTypes: true })
     .filter((entry) => entry.isDirectory() && !entry.name.startsWith("_"))
@@ -65,18 +67,23 @@ export function listSkills(
   departments: readonly string[],
 ): SkillSource[] {
   const found: SkillSource[] = [];
+
   for (const department of departments) {
     const deptDir = path.join(sauronRoot, "skills", department);
+
     if (!fs.existsSync(deptDir)) continue;
     for (const entry of fs.readdirSync(deptDir, { withFileTypes: true })) {
       if (!entry.isDirectory()) continue;
+
       const dir = path.join(deptDir, entry.name);
+
       if (fs.existsSync(path.join(dir, "SKILL.md"))) {
         found.push({ name: entry.name, department, dir });
         continue;
       }
       for (const child of fs.readdirSync(dir, { withFileTypes: true })) {
         const childDir = path.join(dir, child.name);
+
         if (
           child.isDirectory() &&
           fs.existsSync(path.join(childDir, "SKILL.md"))
@@ -86,22 +93,26 @@ export function listSkills(
       }
     }
   }
+
   return found.sort((a, b) => a.name.localeCompare(b.name));
 }
 
 /** Recursively lists files under a folder, as forward-slash relative paths. */
 function listFiles(root: string, rel = ""): string[] {
   const files: string[] = [];
+
   for (const entry of fs.readdirSync(path.join(root, rel), {
     withFileTypes: true,
   })) {
     const childRel = rel ? `${rel}/${entry.name}` : entry.name;
+
     if (entry.isDirectory()) {
       files.push(...listFiles(root, childRel));
     } else if (entry.isFile()) {
       files.push(childRel);
     }
   }
+
   return files;
 }
 
@@ -115,8 +126,10 @@ export function skillFileOutputs(
   baseDirs: readonly string[],
 ): InstallOutput[] {
   const outputs: InstallOutput[] = [];
+
   for (const file of listFiles(skillDir)) {
     const content = fs.readFileSync(path.join(skillDir, file), "utf8");
+
     for (const base of baseDirs) {
       outputs.push({
         relativePath: `${base}/${skillName}/${file}`,
@@ -125,6 +138,7 @@ export function skillFileOutputs(
       });
     }
   }
+
   return outputs;
 }
 
@@ -134,14 +148,17 @@ function readFrontmatter(raw: string): {
   body: string;
 } {
   const match = /^---\r?\n([\s\S]*?)\r?\n---\r?\n?/.exec(raw);
+
   if (!match) {
     return { data: {}, body: raw };
   }
+
   const parsed: unknown = parseYaml(match[1] ?? "");
   const data =
     parsed && typeof parsed === "object"
       ? (parsed as Record<string, unknown>)
       : {};
+
   return { data, body: raw.slice(match[0].length) };
 }
 
@@ -163,6 +180,7 @@ export function listSkillChoices(
     );
     const name = data["name"];
     const description = data["description"];
+
     if (
       typeof name !== "string" ||
       !name.trim() ||
@@ -173,6 +191,7 @@ export function listSkillChoices(
         `Missing picker name or description: ${skill.department}/${skill.name}`,
       );
     }
+
     return {
       value: `${skill.department}/${skill.name}`,
       label: name.replace(/\s+/g, " ").trim(),
@@ -296,7 +315,9 @@ function loadAgents(
   folder: "fellowship" | "agents",
 ): AgentSpec[] {
   const dir = path.join(sauronRoot, "core", folder);
+
   if (!fs.existsSync(dir)) return [];
+
   return fs
     .readdirSync(dir)
     .filter((file) => file.endsWith(".md"))
@@ -318,6 +339,7 @@ function loadAgents(
           ? data["department"]
           : "";
       const description = `${title} (${name}).${keywords ? ` Use proactively for: ${keywords}.` : ""}`;
+
       return {
         id,
         description,
@@ -335,12 +357,14 @@ function renderAgent(
 ): string {
   if (target.agentFormat === "toml") {
     const instructions = `${agent.body.trimEnd()}\n\n${accessNote(agent.access, context.commands)}`;
+
     return [
       ...target.agentFrontmatter(agent, context),
       `developer_instructions = ${JSON.stringify(instructions)}`,
       "",
     ].join("\n");
   }
+
   return [
     "---",
     ...target.agentFrontmatter(agent, context),
@@ -370,7 +394,9 @@ function loadBundledCommands(
   sauronRoot: string,
 ): { file: string; sourceFile: string; content: string }[] {
   const commandsDir = path.join(sauronRoot, "commands");
+
   if (!fs.existsSync(commandsDir)) return [];
+
   const files = fs
     .readdirSync(commandsDir)
     .filter((file) => file.endsWith(".md"))
@@ -381,13 +407,17 @@ function loadBundledCommands(
     ),
   );
   const commandNames = new Set(files.map((file) => file.slice(0, -3)));
+
   return files.map((sourceFile) => {
     const name = sourceFile.slice(0, -3);
     const alias = skillNames.has(name) ? `sauron-${name}` : name;
+
     if (alias !== name && (skillNames.has(alias) || commandNames.has(alias))) {
       throw new Error(`Command alias collides with an existing name: ${alias}`);
     }
+
     const content = fs.readFileSync(path.join(commandsDir, sourceFile), "utf8");
+
     return {
       sourceFile,
       file: `${alias}.md`,
@@ -414,10 +444,14 @@ export function commandRetirements(
   plan: InitPlan,
 ): InstallRetirement[] {
   if (!plan.commands) return [];
+
   const commands = loadBundledCommands(sauronRoot);
+
   return plan.nativeRuntimes.flatMap((runtime) => {
     const target = NATIVE_TARGETS[runtime];
+
     if (!target?.commandsDir) return [];
+
     return commands
       .filter(
         ({ file, sourceFile }) =>
@@ -457,6 +491,7 @@ export function buildInstallOutputs(
   const skillBases = plan.runtimes.includes("claude")
     ? [".agents/skills", ".claude/skills"]
     : [".agents/skills"];
+
   for (const skill of selected) {
     outputs.push(...skillFileOutputs(skill.dir, skill.name, skillBases));
   }
@@ -473,6 +508,7 @@ export function buildInstallOutputs(
 
   for (const runtime of plan.nativeRuntimes) {
     const target = NATIVE_TARGETS[runtime];
+
     if (!target) continue;
 
     for (const agent of [...fellowship, ...core]) {

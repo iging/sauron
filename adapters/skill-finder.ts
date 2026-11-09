@@ -64,21 +64,51 @@ export interface RankedSkill {
 }
 
 const STOP_WORDS: ReadonlySet<string> = new Set([
-  "a", "an", "and", "are", "as", "at", "be", "by", "do", "for", "from", "how",
-  "i", "in", "is", "it", "me", "my", "of", "on", "or", "so", "that", "the",
-  "this", "to", "we", "with", "you",
+  "a",
+  "an",
+  "and",
+  "are",
+  "as",
+  "at",
+  "be",
+  "by",
+  "do",
+  "for",
+  "from",
+  "how",
+  "i",
+  "in",
+  "is",
+  "it",
+  "me",
+  "my",
+  "of",
+  "on",
+  "or",
+  "so",
+  "that",
+  "the",
+  "this",
+  "to",
+  "we",
+  "with",
+  "you",
 ]);
 
 /** Field weights: a name match counts most, then trigger phrases, then description. */
 const NAME_WEIGHT = 3;
+
 const TRIGGER_WEIGHT = 2;
+
 const DESCRIPTION_WEIGHT = 1;
 
 /** Standard BM25 saturation and length normalization constants. */
 const BM25_K1 = 1.2;
+
 const BM25_B = 0.75;
 
 const SKILL_FILE = "SKILL.md";
+
 const TEMPLATE_DIR = "_template";
 
 /**
@@ -86,9 +116,16 @@ const TEMPLATE_DIR = "_template";
  */
 function undouble(stem: string): string {
   const last = stem.at(-1);
-  if (stem.length > 3 && last !== undefined && last === stem.at(-2) && !"aeiouls".includes(last)) {
+
+  if (
+    stem.length > 3 &&
+    last !== undefined &&
+    last === stem.at(-2) &&
+    !"aeiouls".includes(last)
+  ) {
     return stem.slice(0, -1);
   }
+
   return stem;
 }
 
@@ -105,6 +142,7 @@ function stem(word: string): string {
   if (word.length > 3 && word.endsWith("s") && !word.endsWith("ss")) {
     return word.slice(0, -1);
   }
+
   return word;
 }
 
@@ -127,9 +165,15 @@ export function tokenizeQuery(text: string): string[] {
  */
 function unquote(value: string): string {
   const first = value.at(0);
-  if (value.length >= 2 && (first === '"' || first === "'") && value.at(-1) === first) {
+
+  if (
+    value.length >= 2 &&
+    (first === '"' || first === "'") &&
+    value.at(-1) === first
+  ) {
     return value.slice(1, -1);
   }
+
   return value;
 }
 
@@ -141,8 +185,10 @@ function unquote(value: string): string {
 function readFrontmatter(block: string): Map<string, string> {
   const fields = new Map<string, string>();
   let openKey: string | undefined;
+
   for (const line of block.split(/\r?\n/)) {
     const match = /^([A-Za-z][A-Za-z0-9_-]*):\s*(.*)$/.exec(line);
+
     if (match?.[1] !== undefined && match[2] !== undefined) {
       const value = match[2].trim();
       const isBlockStart = value === "" || /^[>|][+-]?$/.test(value);
@@ -150,14 +196,24 @@ function readFrontmatter(block: string): Map<string, string> {
       fields.set(match[1], isBlockStart ? "" : unquote(value));
       continue;
     }
+
     const continuation = line.trim();
-    if (openKey !== undefined && /^\s+\S/.test(line) && !continuation.startsWith("- ")) {
+
+    if (
+      openKey !== undefined &&
+      /^\s+\S/.test(line) &&
+      !continuation.startsWith("- ")
+    ) {
       const previous = fields.get(openKey) ?? "";
-      fields.set(openKey, previous === "" ? continuation : `${previous} ${continuation}`);
+      fields.set(
+        openKey,
+        previous === "" ? continuation : `${previous} ${continuation}`,
+      );
     } else if (continuation !== "") {
       openKey = undefined;
     }
   }
+
   return fields;
 }
 
@@ -165,19 +221,29 @@ function readFrontmatter(block: string): Map<string, string> {
  * Extracts Trigger Matrix phrases whose decision cell reads YES.
  */
 function readTriggerPhrases(body: string): string[] {
-  const section = /^## 2\. Trigger Matrix\s*$([\s\S]*?)(?=^## |(?![\s\S]))/m.exec(body);
+  const section =
+    /^## 2\. Trigger Matrix\s*$([\s\S]*?)(?=^## |(?![\s\S]))/m.exec(body);
+
   if (section?.[1] === undefined) {
     return [];
   }
+
   const phrases: string[] = [];
+
   for (const line of section[1].split(/\r?\n/)) {
     const cells = line.split("|").map((cell) => cell.trim());
     const phrase = cells[1];
     const decision = cells[2];
-    if (phrase !== undefined && decision !== undefined && decision.toUpperCase() === "YES") {
+
+    if (
+      phrase !== undefined &&
+      decision !== undefined &&
+      decision.toUpperCase() === "YES"
+    ) {
       phrases.push(phrase.replace(/^["'`]+|["'`]+$/g, ""));
     }
   }
+
   return phrases;
 }
 
@@ -189,21 +255,28 @@ function readTriggerPhrases(body: string): string[] {
  * @returns Parsed skill document.
  * @throws Error when frontmatter, name, or description is missing.
  */
-export function parseSkillDocument(filePath: string, content: string): SkillDocument {
+export function parseSkillDocument(
+  filePath: string,
+  content: string,
+): SkillDocument {
   const normalizedPath = filePath.replace(/\\/g, "/");
   const match = /^---\r?\n([\s\S]*?)\r?\n---\s*(?:\r?\n|$)/.exec(content);
+
   if (match?.[1] === undefined) {
     throw new Error(`Missing frontmatter in ${normalizedPath}`);
   }
+
   const fields = readFrontmatter(match[1]);
   const name = fields.get("name") ?? "";
   const description = fields.get("description") ?? "";
+
   if (name === "") {
     throw new Error(`Missing name in frontmatter of ${normalizedPath}`);
   }
   if (description === "") {
     throw new Error(`Missing description in frontmatter of ${normalizedPath}`);
   }
+
   return {
     name,
     description,
@@ -219,8 +292,10 @@ export function parseSkillDocument(filePath: string, content: string): SkillDocu
  */
 function collectSkillFiles(directory: string): string[] {
   const found: string[] = [];
+
   for (const entry of fs.readdirSync(directory, { withFileTypes: true })) {
     const full = path.join(directory, entry.name);
+
     if (entry.isDirectory()) {
       if (entry.name !== TEMPLATE_DIR && entry.name !== "node_modules") {
         found.push(...collectSkillFiles(full));
@@ -229,6 +304,7 @@ function collectSkillFiles(directory: string): string[] {
       found.push(full);
     }
   }
+
   return found;
 }
 
@@ -240,16 +316,23 @@ function collectSkillFiles(directory: string): string[] {
  * @returns Valid documents and the files rejected by the parser.
  * @throws Error when skillsRoot does not exist or is not a directory.
  */
-export function loadSkillCatalog(skillsRoot: string, baseDir: string): SkillCatalog {
+export function loadSkillCatalog(
+  skillsRoot: string,
+  baseDir: string,
+): SkillCatalog {
   if (!fs.existsSync(skillsRoot) || !fs.statSync(skillsRoot).isDirectory()) {
     throw new Error(`Skills directory not found: ${skillsRoot}`);
   }
+
   const documents: SkillDocument[] = [];
   const rejected: RejectedSkill[] = [];
+
   for (const file of collectSkillFiles(skillsRoot)) {
     const relativePath = path.relative(baseDir, file).replace(/\\/g, "/");
     try {
-      documents.push(parseSkillDocument(relativePath, fs.readFileSync(file, "utf8")));
+      documents.push(
+        parseSkillDocument(relativePath, fs.readFileSync(file, "utf8")),
+      );
     } catch (error) {
       rejected.push({
         path: relativePath,
@@ -257,8 +340,13 @@ export function loadSkillCatalog(skillsRoot: string, baseDir: string): SkillCata
       });
     }
   }
-  documents.sort((left, right) => (left.path < right.path ? -1 : left.path > right.path ? 1 : 0));
-  rejected.sort((left, right) => (left.path < right.path ? -1 : left.path > right.path ? 1 : 0));
+  documents.sort((left, right) =>
+    left.path < right.path ? -1 : left.path > right.path ? 1 : 0,
+  );
+  rejected.sort((left, right) =>
+    left.path < right.path ? -1 : left.path > right.path ? 1 : 0,
+  );
+
   return { documents, rejected };
 }
 
@@ -276,6 +364,7 @@ function weightedTerms(document: SkillDocument): Map<string, number> {
   add(document.triggerCommand, NAME_WEIGHT);
   add(document.triggerPhrases.join(" "), TRIGGER_WEIGHT);
   add(document.description, DESCRIPTION_WEIGHT);
+
   return terms;
 }
 
@@ -296,7 +385,9 @@ export function rankSkills(
   if (!Number.isInteger(limit) || limit < 1) {
     throw new Error(`Invalid limit: ${limit}. Expected a positive integer.`);
   }
+
   const queryTerms = [...new Set(tokenizeQuery(query))];
+
   if (queryTerms.length === 0 || documents.length === 0) {
     return [];
   }
@@ -304,31 +395,44 @@ export function rankSkills(
   const termMaps = documents.map(weightedTerms);
   const lengths = termMaps.map((terms) => {
     let total = 0;
+
     for (const count of terms.values()) {
       total += count;
     }
+
     return total;
   });
-  const averageLength = lengths.reduce((sum, length) => sum + length, 0) / documents.length || 1;
+  const averageLength =
+    lengths.reduce((sum, length) => sum + length, 0) / documents.length || 1;
 
   const results: RankedSkill[] = [];
   documents.forEach((document, index) => {
     const terms = termMaps[index];
     const length = lengths[index];
+
     if (terms === undefined || length === undefined) {
       return;
     }
+
     let score = 0;
+
     for (const term of queryTerms) {
       const frequency = terms.get(term);
+
       if (frequency === undefined) {
         continue;
       }
-      const containing = termMaps.filter((candidate) => candidate.has(term)).length;
-      const idf = Math.log(1 + (documents.length - containing + 0.5) / (containing + 0.5));
+
+      const containing = termMaps.filter((candidate) =>
+        candidate.has(term),
+      ).length;
+      const idf = Math.log(
+        1 + (documents.length - containing + 0.5) / (containing + 0.5),
+      );
       const normalized =
         (frequency * (BM25_K1 + 1)) /
-        (frequency + BM25_K1 * (1 - BM25_B + BM25_B * (length / averageLength)));
+        (frequency +
+          BM25_K1 * (1 - BM25_B + BM25_B * (length / averageLength)));
       score += idf * normalized;
     }
     if (score > 0) {
@@ -343,8 +447,15 @@ export function rankSkills(
   });
 
   results.sort((left, right) =>
-    right.score !== left.score ? right.score - left.score : left.path < right.path ? -1 : left.path > right.path ? 1 : 0,
+    right.score !== left.score
+      ? right.score - left.score
+      : left.path < right.path
+        ? -1
+        : left.path > right.path
+          ? 1
+          : 0,
   );
+
   return results.slice(0, limit);
 }
 
@@ -355,18 +466,27 @@ export function rankSkills(
  * @param query - Original task description.
  * @returns Report text without a trailing newline.
  */
-export function formatFinderReport(results: readonly RankedSkill[], query: string): string {
+export function formatFinderReport(
+  results: readonly RankedSkill[],
+  query: string,
+): string {
   const top = results[0];
+
   if (top === undefined) {
     return `No skill matches "${query}". Run: sauron list-skills`;
   }
+
   const lines: string[] = [`Skills ranked for "${query}":`, ""];
   results.forEach((result, index) => {
-    const command = result.triggerCommand === "" ? "" : `  ${result.triggerCommand}`;
-    lines.push(`${index + 1}. ${result.name}  (score ${result.score.toFixed(2)})${command}`);
+    const command =
+      result.triggerCommand === "" ? "" : `  ${result.triggerCommand}`;
+    lines.push(
+      `${index + 1}. ${result.name}  (score ${result.score.toFixed(2)})${command}`,
+    );
     lines.push(`   ${result.path}`);
     lines.push(`   ${result.description}`);
   });
   lines.push("", "Paste-ready:", `Read ${top.path}, then: ${query}`);
+
   return lines.join("\n");
 }

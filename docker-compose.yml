@@ -1,5 +1,8 @@
+name: sauron-ai
+
 services:
   sauron:
+    image: sauron-ai:local
     build:
       context: .
       dockerfile: docker/Dockerfile.cli

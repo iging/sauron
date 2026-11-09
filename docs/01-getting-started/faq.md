@@ -8,8 +8,8 @@
 
 **Sauron AI** is a local-first, universal AI coding agent harness and orchestration framework. It solves two critical problems in modern AI engineering:
 
-1. **Configuration Fragmentation:** Instead of manually maintaining separate rules for Cursor, Claude Code, Windsurf, Copilot, and Cline, Sauron compiles a single master configuration (`sauron.config.yaml`) to 17 native runtimes in milliseconds.
-2. **Unverified Agent Coding:** Instead of letting generic AI prompts make chaotic, untested changes, Sauron enforces a 9-agent Fellowship (planning, architecture, TDD, linting, security, refactoring, commits) backed by over 300 modular skills.
+1. **Configuration Fragmentation:** Instead of manually maintaining separate rules for Cursor, Claude Code, Windsurf, Copilot, and Cline, Sauron compiles a single master configuration (`sauron.config.yaml`) to 20 runtime adapters.
+2. **Unverified Agent Coding:** Instead of letting generic AI prompts make chaotic, untested changes, Sauron supplies a 9-agent Fellowship and 69 specialist agents, backed by 248 installable skills across nine departments. Tool enforcement depends on the runtime. See [support tiers](../04-runtime-adapters/runtime-tiers.md).
 
 ---
 
@@ -25,7 +25,7 @@
 
 ### 3. Do I need Node.js installed to use Sauron?
 
-**Yes, unless you use Docker.** Sauron runs on Node.js 18 or newer. These install paths are available:
+**npm and shell installations require Node.js 20.12.0 or newer.** Docker and the Windows portable bundle include Node. The portable bundle is implemented locally for the upcoming release. A production winget package is not yet published. See [Windows portable](windows-portable.md). These install paths are available:
 
 1. **npm or pnpm:** `npx sauron-ai init` or `pnpm dlx sauron-ai init`
 2. **Shell Installers (Node.js required):**

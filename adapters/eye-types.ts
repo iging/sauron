@@ -1,6 +1,8 @@
 /// <reference types="node" />
 /** @fileoverview Eye evidence contract and checked binary reads. Target data never becomes instructions. */
 import * as crypto from "node:crypto";
+
+/** JSON-safe values allowed in the evidence ledger. */
 export type EyeValue =
   | null
   | string
@@ -8,6 +10,8 @@ export type EyeValue =
   | boolean
   | EyeValue[]
   | { [key: string]: EyeValue };
+
+/** One classified observation, inference or explicit gap with a stable report-local ID. */
 export interface EyeEvidence {
   id: string;
   status: "observed" | "inferred" | "unknown";
@@ -20,6 +24,8 @@ export interface EyeEvidence {
   reason?: string;
   evidence?: string[];
 }
+
+/** Bounded report shared by text, JSON, diff, reuse and MCP outputs. */
 export interface EyeReport {
   schemaVersion: 1;
   target: { name: string; size: number; sha256: string };
@@ -34,6 +40,8 @@ export interface EyeReport {
   }[];
   limitations: string[];
 }
+
+/** Global resource ceilings. Nested parsers share entry and inflation budgets. */
 export const EYE_LIMITS = Object.freeze({
   inputBytes: 32 * 1024 * 1024,
   entryBytes: 4 * 1024 * 1024,
@@ -44,13 +52,18 @@ export const EYE_LIMITS = Object.freeze({
   strings: 256,
   stringBytes: 160,
 });
+
+/** A safe diagnostic code. Never put target bytes into a parser exception. */
 export class EyeParseError extends Error {
   readonly code: string;
+
   constructor(code: string = "bounds") {
     super("Input exceeds a checked format boundary.");
     this.code = code;
   }
 }
+
+/** Check integer offsets before exposing a byte slice to any format parser. */
 export function eyeRange(data: Buffer, offset: number, length: number): Buffer {
   if (
     !Number.isSafeInteger(offset) ||
@@ -61,23 +74,36 @@ export function eyeRange(data: Buffer, offset: number, length: number): Buffer {
     length > data.length - offset
   )
     throw new EyeParseError();
+
   return data.subarray(offset, offset + length);
 }
+
+/** Read a checked 16-bit integer using the format's declared byte order. */
 export function eyeU16(data: Buffer, offset: number, little = true): number {
   const value = eyeRange(data, offset, 2);
+
   return little ? value.readUInt16LE(0) : value.readUInt16BE(0);
 }
+
+/** Read a checked 32-bit integer using the format's declared byte order. */
 export function eyeU32(data: Buffer, offset: number, little = true): number {
   const value = eyeRange(data, offset, 4);
+
   return little ? value.readUInt32LE(0) : value.readUInt32BE(0);
 }
+
+/** Reject 64-bit offsets that JavaScript cannot represent exactly. */
 export function eyeU64(data: Buffer, offset: number, little = true): number {
   const value = eyeRange(data, offset, 8);
   const number = little ? value.readBigUInt64LE(0) : value.readBigUInt64BE(0);
+
   if (number > BigInt(Number.MAX_SAFE_INTEGER))
     throw new EyeParseError("integer");
+
   return Number(number);
 }
+
+/** Read a bounded NUL-terminated string and redact unsafe printable content. */
 export function eyeCString(
   data: Buffer,
   offset: number,
@@ -86,12 +112,15 @@ export function eyeCString(
   eyeRange(data, offset, 1);
   const end = Math.min(data.length, offset + max);
   const zero = data.indexOf(0, offset);
+
   return eyeText(
     data
       .subarray(offset, zero >= offset && zero < end ? zero : end)
       .toString("utf8"),
   );
 }
+
+/** Apply conservative control-character and credential-pattern redaction. */
 export function eyeText(value: string, maximum = 256): string {
   return value
     .replace(/[\x00-\x1f\x7f]/g, " ")
@@ -102,25 +131,34 @@ export function eyeText(value: string, maximum = 256): string {
     .replace(/\b[A-Za-z0-9_+/=-]{48,}\b/g, "[redacted]")
     .slice(0, maximum);
 }
+
+/** Hash inert bytes for target identity. This does not establish authenticity. */
 export function eyeHash(data: Buffer | string): string {
   return crypto.createHash("sha256").update(data).digest("hex");
 }
+
+/** Keep public route segments while dropping credentials, query and fragment data. */
 export function eyeUrl(value: string): string | undefined {
   try {
     const url = new URL(value);
+
     if (!["http:", "https:", "ws:", "wss:"].includes(url.protocol))
       return undefined;
+
     const publicSegments =
       /^(?:api|v\d+|users?|auth|login|logout|graphql|rest|sessions?|assets?|static|images?|js|css|index(?:\.html)?|health|status)$/i;
     const route = url.pathname
       .split("/")
       .map((part) => (!part || publicSegments.test(part) ? part : "[redacted]"))
       .join("/");
+
     return eyeText(url.protocol + "//" + url.host + route);
   } catch {
     return undefined;
   }
 }
+
+/** Sanitize nested evidence values independently of the format parser that supplies them. */
 function clean(value: EyeValue, depth = 0): EyeValue {
   if (depth > 8) return "[bounded]";
   if (typeof value === "string")
@@ -134,21 +172,27 @@ function clean(value: EyeValue, depth = 0): EyeValue {
   if (value === null || typeof value === "boolean") return value;
   if (Array.isArray(value))
     return value.slice(0, 128).map((item) => clean(item, depth + 1));
+
   const result: { [key: string]: EyeValue } = Object.create(null) as {
     [key: string]: EyeValue;
   };
+
   for (const [key, item] of Object.entries(value).slice(0, 64))
     result[eyeText(key, 80)] =
       /token|secret|password|authorization|cookie/i.test(key)
         ? "[redacted]"
         : clean(item, depth + 1);
+
   return result;
 }
+
+/** Append evidence and diagnostics while sharing limits across nested containers. */
 export class EyeContext {
   readonly report: EyeReport;
   readonly source: string;
   readonly budget: { entries: number; inflatedBytes: number };
   readonly depth: number;
+
   constructor(
     report: EyeReport,
     source: string,
@@ -160,6 +204,7 @@ export class EyeContext {
     this.budget = budget;
     this.depth = depth;
   }
+
   private add(
     status: EyeEvidence["status"],
     kind: string,
@@ -175,8 +220,10 @@ export class EyeContext {
         "evidence-limit",
         "Further evidence exceeds the ledger limit.",
       );
+
       return "";
     }
+
     const id = "E" + String(this.report.evidence.length + 1).padStart(5, "0");
     this.report.evidence.push({
       id,
@@ -192,8 +239,10 @@ export class EyeContext {
         ? {}
         : { evidence: evidence.filter(Boolean).slice(0, 128) }),
     });
+
     return id;
   }
+
   observe(
     kind: string,
     summary: string,
@@ -203,6 +252,7 @@ export class EyeContext {
   ): string {
     return this.add("observed", kind, summary, value, offset, length);
   }
+
   infer(
     kind: string,
     summary: string,
@@ -221,8 +271,10 @@ export class EyeContext {
       evidence,
     );
   }
+
   unknown(kind: string, reason: string): string {
     this.report.partial = true;
+
     return this.add(
       "unknown",
       kind,
@@ -233,6 +285,7 @@ export class EyeContext {
       reason,
     );
   }
+
   diagnostic(code: string, message: string, offset?: number): void {
     this.report.partial = true;
     if (
@@ -251,6 +304,7 @@ export class EyeContext {
         ...(offset === undefined ? {} : { offset }),
       });
   }
+
   fork(source: string): EyeContext {
     return new EyeContext(
       this.report,
@@ -260,11 +314,15 @@ export class EyeContext {
     );
   }
 }
+
+/** Delegate nested bytes without extraction, execution or a fresh resource budget. */
 export type EyeChildInspector = (
   data: Buffer,
   name: string,
   context: EyeContext,
 ) => void;
+
+/** Recognize and inspect inert bytes. Unsupported details remain explicit unknowns. */
 export interface EyeFormatParser {
   format: string;
   detect(data: Buffer, name: string): boolean;

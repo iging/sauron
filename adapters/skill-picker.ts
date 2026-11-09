@@ -22,8 +22,10 @@ function checked(
   available: readonly string[],
 ): string[] {
   const unknown = values.filter((value) => !available.includes(value));
+
   if (unknown.length)
     throw new InitPlanError(`Unknown picker selection: ${unknown.join(", ")}`);
+
   return [...new Set(values)];
 }
 
@@ -33,11 +35,15 @@ export function parsePickerValues(
   available: readonly string[],
 ): string[] {
   const raw = input.trim().toLowerCase();
+
   if (raw === "all") return [...available];
   if (raw === "none") return [];
+
   const values = raw.split(",").map((value) => value.trim());
+
   if (values.some((value) => !value))
     throw new InitPlanError("Choose numbers or ids, all, or none.");
+
   return checked(
     values.map((value) =>
       /^\d+$/.test(value) ? (available[Number(value) - 1] ?? value) : value,
@@ -54,6 +60,7 @@ export async function pickSkills(
   ui: SkillPickerUI,
 ): Promise<InitPlan["skills"]> {
   const selections = new Map<string, "all" | string[]>();
+
   if (Array.isArray(initial)) {
     for (const item of initial) {
       const department = item.split("/")[0] ?? "";
@@ -68,8 +75,10 @@ export async function pickSkills(
       }
     }
   }
+
   // Choosing Pick from all starts with no departments, then checks each fresh department fully.
   let selectedDepartments = [...selections.keys()];
+
   for (;;) {
     selectedDepartments = checked(
       await ui.departments(departments, selectedDepartments),
@@ -80,6 +89,7 @@ export async function pickSkills(
         selections.delete(department);
     }
     let back = false;
+
     for (const department of selectedDepartments) {
       const options = listSkillChoices(sauronRoot, [department]);
       const available = options.map((option) => option.value);
@@ -89,6 +99,7 @@ export async function pickSkills(
           ? available
           : checked(previous, available);
       const picked = await ui.skills(department, options, defaults);
+
       if (picked === "back") {
         back = true;
         break;
@@ -96,17 +107,23 @@ export async function pickSkills(
       selections.set(department, checked(picked, available));
     }
     if (back) continue;
+
     const action = await ui.action();
+
     if (action === "another" || action === "back") continue;
     if (action !== "done") throw new InitPlanError("Unknown picker action.");
+
     const result = selectedDepartments.flatMap((department) => {
       const values = selections.get(department);
+
       if (!Array.isArray(values))
         throw new InitPlanError(
           "Finish the selected department before continuing.",
         );
+
       return values;
     });
+
     return result.length ? [...new Set(result)] : "none";
   }
 }

@@ -237,6 +237,7 @@ export function formatCavemanSection(
     "- Use normal prose for security warnings and confirmations of irreversible actions.",
     "- Switch tiers on request: `/caveman lite`, `/caveman full`, `/caveman ultra`. Disable with `/caveman off`.",
   ];
+
   if (mode === "off") {
     return [
       `${headingLevel} Token Optimization & Caveman Mode`,
@@ -246,6 +247,7 @@ export function formatCavemanSection(
       "",
     ];
   }
+
   return [
     `${headingLevel} Token Optimization & Caveman Mode`,
     "",

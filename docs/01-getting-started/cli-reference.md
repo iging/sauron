@@ -50,16 +50,21 @@ With piped input, pass `--interactive` to answer the same questions line by line
 
 1. Resolves the plan from prompts, flags, or the saved `init:` section of `sauron.config.yaml`.
 2. Writes `AGENTS.md`, `.agents/skills/`, `.agents/anti-patterns.md`, and the scaffold of each selected runtime.
-3. With Claude Code selected: installs skills into `.claude/skills/`, subagents into `.claude/agents/`, slash commands into `.claude/commands/`, and the Caveman output style. With OpenCode selected: subagents into `.opencode/agents/` and commands into `.opencode/commands/`. With omp selected: subagents into `.omp/agents/` and commands into `.omp/prompts/`.
+3. Native subagents also install for Codex and GitHub Copilot when selected. Their runtime
+   checks remain beta. See [native agents](../02-fellowship-agents/codex-copilot-agents.md).
+   With Claude Code selected: installs skills into `.claude/skills/`, subagents into `.claude/agents/`, slash commands into `.claude/commands/`, and the Caveman output style. With OpenCode selected: subagents into `.opencode/agents/` and commands into `.opencode/commands/`. With omp selected: subagents into `.omp/agents/` and commands into `.omp/prompts/`.
 4. Merges into existing files instead of replacing them (managed `sauron:start/end` blocks; JSON keys you set always win). Copied skills you edited are skipped. Every change is backed up to `.sauron/backups/`.
-5. Saves the choices under `init:` in `sauron.config.yaml` and records files in `.sauron/manifest.json`. `nativeRuntimes` lists the runtimes that receive subagents and commands. A config saved before 3.2.0 has no such key and stays Claude-only on `sync`. To opt in, run `init` with an explicit `--runtimes=` list.
+5. Saves runtime toggles and skills at the top level of config v2, and agent/command choices
+   under `init:`. Records managed files in `.sauron/manifest.json`.
+   `init.nativeRuntimes` controls native-agent opt-in. Old configs preserve Claude-only native
+   choices during migration. See [migration](config-v2.md).
 
 **Options:**
 
 - `--yes`, `-y`: No prompts. Uses the saved choices, or the Recommended preset.
 - `--runtimes=claude,cursor` or `--runtimes=all`: Runtimes to generate. `AGENTS.md` is always included.
-- `--agents=fellowship|core|both|none`: Subagents for Claude Code, OpenCode, and omp.
-- `--skills=all|none|<dept,...>`: Skills to install.
+- `--agents=fellowship|core|both|none`: Subagents for Claude Code, OpenCode, omp, Codex, and Copilot.
+- `--skills=all|none|<dept,dept/skill,...>`: Skills to install.
 - `--caveman=off|lite|full|ultra`: Default Caveman tier.
 - `--no-commands`: Skip slash commands for Claude Code, OpenCode, and omp.
 - `--interactive`: Ask the questions even without a terminal (piped answers).
@@ -69,9 +74,10 @@ Without a terminal and without flags, `init` uses the Recommended preset and pri
 
 ### `sync`
 
-Re-applies the saved `init:` choices without prompts. Files you edited are merged or skipped, never replaced.
+Applies the config v2 runtime toggles, skills, and saved native-agent choices without prompts. Files you edited are merged or skipped, never replaced.
 
 ```bash
+npx sauron-ai sync --dry-run
 npx sauron-ai sync
 ```
 
@@ -106,7 +112,7 @@ node ./bin/sauron.mjs status
 - Harness version and header banner.
 - All 20 runtimes with target configuration paths and sync states.
 - Fellowship agents with assigned titles and roles.
-- Skill ecosystem count across all 8 functional domains.
+- 248 installable skills across nine departments.
 
 ---
 
@@ -150,7 +156,7 @@ node ./bin/sauron.mjs list-skills
 ```
 
 **Output Structure:**
-Displays alphabetical domains (Architecture, Backend, Database, DevOps, Frontend, Quality, Security, Workflow) alongside all active skills within each domain.
+Displays installable skills under nine departments, including AI Engineering. Nested supporting prompt files are excluded.
 
 ---
 
@@ -173,32 +179,28 @@ Each result shows name, score, trigger command, path, and description. The last 
 
 ---
 
-### `sync`
-
-Synchronizes changes from `sauron.config.yaml` and skill directories into all enabled runtime adapter files.
-
-```bash
-node ./bin/sauron.mjs sync [options]
-```
-
-**Actions Performed:**
-
-1. Reads `sauron.config.yaml`.
-2. Evaluates diffs between existing runtime instructions and current specifications.
-3. Routes all file writes through `ConflictManager`.
-4. Creates timestamped backups in `.sauron/backups/` if existing files were manually edited.
-5. Updates `.sauron/manifest.json`.
-
-**Options:**
-
-- `--dry-run`: Calculates and displays file actions (`created`, `updated`, `unchanged`) without modifying files on disk.
-
----
-
 ## Global Flags
 
 - `--version`: Displays the current version of the Sauron engine.
 - `--help`: Displays the CLI help menu and usage instructions.
+
+## Config migration, memory, security scan, and graph
+
+```bash
+sauron upgrade --dry-run
+sauron upgrade
+sauron memory init --path docs/second-brain --dry-run
+sauron scan . --json
+sauron scan . --sarif
+sauron graph .
+```
+
+- [Config v2 migration](config-v2.md) explains backups, reports, downgrade limits and sync.
+- [Memory init](memory-init.md) creates a starter vault without replacing existing notes.
+- [Security scan](../05-security/agent-config-scan.md) explains selected-path coverage,
+  diagnostics and exit thresholds. A scan never edits the target.
+- Graph writes JSON, Markdown and HTML under `.sauron/graph/`. The HTML loads pinned graph
+  assets and fonts from the network when opened.
 
 ## Eye
 

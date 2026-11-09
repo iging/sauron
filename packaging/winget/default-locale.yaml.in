@@ -1,0 +1,18 @@
+# yaml-language-server: $schema=https://aka.ms/winget-manifest.defaultLocale.1.12.0.schema.json
+PackageIdentifier: __PACKAGE_ID__
+PackageVersion: __VERSION__
+PackageLocale: en-US
+Publisher: Sauron Contributors
+PublisherUrl: https://github.com/iging/sauron
+PackageName: Sauron AI
+PackageUrl: https://github.com/iging/sauron
+License: MIT OR Apache-2.0 OR Unlicense
+LicenseUrl: https://github.com/iging/sauron/blob/main/LICENSE
+ShortDescription: Universal AI agent harness for 20 coding runtimes.
+Moniker: sauron
+Tags:
+  - cli
+  - ai
+  - developer-tools
+ManifestType: defaultLocale
+ManifestVersion: 1.12.0

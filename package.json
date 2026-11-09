@@ -21,7 +21,8 @@
     "!docs/handoffs",
     "!docs/sauron-second-brain",
     "commands",
-    "scripts"
+    "scripts",
+    "packaging/winget"
   ],
   "scripts": {
     "build": "tsc",
@@ -33,7 +34,9 @@
     "prepare": "husky",
     "release:patch": "npm test && npm run check-docs && npm run build && npm version patch && npm publish && git push origin main --tags",
     "release:minor": "npm test && npm run check-docs && npm run build && npm version minor && npm publish && git push origin main --tags",
-    "release:major": "npm test && npm run check-docs && npm run build && npm version major && npm publish && git push origin main --tags"
+    "release:major": "npm test && npm run check-docs && npm run build && npm version major && npm publish && git push origin main --tags",
+    "build:windows": "npm run build && node scripts/packaging/build-windows.mjs",
+    "winget:manifest": "node scripts/packaging/generate-winget.mjs"
   },
   "keywords": [
     "ai",
@@ -68,6 +71,8 @@
   "devDependencies": {
     "@types/node": "^20.19.43",
     "husky": "^9.1.7",
-    "typescript": "^7.0.2"
+    "typescript": "^7.0.2",
+    "esbuild": "0.28.2",
+    "postject": "1.0.0-alpha.6"
   }
 }

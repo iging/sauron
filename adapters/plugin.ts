@@ -37,9 +37,11 @@ const PLUGIN_FOLDERS: readonly (readonly [string, string])[] = [
  */
 function withDescription(content: string, relativePath: string): string {
   if (/^---\r?\n/.test(content)) return content;
+
   const heading = /^#\s+(.+)$/m.exec(content)?.[1]?.trim();
   const name = relativePath.split("/").pop()?.replace(/\.md$/, "") ?? "command";
   const description = (heading ?? name).replace(/`/g, "");
+
   return `---\ndescription: ${JSON.stringify(description)}\n---\n\n${content}`;
 }
 
@@ -60,11 +62,14 @@ export function buildClaudePlugin(
   version: string,
 ): InstallOutput[] {
   const files: InstallOutput[] = [];
+
   for (const output of buildInstallOutputs(sauronRoot, PLUGIN_PLAN)) {
     const folder = PLUGIN_FOLDERS.find(([from]) =>
       output.relativePath.startsWith(from),
     );
+
     if (!folder) continue;
+
     const relativePath = `${PLUGIN_NAME}/${folder[1]}${output.relativePath.slice(folder[0].length)}`;
     files.push({
       relativePath,
@@ -133,5 +138,6 @@ export function buildClaudePlugin(
       raw: true,
     },
   );
+
   return files.sort((a, b) => a.relativePath.localeCompare(b.relativePath));
 }

@@ -8,6 +8,7 @@ export interface ScanIssue {
   code: string;
   message: string;
 }
+
 export interface FileAnalysis {
   findings: SinkFinding[];
   issues: ScanIssue[];
@@ -117,6 +118,7 @@ export function analyzeAgentFile(file: string, source: string): FileAnalysis {
   const endpoint = (value: string, line = 1) => {
     try {
       const url = new URL(value);
+
       if (url.username || url.password)
         add(
           "mcp-inline-secret",
@@ -145,26 +147,32 @@ export function analyzeAgentFile(file: string, source: string): FileAnalysis {
   const walk = (node: unknown, context: string, depth = 0): void => {
     if (++nodes > 10000 || depth > 32) {
       problem();
+
       return;
     }
     if (!node || typeof node !== "object" || seen.has(node)) return;
     seen.add(node);
     if (Array.isArray(node)) {
       for (const child of node) walk(child, context, depth + 1);
+
       return;
     }
+
     const record = node as Record<string, unknown>;
+
     if (
       context === "mcp" &&
       typeof record.command === "string" &&
       /(?:^|[\\/])npx(?:\.cmd|\.exe)?$/i.test(record.command)
     ) {
       const args = record.args;
+
       if (Array.isArray(args)) {
         const packages = args.filter(
           (arg): arg is string =>
             typeof arg === "string" && !arg.startsWith("-"),
         );
+
         if (packages.some((arg) => !/@v?\d+\.\d+\.\d+(?:-[\w.-]+)?$/.test(arg)))
           add(
             "mcp-floating-package",
@@ -180,6 +188,7 @@ export function analyzeAgentFile(file: string, source: string): FileAnalysis {
         : lower === "hooks"
           ? "hook"
           : context;
+
       if (
         (lower === "sandbox_mode" && value === "danger-full-access") ||
         (lower === "default_permissions" && value === ":danger-full-access") ||
@@ -260,12 +269,15 @@ export function analyzeAgentFile(file: string, source: string): FileAnalysis {
       logLevel: "silent",
       uniqueKeys: true,
     });
+
     if (doc.errors.length || doc.warnings.length)
       throw new Error("Unsupported YAML");
+
     return doc.toJS({ maxAliasCount: 50 }) as unknown;
   };
   const extension = file.split(".").pop()?.toLowerCase();
   const heuristic = extension === "toml";
+
   if (
     extension === "json" ||
     extension === "jsonc" ||
@@ -292,6 +304,7 @@ export function analyzeAgentFile(file: string, source: string): FileAnalysis {
         problem();
       }
     }
+
     let multiline = "";
     let section = "";
     source.split(/\r?\n/).forEach((line, index) => {
@@ -302,16 +315,23 @@ export function analyzeAgentFile(file: string, source: string): FileAnalysis {
       if (!heuristic) return;
       if (multiline) {
         if (line.includes(multiline)) multiline = "";
+
         return;
       }
+
       const triple = /=\s*("{3}|'{3})/.exec(line)?.[1];
+
       if (triple) {
         if (line.split(triple).length < 3) multiline = triple;
+
         return;
       }
+
       const table = /^\s*\[([^\]]+)\]\s*(?:#.*)?$/.exec(line);
+
       if (table) {
         section = table[1] ?? "";
+
         return;
       }
       if (
@@ -332,9 +352,12 @@ export function analyzeAgentFile(file: string, source: string): FileAnalysis {
           "Approval prompts are disabled. Review unattended execution and host isolation.",
           index + 1,
         );
+
       const scalar =
         /^\s*([\w-]+)\s*=\s*("(?:\\.|[^"\\])*"|'[^']*')\s*(?:#.*)?$/.exec(line);
+
       if (!scalar) return;
+
       let value: string;
       try {
         value = scalar[2]?.startsWith('"')
@@ -357,5 +380,6 @@ export function analyzeAgentFile(file: string, source: string): FileAnalysis {
       }
     });
   }
+
   return { findings, issues, heuristic };
 }
