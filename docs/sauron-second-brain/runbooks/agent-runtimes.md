@@ -17,7 +17,9 @@ hermes, openclaw, opencode, pi, omp, adal, codebuddy. Plus the shared `agents` c
 
 ## Native subagents and commands
 
-Claude Code, OpenCode, and omp get real files. Others get instructions and READMEs only.
+Claude Code, OpenCode, omp, Codex and Copilot get native agent files.
+Command wrappers install for Claude Code, OpenCode and omp. Other targets get instructions.
+Real-session evidence controls stable/beta tiers, not file generation alone.
 
 - Add one entry to `NATIVE_TARGETS` in `adapters/installer.ts` and one id to
   `NATIVE_RUNTIMES` in `adapters/init-plan.ts`.

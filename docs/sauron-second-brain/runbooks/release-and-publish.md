@@ -3,6 +3,15 @@
 How to ship a new `sauron-ai` version to npm. See [[status]] and [[security-rules]].
 Root release guides are retired. See [[verification-checklist]] for test steps.
 
+## Current 4.0.0 gate
+
+The approved handoff combines the features into one major release. Current package version
+is 3.2.0. Do not release or create a GitHub release merely to resume development.
+Miguel must authorize release execution and type the npm OTP.
+Before that signal, finish migration/docs review, hosted CI, packed init/upgrade/doctor/
+uninstall/Eye/scan/graph, Windows zip checks and the manual gates in [[open-items]].
+A build or manifest validation does not close an executable blocked by Application Control.
+
 ## Pick the bump
 
 - PATCH: fixes only (`npm run release:patch`).
@@ -60,4 +69,5 @@ Check version, commit, tag, and registry first. Do not repeat a successful versi
 Browser authentication may follow npm whoami success. The user completes login or OTP.
 Accepted packages can take time to appear. Publish the tested tarball, verify version,
 latest tag and checksum, then apply the correct named stashes. Keep backups until checked.
-Version 3.1.0 is already published.
+Version 3.2.0 is already published according to the recorded release session.
+Check the registry again when release work is authorized.

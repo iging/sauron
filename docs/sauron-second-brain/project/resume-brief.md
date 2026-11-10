@@ -1,39 +1,31 @@
 # Resume Brief
 
-Snapshot: 2026-10-25, release commit `1a185e9`. Start after [[claude]].
+Snapshot: 2026-11-11. Start after [[claude]]. Current source wins over older plans.
 
 ## Current truth
 
-- Sauron translates one config into instructions and assets for 20 coding runtimes.
-- npm package: `sauron-ai`. Version and last verified npm latest: 3.1.0.
-- Branch: `main`. omp merges in PR #9 at `26669a8`. Release tag: `v3.1.0`.
-- Release build, typecheck, doc gate, and 116 tests pass on 2026-10-25.
-- Packed setup and graph checks pass. Fresh registry installation reports 20 runtimes.
-- 3.2.0 work is uncommitted on `main`: [[plan-native-subagents]] and the README fix.
-  Follow [[implementation-order]] for what comes next.
-  Check `git status --short`.
-- Local VS Code edits, stashes, and the extra worktree are user state. Preserve them.
+- Sauron translates config into instructions and assets for 20 coding runtimes.
+- Package version remains 3.2.0. The approved development target is one 4.0.0 release.
+- Phases 0 through 11 are merged. Phase 11 PR #30 merges at 28d9269.
+- See [[phase-1-11-review]] for phase coverage and [[status]] for current evidence.
+- The catalog has 248 installable skills across nine departments.
+- Native agents: Claude Code, OpenCode, omp, Codex, Copilot. Commands: the first three.
+- npm/shell installs require Node 20.12.0. The Windows SEA bundle includes Node.
+- Preserve local edits, four original stashes and the other worktree.
 
 ## Small startup read set
 
-1. Read [[status]], [[open-items]], [[working-rules]], and [[communication]].
-2. Identify the user's task. Read one relevant row in [[task-file-map]].
-3. Run `git status --short` and `git log -5 --oneline` for drift.
-4. Read only the relevant implementation, test, and source section before editing.
-5. Stop expanding context once the task, constraints, evidence, and next action are clear.
+1. Read [[status]], [[open-items]], [[working-rules]],
+   and [[communication]].
+2. Identify the named task and read its row in [[task-file-map]].
+3. Check git status and branch. Do not scan all code, skills, history or other worktrees.
+4. Read relevant implementation and tests only. Build before tests that import dist.
+5. Before stopping, update status, open items, lessons and the current session.
 
-Do not scan all code, all skills, all history, or other worktrees at startup.
-History pages are reference material. A normal resume does not require reading them.
-Use `node bin/sauron.mjs find-skill "<task>"` to locate a specific workflow.
+## Next work
 
-## Next work when requested
-
-- Real-terminal arrows in Git Bash and PowerShell, then runtime session checks.
-- Roadmap starts from [[roadmap-brief]], with two separate research and plan runs.
-- Or pick a known gap from [[open-items]]. Do not bump or publish merely to resume.
-
-## Portable opening prompt
-
-`Read docs/sauron-second-brain/claude.md and follow its small startup read set.
-Use the vault to identify the next step. Read only files needed for my named task.
-Preserve local edits and stashes. Report uncertainty instead of scanning the repository.`
+- Phase 11 CI passes. Actual WinGet installation is open.
+- Phase 12 documentation readiness can be reviewed now. Release execution is not authorized.
+- Real terminal/runtime/plugin, Eye real-file and winget checks stay explicit in [[open-items]].
+- Follow the remaining release sequence in [[open-items]] and [[release-and-publish]].
+- Older one-minor-at-a-time plans and their release numbers are superseded.

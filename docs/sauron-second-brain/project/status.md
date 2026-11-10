@@ -1,98 +1,41 @@
 # Status
 
-Where the project stands. Update this note before every stop. See [[claude]].
-Last updated: 2026-11-07.
+Updated: 2026-11-11. Current sources: [[phase-1-11-review]] and [[open-items]].
 
-## Phase 5b of 4.0.0
+## Current work
 
-- Branch `codex/4.0.0-phase-5b-agent-tools-models` gives all 78 agents a toolset, shell intents,
-  and a model tier, rendered for Claude Code, OpenCode, and omp. Built by Claude Code. Not merged.
-- Node 24.15.0 passes build, typecheck, strict CLI and unused-code checks, doc gate, 218 tests.
-- Real OpenCode parsed the generated `permissions` rules. `claude plugin validate` still passes.
-- See [[session-2026-11-07-phase-5b-agent-tools-models]].
+- Phases 0 through 11 are merged. Phase 11 PR #30 merges at 28d9269.
+- The second-brain follow-up records implementation and verification evidence.
+- SEA asset roots, release allowlist, build/zip and winget drafts are implemented.
+- Adapter spacing/comments remain preserved, with earlier syntax/comment equivalence checks.
+- Runtime matrix, landing advisor drift, catalog overcount and Docker naming are fixed.
+- Public startup docs, CLI help and current vault plans match the approved 4.0.0 scope.
+- The old minor-release queue is superseded. Eye additions are implemented, not parked.
+- All four hosted checks pass at the Phase 11 PR head e181c59.
+- Phase 12 documentation readiness advances. Actual release, version bump and publish wait.
 
-## Phase 5 of 4.0.0
+## Verification
 
-- Merged in PR #24 at `540245a`. Adds `init --profile`, runtime tiers, and `sauron plugin`.
-- Node 24.15.0 passes build, typecheck, strict CLI and unused-code checks, doc gate, 207 tests.
-- `claude plugin validate` passes on the generated plugin and marketplace. Only warning: no icon.
-- See [[session-2026-11-07-phase-5-profiles-plugin-tiers]].
+- Build, typecheck, strict CLI/packaging checkJs and doc gate pass.
+- All 384 tests pass on Node 20, 22 and 24, with no skips.
+- Landing catalog equals all 248 canonical YAML entries. Three regression tests pass.
+- Landing typecheck, lint and production static export pass locally.
+- Thirty selected product documentation files have no missing local Markdown link targets.
+- Nine current vault notes have no missing wiki-note targets.
+- Both exact vis-network 10.1.5 CDN asset URLs return 200.
+- Fresh Windows zip builds. Draft manifests use its real hash and pass winget validate.
+- Fresh zip smoke is BLOCKED before --version by Windows Application Control.
+  The unsigned executable cannot start. Do not bypass or disable the policy.
+- Earlier native standalone smoke passed, including upgrade backups/reports and v2 sync.
+  PR #30 hosted x64 ZIP smoke also passes without Node on PATH. Actual WinGet install is open.
+- Docker Compose config validates project sauron-ai and image sauron-ai:local.
+- Docker build/status pass. The supplied log shows 1.31 MB transferred. Local status rerun passes.
+- PowerShell and Git Bash save/reload 11 selected skills. Decline/cancel checks write nothing.
+- Claude plugin installs/enables in isolated state. OpenCode discovers fixture agents.
+- npm pack preview excludes protected state, vault, handoffs and local notes.
 
-## Phase 4 of 4.0.0
+## Next signal
 
-- Merged in PR #23 at `27324a5`. Adds `list-installed`, `doctor`, `repair`, and `uninstall`.
-- Node 24.15.0 passes build, typecheck, strict CLI check, doc gate, and 194 tests.
-- Node 20 and 22 were not run locally. Hosted CI covers them on the pull request.
-- See [[session-2026-11-07-phase-4-install-lifecycle]].
-
-## Phase 3 of 4.0.0
-
-- Phases 0 through 3 are merged. Main is pulled to `748ca5a` with fast-forward only.
-- Current branch: `main`, matching origin/main. Phase 3 includes CLI follow-up `410d780`.
-- Shared picker flow supports departments, individual skills, another department, Back, and Done.
-- Frontmatter names and hints load on demand. Saved subsets and empty choices survive revisits.
-- Picker saves explicit ids. Arrows use Backspace to return. Numbered input accepts back or 0.
-- Node 20.20.2, 22.23.4, and 24.15.0 each pass build, typecheck, doc gate, and 180 tests.
-- Scripted arrows and packed picker/install/sync preview pass. Real-terminal checks stay open.
-- See [[session-2026-11-07-phase-3-skill-picker]]. Package version remains 3.2.0.
-
-- Post-push CLI type fixes pass strict JS checks and 180 tests. Empty test folder stays locked.
-- See [[session-2026-11-07-cli-lint-cleanup]]. Follow-up `410d780` is committed and pushed.
-
-## npm
-
-- Published: `sauron-ai@3.2.0` on 2026-11-02. npm `latest` is `3.2.0`.
-- Local version is `3.2.0`. Release commit `de9de83` and tag `v3.2.0` are pushed.
-- Published shasum `9c77c9e` comes from a tree with `npm pkg fix` applied to `bin` paths.
-
-## Git
-
-- Main is pulled to `748ca5a` after the Phase 3 merge. Release tag `v3.2.0` stays at `de9de83`.
-- omp is merged through PR #9 at `26669a8`.
-- Local worktree `.claude/worktrees/fix-readline-types` still exists. Its commit is on `main`.
-- Build, typecheck, 116 tests, and the pre-push documentation gate pass on 2026-10-27.
-
-## What 3.1.0 contains
-
-| Change | Commit |
-| :-- | :-- |
-| Arrow-key `init` with `@clack/prompts@0.11.0` | `7dc57d4` |
-| Graph galaxy layout and active department chips | `f3b7b31` |
-| Graph skips framework build output | `0cab09f` |
-| Graph import lines and alias-aware imports | `b6d0355` |
-| `scripts/` included in the published files | `15361d3` |
-| omp (oh-my-pi) runtime, 20 runtimes everywhere | `dd810b8`, `39b26fb` |
-
-## Released: 3.2.0
-
-- Native subagents and commands for OpenCode and omp are built.
-  See [[plan-native-subagents]] and [[session-2026-11-01-native-subagents]].
-- The scanned-folder README fix, the license and policy work, and two launch skills are built.
-- Miguel chose on 2026-11-02: Eye and roadmap stay plan-only, and the rest ships in 3.2.0.
-- Both launch skills ran on the landing page for the first time on 2026-11-02.
-- [[plan-sauron-eye]] is approved for 3.3.0, not built.
-- Order of the next work: [[implementation-order]].
-- Registry install checked: `--version`, `status`, license file, and no internal notes.
-- Not confirmed by this session: legal review, `init` terminal tests, and the OpenCode test.
-- The GitHub release for `v3.2.0` is not created. This machine's shell has no `gh`.
-
-## Numbers (checked 2026-11-02)
-
-- `npm test`: 138 pass, 0 fail. `npx tsc --noEmit`: 0 errors.
-- Runtimes registered: 20, plus the shared `AGENTS.md` core. See [[agent-runtimes]].
-- Packed tarball smoke test passed: `status`, `init --runtimes=omp,opencode,claude`, `graph .`.
-- Packed `init` writes 9 agents each, 123 OpenCode commands, and 119 omp prompts.
-
-## Portable memory and cleanup
-
-- [[resume-brief]] and [[task-file-map]] define the small startup read set.
-- [[history-index]] indexes 66 branch/tag-reachable commits and three handoffs.
-- [[cleanup-record]] records eleven recoverably removed files.
-- Vault audit: 35 notes, 193 wiki links, zero missing links or duplicate note names.
-- Vault, root entry points, ignore rules, and cleanup changes are prepared for review.
-
-## Next
-
-1. Release 3.2.0 is live. Create the GitHub release.
-2. Real-terminal test of the arrow-key `init` (Git Bash and PowerShell).
-3. Miguel merges the Phase 5b pull request. Then Phase 6: Codex and Copilot subagents.
+Read [[open-items]] for manual runtime/Eye/winget checks and release decisions.
+Session evidence: [[session-2026-11-09-phase-11-winget]].
+Published release history: [[release-and-publish]], [[history-releases-and-init]].

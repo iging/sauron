@@ -2,7 +2,78 @@
 
 What went wrong and what we do now. Add new lessons at the top. See [[claude]].
 
+## 2026-11-09
+
+- Keep ZIP smoke, manifest validation and WinGet installation as distinct gates. An install
+  check needs a reachable archive URL, an exact hash and a runner that permits execution.
+
+- Verify the opened PR's base and head commit against the progress report before reporting CI.
+
+- Check the staged names against the explicit allowlist before committing packaging work.
+
+- Record terminal input paths separately. Decline and cancellation preserve fixtures, while a
+  saved-subset installation and rerun require their own evidence.
+- A real plugin installation or agent listing does not verify a live model session.
+
+- Rebuilds produce new executable identities. Earlier smoke success does not close a new
+  Windows Application Control block. Record the exact blocked artifact and never bypass policy.
+- Catalog generation must share installable-owner depth and reject invalid metadata before output.
+- Derive public count labels from generated data, and run catalog fixtures before the site build.
+- Replace stale active roadmap directions while retaining historical source and session context.
+
+- Sync checks must compare the destination with current repo files, not only a prepared snapshot.
+- Normalize CRLF before reporting content drift. Then compare actual version and behavior text.
+- A green test suite does not close catalog regeneration, cross-repo synchronization or manual gates.
+- Check recorded decisions before calling a planned file missing: Phase 5b uses typed constants.
+
+
+- Portable release allowlists need credential-filename exclusions inside allowed folders too.
+- Test executable upgrade dry-run, backup bytes, migration report and subsequent sync together.
+
+
+- Windows checkouts may turn fixture Markdown into CRLF. Normalize test reads before anchors.
+- A copied signed Node binary cannot retain its signature after SEA injection. Mark it unsigned.
+- Validate portable manifests with winget: Scope is unsupported for portable installers.
+- Smoke-test the extracted zip from another cwd with Node absent from PATH and verify asset hashes.
+- Contributor readability needs stage spacing and useful contract comments, not only line wrapping.
+- Compare parsed syntax and retain original comments during broad formatting passes.
+
+## 2026-11-08
+
+- Re-read PR state before the final report. A human can merge while reporting finishes.
+
+
+- Validate local reference targets against the Git index, not existence alone. Untracked files can
+  make local tests pass while clean CI checkouts fail. Recheck concurrent source additions.
+
+
+- Additive parsers must validate complete headers before classifying declared format evidence.
+- A reuse cache is untrusted input: refuse links/special files and verify freshly inspected evidence.
+- Markdown contract tests must accept formatter padding and validate actual heading targets.
+- Local app links can treat fragments as filename characters. Use plain file links plus section labels.
+- Count installable skills with listSkills. Recursive supporting SKILL.md files inflate landing counts.
+- Record unavailable real-world fixtures as unverified even when synthetic coverage passes.
+
 ## 2026-11-07
+
+- Read-only scanners still need byte, entry, depth, alias, and file-count limits.
+- Never echo parser exceptions or source values. Keep incomplete coverage distinct from findings.
+- Refuse an explicit linked scan root as well as linked descendants.
+
+- Native Windows execution verifies junction rejection when the sandbox cannot create the fixture.
+- Persistent project knowledge must stay outside runtime uninstall tracking.
+
+- Windows sandbox may deny junction creation before a safety test reaches the feature.
+  Record the environment failure separately from verified path-rejection behavior.
+
+- Recheck a previously blocked PR before resuming. A merge can happen outside this session.
+
+- Green checks and MERGEABLE do not satisfy required reviews. Stop on REVIEW_REQUIRED/BLOCKED.
+- Docker transfer bytes can be incremental. Measure the full filtered context independently.
+
+- Codex standalone agents inherit parent permissions. Do not emit sandbox overrides as enforcement.
+- Copilot tool aliases restrict tools, not paths or shell commands. Keep limits explicit.
+- Node 20 test runs need explicit file paths because its test runner does not expand the glob.
 
 - OpenCode moved to V2 `permissions` lists. `opencode debug agents` shows the parsed rules, and
   its own defaults come first, so Sauron rules placed after them win.

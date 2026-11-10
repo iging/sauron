@@ -1,6 +1,8 @@
 # Roadmap Brief
 
-Newest proposal: [[roadmap-ecc]]. Planning context only. Reading this does not authorize new research or implementation.
+Current development follows [[status]] and [[open-items]].
+This note retains parked research context. The prior ECC-inspired queue is superseded.
+Reading this does not authorize new research or implementation.
 Source: October 20 handoff, sections 9 through 11. See [[handoffs-index]].
 
 ## Retired local drafts

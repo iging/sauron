@@ -6,7 +6,7 @@ For a contributor who continues the work. See [[claude]].
 
 1. Read [[project-overview]], [[status]], and [[open-items]].
 2. Read [[working-rules]] and [[security-rules]].
-3. Clone `https://github.com/iging/sauron`. Use Node 18 or newer.
+3. Clone `https://github.com/iging/sauron`. Use Node 20.12.0 or newer.
 4. Run `npm ci`, `npm run build`, `npx tsc --noEmit`, and `npm test`. All must pass.
 5. Run `node bin/sauron.mjs status` and try `init` on a scratch folder. See
    [[commands-and-stack]].

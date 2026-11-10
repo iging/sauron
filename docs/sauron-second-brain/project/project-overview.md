@@ -11,7 +11,7 @@ files, skills, subagents, and commands of 20 AI coding runtimes.
 
 - npm package: `sauron-ai`. Bins: `sauron` and `sauron-ai`.
 - Repo: `https://github.com/iging/sauron`. Owner and lead: Miguel (`@iging`).
-- Install: `npx sauron-ai init` or `pnpm dlx sauron-ai init`. Node 18 or newer.
+- Install: `npx sauron-ai init` or `pnpm dlx sauron-ai init`. Node 20.12.0 or newer.
 - Python entry point `sauron.py` forwards every command to the Node CLI.
 - Landing site: `https://sauron-cli.vercel.app`, from sibling repo `../sauron-landing`.
 
