@@ -1,83 +1,74 @@
 # Open Items
 
-Things not finished or not decided. Update before every stop. See [[claude]] and [[status]].
-Last updated: 2026-11-07.
+Updated: 2026-11-11. Current evidence: [[status]], [[phase-1-11-review]].
+Release procedure: [[release-and-publish]].
 
-## Phase 3 review
+## Local delivery
 
-- Phase 3 is merged and main is pulled to `748ca5a`. See [[session-2026-11-07-phase-3-skill-picker]].
-- Miguel checks picker rendering, Backspace/Back, saved subsets, cancel, decline, and exit.
-- Run real-terminal checks in Git Bash and PowerShell. Scripted input is separate evidence.
-- Landing page still needs the 245 installable-skill count in its separate workspace.
-- Phase 4 is merged. Still open: `uninstall --yes` on a real project with user edits.
-- Phase 5 is merged. Phase 5b is on branch `codex/4.0.0-phase-5b-agent-tools-models`. Next: Phase 6.
-- Open for Phase 5b: a Claude Code agent refusing a missing tool in a real session, and omp
-  reading `tools` in a real session. Claude Code cannot limit Bash per command in an agent file.
-- Open for Phase 5: install the plugin in a real Claude Code session, add a plugin icon, and
-  record real-tool checks to promote beta runtimes. See `docs/04-runtime-adapters/runtime-tiers.md`.
+- Phase 11 merges through PR #30 at 28d9269.
+- PR #30 hosted Node 20/22/24 and Windows x64 ZIP smoke pass at e181c59. ARM64 stays open.
+- Phase 12 release execution stays pending. No version bump or publish now.
+- Rebuild release artifacts and validate final hashes after the final approved release tree.
+- Final production winget ID, released asset URL and community submission need Miguel.
+- Actual WinGet install is still open. Use a disposable Windows runner with local manifests
+  permitted and a reachable URL for the exact ZIP. Validate its real hash, install, verify
+  version/status from a fresh shell, then uninstall and check PATH cleanup. Upgrade needs
+  two versioned ZIPs under the same test ID. Test production ID and URL before submission.
+- Local WinGet 1.29.380 reports LocalManifestFiles disabled. The unsigned exe remains
+  blocked by local Application Control. Hosted ZIP smoke does not exercise WinGet install.
+- The executable is unsigned. No publisher-trust claim is made.
+- Fresh zip smoke is blocked by Windows Application Control before --version.
+  Build and hash-based manifest validation pass. Earlier successful smoke is separate evidence.
+  Do not disable or bypass the policy. Latest artifact: windows-remaining-fixes under the task root.
+- Docker config validates with sauron-ai project and sauron-ai:local image.
+- Docker build/status pass. Miguel's build log reports 1.31 MB transferred, below 182 MB.
+  A local rerun prints the status banner with the default entrypoint.
 
-- CLI type fixes are pushed as `410d780`. Close the process holding the empty test folder.
-- Cleanup backs up 369 files through ConflictManager. See [[session-2026-11-07-cli-lint-cleanup]].
+## Real-tool gates
 
-## Remaining release verification
+- UNVERIFIED: Eye on Miguel's own build and svla HAR. Miguel explicitly defers both
+  on 2026-11-08 because paths are unavailable. Do not execute the build. Redact HAR reports.
+- Picker: PowerShell arrow navigation and decline/exit pass. Git Bash arrows, Space,
+  Backspace and Ctrl+C cancellation pass without writes. Git Bash also installs 11 selected
+  skills and preselects the same saved plan on rerun. PowerShell repeats that 11-skill test.
+- Uninstall on a real project with user edits. Synthetic preservation tests are separate.
+- Claude Code plugin validates, installs and lists as enabled in isolated local state.
+  Live /agents, /gandalf, /output-style and /plan-feature sessions remain open.
+- OpenCode debug agents discovers Gandalf, Frodo and Samwise from the fixture.
+  Real OpenCode slash command and refusal of a missing tool remain open.
+- Real Claude Code missing-tool refusal. Bash command limits are not enforced by agent files.
+- Real omp discovery and tools fields, plus Codex/Copilot discovery, models and tools.
+- Runtime note/alias loading in Claude, Pi, Windsurf, Cline, Cursor, OpenCode and omp.
+- Beta runtime promotion needs evidence. OpenCode remains the only stable tier.
+- Memory starter human review and Sauron Obsidian UI check remain pending.
+- Real-project security scan findings need human review.
+- pnpm dlx and both install scripts need real installation checks.
+- Unverified runtime paths: Trae, Pi, Kimi, Hermes, OpenClaw and AdaL.
+  See docs/runtime-scaffolds.md. Antigravity has no adapter.
 
-- omp is merged in PR #9. Release commit and tag are pushed.
-- Real-terminal test of the arrow-key `init` in Git Bash and PowerShell.
-- 3.1.0 is published and verified as npm `latest`. Registry checksum matches the tarball.
-- Do not repeat `release:minor`. The version is already 3.2.0.
-- Full steps: [[release-and-publish]].
+## Landing and launch
 
-## Not verified yet
+- Advisor 1.2.0 is synced. Compiler now indexes 248 installable owners, not supporting files.
+- Catalog regression tests, typecheck, lint and static export pass locally.
+- Landing browser/UI review and deployment remain unverified. No landing commit/push.
+- Prior landing launch audit remains historical:
+  ../sauron-landing/launch-audit-2026-11-02.md.
+- Trademark/license/legal review and GitHub private vulnerability reporting need the owner.
+- Optional plugin icon remains a follow-up, not evidence of a verified plugin install.
+- Separate launch gaps: breach runbook, error alerts, CSP, X-Content-Type-Options and
+  primary-action event. These are not missing Phase 1-11 implementations.
+- Do not assume live privacy links or deployed data match local files without a live check.
+- sauron-ai.vercel.app ownership remains unknown. Use the configured sauron-cli site.
 
-- Sauron output inside a real Claude Code session: `/agents`, `/gandalf`, `/output-style`,
-  `/plan-feature`.
-- omp output inside a real omp session (`/extensions` should list `.agents/skills/`).
-- `pnpm dlx sauron-ai` works for `--version` and an `init` dry run. Install scripts are unrun.
-- Runtime paths still unverified: Trae, Pi, Kimi, Hermes, OpenClaw, AdaL. Antigravity has
-  no adapter. See `docs/runtime-scaffolds.md`.
+## Closed implementation gaps
 
-## Known gaps
-
-- Collision aliases and note migration are built. Confirm them in Claude Code, Pi,
-  Windsurf, Cline, Cursor, OpenCode, and omp before calling real-tool checks complete.
-- Saved-choice defaults are built and piped-input tested. Real arrow-key checks remain.
-- Caveman savings have no benchmark. Publish a figure only with a script and raw data.
-- `graph.html` loads `vis-network` from unpkg with no version pin. Pin it or bundle it.
-
-## Housekeeping
-
-- Retired follower update is archived and removed. See [[cleanup-record]].
-- Order of all planned work: [[implementation-order]].
-- `launch-compliance-audit` has 44 items, and `website-launch-audit` has 40. Both ran on the
-  landing page on 2026-11-02. The report is local: `../sauron-landing/launch-audit-2026-11-02.md`.
-- Landing gaps from that run: no trademark search record, no breach runbook, no error alerts,
-  no CSP or `X-Content-Type-Options`, and no event for the primary action.
-- CLI and repo docs count 245 installable skills. The landing page count still needs its own update.
-- Phase 0 removes `chalk` and `commander`. Dependabot #13 and #18 stay closed.
-- Old holds for #16 and #17 end. Clack is pinned to 1.8.1 and `@types/node` stays on major 20.
-- Plugin, Python, and installer versions now match 3.2.0. Future releases must keep them aligned.
-- Older gaps: [[historical-open-items]].
-- Sauron Obsidian UI check remains pending. Disk checks are separate.
-- Remove the locked worktree `fix-readline-types` after closing its session.
-- Landing launch work is live through PR #2. Analytics reports, and no cookies are set.
-  `/privacy` links to `PRIVACY.md`, which returns 404 until the Sauron work merges.
-- Turn on private vulnerability reporting in the GitHub repository security settings.
-  `sauron-ai.vercel.app` is an unrelated placeholder. Ownership is unknown.
-  Update `SKILL_COUNT_LABEL` in `src/constants/stats.ts` after each skill sync.
-
-## Roadmap (after 3.1.0)
-
-- Built for 3.2.0, uncommitted on `main`: [[plan-native-subagents]]. Run `/progress-report`.
-  Open checks: slash commands in the OpenCode TUI, all of omp, arrow prompts in a terminal.
-- README notes for OpenCode and omp now sit at `.opencode/README.md` and `.omp/README.md`.
-  Same check still open for Pi, Claude Code, Windsurf, Cline, and Cursor. See [[roadmap-ecc]].
-- [[plan-sauron-eye]] is approved for 3.3.0, not built. Future Eye work is listed in that note.
-- Approved 4.0.0 handoff supersedes the older one-tier roadmap in [[roadmap-ecc]].
-- Same native install for Codex (TOML) and Copilot, after OpenCode and omp are proven.
-- Batch research, then `/plan-feature` Part 1 (product roadmap) and Part 2 (Agent
-  Engineering Track). Briefs: `docs/handoffs/2026-10-20-sauron-v3-release-and-roadmap.md`
-  sections 9 to 11. See [[roadmap-brief]]. Old PRD and TASKS are archived and removed.
-  Create new local planning files only when the user requests that work.
-- Candidate highlights: `sauron doctor`, `sauron uninstall`, Claude Code plugin, remote skill
-  registry, subagents for other runtimes, MCP sync, CI matrix with npm provenance,
-  `CHANGELOG.md` from Conventional Commits.
+- Runtime matrix: 248 skills, five native-agent runtimes, three command runtimes.
+- Landing advisor drift and recursive catalog overcount.
+- Docker project/image naming and matching public documentation.
+- Graph library CDN version is pinned. Fonts and library still load over the network.
+- PowerShell installer tests fall back to powershell.exe when pwsh is unavailable.
+- Public startup docs and current vault plans now follow the approved 4.0.0 scope.
+- Chalk/commander removal and Clack 1.8.1 pin are complete.
+- No Caveman savings benchmark exists. Publish no percentage without measured raw data.
+- Preserve local edits, four stashes, and fix-readline-types worktree.
+- Older release and research context: [[historical-open-items]], [[roadmap-brief]].

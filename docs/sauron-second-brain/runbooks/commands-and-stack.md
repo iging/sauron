@@ -5,8 +5,8 @@ See [[claude]] and [[git-and-pr-flow]].
 ## Stack
 
 - Node 20.12.0 or newer. TypeScript 7 strict, ES modules. `tsc` builds `adapters/` into `dist/`.
-- Dependencies: `@clack/prompts` 1.x and `yaml`. Dev: `@types/node` major 20, `husky`,
-  `typescript`.
+- Dependencies: `@clack/prompts` exact 1.8.1 and `yaml`. Dev: `@types/node` major 20, `husky`,
+  `typescript`, `esbuild` and `postject` (Windows packaging only).
 - Tests: native `node --test`. They import from `dist/`, so build first.
 
 ## Repo commands
@@ -38,6 +38,10 @@ See [[claude]] and [[git-and-pr-flow]].
 - `upgrade`: migrate config with backup and report. Flags `--dry-run`, `--to=1|2`.
 - `sync`: apply v2 runtime toggles and skill choices. `add <skill>`: add skills (`--to <dir>`).
 - `graph [path]`: code graph into `.sauron/graph/` (json, md, html).
+- `list-installed`, `doctor`, `repair`, `uninstall`: manifest-safe lifecycle.
+- `memory init`: create-only vault. `scan`: read-only selected agent config review.
+- `eye`: bounded static inspection, diff/export/reuse and stdio MCP.
+- `plugin`: local plugin/marketplace. `--profile=`: named init plan.
 - `list-skills`, `find-skill <task>`, `diff`, `mcp-index`, `trace-report`, `fitness`,
   `worktree-plan`, `slop-scan`, `import`, `registry-build`.
 
