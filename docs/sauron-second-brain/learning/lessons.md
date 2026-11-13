@@ -2,10 +2,12 @@
 
 What went wrong and what we do now. Add new lessons at the top. See [[claude]].
 
-## 2026-11-09
+## Release scope
 
-- Keep ZIP smoke, manifest validation and WinGet installation as distinct gates. An install
-  check needs a reachable archive URL, an exact hash and a runner that permits execution.
+- When dropping a distribution channel, remove its commands, packaged files and release checks
+  together. Keep the verification that still applies to the remaining artifacts.
+
+## 2026-11-09
 
 - Verify the opened PR's base and head commit against the progress report before reporting CI.
 
@@ -33,7 +35,6 @@ What went wrong and what we do now. Add new lessons at the top. See [[claude]].
 
 - Windows checkouts may turn fixture Markdown into CRLF. Normalize test reads before anchors.
 - A copied signed Node binary cannot retain its signature after SEA injection. Mark it unsigned.
-- Validate portable manifests with winget: Scope is unsupported for portable installers.
 - Smoke-test the extracted zip from another cwd with Node absent from PATH and verify asset hashes.
 - Contributor readability needs stage spacing and useful contract comments, not only line wrapping.
 - Compare parsed syntax and retain original comments during broad formatting passes.

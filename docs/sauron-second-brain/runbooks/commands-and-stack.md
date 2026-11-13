@@ -6,7 +6,7 @@ See [[claude]] and [[git-and-pr-flow]].
 
 - Node 20.12.0 or newer. TypeScript 7 strict, ES modules. `tsc` builds `adapters/` into `dist/`.
 - Dependencies: `@clack/prompts` exact 1.8.1 and `yaml`. Dev: `@types/node` major 20, `husky`,
-  `typescript`, `esbuild` and `postject` (Windows packaging only).
+  `typescript`.
 - Tests: native `node --test`. They import from `dist/`, so build first.
 
 ## Repo commands

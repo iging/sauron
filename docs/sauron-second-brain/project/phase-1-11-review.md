@@ -43,7 +43,7 @@ Remaining manual verification and release work are tracked in [[open-items]].
 | 9 | Bounded parsers, ledger, diff/export/reuse/MCP | Real build/HAR explicitly deferred |
 | 10 | Advisor, patterns/samples, context handoffs | Repo and landing copy aligned |
 | 10b | Attributed re-authoring, idea map, guides | Implementation and compared sync present |
-| 11 | SEA roots/build/zip, CI/release, hash-based drafts | Merged. Hosted x64 smoke passes. WinGet install open |
+| 11 | Original standalone Windows distribution | Removed from 4.0.0 scope |
 
 Phase 5b uses typed constants in agent-access.ts instead of the planned YAML files, by the
 recorded session decision. Instruction-only restrictions are not runtime enforcement.
@@ -54,14 +54,11 @@ OpenCode remains the only stable runtime. No missing file is inferred from old p
 - Build/typecheck/strict CLI/packaging/doc gate pass. Node 20/22/24 each pass all 384 tests.
 - Landing: 248 canonical entries, three tests, typecheck, lint and static build pass.
 - Selected product local links and current vault wiki-note targets resolve.
-- Fresh Windows build and exact-hash winget validate pass.
-- Local Windows Application Control blocks the unsigned executable. The hosted x64 ZIP smoke
-  passes at e181c59 without Node on PATH. Actual WinGet install remains open.
 - Docker config/build/status pass. Miguel's build shows 1.31 MB context transferred.
 - PowerShell decline/exit and Git Bash Backspace/cancel preserve their fixtures.
 - Claude plugin validates and installs in isolated local state. OpenCode discovers agents.
   Git Bash and PowerShell install and reload 11 selected skills. Live sessions stay open.
-- npm pack preview excludes internal/local notes. Latest archive hash is in its build-info.
-- Real Eye build/HAR, live runtime sessions, WinGet installation, ARM64 and landing
+- npm pack preview excludes internal/local notes.
+- Real Eye build/HAR, live runtime sessions and landing
   browser/deployment checks remain unverified. See [[open-items]].
 - Phase 12 docs readiness advances, but release execution still needs Miguel's signal.

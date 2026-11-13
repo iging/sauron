@@ -23,7 +23,6 @@ Browse the documentation by topic:
 - [Profiles and Plugin](01-getting-started/profiles-and-plugin.md): Named installs and local marketplace.
 - [Memory Init](01-getting-started/memory-init.md): Create-only second brain starter.
 - [Eye](01-getting-started/eye.md): Bounded static inspection and explicit partial coverage.
-- [Windows Portable](01-getting-started/windows-portable.md): Bundle layout and unverified install gates.
 
 ### [02. The Fellowship of 9 Sub-Agents](02-fellowship-agents/overview.md)
 

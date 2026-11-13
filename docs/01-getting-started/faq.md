@@ -25,7 +25,7 @@
 
 ### 3. Do I need Node.js installed to use Sauron?
 
-**npm and shell installations require Node.js 20.12.0 or newer.** Docker and the Windows portable bundle include Node. The portable bundle is implemented locally for the upcoming release. A production winget package is not yet published. See [Windows portable](windows-portable.md). These install paths are available:
+**npm and shell installations require Node.js 20.12.0 or newer.** Docker includes Node. These install paths are available:
 
 1. **npm or pnpm:** `npx sauron-ai init` or `pnpm dlx sauron-ai init`
 2. **Shell Installers (Node.js required):**

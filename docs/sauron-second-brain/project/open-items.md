@@ -6,20 +6,9 @@ Release procedure: [[release-and-publish]].
 ## Local delivery
 
 - Phase 11 merges through PR #30 at 28d9269.
-- PR #30 hosted Node 20/22/24 and Windows x64 ZIP smoke pass at e181c59. ARM64 stays open.
+- PR #30 hosted Node 20/22/24 pass at e181c59.
 - Phase 12 release execution stays pending. No version bump or publish now.
 - Rebuild release artifacts and validate final hashes after the final approved release tree.
-- Final production winget ID, released asset URL and community submission need Miguel.
-- Actual WinGet install is still open. Use a disposable Windows runner with local manifests
-  permitted and a reachable URL for the exact ZIP. Validate its real hash, install, verify
-  version/status from a fresh shell, then uninstall and check PATH cleanup. Upgrade needs
-  two versioned ZIPs under the same test ID. Test production ID and URL before submission.
-- Local WinGet 1.29.380 reports LocalManifestFiles disabled. The unsigned exe remains
-  blocked by local Application Control. Hosted ZIP smoke does not exercise WinGet install.
-- The executable is unsigned. No publisher-trust claim is made.
-- Fresh zip smoke is blocked by Windows Application Control before --version.
-  Build and hash-based manifest validation pass. Earlier successful smoke is separate evidence.
-  Do not disable or bypass the policy. Latest artifact: windows-remaining-fixes under the task root.
 - Docker config validates with sauron-ai project and sauron-ai:local image.
 - Docker build/status pass. Miguel's build log reports 1.31 MB transferred, below 182 MB.
   A local rerun prints the status banner with the default entrypoint.

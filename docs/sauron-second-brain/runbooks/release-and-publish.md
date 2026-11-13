@@ -9,8 +9,7 @@ The approved handoff combines the features into one major release. Current packa
 is 3.2.0. Do not release or create a GitHub release merely to resume development.
 Miguel must authorize release execution and type the npm OTP.
 Before that signal, finish migration/docs review, hosted CI, packed init/upgrade/doctor/
-uninstall/Eye/scan/graph, Windows zip checks and the manual gates in [[open-items]].
-A build or manifest validation does not close an executable blocked by Application Control.
+uninstall/Eye/scan/graph and the manual gates in [[open-items]].
 
 ## Pick the bump
 

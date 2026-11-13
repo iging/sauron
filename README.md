@@ -421,12 +421,4 @@ Use /folder-structure-advisor to propose a folder tree from context without crea
 and /llm-wiki to link immutable sources to a maintained wiki. Generated guides mention llm-wiki
 only when that skill is selected for installation.
 
-## Windows portable builds
-
-Build a standalone Windows executable and asset zip with Node SEA. Users run sauron.exe
-without installing Node. Keep its sibling asset folders together. See
-[Windows portable packaging](docs/01-getting-started/windows-portable.md) for build and zip
-verification, winget manifest generation, unsigned-binary limits and manual release checks.
-No Windows zip or winget package is published by this development change.
-
 Adapter contributors: see [source layout and comments](docs/adapter-contributors.md).

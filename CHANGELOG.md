@@ -30,8 +30,6 @@ Notable changes to Sauron. Versions follow [Semantic Versioning](https://semver.
 - Pin the graph library CDN assets to vis-network 10.1.5.
 - Fall back to Windows PowerShell for installer checks when pwsh is unavailable.
 
-- Exclude credential-named files from portable assets while retaining explicit env templates.
-- Verify standalone legacy config upgrade backups/reports and linked executable asset roots.
 
 
 - Align all installers with Node 20.12.0 and use one CLI-only Docker Compose configuration.
@@ -45,9 +43,6 @@ Notable changes to Sauron. Versions follow [Semantic Versioning](https://semver.
 
 ### Added
 
-- Add native Windows SEA packaging, sibling asset resolution and verified portable zip smoke tests.
-- Generate winget zip/portable manifests from the real archive hash without publishing or installing.
-- Build the Windows zip in CI and attach the verified artifact in the release workflow.
 
 
 - Add Sauron Eye with bounded static parsers, evidence ledgers, diff/export/reuse and MCP stdio.

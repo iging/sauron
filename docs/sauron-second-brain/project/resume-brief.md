@@ -10,7 +10,7 @@ Snapshot: 2026-11-11. Start after [[claude]]. Current source wins over older pla
 - See [[phase-1-11-review]] for phase coverage and [[status]] for current evidence.
 - The catalog has 248 installable skills across nine departments.
 - Native agents: Claude Code, OpenCode, omp, Codex, Copilot. Commands: the first three.
-- npm/shell installs require Node 20.12.0. The Windows SEA bundle includes Node.
+- npm/shell installs require Node 20.12.0.
 - Preserve local edits, four original stashes and the other worktree.
 
 ## Small startup read set
@@ -24,8 +24,8 @@ Snapshot: 2026-11-11. Start after [[claude]]. Current source wins over older pla
 
 ## Next work
 
-- Phase 11 CI passes. Actual WinGet installation is open.
+- Phase 11 CI passes. Verify the npm tarball on the final release candidate.
 - Phase 12 documentation readiness can be reviewed now. Release execution is not authorized.
-- Real terminal/runtime/plugin, Eye real-file and winget checks stay explicit in [[open-items]].
+- Real terminal/runtime/plugin and Eye real-file checks stay explicit in [[open-items]].
 - Follow the remaining release sequence in [[open-items]] and [[release-and-publish]].
 - Older one-minor-at-a-time plans and their release numbers are superseded.

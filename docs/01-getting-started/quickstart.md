@@ -6,8 +6,6 @@ Registry installations may therefore lack commands documented for the upcoming r
 ## Prerequisites
 
 npm and shell installations require Node.js 20.12.0 or newer. Docker includes Node.
-The Windows portable bundle includes Node too. Its production winget submission is pending.
-See [Windows portable](windows-portable.md).
 
 ## Install
 

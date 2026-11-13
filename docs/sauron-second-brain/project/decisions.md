@@ -2,6 +2,11 @@
 
 Short record of decisions and why. See [[claude]] and [[project-overview]].
 
+## Windows distribution
+
+Retain npm and Docker as the 4.0.0 installation paths. Miguel drops the separate standalone
+Windows distribution. Windows users can run the npm CLI through Node.js.
+
 ## Phases 9, 10 and 10b, 2026-11-08
 
 - Miguel combines these phases on one branch and PR, overriding one-phase-per-PR guidance.

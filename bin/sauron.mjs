@@ -15,7 +15,7 @@
 import fs from "node:fs";
 import path from "node:path";
 import process from "node:process";
-import { resolveSauronRoot } from "../dist/adapters/package-root.js";
+import { fileURLToPath } from "node:url";
 import {
   inspectEye,
   diffEye,
@@ -84,7 +84,7 @@ import {
 } from "../dist/adapters/skill-picker.js";
 
 // SEA assets live beside the real executable. npm assets live above bin/.
-const SAURON_ROOT = resolveSauronRoot(import.meta.url);
+const SAURON_ROOT = fileURLToPath(new URL("../", import.meta.url));
 const packageJsonPath = path.join(SAURON_ROOT, "package.json");
 const packageJson = JSON.parse(fs.readFileSync(packageJsonPath, "utf8"));
 
