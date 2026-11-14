@@ -1,7 +1,6 @@
 # Quickstart Guide
 
-The development branch targets Sauron 4.0.0. The package version remains 3.2.0 until release.
-Registry installations may therefore lack commands documented for the upcoming release.
+This guide applies to Sauron 4.0.0.
 
 ## Prerequisites
 

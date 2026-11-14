@@ -4,8 +4,9 @@ Snapshot: 2026-11-11. Start after [[claude]]. Current source wins over older pla
 
 ## Current truth
 
+- Release scope and migration: [[release-4.0.0]].
 - Sauron translates config into instructions and assets for 20 coding runtimes.
-- Package version remains 3.2.0. The approved development target is one 4.0.0 release.
+- The checkout is prepared for Sauron 4.0.0. See [[release-4.0.0]].
 - Phases 0 through 11 are merged. Phase 11 PR #30 merges at 28d9269.
 - See [[phase-1-11-review]] for phase coverage and [[status]] for current evidence.
 - The catalog has 248 installable skills across nine departments.

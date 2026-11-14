@@ -7,7 +7,7 @@
 
 set -euo pipefail
 
-VERSION="3.2.0"
+VERSION="4.0.0"
 INSTALL_DIR="${HOME}/.local/bin"
 SAURON_HOME="${HOME}/.sauron"
 

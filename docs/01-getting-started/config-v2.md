@@ -1,7 +1,7 @@
 # Config v2 and Migration
 
 Config version `2.0.0` controls runtime and skill selection. It is separate from the npm package
-version, which stays at 3.2.0 until the approved 4.0.0 release.
+version.
 
 ## Existing projects
 

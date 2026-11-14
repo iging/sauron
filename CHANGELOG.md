@@ -4,6 +4,8 @@ Notable changes to Sauron. Versions follow [Semantic Versioning](https://semver.
 
 ## [Unreleased]
 
+## [4.0.0] - 2026-11-14
+
 ### Changed
 
 - Expand adapter source spacing and parser declarations, preserving comments and executable syntax.
@@ -22,7 +24,7 @@ Notable changes to Sauron. Versions follow [Semantic Versioning](https://semver.
 
 - Require Node.js 20.12.0 or newer and verify CI on Node 20, 22, and 24.
 - Pin `@clack/prompts` to 1.8.1 and keep `@types/node` on major 20.
-- Align plugin, Python, and installer versions with package version 3.2.0.
+- Align plugin, Python, and installer versions with the npm package.
 
 ### Fixed
 

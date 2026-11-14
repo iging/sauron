@@ -4,7 +4,7 @@ build-backend = "setuptools.build_meta"
 
 [project]
 name = "sauron-ai"
-version = "3.2.0"
+version = "4.0.0"
 description = "Universal AI agent harness for 20 AI coding runtimes (Python entry point for the Node.js CLI; requires Node.js 20.12.0 or newer)."
 readme = "README.md"
 requires-python = ">=3.10"

@@ -4,6 +4,9 @@ What went wrong and what we do now. Add new lessons at the top. See [[claude]].
 
 ## Release scope
 
+- Run the packed CLI on the exact release tarball before publication. Verify registry
+  integrity against that tarball after publish.
+
 - When dropping a distribution channel, remove its commands, packaged files and release checks
   together. Keep the verification that still applies to the remaining artifacts.
 

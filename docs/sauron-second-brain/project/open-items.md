@@ -5,6 +5,10 @@ Release procedure: [[release-and-publish]].
 
 ## Local delivery
 
+- npm accepts the tested 4.0.0 upload with HTTP 202 after browser verification.
+  The public endpoint still returns 404 and latest is 3.2.0. Verify tarball integrity
+  and a fresh registry installation when 4.0.0 becomes visible. Check before retrying.
+
 - Phase 11 merges through PR #30 at 28d9269.
 - PR #30 hosted Node 20/22/24 pass at e181c59.
 - Phase 12 release execution stays pending. No version bump or publish now.

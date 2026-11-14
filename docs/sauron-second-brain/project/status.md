@@ -4,6 +4,10 @@ Updated: 2026-11-11. Current sources: [[phase-1-11-review]] and [[open-items]].
 
 ## Current work
 
+- The 4.0.0 candidate and exact npm tarball pass build, typecheck, doc gates, 373 tests,
+  and installed CLI smoke. npm accepted the upload with HTTP 202. Public registry verification remains pending.
+
+- Release scope and migration: [[release-4.0.0]].
 - Phases 0 through 11 are merged. Phase 11 PR #30 merges at 28d9269.
 - The second-brain follow-up records implementation and verification evidence.
 - 4.0.0 distribution uses npm, Docker and the existing harness archive.

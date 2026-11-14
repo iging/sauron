@@ -10,7 +10,7 @@ param (
 )
 
 $ErrorActionPreference = "Stop"
-$Version = "3.2.0"
+$Version = "4.0.0"
 
 Write-Host "===================================================================" -ForegroundColor Cyan
 Write-Host "                       S A U R O N" -ForegroundColor Cyan
